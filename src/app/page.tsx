@@ -322,6 +322,26 @@ export default function HomePage() {
           html { scroll-behavior:auto; }
           *, *::before, *::after { animation-duration:0.001ms !important; animation-iteration-count:1 !important; transition-duration:0.001ms !important; }
         }
+
+        @media (max-width: 768px) {
+          .hero-stat { padding: 0 12px; }
+          .svc-card { min-width: 90px; padding: 16px 8px; }
+          .svc-icon-wrap { width: 40px; height: 40px; }
+          .city-tab { padding: 6px 12px; font-size: 12px; }
+          .search-tab { padding: 8px 12px; font-size: 12px; }
+          .badge-free { display: none; }
+          .premium-card { width: 260px !important; }
+          .cat-card { min-height: 200px !important; }
+          .loc-card { width: 180px !important; height: 180px !important; }
+        }
+
+        @media (max-width: 480px) {
+          .hero-stat { padding: 0 8px; }
+          .hero-stat div:first-child { font-size: 20px !important; }
+          .hero-stat div:last-child { font-size: 10px !important; }
+          .svc-card { min-width: 80px; padding: 12px 6px; gap: 8px; }
+          .premium-card { width: 240px !important; }
+        }
       `}</style>
 
       {/* ══════════ HERO ══════════ */}
@@ -580,7 +600,7 @@ export default function HomePage() {
           initial={{ opacity:0, y:30 }}
           animate={{ opacity:1, y:0 }}
           transition={{ duration:0.8, ease:[0.16,1,0.3,1] }}
-          style={{position:"relative", zIndex:2, padding:"0 56px 64px", maxWidth:860, paddingTop:80, margin:"0 auto", textAlign:"center"}}
+          style={{position:"relative", zIndex:2, padding:"0 24px 64px", maxWidth:860, paddingTop:80, margin:"0 auto", textAlign:"center"}}
         >
           {/* 1 — Rating pill */}
           <div style={{display:"inline-flex", alignItems:"center", gap:8, background:"rgba(43,168,224,0.06)", border:"0.5px solid rgba(43,168,224,0.30)", borderRadius:999, padding:"6px 16px", marginBottom:28, backdropFilter:"blur(12px)"}}>
@@ -675,7 +695,7 @@ export default function HomePage() {
       <div className="section-divider" />
 
       {/* ══════════ SECTION 3 — EVERYTHING AT ONE PLACE ══════════ */}
-      <section style={{background:"#000000", padding:"96px 56px", borderTop:"1px solid rgba(43,168,224,0.08)"}}>
+      <section style={{background:"#000000", padding:"96px 40px", borderTop:"1px solid rgba(43,168,224,0.08)"}}>
         <div style={{maxWidth:1280, margin:"0 auto"}}>
           <Reveal>
           <div style={{display:"flex", justifyContent:"space-between", alignItems:"flex-end", marginBottom:28, flexWrap:"wrap", gap:16}}>
@@ -785,7 +805,7 @@ export default function HomePage() {
       <div className="section-divider" />
 
       {/* ══════════ SECTION 5 — PROPERTY CATEGORIES ══════════ */}
-      <section style={{background:"#000000", padding:"96px 56px"}}>
+      <section style={{background:"#000000", padding:"96px 40px"}}>
         <div style={{maxWidth:1280, margin:"0 auto"}}>
           <Reveal>
           <div style={{display:"flex", justifyContent:"space-between", alignItems:"flex-end", marginBottom:24, flexWrap:"wrap", gap:12}}>
@@ -830,7 +850,7 @@ export default function HomePage() {
       <div className="section-divider" />
 
       {/* ══════════ SECTION 6 — MARKET INSIGHTS ══════════ */}
-      <section style={{background:"#0B0D10", padding:"96px 56px"}}>
+      <section style={{background:"#0B0D10", padding:"96px 40px"}}>
         <div style={{maxWidth:1280, margin:"0 auto"}}>
           <Reveal>
           <div style={{display:"flex", justifyContent:"space-between", alignItems:"flex-end", marginBottom:24, flexWrap:"wrap", gap:12}}>
@@ -913,7 +933,7 @@ export default function HomePage() {
       <div className="section-divider" />
 
       {/* ══════════ SECTION 7 — WHY Nilay 360 ══════════ */}
-      <section style={{background:"linear-gradient(180deg, #000000 0%, #0B0D10 100%)", padding:"96px 56px", position:"relative"}}>
+      <section style={{background:"linear-gradient(180deg, #000000 0%, #0B0D10 100%)", padding:"96px 40px", position:"relative"}}>
         <div style={{ position:"absolute", inset:0, pointerEvents:"none", zIndex:0, backgroundImage:"url('https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&q=30')", backgroundSize:"cover", opacity:0.03, mixBlendMode:"overlay" }} />
         <div style={{maxWidth:1280, margin:"0 auto", position:"relative", zIndex:1}}>
           <Reveal>
@@ -990,7 +1010,7 @@ export default function HomePage() {
       <div className="section-divider" />
 
       {/* ══════════ SECTION 9 — TESTIMONIALS ══════════ */}
-      <section style={{background:"#0B0D10", padding:"96px 56px"}}>
+      <section style={{background:"#0B0D10", padding:"96px 40px"}}>
         <div style={{maxWidth:1280, margin:"0 auto"}}>
           <Reveal>
           <div style={{textAlign:"center", marginBottom:28}}>
@@ -1039,7 +1059,7 @@ export default function HomePage() {
       <div className="section-divider" />
 
       {/* ══════════ SECTION 10 — CTA BANNER ══════════ */}
-      <section style={{background:`linear-gradient(135deg, ${G.dark} 0%, ${G.mid} 100%)`, padding:"96px 56px", position:"relative", overflow:"hidden"}}>
+      <section style={{background:`linear-gradient(135deg, ${G.dark} 0%, ${G.mid} 100%)`, padding:"96px 40px", position:"relative", overflow:"hidden"}}>
         {/* Decorative circles */}
         <div style={{position:"absolute", left:-150, top:-150, width:500, height:500, borderRadius:"50%", background:"radial-gradient(circle, rgba(43,168,224,0.12) 0%, transparent 70%)", pointerEvents:"none"}} />
         <div style={{position:"absolute", right:-150, bottom:-150, width:500, height:500, borderRadius:"50%", background:"radial-gradient(circle, rgba(43,168,224,0.10) 0%, transparent 70%)", pointerEvents:"none"}} />

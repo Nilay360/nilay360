@@ -195,7 +195,9 @@ function AuthModalInner({
       const supabase = createClient();
       const { error: oauthErr } = await supabase.auth.signInWithOAuth({
         provider: "google",
-        options: { redirectTo: window.location.origin },
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+        },
       });
       if (oauthErr) setError(oauthErr.message);
       // On success the browser redirects to Google — nothing more to do here.

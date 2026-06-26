@@ -881,16 +881,17 @@ export function Navbar() {
                           display: "flex",
                           alignItems: "center",
                           justifyContent: "space-between",
-                          padding: "10px 12px",
+                          padding: "14px 24px",
                           borderRadius: 6,
                           background: isActive || isExpanded ? "rgba(255,255,255,0.06)" : "transparent",
                           border: "none",
                           cursor: "pointer",
-                          fontSize: 14,
+                          fontSize: 16,
                           fontWeight: 500,
                           fontFamily: "'DM Sans', sans-serif",
                           color: isActive ? "#3DBEF5" : "rgba(255,255,255,0.65)",
                           textAlign: "left",
+                          minHeight: 44,
                         }}
                       >
                         <span>{link.label}</span>
@@ -976,15 +977,16 @@ export function Navbar() {
                     href={link.href}
                     onClick={() => setMenuOpen(false)}
                     style={{
-                      padding: "10px 12px",
+                      padding: "14px 24px",
                       borderRadius: 6,
-                      fontSize: 14,
+                      fontSize: 16,
                       fontWeight: 500,
                       fontFamily: "'DM Sans', sans-serif",
                       textDecoration: "none",
                       color: isActive ? "#3DBEF5" : "rgba(255,255,255,0.65)",
                       background: isActive ? "rgba(255,255,255,0.06)" : "transparent",
                       display: "block",
+                      minHeight: 44,
                     }}
                   >
                     {link.label}

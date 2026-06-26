@@ -394,6 +394,9 @@ export default function PropertyDetailClient() {
   const [visitDone, setVisitDone] = useState(false);
   const [visitError, setVisitError] = useState<string | null>(null);
 
+  const [prevProperty, setPrevProperty] = useState<{slug:string, title:string, price:number, images:string[]} | null>(null);
+  const [nextProperty, setNextProperty] = useState<{slug:string, title:string, price:number, images:string[]} | null>(null);
+
   useEffect(() => {
     if (!slug) return;
     async function load() {
@@ -449,6 +452,27 @@ export default function PropertyDetailClient() {
       image: property.images?.[0] ?? null,
     });
   }, [property, addRecentlyViewed]);
+
+  useEffect(() => {
+    if (!property) return;
+    const fetchAdjacent = async () => {
+      const supabase = createClient();
+      const { data } = await supabase
+        .from('property_listings')
+        .select('slug, title, price, images, created_at')
+        .eq('status', 'active')
+        .order('created_at', { ascending: false });
+
+      if (!data || data.length === 0) return;
+
+      const currentIndex = data.findIndex((p: any) => p.slug === property.slug);
+      if (currentIndex === -1) return;
+
+      setPrevProperty(currentIndex > 0 ? data[currentIndex - 1] : null);
+      setNextProperty(currentIndex < data.length - 1 ? data[currentIndex + 1] : null);
+    };
+    fetchAdjacent();
+  }, [property?.slug]);
 
   const emi = useMemo(() => {
     if (!property) return 0;
@@ -1077,6 +1101,59 @@ export default function PropertyDetailClient() {
 
             </div>
           </div>
+
+          {(prevProperty || nextProperty) && (
+            <div style={{
+              maxWidth: 1280, margin: "0 auto", padding: "48px 40px",
+              borderTop: "1px solid rgba(255,255,255,0.08)",
+              display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16
+            }}>
+              {/* Previous */}
+              {prevProperty ? (
+                <a href={`/property/${prevProperty.slug}`} style={{
+                  display: "flex", alignItems: "center", gap: 16,
+                  background: "#161A1F", border: "1px solid rgba(255,255,255,0.07)",
+                  borderRadius: 16, padding: 20, textDecoration: "none",
+                  transition: "all 0.3s ease"
+                }}
+                onMouseOver={e => (e.currentTarget.style.borderColor = "rgba(43,168,224,0.3)")}
+                onMouseOut={e => (e.currentTarget.style.borderColor = "rgba(255,255,255,0.07)")}>
+                  <div style={{fontSize: 24, color: "rgba(255,255,255,0.3)"}}>←</div>
+                  <div style={{overflow: "hidden", flex: 1}}>
+                    <div style={{fontSize: 11, color: "rgba(255,255,255,0.4)", marginBottom: 4, textTransform: "uppercase", letterSpacing: "0.1em"}}>Previous Property</div>
+                    <div style={{fontSize: 15, fontWeight: 600, color: "#FFFFFF", fontFamily: "'Cormorant Garamond',serif", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis"}}>{prevProperty.title}</div>
+                    <div style={{fontSize: 13, color: "#2BA8E0", marginTop: 4, fontWeight: 600}}>₹{(prevProperty.price / 10000000).toFixed(1)} Cr</div>
+                  </div>
+                  {prevProperty.images?.[0] && (
+                    <div style={{width: 64, height: 64, borderRadius: 10, backgroundImage: `url(${prevProperty.images[0]})`, backgroundSize: "cover", backgroundPosition: "center", flexShrink: 0}} />
+                  )}
+                </a>
+              ) : <div />}
+
+              {/* Next */}
+              {nextProperty ? (
+                <a href={`/property/${nextProperty.slug}`} style={{
+                  display: "flex", alignItems: "center", gap: 16,
+                  background: "#161A1F", border: "1px solid rgba(255,255,255,0.07)",
+                  borderRadius: 16, padding: 20, textDecoration: "none",
+                  transition: "all 0.3s ease", justifyContent: "flex-end"
+                }}
+                onMouseOver={e => (e.currentTarget.style.borderColor = "rgba(43,168,224,0.3)")}
+                onMouseOut={e => (e.currentTarget.style.borderColor = "rgba(255,255,255,0.07)")}>
+                  {nextProperty.images?.[0] && (
+                    <div style={{width: 64, height: 64, borderRadius: 10, backgroundImage: `url(${nextProperty.images[0]})`, backgroundSize: "cover", backgroundPosition: "center", flexShrink: 0}} />
+                  )}
+                  <div style={{overflow: "hidden", flex: 1, textAlign: "right"}}>
+                    <div style={{fontSize: 11, color: "rgba(255,255,255,0.4)", marginBottom: 4, textTransform: "uppercase", letterSpacing: "0.1em"}}>Next Property</div>
+                    <div style={{fontSize: 15, fontWeight: 600, color: "#FFFFFF", fontFamily: "'Cormorant Garamond',serif", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis"}}>{nextProperty.title}</div>
+                    <div style={{fontSize: 13, color: "#2BA8E0", marginTop: 4, fontWeight: 600}}>₹{(nextProperty.price / 10000000).toFixed(1)} Cr</div>
+                  </div>
+                  <div style={{fontSize: 24, color: "rgba(255,255,255,0.3)"}}>→</div>
+                </a>
+              ) : <div />}
+            </div>
+          )}
+
         </div>
       </div>
 

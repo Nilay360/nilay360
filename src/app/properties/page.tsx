@@ -214,6 +214,7 @@ export default function PropertiesPage() {
   const [maxPrice, setMaxPrice] = useState("");
   const [sortBy, setSortBy] = useState("featured");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
+  const [page, setPage] = useState(1);
 
   useEffect(() => {
     async function load() {
@@ -252,6 +253,15 @@ export default function PropertiesPage() {
     else list.sort((a, b) => (b.is_featured ? 1 : 0) - (a.is_featured ? 1 : 0));
     return list;
   }, [allProperties, listingType, city, propTypes, bhk, amenityFilters, minPrice, maxPrice, sortBy]);
+
+  const ITEMS_PER_PAGE = 9;
+  const totalPages = Math.max(1, Math.ceil(filtered.length / ITEMS_PER_PAGE));
+  const paginatedItems = useMemo(
+    () => filtered.slice((page - 1) * ITEMS_PER_PAGE, page * ITEMS_PER_PAGE),
+    [filtered, page]
+  );
+
+  useEffect(() => { setPage(1); }, [filtered]);
 
   function clearFilters() {
     setListingType("all"); setCity("all"); setPropTypes(new Set());
@@ -429,11 +439,11 @@ export default function PropertiesPage() {
               </div>
             ) : viewMode === "grid" ? (
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: "20px" }}>
-                {filtered.map(p => <PropertyCard key={p.id} property={p} savedIds={savedIds} onToggleSave={toggleSave} />)}
+                {paginatedItems.map(p => <PropertyCard key={p.id} property={p} savedIds={savedIds} onToggleSave={toggleSave} />)}
               </div>
             ) : (
               <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-                {filtered.map(p => (
+                {paginatedItems.map(p => (
                   <a key={p.id} href={`/property/${p.slug}`} style={{ display: "flex", textDecoration: "none", color: "inherit", cursor: "pointer", background: "rgba(245,242,236,0.04)", border: "1px solid rgba(245,242,236,0.08)", borderRadius: "16px", overflow: "hidden", transition: "border-color 0.2s, box-shadow 0.2s" }}
                     onMouseEnter={e => { const d = e.currentTarget as HTMLElement; d.style.borderColor = "rgba(201,168,76,0.3)"; d.style.boxShadow = "0 8px 32px rgba(0,0,0,0.3)"; }}
                     onMouseLeave={e => { const d = e.currentTarget as HTMLElement; d.style.borderColor = "rgba(245,242,236,0.08)"; d.style.boxShadow = "none"; }}
@@ -468,6 +478,66 @@ export default function PropertiesPage() {
                     </div>
                   </a>
                 ))}
+              </div>
+            )}
+
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div style={{display: "flex", alignItems: "center", justifyContent: "center", gap: 12, marginTop: 48, paddingTop: 32, borderTop: "1px solid rgba(255,255,255,0.07)"}}>
+                <button
+                  onClick={() => setPage(p => Math.max(1, p - 1))}
+                  disabled={page === 1}
+                  style={{
+                    display: "flex", alignItems: "center", gap: 8,
+                    padding: "12px 24px", borderRadius: 10,
+                    background: page === 1 ? "rgba(255,255,255,0.03)" : "#161A1F",
+                    border: `1px solid ${page === 1 ? "rgba(255,255,255,0.05)" : "rgba(43,168,224,0.25)"}`,
+                    color: page === 1 ? "rgba(255,255,255,0.2)" : "#FFFFFF",
+                    fontSize: 14, fontWeight: 600, cursor: page === 1 ? "not-allowed" : "pointer",
+                    transition: "all 0.2s ease", fontFamily: "'DM Sans',sans-serif"
+                  }}
+                  onMouseOver={e => { if (page !== 1) e.currentTarget.style.background = "rgba(43,168,224,0.1)"; }}
+                  onMouseOut={e => { if (page !== 1) e.currentTarget.style.background = "#161A1F"; }}
+                >
+                  ← Previous
+                </button>
+
+                <div style={{display: "flex", gap: 6}}>
+                  {Array.from({length: totalPages}, (_, i) => i + 1).slice(
+                    Math.max(0, page - 3), Math.min(totalPages, page + 2)
+                  ).map(p => (
+                    <button key={p} onClick={() => setPage(p)} style={{
+                      width: 40, height: 40, borderRadius: 8,
+                      background: p === page ? "#2BA8E0" : "#161A1F",
+                      border: `1px solid ${p === page ? "#2BA8E0" : "rgba(255,255,255,0.08)"}`,
+                      color: p === page ? "#000" : "rgba(255,255,255,0.6)",
+                      fontSize: 14, fontWeight: p === page ? 700 : 400,
+                      cursor: "pointer", transition: "all 0.2s ease",
+                      fontFamily: "'DM Sans',sans-serif"
+                    }}>
+                      {p}
+                    </button>
+                  ))}
+                </div>
+
+                <button
+                  onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                  disabled={page === totalPages}
+                  style={{
+                    display: "flex", alignItems: "center", gap: 8,
+                    padding: "12px 24px", borderRadius: 10,
+                    background: page === totalPages ? "rgba(255,255,255,0.03)" : "#161A1F",
+                    border: `1px solid ${page === totalPages ? "rgba(255,255,255,0.05)" : "rgba(43,168,224,0.25)"}`,
+                    color: page === totalPages ? "rgba(255,255,255,0.2)" : "#FFFFFF",
+                    fontSize: 14, fontWeight: 600,
+                    cursor: page === totalPages ? "not-allowed" : "pointer",
+                    transition: "all 0.2s ease", fontFamily: "'DM Sans',sans-serif"
+                  }}
+                  onMouseOver={e => { if (page !== totalPages) e.currentTarget.style.background = "rgba(43,168,224,0.1)"; }}
+                  onMouseOut={e => { if (page !== totalPages) e.currentTarget.style.background = "#161A1F"; }}
+                >
+                  Next →
+                </button>
               </div>
             )}
           </div>

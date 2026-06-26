@@ -180,3 +180,35 @@ a:hover { color: var(--blue-bright); }
 
 /* ── Focus ring ──────────────────────────────────────────────────── */
 :focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; border-radius: 4px; }
+
+/* ── Mobile Responsiveness ───────────────────────────────── */
+@media (max-width: 768px) {
+  /* Container */
+  .nilay360-container {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  /* Typography scale down */
+  h1 { font-size: clamp(1.8rem, 8vw, 2.5rem); }
+  h2 { font-size: clamp(1.4rem, 6vw, 2rem); }
+  h3 { font-size: clamp(1.1rem, 4vw, 1.5rem); }
+
+  /* Hide scrollbar on mobile carousels */
+  .hide-scroll { -webkit-overflow-scrolling: touch; }
+
+  /* Cards full width on mobile */
+  .premium-card { width: 100% !important; }
+
+  /* Category cards stack on mobile */
+  .cat-card { min-height: 200px !important; }
+
+  /* Location cards smaller on mobile */
+  .loc-card { width: 180px !important; height: 180px !important; }
+
+  /* Glow dot hidden on mobile */
+  .glow-dot { display: none; }
+
+  /* Section divider thinner */
+  .section-divider { opacity: 0.5; }
+}
