@@ -1,0 +1,182 @@
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap');
+@import "tailwindcss";
+
+/* ── Nilay 360 Design System ─────────────────────────────────────── */
+:root {
+  /* Backgrounds — never flat */
+  --bg-base:     #000000;
+  --bg-elevated: #0B0D10;
+  --bg-surface:  #121519;
+  --bg-card:     #161A1F;
+
+  /* Text */
+  --text-primary:   #FFFFFF;
+  --text-secondary: #AEB4BC;
+  --text-muted:     #6B7280;
+
+  /* Electric Blue — primary accent */
+  --blue:        #2BA8E0;
+  --blue-bright: #3DBEF5;
+  --blue-deep:   #1577B8;
+  --blue-glow:   rgba(43, 168, 224, 0.25);
+
+  /* Silver metallic */
+  --silver-light:    #E8EAED;
+  --silver-mid:      #A8AEB5;
+  --silver-dark:     #6E747C;
+  --silver-gradient: linear-gradient(135deg, #E8EAED 0%, #A8AEB5 40%, #6E747C 100%);
+
+  /* Borders */
+  --border:       rgba(255, 255, 255, 0.08);
+  --border-blue:  rgba(43, 168, 224, 0.30);
+  --border-hover: rgba(255, 255, 255, 0.16);
+
+  /* Typography */
+  --font-display: 'Cormorant Garamond', Georgia, serif;
+  --font-body:    'DM Sans', system-ui, sans-serif;
+
+  /* Spacing (4px base) */
+  --space-xs:  4px;
+  --space-sm:  8px;
+  --space-md:  16px;
+  --space-lg:  24px;
+  --space-xl:  32px;
+  --space-2xl: 48px;
+  --space-3xl: 64px;
+  --space-4xl: 96px;
+
+  /* Radius */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+
+  /* Texture overlay opacity */
+  --texture-opacity: 0.035;
+}
+
+/* ── Reset ───────────────────────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
+/* ── Body — liquid-silk black ────────────────────────────────────── */
+body {
+  font-family: var(--font-body);
+  background-color: var(--bg-base);
+  color: var(--text-primary);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-image:
+    radial-gradient(ellipse 120% 60% at 20% 0%,   rgba(43,168,224,0.04) 0%, transparent 60%),
+    radial-gradient(ellipse 80%  80% at 80% 100%, rgba(43,168,224,0.03) 0%, transparent 55%),
+    radial-gradient(ellipse 100% 50% at 50% 50%,  rgba(255,255,255,0.015) 0%, transparent 70%),
+    linear-gradient(160deg, #0B0D10 0%, #000000 40%, #050709 100%);
+  background-attachment: fixed;
+}
+
+/* Silk texture overlay — performance-safe, pointer-events none */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  opacity: var(--texture-opacity);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='400' height='400' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 200px 200px;
+}
+
+/* All content sits above the texture layer */
+#__next, main, [data-content] {
+  position: relative;
+  z-index: 1;
+}
+
+/* ── Typography ──────────────────────────────────────────────────── */
+.font-display { font-family: var(--font-display); }
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  line-height: 1.2;
+  color: var(--text-primary);
+  letter-spacing: -0.01em;
+}
+
+h1 { font-size: clamp(2rem, 5vw, 3.5rem); }
+h2 { font-size: clamp(1.5rem, 3.5vw, 2.5rem); }
+h3 { font-size: clamp(1.25rem, 2.5vw, 1.875rem); }
+
+p { color: var(--text-secondary); }
+
+a {
+  color: var(--blue);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+a:hover { color: var(--blue-bright); }
+
+/* ── Utility classes ─────────────────────────────────────────────── */
+.nilay360-container {
+  width: 100%;
+  max-width: 1280px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 40px;
+  padding-right: 40px;
+}
+
+@media (max-width: 768px) {
+  .nilay360-container { padding-left: 20px; padding-right: 20px; }
+}
+
+.text-gradient-silver {
+  background: var(--silver-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.text-gradient-blue {
+  background: linear-gradient(135deg, var(--blue-bright) 0%, var(--blue) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.blue-glow {
+  box-shadow: 0 0 24px var(--blue-glow), 0 0 48px rgba(43,168,224,0.10);
+}
+
+/* ── Skeleton shimmer ────────────────────────────────────────────── */
+.skeleton {
+  background: linear-gradient(90deg, #121519 25%, #1a1f26 50%, #121519 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+@keyframes shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* ── Scrollbar ───────────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--bg-base); }
+::-webkit-scrollbar-thumb { background: var(--border-hover); border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: var(--blue); }
+
+/* ── Selection ───────────────────────────────────────────────────── */
+::selection { background: rgba(43,168,224,0.30); color: var(--text-primary); }
+
+/* ── Focus ring ──────────────────────────────────────────────────── */
+:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; border-radius: 4px; }
