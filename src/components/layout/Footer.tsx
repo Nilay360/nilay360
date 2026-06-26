@@ -30,13 +30,30 @@ const footerLinks = {
 
 export function Footer() {
   return (
+    <>
+    <style>{`
+      @media (max-width: 768px) {
+        .footer-grid {
+          grid-template-columns: 1fr 1fr !important;
+          gap: 32px !important;
+        }
+        .footer-brand {
+          grid-column: 1 / -1 !important;
+        }
+      }
+      @media (max-width: 480px) {
+        .footer-grid {
+          grid-template-columns: 1fr !important;
+        }
+      }
+    `}</style>
     <footer className="bg-[#000000] text-white">
       {/* Main footer */}
       <div className="nilay360-container py-14">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-10">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-10 footer-grid">
 
           {/* Brand column */}
-          <div className="lg:col-span-2">
+          <div className="lg:col-span-2 footer-brand">
             <div className="font-body text-[22px] font-semibold tracking-[0.14em] mb-1">
               Nilay 360<span className="text-[#2BA8E0] ml-1">·</span>
             </div>
@@ -135,5 +152,6 @@ export function Footer() {
         </div>
       </div>
     </footer>
+    </>
   )
 }

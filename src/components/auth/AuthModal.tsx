@@ -685,14 +685,14 @@ const styles = `
   }
   .am-card {
     position: relative;
-    width: 100%; max-width: 440px;
-    max-height: calc(100vh - 48px);
+    width: 100%; max-width: min(480px, 95vw);
+    max-height: 90vh;
     overflow-y: auto;
     background: ${CARD_BG};
     border: 1px solid rgba(201,168,76,0.32);
     border-radius: 16px;
     box-shadow: 0 30px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(201,168,76,0.05);
-    padding: 28px 30px 30px;
+    padding: clamp(20px, 5vw, 40px);
     animation: amCardIn 0.26s cubic-bezier(0.16,1,0.3,1);
   }
   .am-close {

@@ -855,11 +855,17 @@ export function Navbar() {
           <div
             className="nvl-mobile"
             style={{
+              position: "fixed",
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
               background: "#0B0D10",
               borderTop: "1px solid rgba(43,168,224,0.15)",
               padding: "12px 16px",
-              maxHeight: "calc(100vh - 64px)",
               overflowY: "auto",
+              zIndex: 999,
+              paddingBottom: 40,
             }}
           >
             {/* Nav links with accordion for mega-menu items */}
