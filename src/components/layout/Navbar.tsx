@@ -1,6 +1,7 @@
 "use client"
 
 import React, { useState, useEffect, useRef } from "react"
+import { createPortal } from "react-dom"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { NAV_LINKS, NAV_MENUS } from "@/constants"
@@ -178,21 +179,35 @@ function Avatar({
 // ─── User dropdown panel ───────────────────────────────────────────────────────
 
 interface DropdownProps {
-  user:      User
-  profile:   Profile | null
-  onClose:   () => void
-  onSignOut: () => void
+  user:       User
+  profile:    Profile | null
+  onClose:    () => void
+  onSignOut:  () => void
+  open:       boolean
+  wrapperRef: React.RefObject<HTMLDivElement>
 }
 
-function UserDropdown({ user, profile, onClose, onSignOut }: DropdownProps) {
+function UserDropdown({ user, profile, onClose, onSignOut, open, wrapperRef }: DropdownProps) {
   const displayName = profile?.full_name ?? user.email?.split("@")[0] ?? "User"
   const initial     = (displayName || "U")[0].toUpperCase()
   const city        = profile?.city ?? null
 
-  return (
+  const [dropdownPos, setDropdownPos] = React.useState({ top: 0, right: 0 })
+
+  React.useEffect(() => {
+    if (open && wrapperRef.current) {
+      const rect = wrapperRef.current.getBoundingClientRect()
+      setDropdownPos({
+        top:   rect.bottom + 10,
+        right: window.innerWidth - rect.right,
+      })
+    }
+  }, [open, wrapperRef])
+
+  return createPortal(
     <div
       style={{
-        position: "absolute", right: 0, top: "calc(100% + 10px)",
+        position: "fixed", right: dropdownPos.right, top: dropdownPos.top,
         width: 272,
         background: "#0B0D10",
         border: "1px solid rgba(43,168,224,0.18)",
@@ -313,7 +328,8 @@ function UserDropdown({ user, profile, onClose, onSignOut }: DropdownProps) {
           Sign Out
         </button>
       </div>
-    </div>
+    </div>,
+    document.body
   )
 }
 
@@ -788,6 +804,8 @@ export function Navbar() {
                     profile={profile}
                     onClose={() => setDropdown(false)}
                     onSignOut={handleSignOut}
+                    open={dropdown}
+                    wrapperRef={wrapperRef}
                   />
                 )}
               </div>
