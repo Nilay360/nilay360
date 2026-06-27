@@ -257,6 +257,9 @@ export default function HomePage() {
         *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
         html { scroll-behavior:smooth; }
         body { font-family:'DM Sans',system-ui,sans-serif; background:#000000; color:#E8EAED; overflow-x:hidden; }
+        html, body { max-width: 100vw; overflow-x: hidden !important; }
+        #__next, main, section { max-width: 100vw; overflow-x: hidden; }
+        * { max-width: 100%; }
         a { color:inherit; text-decoration:none; }
         button { font-family:'DM Sans',system-ui,sans-serif; }
 
@@ -324,6 +327,13 @@ export default function HomePage() {
         }
 
         @media (max-width: 768px) {
+          .hero-section { min-height: auto !important; padding-top: 0 !important; }
+          .hero-content { padding: 24px 16px 40px !important; padding-top: 90px !important; min-height: auto !important; }
+          .hero-pill { margin-bottom: 20px !important; padding: 5px 12px !important; font-size: 11px !important; }
+          .hero-h1 { font-size: clamp(30px, 8vw, 44px) !important; line-height: 1.1 !important; margin-bottom: 12px !important; }
+          .hero-subline { font-size: 14px !important; margin-bottom: 24px !important; line-height: 1.6 !important; }
+          .hero-searchbox { margin-bottom: 24px !important; border-radius: 16px !important; }
+          .hero-stats { padding-top: 20px !important; padding-bottom: 0 !important; margin-bottom: 0 !important; gap: 16px 0 !important; }
           .hero-stat { padding: 0 10px; }
           .hero-stat div:first-child { font-size: 18px !important; }
           .svc-card { min-width: 85px; padding: 14px 8px; gap: 8px; }
@@ -334,22 +344,92 @@ export default function HomePage() {
           .premium-card { width: 260px !important; }
           .cat-card { min-height: 180px !important; }
           .loc-card { width: 160px !important; height: 160px !important; }
-          .hero-search-row { flex-direction: column !important; gap: 8px !important; padding: 12px !important; }
+          .hero-search-row { flex-direction: column !important; align-items: stretch !important; gap: 10px !important; padding: 12px !important; width: 100% !important; box-sizing: border-box !important; }
+          .hero-search-row > * { width: 100% !important; max-width: 100% !important; box-sizing: border-box !important; flex: none !important; }
+          .hero-search-row select { border-right: none !important; border-bottom: 1px solid rgba(255,255,255,0.1) !important; padding: 10px 16px !important; }
+          .hero-search-row button[type=submit], .hero-search-row > button:last-child { min-height: 44px !important; justify-content: center; }
           .section-heading { font-size: clamp(28px, 7vw, 40px) !important; }
         }
 
         @media (max-width: 480px) {
-          .hero-stat { padding: 0 6px; }
-          .hero-stat div:first-child { font-size: 16px !important; }
+          .hero-content { padding-top: 84px !important; }
+          .hero-h1 { font-size: clamp(28px, 9vw, 38px) !important; }
+          .hero-stat { flex: 1 1 50% !important; padding: 8px 4px !important; min-width: 0 !important; border-left: none !important; }
+          .hero-stat div:first-child { font-size: 18px !important; }
           .hero-stat div:last-child { font-size: 9px !important; }
           .svc-card { min-width: 75px; padding: 10px 4px; font-size: 10px; }
           .premium-card { width: 230px !important; }
           .loc-card { width: 140px !important; height: 140px !important; }
         }
+
+        @media (max-width: 768px) {
+          .services-section { padding: clamp(36px, 8vw, 56px) clamp(16px, 4vw, 24px) !important; }
+          .services-h2 { font-size: clamp(22px, 6vw, 30px) !important; text-align: center !important; margin-bottom: 20px !important; }
+          .services-tabs { justify-content: center !important; flex-wrap: wrap !important; gap: 8px !important; margin-bottom: 28px !important; }
+          .services-grid { grid-template-columns: repeat(3, 1fr) !important; gap: 16px !important; }
+        }
+
+        @media (max-width: 480px) {
+          .services-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 12px !important; }
+          .services-tabs { gap: 6px !important; }
+        }
+
+        @media (max-width: 768px) {
+          .featured-section { padding: clamp(36px,8vw,56px) clamp(16px,4vw,24px) !important; }
+          .featured-heading { font-size: clamp(22px,6vw,30px) !important; text-align: center !important; }
+          .featured-carousel { gap: 16px !important; padding-bottom: 16px !important; }
+          .discover-section { padding: clamp(36px,8vw,56px) clamp(16px,4vw,24px) !important; }
+          .discover-heading { font-size: clamp(22px,6vw,30px) !important; text-align: center !important; }
+          .discover-grid { grid-template-columns: repeat(2,1fr) !important; gap: 14px !important; }
+        }
+
+        @media (max-width: 480px) {
+          .discover-grid { grid-template-columns: 1fr 1fr !important; gap: 10px !important; }
+        }
+
+        @media (max-width: 768px) {
+          .market-section { padding: clamp(36px,8vw,56px) clamp(16px,4vw,24px) !important; }
+          .market-heading { font-size: clamp(22px,6vw,30px) !important; text-align: center !important; }
+          .market-grid { grid-template-columns: repeat(2,1fr) !important; gap: 14px !important; }
+        }
+
+        @media (max-width: 480px) {
+          .market-grid { grid-template-columns: 1fr !important; gap: 12px !important; }
+        }
+
+        @media (max-width: 768px) {
+          .why-section { padding: clamp(36px,8vw,56px) clamp(16px,4vw,24px) !important; }
+          .why-heading { font-size: clamp(22px,6vw,30px) !important; text-align: center !important; }
+          .why-grid { grid-template-columns: repeat(2,1fr) !important; gap: 16px !important; }
+        }
+
+        @media (max-width: 480px) {
+          .why-grid { grid-template-columns: 1fr !important; gap: 12px !important; }
+        }
+
+        @media (max-width: 768px) {
+          .trending-section { padding: clamp(36px,8vw,56px) clamp(16px,4vw,24px) !important; }
+          .trending-heading { font-size: clamp(22px,6vw,30px) !important; text-align: center !important; }
+          .trending-carousel { gap: 12px !important; padding-bottom: 12px !important; }
+          .testimonials-section { padding: clamp(36px,8vw,56px) clamp(16px,4vw,24px) !important; }
+          .testimonials-heading { font-size: clamp(22px,6vw,30px) !important; text-align: center !important; }
+          .testimonials-grid { grid-template-columns: 1fr !important; gap: 16px !important; }
+          .cta-section { padding: clamp(48px,10vw,72px) clamp(16px,4vw,24px) !important; text-align: center !important; }
+          .cta-heading { font-size: clamp(24px,6vw,36px) !important; }
+          .cta-buttons { flex-direction: column !important; align-items: center !important; gap: 12px !important; }
+          .footer-section { padding: clamp(36px,8vw,56px) clamp(16px,4vw,24px) !important; }
+          .footer-grid { grid-template-columns: repeat(2,1fr) !important; gap: 24px !important; }
+          .footer-bottom { flex-direction: column !important; text-align: center !important; gap: 8px !important; }
+        }
+
+        @media (max-width: 480px) {
+          .footer-grid { grid-template-columns: 1fr !important; gap: 20px !important; }
+          .cta-heading { font-size: clamp(22px,6vw,30px) !important; }
+        }
       `}</style>
 
       {/* ══════════ HERO ══════════ */}
-      <section ref={heroRef} style={{
+      <section ref={heroRef} className="hero-section" style={{
         position:"relative", minHeight:"100vh", paddingTop:"64px",
         display:"flex", flexDirection:"column", justifyContent:"center",
         background:"radial-gradient(ellipse 100% 50% at 50% 0%, rgba(43,168,224,0.08) 0%, transparent 60%), radial-gradient(ellipse 80% 80% at 80% 100%, rgba(43,168,224,0.04) 0%, transparent 50%), linear-gradient(180deg, #000000 0%, #050810 50%, #000000 100%)",
@@ -604,16 +684,17 @@ export default function HomePage() {
           initial={{ opacity:0, y:30 }}
           animate={{ opacity:1, y:0 }}
           transition={{ duration:0.8, ease:[0.16,1,0.3,1] }}
-          style={{position:"relative", zIndex:2, padding:"0 16px 48px", maxWidth:860, paddingTop:80, margin:"0 auto", textAlign:"center"}}
+          className="hero-content"
+          style={{position:"relative", zIndex:2, padding:"0 16px 48px", maxWidth:"min(860px, 100%)", paddingTop:80, margin:"0 auto", textAlign:"center", width:"100%", boxSizing:"border-box"}}
         >
           {/* 1 — Rating pill */}
-          <div style={{display:"inline-flex", alignItems:"center", gap:8, background:"rgba(43,168,224,0.06)", border:"0.5px solid rgba(43,168,224,0.30)", borderRadius:999, padding:"6px 16px", marginBottom:28, backdropFilter:"blur(12px)"}}>
+          <div className="hero-pill" style={{display:"inline-flex", alignItems:"center", gap:8, background:"rgba(43,168,224,0.06)", border:"0.5px solid rgba(43,168,224,0.30)", borderRadius:999, padding:"6px 16px", marginBottom:28, backdropFilter:"blur(12px)"}}>
             <span style={{color:G.gold, fontSize:13}}>★</span>
             <span style={{fontSize:12, color:"rgba(255,255,255,0.75)", fontWeight:500}}>4.9 · 18,000+ Google Reviews</span>
           </div>
 
           {/* 2 — Search bar */}
-          <div style={{background:"rgba(255,255,255,0.06)", backdropFilter:"blur(20px)", border:"0.5px solid rgba(255,255,255,0.12)", borderRadius:12, overflow:"hidden", maxWidth:820, marginBottom:36, margin:"0 auto 36px"}}>
+          <div className="hero-searchbox" style={{background:"rgba(255,255,255,0.06)", backdropFilter:"blur(20px)", border:"0.5px solid rgba(255,255,255,0.12)", borderRadius:12, overflow:"hidden", maxWidth:"min(820px, 100%)", marginBottom:36, margin:"0 auto 36px", width:"100%", boxSizing:"border-box"}}>
             <div style={{display:"flex", borderBottom:"1px solid rgba(255,255,255,0.08)", paddingLeft:4, overflowX:"auto"}} className="hide-scroll">
               {["Buy","Rent","New Projects","Valuation","List Property","Agents"].map(t=>(
                 <button key={t} onClick={()=>setSearchTab(t)} className={`search-tab${searchTab===t?" active":""}`}>
@@ -658,7 +739,7 @@ export default function HomePage() {
           </div>
 
           {/* 3 — Stats strip */}
-          <div style={{display:"flex", marginBottom:40, paddingBottom:32, borderBottom:"1px solid rgba(43,168,224,0.12)"}}>
+          <div className="hero-stats" style={{display:"flex", flexWrap:"wrap", justifyContent:"center", gap:"20px 0", width:"100%", maxWidth:"100%", boxSizing:"border-box", marginBottom:40, paddingBottom:32, borderBottom:"1px solid rgba(43,168,224,0.12)"}}>
             {[["2,400+","Listings"],["500+","Agents"],["14","Cities"],["₹18,000Cr","Deals Closed"]].map(([v,l])=>(
               <div key={l} className="hero-stat">
                 <div style={{fontFamily:"'Cormorant Garamond',Georgia,serif", fontSize:26, fontWeight:600, background:"linear-gradient(135deg, #E8EAED 0%, #2BA8E0 100%)", WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent"}}>{v}</div>
@@ -668,13 +749,13 @@ export default function HomePage() {
           </div>
 
           {/* 4 — Headline */}
-          <h1 style={{fontFamily:"'Cormorant Garamond',Georgia,serif", fontSize:"clamp(48px,6vw,72px)", fontWeight:300, color:"#fff", lineHeight:1.05, marginBottom:16, letterSpacing:"-0.01em"}}>
+          <h1 className="hero-h1" style={{fontFamily:"'Cormorant Garamond',Georgia,serif", fontSize:"clamp(32px,7vw,72px)", fontWeight:300, color:"#fff", lineHeight:1.05, marginBottom:16, letterSpacing:"-0.01em", wordBreak:"break-word", maxWidth:"100%"}}>
             Find Your Dream Property
             <em style={{display:"block", color:G.goldLt, fontStyle:"italic", fontWeight:400}}>Anywhere in India</em>
           </h1>
 
           {/* 5 — Subline */}
-          <p style={{fontSize:15, color:"rgba(255,255,255,0.5)", lineHeight:1.75, marginBottom:0, maxWidth:500, fontWeight:300, margin:"0 auto"}}>
+          <p className="hero-subline" style={{fontSize:15, color:"rgba(255,255,255,0.5)", lineHeight:1.75, marginBottom:0, maxWidth:500, fontWeight:300, margin:"0 auto", padding:"0 8px", maxWidth:"100%", boxSizing:"border-box"}}>
             From search to possession — India's most trusted premium platform
           </p>
         </motion.div>
@@ -683,7 +764,7 @@ export default function HomePage() {
       {/* ══════════ SECTION 2 — TRUST BAR ══════════ */}
       <div className="section-divider" />
       <section style={{ background:"#0B0D10", padding:"0 56px" }}>
-        <div style={{ maxWidth:1280, margin:"0 auto", display:"flex", alignItems:"center", justifyContent:"space-between", height:64, gap:24 }}>
+        <div style={{ maxWidth:"min(1280px, 100%)", margin:"0 auto", width:"100%", boxSizing:"border-box", display:"flex", alignItems:"center", justifyContent:"space-between", height:64, gap:24 }}>
           <div className="glow-dot" />
           <span style={{ fontSize:12, color:"rgba(255,255,255,0.5)", fontWeight:500, letterSpacing:"0.05em", whiteSpace:"nowrap" }}>INDIA'S PREMIUM REAL ESTATE PLATFORM</span>
           <div style={{ flex:1, height:1, background:"rgba(255,255,255,0.06)" }} />
@@ -699,15 +780,15 @@ export default function HomePage() {
       <div className="section-divider" />
 
       {/* ══════════ SECTION 3 — EVERYTHING AT ONE PLACE ══════════ */}
-      <section style={{background:"#000000", padding:"clamp(48px, 8vw, 96px) clamp(16px, 4vw, 40px)", borderTop:"1px solid rgba(43,168,224,0.08)"}}>
-        <div style={{maxWidth:1280, margin:"0 auto"}}>
+      <section className="services-section" style={{background:"#000000", padding:"clamp(48px, 8vw, 96px) clamp(16px, 4vw, 40px)", borderTop:"1px solid rgba(43,168,224,0.08)"}}>
+        <div style={{maxWidth:"min(1280px, 100%)", margin:"0 auto", width:"100%", boxSizing:"border-box"}}>
           <Reveal>
           <div style={{display:"flex", justifyContent:"space-between", alignItems:"flex-end", marginBottom:28, flexWrap:"wrap", gap:16}}>
             <div>
               <div style={{fontSize:11, color:G.gold, fontWeight:700, letterSpacing:2, textTransform:"uppercase", marginBottom:8}}>Our Services</div>
-              <h2 style={{fontFamily:"'Cormorant Garamond',Georgia,serif", fontSize:32, fontWeight:700, color:"#fff"}}>Everything You Need at One Place</h2>
+              <h2 className="services-h2" style={{fontFamily:"'Cormorant Garamond',Georgia,serif", fontSize:32, fontWeight:700, color:"#fff", wordBreak:"break-word", maxWidth:"100%"}}>Everything You Need at One Place</h2>
             </div>
-            <div style={{display:"flex", gap:6, background:"rgba(255,255,255,0.04)", borderRadius:12, padding:4, border:"1px solid rgba(255,255,255,0.06)"}}>
+            <div className="services-tabs" style={{display:"flex", gap:6, background:"rgba(255,255,255,0.04)", borderRadius:12, padding:4, border:"1px solid rgba(255,255,255,0.06)"}}>
               {Object.keys(SERVICES).map(t=>(
                 <button key={t} onClick={()=>setServiceTab(t)} style={{padding:"8px 18px", borderRadius:10, fontSize:13, fontWeight:500, cursor:"pointer", border:"none", background: serviceTab===t ? G.gold : "transparent", color: serviceTab===t ? "#000" : "rgba(255,255,255,0.45)", transition:"all 0.15s"}}>
                   {t}
@@ -717,7 +798,7 @@ export default function HomePage() {
           </div>
           </Reveal>
 
-          <div style={{display:"grid", gridTemplateColumns:"repeat(6,1fr)", gap:12}}>
+          <div className="services-grid" style={{display:"grid", gridTemplateColumns:"repeat(6,1fr)", gap:12}}>
             {SERVICES[serviceTab].map((svc,i)=>(
               <Reveal key={svc.label} delay={i*0.06}>
               <motion.div whileHover={{ y: -4 }} transition={{ type:"spring", stiffness:300, damping:20 }}>
@@ -737,13 +818,13 @@ export default function HomePage() {
       <div className="section-divider" />
 
       {/* ══════════ SECTION 4 — FEATURED PROPERTIES CAROUSEL ══════════ */}
-      <section style={{background:"#0B0D10", padding:"96px 0 96px 56px"}}>
+      <section className="featured-section" style={{background:"#0B0D10", padding:"96px 0 96px 56px"}}>
         <div style={{maxWidth:1280+56, paddingRight:0}}>
           <Reveal>
           <div style={{display:"flex", justifyContent:"space-between", alignItems:"flex-end", marginBottom:20, paddingRight:56, flexWrap:"wrap", gap:12}}>
             <div>
               <div style={{fontSize:11, color:G.gold, fontWeight:700, letterSpacing:2, textTransform:"uppercase", marginBottom:8}}>Featured Listings</div>
-              <h2 style={{fontFamily:"'Cormorant Garamond',Georgia,serif", fontSize:32, fontWeight:700, color:"#fff"}}>Premium Properties</h2>
+              <h2 className="featured-heading" style={{fontFamily:"'Cormorant Garamond',Georgia,serif", fontSize:32, fontWeight:700, color:"#fff", wordBreak:"break-word", maxWidth:"100%"}}>Premium Properties</h2>
             </div>
             <div style={{display:"flex", alignItems:"center", gap:16}}>
               <a href="/properties" style={{fontSize:14, color:G.gold, fontWeight:600, display:"flex", alignItems:"center", gap:4}}>
@@ -771,11 +852,11 @@ export default function HomePage() {
           </div>
 
           {/* Carousel */}
-          <div ref={carouselRef} className="hide-scroll" style={{display:"flex", gap:16, overflowX:"auto", paddingBottom:8, paddingRight:56}}>
+          <div ref={carouselRef} className="hide-scroll featured-carousel" style={{display:"flex", gap:16, overflowX:"auto", paddingBottom:8, paddingRight:56, scrollSnapType:"x mandatory", WebkitOverflowScrolling:"touch", maxWidth:"100vw", boxSizing:"border-box"}}>
             {filteredProps.map((p,i)=>(
               <Reveal key={p.id} delay={i*0.06} style={{flexShrink:0}}>
               <a href={`/property/${p.id}`} className="premium-card"
-                style={{flexShrink:0, width:280, borderRadius:16, overflow:"hidden", display:"block"}}>
+                style={{flexShrink:0, width:280, borderRadius:16, overflow:"hidden", display:"block", scrollSnapAlign:"start"}}>
                 {/* Image */}
                 <div style={{height:180, position:"relative", overflow:"hidden"}}>
                   <div className="card-img" style={{position:"absolute", inset:0, backgroundImage:`url(${p.img})`, backgroundSize:"cover", backgroundPosition:"center"}} />
@@ -809,13 +890,13 @@ export default function HomePage() {
       <div className="section-divider" />
 
       {/* ══════════ SECTION 5 — PROPERTY CATEGORIES ══════════ */}
-      <section style={{background:"#000000", padding:"clamp(48px, 8vw, 96px) clamp(16px, 4vw, 40px)"}}>
-        <div style={{maxWidth:1280, margin:"0 auto"}}>
+      <section className="discover-section" style={{background:"#000000", padding:"clamp(48px, 8vw, 96px) clamp(16px, 4vw, 40px)"}}>
+        <div style={{maxWidth:"min(1280px, 100%)", margin:"0 auto", width:"100%", boxSizing:"border-box"}}>
           <Reveal>
           <div style={{display:"flex", justifyContent:"space-between", alignItems:"flex-end", marginBottom:24, flexWrap:"wrap", gap:12}}>
             <div>
               <div style={{fontSize:11, color:G.gold, fontWeight:700, letterSpacing:2, textTransform:"uppercase", marginBottom:8}}>Browse by Type</div>
-              <h2 style={{fontFamily:"'Cormorant Garamond',Georgia,serif", fontSize:32, fontWeight:700, color:"#fff"}}>Discover Properties Across India</h2>
+              <h2 className="discover-heading" style={{fontFamily:"'Cormorant Garamond',Georgia,serif", fontSize:32, fontWeight:700, color:"#fff", wordBreak:"break-word", maxWidth:"100%"}}>Discover Properties Across India</h2>
             </div>
             <div style={{display:"flex", gap:6, flexWrap:"wrap"}}>
               {CITIES.slice(0,6).map(c=>(
@@ -825,7 +906,7 @@ export default function HomePage() {
           </div>
           </Reveal>
 
-          <div style={{display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:16}}>
+          <div className="discover-grid" style={{display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:16}}>
             {[
               {type:"Apartments", count:142, grad:"linear-gradient(135deg, rgba(43,168,224,0.6) 0%, rgba(11,13,16,0.8) 100%)", img:"https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=800&q=80", d:"M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-2 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"},
               {type:"Villas", count:48, grad:"linear-gradient(135deg, rgba(61,190,245,0.5) 0%, rgba(11,13,16,0.8) 100%)", img:"https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=800&q=80", d:"M3 12l9-9 9 9M5 10v10h5v-6h4v6h5V10"},
@@ -854,13 +935,13 @@ export default function HomePage() {
       <div className="section-divider" />
 
       {/* ══════════ SECTION 6 — MARKET INSIGHTS ══════════ */}
-      <section style={{background:"#0B0D10", padding:"clamp(48px, 8vw, 96px) clamp(16px, 4vw, 40px)"}}>
-        <div style={{maxWidth:1280, margin:"0 auto"}}>
+      <section className="market-section" style={{background:"#0B0D10", padding:"clamp(48px, 8vw, 96px) clamp(16px, 4vw, 40px)"}}>
+        <div style={{maxWidth:"min(1280px, 100%)", margin:"0 auto", width:"100%", boxSizing:"border-box"}}>
           <Reveal>
           <div style={{display:"flex", justifyContent:"space-between", alignItems:"flex-end", marginBottom:24, flexWrap:"wrap", gap:12}}>
             <div>
               <div style={{fontSize:11, color:G.gold, fontWeight:700, letterSpacing:2, textTransform:"uppercase", marginBottom:8}}>Market Intelligence</div>
-              <h2 style={{fontFamily:"'Cormorant Garamond',Georgia,serif", fontSize:32, fontWeight:700, color:"#fff"}}>Property Price Insights</h2>
+              <h2 className="market-heading" style={{fontFamily:"'Cormorant Garamond',Georgia,serif", fontSize:32, fontWeight:700, color:"#fff", wordBreak:"break-word", maxWidth:"100%"}}>Property Price Insights</h2>
             </div>
             <div style={{display:"flex", gap:6, flexWrap:"wrap"}}>
               {Object.keys(MARKET).map(c=>(
@@ -870,7 +951,7 @@ export default function HomePage() {
           </div>
           </Reveal>
 
-          <div style={{display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:16}}>
+          <div className="market-grid" style={{display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:16}}>
             {/* Price trend mini chart */}
             <Reveal delay={0}>
             <div style={{background:"#000000", borderRadius:16, padding:24, border:"1px solid rgba(255,255,255,0.05)", height:"100%"}}>
@@ -937,17 +1018,17 @@ export default function HomePage() {
       <div className="section-divider" />
 
       {/* ══════════ SECTION 7 — WHY Nilay 360 ══════════ */}
-      <section style={{background:"linear-gradient(180deg, #000000 0%, #0B0D10 100%)", padding:"clamp(48px, 8vw, 96px) clamp(16px, 4vw, 40px)", position:"relative"}}>
+      <section className="why-section" style={{background:"linear-gradient(180deg, #000000 0%, #0B0D10 100%)", padding:"clamp(48px, 8vw, 96px) clamp(16px, 4vw, 40px)", position:"relative"}}>
         <div style={{ position:"absolute", inset:0, pointerEvents:"none", zIndex:0, backgroundImage:"url('https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&q=30')", backgroundSize:"cover", opacity:0.03, mixBlendMode:"overlay" }} />
-        <div style={{maxWidth:1280, margin:"0 auto", position:"relative", zIndex:1}}>
+        <div style={{maxWidth:"min(1280px, 100%)", margin:"0 auto", width:"100%", boxSizing:"border-box", position:"relative", zIndex:1}}>
           <Reveal>
           <div style={{textAlign:"center", marginBottom:28}}>
             <div style={{fontSize:11, color:G.gold, fontWeight:700, letterSpacing:2, textTransform:"uppercase", marginBottom:8}}>Why Choose Us</div>
-            <h2 style={{fontFamily:"'Cormorant Garamond',Georgia,serif", fontSize:32, fontWeight:700, color:"#fff"}}>The Nilay 360 Difference</h2>
+            <h2 className="why-heading" style={{fontFamily:"'Cormorant Garamond',Georgia,serif", fontSize:32, fontWeight:700, color:"#fff", wordBreak:"break-word", maxWidth:"100%"}}>The Nilay 360 Difference</h2>
           </div>
           </Reveal>
 
-          <div style={{display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:12}}>
+          <div className="why-grid" style={{display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:12}}>
             {[
               {d:"M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z", title:"RERA Verified", desc:"Every listing verified"},
               {d:"M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z", title:"Trusted Agents", desc:"500+ certified professionals"},
@@ -975,24 +1056,24 @@ export default function HomePage() {
       <div className="section-divider" />
 
       {/* ══════════ SECTION 8 — TRENDING LOCATIONS ══════════ */}
-      <section style={{background:"#000000", padding:"96px 0 96px 56px"}}>
+      <section className="trending-section" style={{background:"#000000", padding:"96px 0 96px 56px"}}>
         <div style={{maxWidth:1280+56}}>
           <Reveal>
           <div style={{display:"flex", justifyContent:"space-between", alignItems:"flex-end", marginBottom:28, paddingRight:56}}>
             <div>
               <div style={{fontSize:11, color:G.gold, fontWeight:700, letterSpacing:2, textTransform:"uppercase", marginBottom:8}}>Hot Markets</div>
-              <h2 style={{fontFamily:"'Cormorant Garamond',Georgia,serif", fontSize:32, fontWeight:700, color:"#fff"}}>Trending Locations</h2>
+              <h2 className="trending-heading" style={{fontFamily:"'Cormorant Garamond',Georgia,serif", fontSize:32, fontWeight:700, color:"#fff", wordBreak:"break-word", maxWidth:"100%"}}>Trending Locations</h2>
             </div>
             <a href="/locations" style={{fontSize:14, color:G.gold, fontWeight:600}}>View all cities →</a>
           </div>
           </Reveal>
 
-          <div className="hide-scroll" style={{display:"flex", gap:16, overflowX:"auto", paddingRight:56, paddingBottom:8}}>
+          <div className="hide-scroll trending-carousel" style={{display:"flex", gap:16, overflowX:"auto", paddingRight:56, paddingBottom:8, scrollSnapType:"x mandatory", WebkitOverflowScrolling:"touch", maxWidth:"100vw", boxSizing:"border-box"}}>
             {LOCATIONS.map((loc,i)=>(
               <Reveal key={`${loc.city}-${loc.area}`} delay={i*0.06} style={{flexShrink:0}}>
               <a href={`/search?city=${loc.city.toLowerCase().replace(" ","-")}&locality=${loc.area.toLowerCase().replace(" ","-")}`}
                 className="loc-card"
-                style={{ position:"relative", borderRadius:20, overflow:"hidden", height:240, width:240, flexShrink:0, cursor:"pointer", display:"block" }}>
+                style={{ position:"relative", borderRadius:20, overflow:"hidden", height:240, width:240, flexShrink:0, cursor:"pointer", display:"block", scrollSnapAlign:"start" }}>
                 <div style={{position:"absolute", inset:0, backgroundImage:`url(${loc.img})`, backgroundSize:"cover", backgroundPosition:"center", transition:"transform 0.6s cubic-bezier(0.16,1,0.3,1)"}} />
                 <div style={{position:"absolute", inset:0, background:loc.grad, opacity:0.25}} />
                 <div style={{position:"absolute", inset:0, background:"linear-gradient(to top, rgba(0,0,0,0.90) 0%, rgba(0,0,0,0.20) 60%, transparent 100%)"}} />
@@ -1014,12 +1095,12 @@ export default function HomePage() {
       <div className="section-divider" />
 
       {/* ══════════ SECTION 9 — TESTIMONIALS ══════════ */}
-      <section style={{background:"#0B0D10", padding:"clamp(48px, 8vw, 96px) clamp(16px, 4vw, 40px)"}}>
-        <div style={{maxWidth:1280, margin:"0 auto"}}>
+      <section className="testimonials-section" style={{background:"#0B0D10", padding:"clamp(48px, 8vw, 96px) clamp(16px, 4vw, 40px)"}}>
+        <div style={{maxWidth:"min(1280px, 100%)", margin:"0 auto", width:"100%", boxSizing:"border-box"}}>
           <Reveal>
           <div style={{textAlign:"center", marginBottom:28}}>
             <div style={{fontSize:11, color:G.gold, fontWeight:700, letterSpacing:2, textTransform:"uppercase", marginBottom:8}}>Client Stories</div>
-            <h2 style={{fontFamily:"'Cormorant Garamond',Georgia,serif", fontSize:32, fontWeight:700, color:"#fff", marginBottom:8}}>What Our Clients Say</h2>
+            <h2 className="testimonials-heading" style={{fontFamily:"'Cormorant Garamond',Georgia,serif", fontSize:32, fontWeight:700, color:"#fff", marginBottom:8, wordBreak:"break-word", maxWidth:"100%"}}>What Our Clients Say</h2>
             <div style={{display:"flex", alignItems:"center", justifyContent:"center", gap:8}}>
               <span style={{color:G.gold, fontSize:16}}>★★★★★</span>
               <span style={{fontSize:14, color:"rgba(255,255,255,0.45)"}}>4.9 / 5 on Google Reviews · 18,000+ reviews</span>
@@ -1028,7 +1109,7 @@ export default function HomePage() {
           </Reveal>
 
           {/* Review cards */}
-          <div style={{display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:16, marginBottom:24}}>
+          <div className="testimonials-grid" style={{display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:16, marginBottom:24}}>
             {[reviewIdx, (reviewIdx+1)%REVIEWS.length, (reviewIdx+2)%REVIEWS.length].map((i,pos)=>{
               const r = REVIEWS[i];
               return (
@@ -1063,20 +1144,20 @@ export default function HomePage() {
       <div className="section-divider" />
 
       {/* ══════════ SECTION 10 — CTA BANNER ══════════ */}
-      <section style={{background:`linear-gradient(135deg, ${G.dark} 0%, ${G.mid} 100%)`, padding:"clamp(48px, 8vw, 96px) clamp(16px, 4vw, 40px)", position:"relative", overflow:"hidden"}}>
+      <section className="cta-section" style={{background:`linear-gradient(135deg, ${G.dark} 0%, ${G.mid} 100%)`, padding:"clamp(48px, 8vw, 96px) clamp(16px, 4vw, 40px)", position:"relative", overflow:"hidden"}}>
         {/* Decorative circles */}
         <div style={{position:"absolute", left:-150, top:-150, width:500, height:500, borderRadius:"50%", background:"radial-gradient(circle, rgba(43,168,224,0.12) 0%, transparent 70%)", pointerEvents:"none"}} />
         <div style={{position:"absolute", right:-150, bottom:-150, width:500, height:500, borderRadius:"50%", background:"radial-gradient(circle, rgba(43,168,224,0.10) 0%, transparent 70%)", pointerEvents:"none"}} />
         <div style={{position:"absolute", inset:0, backgroundImage:"radial-gradient(ellipse 50% 80% at 80% 50%, rgba(43,168,224,0.1) 0%, transparent 60%)", pointerEvents:"none"}} />
         <Reveal style={{maxWidth:720, margin:"0 auto", position:"relative", zIndex:1}}>
         <div style={{textAlign:"center"}}>
-          <h2 style={{fontFamily:"'Cormorant Garamond',Georgia,serif", fontSize:40, fontWeight:300, color:"#fff", marginBottom:14}}>
+          <h2 className="cta-heading" style={{fontFamily:"'Cormorant Garamond',Georgia,serif", fontSize:"clamp(26px,5vw,40px)", fontWeight:300, color:"#fff", marginBottom:14, wordBreak:"break-word", maxWidth:"100%"}}>
             Ready to Find Your<br /><em style={{fontStyle:"italic", color:G.goldLt}}>Perfect Property?</em>
           </h2>
           <p style={{fontSize:15, color:"rgba(255,255,255,0.6)", marginBottom:32, lineHeight:1.7}}>
             Join 50,000+ buyers and investors who found their dream property through Nilay 360.
           </p>
-          <div style={{display:"flex", gap:14, justifyContent:"center", flexWrap:"wrap"}}>
+          <div className="cta-buttons" style={{display:"flex", gap:14, justifyContent:"center", flexWrap:"wrap"}}>
             <a href="/search" style={{padding:"14px 32px", background:G.gold, borderRadius:10, color:"#000", fontSize:15, fontWeight:700, transition:"background 0.15s"}}
               onMouseOver={e=>(e.currentTarget.style.background=G.goldLt)} onMouseOut={e=>(e.currentTarget.style.background=G.gold)}>Browse Properties</a>
             <a href="/contact" style={{padding:"14px 32px", border:"1px solid rgba(255,255,255,0.25)", borderRadius:10, color:"#fff", fontSize:15, fontWeight:500, transition:"all 0.15s"}}
@@ -1088,9 +1169,9 @@ export default function HomePage() {
       </section>
 
       {/* ══════════ SECTION 11 — FOOTER ══════════ */}
-      <footer style={{background:G.black, padding:"56px 56px 28px", color:"rgba(255,255,255,0.55)"}}>
-        <div style={{maxWidth:1280, margin:"0 auto"}}>
-          <div style={{display:"grid", gridTemplateColumns:"2fr 1fr 1fr 1fr 1fr", gap:40, marginBottom:48}}>
+      <footer className="footer-section" style={{background:G.black, padding:"56px 56px 28px", color:"rgba(255,255,255,0.55)"}}>
+        <div style={{maxWidth:"min(1280px, 100%)", margin:"0 auto", width:"100%", boxSizing:"border-box"}}>
+          <div className="footer-grid" style={{display:"grid", gridTemplateColumns:"2fr 1fr 1fr 1fr 1fr", gap:40, marginBottom:48}}>
             {/* Brand */}
             <div>
               <a href="/" style={{display:"inline-block", marginBottom:12}}>
@@ -1129,7 +1210,7 @@ export default function HomePage() {
             ))}
           </div>
 
-          <div style={{borderTop:"1px solid rgba(255,255,255,0.07)", paddingTop:24, display:"flex", justifyContent:"space-between", alignItems:"center", flexWrap:"wrap", gap:12}}>
+          <div className="footer-bottom" style={{borderTop:"1px solid rgba(255,255,255,0.07)", paddingTop:24, display:"flex", justifyContent:"space-between", alignItems:"center", flexWrap:"wrap", gap:12}}>
             <p style={{fontSize:12}}>© {new Date().getFullYear()} Nilay 360 · All rights reserved.</p>
             <p style={{fontSize:12}}>All listings subject to availability. Prices are indicative. Verify with RERA before purchase.</p>
           </div>

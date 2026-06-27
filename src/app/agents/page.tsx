@@ -219,6 +219,26 @@ export default function AgentsPage() {
         @keyframes fadeUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
         input::placeholder { color: #9CA3AF; }
         input:focus { border-color: rgba(201,168,76,0.5) !important; box-shadow: 0 0 0 3px rgba(201,168,76,0.08); }
+        @media (max-width: 768px) {
+          .ag-hero { padding: 48px 16px 56px !important; }
+          .ag-stats { gap: 24px !important; flex-wrap: wrap !important; justify-content: center !important; }
+          .ag-filters { padding: 32px 16px 0 !important; }
+          .ag-filter-row select { flex: 1 1 calc(50% - 5px) !important; }
+          .ag-featured { padding: 40px 16px 0 !important; }
+          .ag-featured-grid { grid-template-columns: 1fr !important; }
+          .ag-all { padding: 40px 16px 56px !important; }
+          .ag-all-grid { grid-template-columns: repeat(2,1fr) !important; gap: 14px !important; }
+          .ag-become { padding: 56px 16px !important; }
+          .ag-become-grid { grid-template-columns: 1fr !important; gap: 32px !important; }
+          .ag-cta { padding: 48px 16px !important; }
+          .ag-cta-inner { padding: 40px 20px !important; }
+          .ag-footer { padding: 48px 16px 0 !important; }
+          .ag-footer-grid { grid-template-columns: 1fr 1fr !important; gap: 32px !important; }
+        }
+        @media (max-width: 480px) {
+          .ag-all-grid { grid-template-columns: 1fr !important; }
+          .ag-footer-grid { grid-template-columns: 1fr !important; }
+        }
       `}</style>
 
       <div style={{ minHeight: "100vh", background: "#000000" }}>
@@ -228,7 +248,7 @@ export default function AgentsPage() {
           <div style={{ position: "absolute", inset: 0, backgroundImage: "linear-gradient(rgba(201,168,76,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(201,168,76,0.04) 1px, transparent 1px)", backgroundSize: "60px 60px", pointerEvents: "none" }} />
           <div style={{ position: "absolute", inset: 0, background: "radial-gradient(ellipse 65% 65% at 50% 130%, rgba(201,168,76,0.1) 0%, transparent 55%)", pointerEvents: "none" }} />
           <div style={{ position: "absolute", right: 0, top: 0, bottom: 0, width: "40%", backgroundImage: "radial-gradient(circle, rgba(201,168,76,0.1) 1px, transparent 1px)", backgroundSize: "24px 24px", pointerEvents: "none", maskImage: "linear-gradient(to left, rgba(0,0,0,0.4), transparent)" }} />
-          <div style={{ position: "relative", zIndex: 2, maxWidth: "1280px", width: "100%", margin: "0 auto", padding: "72px 48px", textAlign: "center" }}>
+          <div className="ag-hero" style={{ position: "relative", zIndex: 2, maxWidth: "1280px", width: "100%", margin: "0 auto", padding: "72px 48px", textAlign: "center" }}>
             <div style={{ animation: "fadeUp 0.5s ease-out both" }}><Eyebrow label="Our Expert Team" /></div>
             <h1 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "clamp(44px, 6.5vw, 78px)", fontWeight: 300, color: "#000000", lineHeight: 1.08, marginBottom: "16px", animation: "fadeUp 0.5s 0.1s ease-out both" }}>
               Meet Our Verified<br /><em style={{ fontStyle: "italic", color: "#2BA8E0" }}>Agents</em>
@@ -236,7 +256,7 @@ export default function AgentsPage() {
             <p style={{ fontSize: "16px", color: "rgba(245,242,236,0.5)", marginBottom: "48px", animation: "fadeUp 0.5s 0.18s ease-out both" }}>
               RERA certified professionals with proven track records
             </p>
-            <div style={{ display: "flex", justifyContent: "center", gap: "60px", paddingTop: "28px", borderTop: "1px solid rgba(245,242,236,0.06)", animation: "fadeUp 0.5s 0.25s ease-out both" }}>
+            <div className="ag-stats" style={{ display: "flex", justifyContent: "center", gap: "60px", paddingTop: "28px", borderTop: "1px solid rgba(245,242,236,0.06)", animation: "fadeUp 0.5s 0.25s ease-out both" }}>
               {[["500+","Verified Agents"],["14","Cities Covered"],["4.9","Avg Rating"]].map(([v,l]) => (
                 <div key={l} style={{ textAlign: "center" }}>
                   <p style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "34px", fontWeight: 600, color: "#2BA8E0" }}>{v}</p>
@@ -248,7 +268,7 @@ export default function AgentsPage() {
         </section>
 
         {/* ── SEARCH & FILTERS ───────────────────────────────── */}
-        <div style={{ maxWidth: "1280px", margin: "0 auto", padding: "44px 48px 0" }}>
+        <div className="ag-filters" style={{ maxWidth: "1280px", margin: "0 auto", padding: "44px 48px 0" }}>
           <div style={{ background: "#fff", border: "1px solid rgba(13,43,31,0.07)", borderRadius: "16px", padding: "20px 24px", boxShadow: "0 2px 12px rgba(13,43,31,0.04)" }}>
             {/* Search */}
             <div style={{ position: "relative", marginBottom: "16px" }}>
@@ -257,7 +277,7 @@ export default function AgentsPage() {
                 style={{ width: "100%", padding: "13px 16px 13px 44px", background: "#F8F6F1", border: "1.5px solid rgba(13,43,31,0.08)", borderRadius: "10px", fontSize: "13px", color: "#000000", fontFamily: "'DM Sans', sans-serif", outline: "none" }} />
             </div>
             {/* Filter row */}
-            <div style={{ display: "flex", gap: "10px", alignItems: "center", flexWrap: "wrap" }}>
+            <div className="ag-filter-row" style={{ display: "flex", gap: "10px", alignItems: "center", flexWrap: "wrap" }}>
               <Sel value={cityFilter} onChange={v => { setCityFilter(v); setPage(1); }} placeholder="All Cities"
                 opts={[["Hyderabad","Hyderabad"],["Mumbai","Mumbai"],["Bengaluru","Bengaluru"],["Delhi NCR","Delhi NCR"],["Chennai","Chennai"],["Pune","Pune"]]} />
               <Sel value={specFilter} onChange={v => { setSpecFilter(v); setPage(1); }} placeholder="Specialisation"
@@ -280,21 +300,21 @@ export default function AgentsPage() {
 
         {/* ── FEATURED AGENTS ────────────────────────────────── */}
         {featured.length > 0 && (
-          <section style={{ maxWidth: "1280px", margin: "0 auto", padding: "60px 48px 0" }}>
+          <section className="ag-featured" style={{ maxWidth: "1280px", margin: "0 auto", padding: "60px 48px 0" }}>
             <div style={{ textAlign: "center", marginBottom: "36px" }}>
               <Eyebrow label="Top Performers" />
               <h2 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "clamp(28px, 3.5vw, 42px)", fontWeight: 400, color: "#000000" }}>
                 Featured <em style={{ fontStyle: "italic", color: "#2BA8E0" }}>Agents</em>
               </h2>
             </div>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "24px" }}>
+            <div className="ag-featured-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "24px" }}>
               {featured.map(a => <FeaturedCard key={a.id} a={a} />)}
             </div>
           </section>
         )}
 
         {/* ── ALL AGENTS GRID ────────────────────────────────── */}
-        <section style={{ maxWidth: "1280px", margin: "0 auto", padding: "60px 48px 72px" }}>
+        <section className="ag-all" style={{ maxWidth: "1280px", margin: "0 auto", padding: "60px 48px 72px" }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "28px" }}>
             <h2 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "28px", fontWeight: 400, color: "#000000" }}>
               All Agents <span style={{ color: "#2BA8E0", fontStyle: "italic" }}>({filtered.length})</span>
@@ -308,7 +328,7 @@ export default function AgentsPage() {
             </div>
           ) : (
             <>
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "18px", marginBottom: "36px" }}>
+              <div className="ag-all-grid" style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "18px", marginBottom: "36px" }}>
                 {paginated.map(a => <AgentCard key={a.id} a={a} />)}
               </div>
               {/* Pagination */}
@@ -331,10 +351,10 @@ export default function AgentsPage() {
         </section>
 
         {/* ── BECOME AN AGENT ────────────────────────────────── */}
-        <section style={{ background: "#000000", padding: "90px 48px", position: "relative", overflow: "hidden" }}>
+        <section className="ag-become" style={{ background: "#000000", padding: "90px 48px", position: "relative", overflow: "hidden" }}>
           <div style={{ position: "absolute", inset: 0, backgroundImage: "linear-gradient(rgba(201,168,76,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(201,168,76,0.04) 1px, transparent 1px)", backgroundSize: "52px 52px", pointerEvents: "none" }} />
           <div style={{ position: "absolute", inset: 0, background: "radial-gradient(ellipse 60% 55% at 50% 110%, rgba(201,168,76,0.1) 0%, transparent 55%)", pointerEvents: "none" }} />
-          <div style={{ position: "relative", zIndex: 2, maxWidth: "1100px", margin: "0 auto", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "60px", alignItems: "center" }}>
+          <div className="ag-become-grid" style={{ position: "relative", zIndex: 2, maxWidth: "1100px", margin: "0 auto", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "60px", alignItems: "center" }}>
             {/* Left */}
             <div>
               <Eyebrow label="Join Our Network" />
@@ -374,8 +394,8 @@ export default function AgentsPage() {
         </section>
 
         {/* ── CTA ────────────────────────────────────────────── */}
-        <section style={{ maxWidth: "1280px", margin: "0 auto", padding: "80px 48px" }}>
-          <div style={{ background: "#F8F6F1", border: "1px solid rgba(13,43,31,0.07)", borderRadius: "22px", padding: "60px 48px", textAlign: "center", position: "relative", overflow: "hidden" }}>
+        <section className="ag-cta" style={{ maxWidth: "1280px", margin: "0 auto", padding: "80px 48px" }}>
+          <div className="ag-cta-inner" style={{ background: "#F8F6F1", border: "1px solid rgba(13,43,31,0.07)", borderRadius: "22px", padding: "60px 48px", textAlign: "center", position: "relative", overflow: "hidden" }}>
             <div style={{ position: "absolute", inset: 0, backgroundImage: "radial-gradient(circle, rgba(201,168,76,0.06) 1px, transparent 1px)", backgroundSize: "30px 30px", pointerEvents: "none" }} />
             <div style={{ position: "relative", zIndex: 2 }}>
               <Eyebrow label="Expert Guidance" />
@@ -394,9 +414,9 @@ export default function AgentsPage() {
         </section>
 
         {/* ── FOOTER ─────────────────────────────────────────── */}
-        <footer style={{ background: "#05080C", padding: "72px 48px 0" }}>
+        <footer className="ag-footer" style={{ background: "#05080C", padding: "72px 48px 0" }}>
           <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
-            <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1fr", gap: "48px", paddingBottom: "56px", borderBottom: "1px solid rgba(245,242,236,0.06)" }}>
+            <div className="ag-footer-grid" style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1fr", gap: "48px", paddingBottom: "56px", borderBottom: "1px solid rgba(245,242,236,0.06)" }}>
               <div>
                 <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "18px", fontWeight: 600, color: "#fff", letterSpacing: "0.16em", marginBottom: "14px" }}>Nilay 360 <span style={{ color: "#2BA8E0" }}>·</span></div>
                 <p style={{ fontSize: "13px", color: "rgba(245,242,236,0.35)", lineHeight: 1.75, maxWidth: "280px" }}>India's most trusted premium real estate platform. Every listing verified, every agent certified.</p>

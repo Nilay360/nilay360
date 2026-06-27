@@ -50,7 +50,7 @@ export function Footer() {
     <footer className="bg-[#000000] text-white">
       {/* Main footer */}
       <div className="nilay360-container py-14">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-10 footer-grid">
+        <div className="footer-grid" style={{display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(140px, 1fr))", gap:32, width:"100%", maxWidth:"100%", boxSizing:"border-box"}}>
 
           {/* Brand column */}
           <div className="lg:col-span-2 footer-brand">

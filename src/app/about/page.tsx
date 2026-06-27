@@ -95,6 +95,31 @@ export default function AboutPage() {
         ::-webkit-scrollbar-thumb { background: rgba(201,168,76,0.3); border-radius: 2px; }
         @keyframes fadeUp { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes shimmer { from { background-position: -400px 0; } to { background-position: 400px 0; } }
+        @media (max-width: 768px) {
+          .ab-hero { padding: 56px 16px 64px !important; }
+          .ab-story { padding: 56px 16px !important; }
+          .ab-story-grid { grid-template-columns: 1fr !important; gap: 32px !important; }
+          .ab-mission { padding: 56px 16px !important; }
+          .ab-mission-grid { grid-template-columns: 1fr !important; gap: 32px !important; }
+          .ab-why { padding: 56px 16px !important; }
+          .ab-why-grid { grid-template-columns: repeat(2,1fr) !important; gap: 16px !important; }
+          .ab-stats { padding: 56px 16px !important; flex-wrap: wrap !important; gap: 24px !important; }
+          .ab-team { padding: 56px 16px !important; }
+          .ab-team-grid { grid-template-columns: repeat(2,1fr) !important; gap: 16px !important; }
+          .ab-awards { padding: 48px 16px !important; }
+          .ab-awards-grid { grid-template-columns: repeat(2,1fr) !important; gap: 16px !important; }
+          .ab-testimonials { padding: 56px 16px !important; }
+          .ab-testimonials-grid { grid-template-columns: 1fr !important; gap: 16px !important; }
+          .ab-cta { padding: 56px 16px !important; }
+          .ab-footer { padding: 48px 16px 0 !important; }
+          .ab-footer-grid { grid-template-columns: 1fr 1fr !important; gap: 32px !important; }
+        }
+        @media (max-width: 480px) {
+          .ab-why-grid { grid-template-columns: 1fr !important; }
+          .ab-team-grid { grid-template-columns: 1fr !important; }
+          .ab-awards-grid { grid-template-columns: 1fr !important; }
+          .ab-footer-grid { grid-template-columns: 1fr !important; }
+        }
       `}</style>
 
       <div style={{ minHeight: "100vh", background: "#000000" }}>
@@ -105,7 +130,7 @@ export default function AboutPage() {
           <div style={{ position: "absolute", inset: 0, pointerEvents: "none", backgroundImage: "linear-gradient(rgba(201,168,76,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(201,168,76,0.04) 1px, transparent 1px)", backgroundSize: "52px 52px" }} />
           {/* Radial glows */}
           <div style={{ position: "absolute", inset: 0, pointerEvents: "none", background: "radial-gradient(ellipse 60% 70% at 90% 110%, rgba(201,168,76,0.09) 0%, transparent 55%), radial-gradient(ellipse 50% 55% at 5% 0%, rgba(45,106,79,0.25) 0%, transparent 50%)" }} />
-          <div style={{ position: "relative", zIndex: 2, maxWidth: "900px", margin: "0 auto", padding: "80px 48px 90px", textAlign: "center" }}>
+          <div className="ab-hero" style={{ position: "relative", zIndex: 2, maxWidth: "900px", margin: "0 auto", padding: "80px 48px 90px", textAlign: "center" }}>
             <div style={{ display: "inline-flex", alignItems: "center", gap: "8px", padding: "5px 16px", background: "rgba(201,168,76,0.1)", border: "1px solid rgba(201,168,76,0.25)", borderRadius: "100px", marginBottom: "28px" }}>
               <div style={{ width: "5px", height: "5px", borderRadius: "50%", background: "#2BA8E0", boxShadow: "0 0 6px rgba(201,168,76,0.6)" }} />
               <span style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.2em", color: "#2BA8E0", textTransform: "uppercase" }}>About Nilay 360</span>
@@ -128,8 +153,8 @@ export default function AboutPage() {
         </section>
 
         {/* ── 2. COMPANY STORY ────────────────────────────────── */}
-        <section style={{ background: "#000000", padding: "100px 48px" }}>
-          <div style={{ maxWidth: "1200px", margin: "0 auto", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "80px", alignItems: "center" }}>
+        <section className="ab-story" style={{ background: "#000000", padding: "100px 48px" }}>
+          <div className="ab-story-grid" style={{ maxWidth: "1200px", margin: "0 auto", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "80px", alignItems: "center" }}>
             {/* Text */}
             <div>
               <div style={{ display: "inline-flex", alignItems: "center", gap: "8px", marginBottom: "18px" }}>
@@ -186,7 +211,7 @@ export default function AboutPage() {
         </section>
 
         {/* ── 3. MISSION & VISION ─────────────────────────────── */}
-        <section style={{ background: "#000000", padding: "100px 48px", position: "relative", overflow: "hidden" }}>
+        <section className="ab-mission" style={{ background: "#000000", padding: "100px 48px", position: "relative", overflow: "hidden" }}>
           <div style={{ position: "absolute", inset: 0, pointerEvents: "none", backgroundImage: "linear-gradient(rgba(201,168,76,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(201,168,76,0.03) 1px, transparent 1px)", backgroundSize: "52px 52px" }} />
           <div style={{ position: "relative", zIndex: 2, maxWidth: "1100px", margin: "0 auto" }}>
             <div style={{ textAlign: "center", marginBottom: "56px" }}>
@@ -199,7 +224,7 @@ export default function AboutPage() {
                 Why We Exist
               </h2>
             </div>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "24px" }}>
+            <div className="ab-mission-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "24px" }}>
               {[
                 {
                   label: "Our Mission", sub: "What We Do Today",
@@ -226,7 +251,7 @@ export default function AboutPage() {
         </section>
 
         {/* ── 4. WHY CHOOSE Nilay 360 ────────────────────────────── */}
-        <section style={{ background: "#000000", padding: "100px 48px" }}>
+        <section className="ab-why" style={{ background: "#000000", padding: "100px 48px" }}>
           <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
             <div style={{ textAlign: "center", marginBottom: "60px" }}>
               <div style={{ display: "inline-flex", alignItems: "center", gap: "8px", marginBottom: "16px" }}>
@@ -238,7 +263,7 @@ export default function AboutPage() {
                 Why Discerning Buyers<br /><em style={{ fontStyle: "italic", color: "#2BA8E0" }}>Choose Nilay 360</em>
               </h2>
             </div>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "20px" }}>
+            <div className="ab-why-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "20px" }}>
               {FEATURES.map((f, i) => {
                 const [hover, setHover] = useState(false);
                 return (
@@ -256,7 +281,7 @@ export default function AboutPage() {
         </section>
 
         {/* ── 5. STATS ────────────────────────────────────────── */}
-        <section style={{ background: "#000000", padding: "90px 48px", position: "relative", overflow: "hidden" }}>
+        <section className="ab-stats" style={{ background: "#000000", padding: "90px 48px", position: "relative", overflow: "hidden" }}>
           <div style={{ position: "absolute", inset: 0, background: "radial-gradient(ellipse 80% 60% at 50% 100%, rgba(45,106,79,0.2) 0%, transparent 60%)", pointerEvents: "none" }} />
           <div ref={statsRef} style={{ position: "relative", zIndex: 2, maxWidth: "1200px", margin: "0 auto" }}>
             <div style={{ textAlign: "center", marginBottom: "60px" }}>
@@ -279,7 +304,7 @@ export default function AboutPage() {
         </section>
 
         {/* ── 6. LEADERSHIP TEAM ──────────────────────────────── */}
-        <section style={{ background: "#000000", padding: "100px 48px" }}>
+        <section className="ab-team" style={{ background: "#000000", padding: "100px 48px" }}>
           <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
             <div style={{ textAlign: "center", marginBottom: "60px" }}>
               <div style={{ display: "inline-flex", alignItems: "center", gap: "8px", marginBottom: "16px" }}>
@@ -294,7 +319,7 @@ export default function AboutPage() {
                 Experienced operators, technologists, and real estate professionals united by a single standard: excellence.
               </p>
             </div>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "20px" }}>
+            <div className="ab-team-grid" style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "20px" }}>
               {TEAM.map((m, i) => {
                 const [hover, setHover] = useState(false);
                 return (
@@ -313,7 +338,7 @@ export default function AboutPage() {
         </section>
 
         {/* ── 7. AWARDS & CERTIFICATIONS ──────────────────────── */}
-        <section style={{ background: "#fff", padding: "80px 48px", borderTop: "1px solid rgba(13,43,31,0.06)", borderBottom: "1px solid rgba(13,43,31,0.06)" }}>
+        <section className="ab-awards" style={{ background: "#fff", padding: "80px 48px", borderTop: "1px solid rgba(13,43,31,0.06)", borderBottom: "1px solid rgba(13,43,31,0.06)" }}>
           <div style={{ maxWidth: "1100px", margin: "0 auto" }}>
             <div style={{ textAlign: "center", marginBottom: "50px" }}>
               <div style={{ display: "inline-flex", alignItems: "center", gap: "8px", marginBottom: "14px" }}>
@@ -325,7 +350,7 @@ export default function AboutPage() {
                 Awards & Certifications
               </h2>
             </div>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "18px" }}>
+            <div className="ab-awards-grid" style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "18px" }}>
               {AWARDS.map((a, i) => (
                 <div key={i} style={{ background: "#F8F6F1", border: "1px solid rgba(13,43,31,0.07)", borderRadius: "16px", padding: "32px 20px", textAlign: "center" }}>
                   <div style={{ fontSize: "36px", marginBottom: "14px", filter: "grayscale(0)" }}>{a.icon}</div>
@@ -338,7 +363,7 @@ export default function AboutPage() {
         </section>
 
         {/* ── 8. TESTIMONIALS ─────────────────────────────────── */}
-        <section style={{ background: "#000000", padding: "100px 48px" }}>
+        <section className="ab-testimonials" style={{ background: "#000000", padding: "100px 48px" }}>
           <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
             <div style={{ textAlign: "center", marginBottom: "56px" }}>
               <div style={{ display: "inline-flex", alignItems: "center", gap: "8px", marginBottom: "16px" }}>
@@ -350,7 +375,7 @@ export default function AboutPage() {
                 Trusted by Thousands
               </h2>
             </div>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "20px" }}>
+            <div className="ab-testimonials-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "20px" }}>
               {TESTIMONIALS.map((t, i) => (
                 <div key={i} style={{ background: "#fff", border: "1px solid rgba(13,43,31,0.07)", borderRadius: "18px", padding: "36px 32px" }}>
                   <div style={{ fontSize: "36px", fontFamily: "Georgia, serif", color: "#2BA8E0", lineHeight: 0.9, marginBottom: "18px", opacity: 0.7 }}>"</div>
@@ -369,7 +394,7 @@ export default function AboutPage() {
         </section>
 
         {/* ── 9. CTA ──────────────────────────────────────────── */}
-        <section style={{ background: "#000000", padding: "90px 48px", position: "relative", overflow: "hidden" }}>
+        <section className="ab-cta" style={{ background: "#000000", padding: "90px 48px", position: "relative", overflow: "hidden" }}>
           <div style={{ position: "absolute", inset: 0, backgroundImage: "linear-gradient(rgba(201,168,76,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(201,168,76,0.04) 1px, transparent 1px)", backgroundSize: "52px 52px", pointerEvents: "none" }} />
           <div style={{ position: "absolute", inset: 0, background: "radial-gradient(ellipse 60% 60% at 50% 120%, rgba(201,168,76,0.1) 0%, transparent 55%)", pointerEvents: "none" }} />
           <div style={{ position: "relative", zIndex: 2, maxWidth: "680px", margin: "0 auto", textAlign: "center" }}>
@@ -392,9 +417,9 @@ export default function AboutPage() {
         </section>
 
         {/* ── FOOTER ──────────────────────────────────────────── */}
-        <footer style={{ background: "#05080C", padding: "72px 48px 0" }}>
+        <footer className="ab-footer" style={{ background: "#05080C", padding: "72px 48px 0" }}>
           <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
-            <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1fr 1fr", gap: "48px", paddingBottom: "56px", borderBottom: "1px solid rgba(245,242,236,0.06)" }}>
+            <div className="ab-footer-grid" style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1fr 1fr", gap: "48px", paddingBottom: "56px", borderBottom: "1px solid rgba(245,242,236,0.06)" }}>
               <div>
                 <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "18px", fontWeight: 600, color: "#fff", letterSpacing: "0.16em", marginBottom: "14px" }}>Nilay 360 <span style={{ color: "#2BA8E0" }}>·</span></div>
                 <p style={{ fontSize: "13px", color: "rgba(245,242,236,0.35)", lineHeight: 1.75, maxWidth: "280px", marginBottom: "22px" }}>India's most trusted premium real estate platform. Verified listings, certified agents, independent legal guidance.</p>

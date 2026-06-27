@@ -282,6 +282,19 @@ export default function PropertiesPage() {
         ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: rgba(201,168,76,0.25); border-radius: 2px; }
+        @media (max-width: 768px) {
+          .pr-hero { padding: 48px 16px 32px !important; }
+          .pr-layout { flex-direction: column !important; padding: 16px 16px 56px !important; gap: 16px !important; }
+          .pr-sidebar { width: 100% !important; position: static !important; max-height: none !important; flex-shrink: unset !important; }
+          .pr-skeleton-grid { grid-template-columns: repeat(2,1fr) !important; }
+          .pr-cards-grid { grid-template-columns: repeat(auto-fill, minmax(240px,1fr)) !important; }
+          .pr-list-item { flex-direction: column !important; }
+          .pr-list-img { width: 100% !important; height: 200px !important; object-fit: cover !important; }
+        }
+        @media (max-width: 480px) {
+          .pr-skeleton-grid { grid-template-columns: 1fr !important; }
+          .pr-cards-grid { grid-template-columns: 1fr !important; }
+        }
       `}</style>
 
       <div style={{ minHeight: "100vh", background: "#000000", color: "#000000" }}>
@@ -289,7 +302,7 @@ export default function PropertiesPage() {
         <div style={{ position: "fixed", inset: 0, pointerEvents: "none", zIndex: 0, backgroundImage: "linear-gradient(rgba(201,168,76,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(201,168,76,0.03) 1px, transparent 1px)", backgroundSize: "52px 52px" }} />
 
         {/* Hero */}
-        <div style={{ position: "relative", zIndex: 1, marginTop: "64px", background: "linear-gradient(135deg, #081c12 0%, #000000 60%, #132e1f 100%)", borderBottom: "1px solid rgba(201,168,76,0.12)", padding: "48px 48px 40px" }}>
+        <div className="pr-hero" style={{ position: "relative", zIndex: 1, marginTop: "64px", background: "linear-gradient(135deg, #081c12 0%, #000000 60%, #132e1f 100%)", borderBottom: "1px solid rgba(201,168,76,0.12)", padding: "48px 48px 40px" }}>
           <div style={{ maxWidth: "1400px", margin: "0 auto" }}>
             <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "16px" }}>
               <a href="/" style={{ fontSize: "12px", color: "rgba(245,242,236,0.4)", textDecoration: "none" }}>Home</a>
@@ -306,10 +319,10 @@ export default function PropertiesPage() {
         </div>
 
         {/* Main layout */}
-        <div style={{ position: "relative", zIndex: 1, maxWidth: "1400px", margin: "0 auto", padding: "32px 48px 80px", display: "flex", gap: "28px", alignItems: "flex-start" }}>
+        <div className="pr-layout" style={{ position: "relative", zIndex: 1, maxWidth: "1400px", margin: "0 auto", padding: "32px 48px 80px", display: "flex", gap: "28px", alignItems: "flex-start" }}>
 
           {/* Sidebar */}
-          <aside style={{ width: "280px", flexShrink: 0, position: "sticky", top: "88px", background: "rgba(245,242,236,0.03)", border: "1px solid rgba(245,242,236,0.08)", borderRadius: "16px", overflow: "hidden", maxHeight: "calc(100vh - 108px)", overflowY: "auto" }}>
+          <aside className="pr-sidebar" style={{ width: "280px", flexShrink: 0, position: "sticky", top: "88px", background: "rgba(245,242,236,0.03)", border: "1px solid rgba(245,242,236,0.08)", borderRadius: "16px", overflow: "hidden", maxHeight: "calc(100vh - 108px)", overflowY: "auto" }}>
             <div style={{ padding: "20px 20px 16px", borderBottom: "1px solid rgba(245,242,236,0.07)", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
               <span style={{ fontSize: "13px", fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", color: "rgba(245,242,236,0.5)" }}>Filters</span>
               {hasFilters && <button onClick={clearFilters} style={{ fontSize: "11px", fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase", color: "#2BA8E0", background: "transparent", border: "none", cursor: "pointer", fontFamily: "'DM Sans', sans-serif" }}>Clear All</button>}
@@ -427,7 +440,7 @@ export default function PropertiesPage() {
 
             {/* Cards */}
             {loading ? (
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "20px" }}>
+              <div className="pr-skeleton-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "20px" }}>
                 {Array.from({ length: 6 }).map((_, i) => <SkeletonCard key={i} />)}
               </div>
             ) : filtered.length === 0 ? (
@@ -438,17 +451,17 @@ export default function PropertiesPage() {
                 <button onClick={clearFilters} style={{ padding: "11px 28px", background: "#2BA8E0", border: "none", borderRadius: "8px", color: "#000000", fontSize: "13px", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", cursor: "pointer", fontFamily: "'DM Sans', sans-serif" }}>Clear Filters</button>
               </div>
             ) : viewMode === "grid" ? (
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: "20px" }}>
+              <div className="pr-cards-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: "20px" }}>
                 {paginatedItems.map(p => <PropertyCard key={p.id} property={p} savedIds={savedIds} onToggleSave={toggleSave} />)}
               </div>
             ) : (
               <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
                 {paginatedItems.map(p => (
-                  <a key={p.id} href={`/property/${p.slug}`} style={{ display: "flex", textDecoration: "none", color: "inherit", cursor: "pointer", background: "rgba(245,242,236,0.04)", border: "1px solid rgba(245,242,236,0.08)", borderRadius: "16px", overflow: "hidden", transition: "border-color 0.2s, box-shadow 0.2s" }}
+                  <a key={p.id} href={`/property/${p.slug}`} className="pr-list-item" style={{ display: "flex", textDecoration: "none", color: "inherit", cursor: "pointer", background: "rgba(245,242,236,0.04)", border: "1px solid rgba(245,242,236,0.08)", borderRadius: "16px", overflow: "hidden", transition: "border-color 0.2s, box-shadow 0.2s" }}
                     onMouseEnter={e => { const d = e.currentTarget as HTMLElement; d.style.borderColor = "rgba(201,168,76,0.3)"; d.style.boxShadow = "0 8px 32px rgba(0,0,0,0.3)"; }}
                     onMouseLeave={e => { const d = e.currentTarget as HTMLElement; d.style.borderColor = "rgba(245,242,236,0.08)"; d.style.boxShadow = "none"; }}
                   >
-                    <div style={{ width: "280px", flexShrink: 0, position: "relative" }}>
+                    <div className="pr-list-img" style={{ width: "280px", flexShrink: 0, position: "relative" }}>
                       <img src={p.images?.[0] || IMAGES.properties[p.type?.toLowerCase() as keyof typeof IMAGES.properties] || IMAGES.properties.apartment} alt={p.title} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block", minHeight: "180px" }} />
                       <span style={{ position: "absolute", top: "12px", left: "12px", padding: "4px 10px", borderRadius: "100px", fontSize: "10px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", background: p.listing_type === "rent" ? "rgba(45,106,79,0.9)" : "rgba(201,168,76,0.9)", color: p.listing_type === "rent" ? "#0B0D10" : "#000000", backdropFilter: "blur(8px)" }}>
                         {p.listing_type === "rent" ? "For Rent" : "For Sale"}

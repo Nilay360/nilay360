@@ -673,16 +673,31 @@ export default function PropertyDetailClient() {
         input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; }
         input[type=range] { -webkit-appearance: none; appearance: none; width: 100%; height: 4px; border-radius: 2px; background: rgba(13,43,31,0.12); outline: none; }
         input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%; background: #2BA8E0; cursor: pointer; border: 2px solid #fff; box-shadow: 0 1px 4px rgba(0,0,0,0.2); }
+        html, body { max-width: 100vw; overflow-x: hidden !important; }
+        @media (max-width: 768px) {
+          .pd-nav { padding: 0 16px !important; }
+          .pd-nav-links { display: none !important; }
+          .pd-breadcrumb { padding: 12px 16px !important; }
+          .pd-layout { flex-direction: column !important; padding: 0 16px 48px !important; }
+          .pd-left { flex: none !important; width: 100% !important; }
+          .pd-right { flex: none !important; width: 100% !important; position: static !important; top: auto !important; }
+          .pd-emi-grid { grid-template-columns: 1fr !important; }
+          .pd-similar-grid { grid-template-columns: repeat(2, 1fr) !important; }
+          .pd-prev-next { padding: 32px 16px !important; grid-template-columns: 1fr !important; }
+        }
+        @media (max-width: 480px) {
+          .pd-similar-grid { grid-template-columns: 1fr !important; }
+        }
       `}</style>
 
       <div style={{ background: "#000000", minHeight: "100vh" }}>
 
         {/* ── NAV ── */}
-        <nav style={{ position: "fixed", top: 0, left: 0, right: 0, zIndex: 100, height: "68px", display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 48px", background: "rgba(5,8,12,0.82)", backdropFilter: "blur(20px) saturate(180%)", borderBottom: "0.5px solid rgba(201,168,76,0.18)" }}>
+        <nav className="pd-nav" style={{ position: "fixed", top: 0, left: 0, right: 0, zIndex: 100, height: "68px", display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 48px", background: "rgba(5,8,12,0.82)", backdropFilter: "blur(20px) saturate(180%)", borderBottom: "0.5px solid rgba(201,168,76,0.18)" }}>
           <a href="/" style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "19px", fontWeight: 600, color: "#fff", letterSpacing: "0.16em", display: "flex", alignItems: "center", gap: "6px", textDecoration: "none" }}>
             Nilay 360 <span style={{ color: "#2BA8E0", fontSize: "22px", lineHeight: 1 }}>·</span>
           </a>
-          <div style={{ display: "flex", gap: "2px" }}>
+          <div className="pd-nav-links" style={{ display: "flex", gap: "2px" }}>
             {[["Home", "/"], ["Properties", "/properties"], ["Agents", "/agents"], ["Blog", "/blog"]].map(([label, href]) => (
               <a key={label} href={href} style={{ padding: "7px 15px", borderRadius: "6px", fontSize: "13px", fontWeight: 500, color: "rgba(255,255,255,0.55)", textDecoration: "none" }}>{label}</a>
             ))}
@@ -766,7 +781,7 @@ export default function PropertyDetailClient() {
           </div>
 
           {/* ── BREADCRUMB ── */}
-          <div style={{ maxWidth: "1400px", margin: "0 auto", padding: "16px 48px" }}>
+          <div className="pd-breadcrumb" style={{ maxWidth: "1400px", margin: "0 auto", padding: "16px 48px" }}>
             <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
               <a href="/" style={{ fontSize: "12px", color: "#6B7C72", textDecoration: "none" }}>Home</a>
               <span style={{ color: "#2BA8E0", fontSize: "10px" }}>›</span>
@@ -777,10 +792,10 @@ export default function PropertyDetailClient() {
           </div>
 
           {/* ── TWO COLUMN LAYOUT ── */}
-          <div style={{ maxWidth: "1400px", margin: "0 auto", padding: "0 48px 80px", display: "flex", gap: "28px", alignItems: "flex-start" }}>
+          <div className="pd-layout" style={{ maxWidth: "1400px", margin: "0 auto", padding: "0 48px 80px", display: "flex", gap: "28px", alignItems: "flex-start" }}>
 
             {/* ══ LEFT COLUMN ══ */}
-            <div style={{ flex: "0 0 65%", minWidth: 0 }}>
+            <div className="pd-left" style={{ flex: "0 0 65%", minWidth: 0 }}>
 
               {/* ── PRICE & TITLE ── */}
               <Card>
@@ -914,7 +929,7 @@ export default function PropertyDetailClient() {
               {property.listing_type === "sale" && (
                 <Card>
                   <SectionHeading>Calculate Your EMI</SectionHeading>
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "24px" }}>
+                  <div className="pd-emi-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "24px" }}>
                     <div>
                       {/* Property price display */}
                       <div style={{ marginBottom: "20px" }}>
@@ -982,7 +997,7 @@ export default function PropertyDetailClient() {
                 <Reveal>
                   <div style={{ marginBottom: "24px" }}>
                     <SectionHeading>Similar Properties</SectionHeading>
-                    <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "16px" }}>
+                    <div className="pd-similar-grid" style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "16px" }}>
                       {similar.map(p => <SimilarCard key={p.id} p={p} />)}
                     </div>
                   </div>
@@ -992,7 +1007,7 @@ export default function PropertyDetailClient() {
             </div>
 
             {/* ══ RIGHT SIDEBAR ══ */}
-            <div style={{ flex: "0 0 35%", position: "sticky", top: "88px" }}>
+            <div className="pd-right" style={{ flex: "0 0 35%", position: "sticky", top: "88px" }}>
 
               {/* ── CONTACT FORM ── */}
               <Card style={{ marginBottom: "20px" }}>
@@ -1103,7 +1118,7 @@ export default function PropertyDetailClient() {
           </div>
 
           {(prevProperty || nextProperty) && (
-            <div style={{
+            <div className="pd-prev-next" style={{
               maxWidth: 1280, margin: "0 auto", padding: "48px 40px",
               borderTop: "1px solid rgba(255,255,255,0.08)",
               display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16

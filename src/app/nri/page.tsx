@@ -142,16 +142,46 @@ export default function NriPage() {
         @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes floatIn { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
         select option { background: #fff; color: #000000; }
+        @media (max-width: 768px) {
+          .nri-nav { padding: 0 16px !important; }
+          .nri-nav-links { display: none !important; }
+          .nri-hero { padding: 56px 16px 64px !important; }
+          .nri-why { padding: 56px 16px !important; }
+          .nri-stats-grid { grid-template-columns: repeat(2,1fr) !important; gap: 16px !important; }
+          .nri-reasons-grid { grid-template-columns: 1fr !important; gap: 16px !important; }
+          .nri-how { padding: 56px 16px !important; }
+          .nri-steps { flex-direction: column !important; align-items: stretch !important; gap: 20px !important; }
+          .nri-fema { padding: 56px 16px !important; }
+          .nri-fema-grid { grid-template-columns: 1fr !important; gap: 16px !important; }
+          .nri-loans { padding: 56px 16px !important; }
+          .nri-loans-grid { grid-template-columns: 1fr !important; gap: 16px !important; }
+          .nri-services { padding: 56px 16px !important; }
+          .nri-services-grid { grid-template-columns: repeat(2,1fr) !important; gap: 16px !important; }
+          .nri-testimonials { padding: 56px 16px !important; }
+          .nri-testimonials-grid { grid-template-columns: 1fr !important; gap: 16px !important; }
+          .nri-consult { padding: 56px 16px !important; }
+          .nri-consult-grid { grid-template-columns: 1fr !important; gap: 24px !important; }
+          .nri-form-row { grid-template-columns: 1fr !important; }
+          .nri-faq { padding: 56px 16px !important; }
+          .nri-cta { padding: 56px 16px !important; }
+          .nri-footer { padding: 48px 16px 0 !important; }
+          .nri-footer-grid { grid-template-columns: 1fr 1fr !important; gap: 32px !important; }
+        }
+        @media (max-width: 480px) {
+          .nri-stats-grid { grid-template-columns: 1fr !important; }
+          .nri-services-grid { grid-template-columns: 1fr !important; }
+          .nri-footer-grid { grid-template-columns: 1fr !important; }
+        }
       `}</style>
 
       <div style={{ minHeight: "100vh", background: "#000000" }}>
 
         {/* ── NAVBAR ─────────────────────────────────────────── */}
-        <nav style={{ position: "fixed", top: 0, left: 0, right: 0, zIndex: 200, height: "68px", display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 48px", background: "rgba(5,8,12,0.88)", backdropFilter: "blur(20px) saturate(180%)", borderBottom: "0.5px solid rgba(201,168,76,0.18)" }}>
+        <nav className="nri-nav" style={{ position: "fixed", top: 0, left: 0, right: 0, zIndex: 200, height: "68px", display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 48px", background: "rgba(5,8,12,0.88)", backdropFilter: "blur(20px) saturate(180%)", borderBottom: "0.5px solid rgba(201,168,76,0.18)" }}>
           <a href="/" style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "19px", fontWeight: 600, color: "#fff", letterSpacing: "0.16em", textDecoration: "none", display: "flex", alignItems: "center", gap: "5px" }}>
             Nilay 360 <span style={{ color: "#2BA8E0", fontSize: "22px", lineHeight: 1 }}>·</span>
           </a>
-          <div style={{ display: "flex", gap: "2px" }}>
+          <div className="nri-nav-links" style={{ display: "flex", gap: "2px" }}>
             {[["Home", "/"], ["Properties", "/properties"], ["Search", "/search"], ["Blog", "/blog"], ["About", "/about"], ["Contact", "/contact"]].map(([l, h]) => (
               <a key={l} href={h} style={{ padding: "7px 14px", borderRadius: "6px", fontSize: "13px", fontWeight: 500, color: "rgba(255,255,255,0.5)", textDecoration: "none" }}>{l}</a>
             ))}
@@ -177,7 +207,7 @@ export default function NriPage() {
           {/* Floating continent silhouettes (decorative) */}
           <div style={{ position: "absolute", top: "20%", right: "5%", width: "300px", height: "200px", background: "radial-gradient(ellipse at center, rgba(201,168,76,0.06) 0%, transparent 70%)", borderRadius: "50%", pointerEvents: "none" }} />
 
-          <div style={{ position: "relative", zIndex: 2, maxWidth: "860px", margin: "0 auto", padding: "80px 48px 90px", textAlign: "center" }}>
+          <div className="nri-hero" style={{ position: "relative", zIndex: 2, maxWidth: "860px", margin: "0 auto", padding: "80px 48px 90px", textAlign: "center" }}>
             <div style={{ display: "inline-flex", alignItems: "center", gap: "8px", padding: "5px 16px", background: "rgba(201,168,76,0.1)", border: "1px solid rgba(201,168,76,0.25)", borderRadius: "100px", marginBottom: "26px", animation: "fadeUp 0.5s ease-out both" }}>
               <span style={{ fontSize: "14px" }}>🌍</span>
               <span style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.2em", color: "#2BA8E0", textTransform: "uppercase" }}>NRI Property Services</span>
@@ -211,7 +241,7 @@ export default function NriPage() {
         </section>
 
         {/* ── 2. WHY INVEST ───────────────────────────────────── */}
-        <section style={{ background: "#000000", padding: "96px 48px" }}>
+        <section className="nri-why" style={{ background: "#000000", padding: "96px 48px" }}>
           <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
             <div style={{ textAlign: "center", marginBottom: "56px" }}>
               <Eyebrow label="The Opportunity" />
@@ -224,7 +254,7 @@ export default function NriPage() {
             </div>
 
             {/* Stat pills */}
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "18px", marginBottom: "52px" }}>
+            <div className="nri-stats-grid" style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "18px", marginBottom: "52px" }}>
               {[
                 { num: "8.2%", label: "Avg Annual Appreciation", sub: "Premium city markets" },
                 { num: "₹43K Cr", label: "NRI Investment in 2024", sub: "Record year" },
@@ -241,7 +271,7 @@ export default function NriPage() {
             </div>
 
             {/* Reason cards */}
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "20px" }}>
+            <div className="nri-reasons-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "20px" }}>
               {[
                 { icon: "📈", title: "Strong Capital Appreciation", desc: "Premium residential markets in Hyderabad, Mumbai, and Bengaluru have delivered 8–14% annual appreciation over the past decade, outpacing most global asset classes. The infrastructure push — metro expansions, IT corridors, and airport developments — continues to drive micro-market premiums." },
                 { icon: "🏠", title: "Rental Income Potential", desc: "Demand from India's rapidly expanding professional workforce means premium properties in technology corridors command rental yields of 3–5% — with occupancy rates above 95% in top localities. A Kokapet apartment rented to a GCC employee pays your EMI and then some." },
@@ -262,7 +292,7 @@ export default function NriPage() {
         </section>
 
         {/* ── 3. HOW IT WORKS ─────────────────────────────────── */}
-        <section style={{ background: "#000000", padding: "96px 48px", position: "relative", overflow: "hidden" }}>
+        <section className="nri-how" style={{ background: "#000000", padding: "96px 48px", position: "relative", overflow: "hidden" }}>
           <div style={{ position: "absolute", inset: 0, backgroundImage: "linear-gradient(rgba(201,168,76,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(201,168,76,0.04) 1px, transparent 1px)", backgroundSize: "52px 52px", pointerEvents: "none" }} />
           <div style={{ maxWidth: "1200px", margin: "0 auto", position: "relative", zIndex: 2 }}>
             <div style={{ textAlign: "center", marginBottom: "60px" }}>
@@ -272,7 +302,7 @@ export default function NriPage() {
               </h2>
               <p style={{ fontSize: "14px", color: "rgba(245,242,236,0.4)", marginTop: "12px" }}>Six steps. Zero stress. Complete from abroad.</p>
             </div>
-            <div style={{ display: "flex", gap: "12px", alignItems: "flex-start" }}>
+            <div className="nri-steps" style={{ display: "flex", gap: "12px", alignItems: "flex-start" }}>
               <StepCard num={1} icon="📞" title="Free Consultation"   desc="30-minute video call with a dedicated NRI advisor to understand your goals, budget, and timeline." />
               <StepCard num={2} icon="🔍" title="Property Shortlisting" desc="We curate 8–12 verified properties matching your criteria, complete with legal status and pricing data." />
               <StepCard num={3} icon="🎥" title="Virtual Site Tours"  desc="Live video tours conducted by our ground team. Walk through properties in real time from your living room." />
@@ -284,7 +314,7 @@ export default function NriPage() {
         </section>
 
         {/* ── 4. FEMA & LEGAL GUIDE ───────────────────────────── */}
-        <section id="fema" style={{ background: "#000000", padding: "96px 48px" }}>
+        <section id="fema" className="nri-fema" style={{ background: "#000000", padding: "96px 48px" }}>
           <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
             <div style={{ textAlign: "center", marginBottom: "52px" }}>
               <Eyebrow label="Legal Framework" />
@@ -295,7 +325,7 @@ export default function NriPage() {
                 The Foreign Exchange Management Act governs NRI property ownership. Here's everything you need to know.
               </p>
             </div>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "20px" }}>
+            <div className="nri-fema-grid" style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "20px" }}>
               {[
                 {
                   icon: "👤", title: "Who Can Buy",
@@ -343,7 +373,7 @@ export default function NriPage() {
         </section>
 
         {/* ── 5. NRI HOME LOAN ────────────────────────────────── */}
-        <section style={{ background: "#fff", padding: "96px 48px", borderTop: "1px solid rgba(13,43,31,0.06)", borderBottom: "1px solid rgba(13,43,31,0.06)" }}>
+        <section className="nri-loans" style={{ background: "#fff", padding: "96px 48px", borderTop: "1px solid rgba(13,43,31,0.06)", borderBottom: "1px solid rgba(13,43,31,0.06)" }}>
           <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
             <div style={{ textAlign: "center", marginBottom: "52px" }}>
               <Eyebrow label="Financing" />
@@ -351,7 +381,7 @@ export default function NriPage() {
                 NRI Home Loan<br /><em style={{ fontStyle: "italic", color: "#2BA8E0" }}>Options</em>
               </h2>
             </div>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "20px", marginBottom: "32px" }}>
+            <div className="nri-loans-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "20px", marginBottom: "32px" }}>
               {[
                 {
                   bank: "HDFC NRI Loans", logo: "HDFC", rate: "8.70% – 9.85%", maxLoan: "₹10 Crore", tenure: "Up to 25 years",
@@ -404,7 +434,7 @@ export default function NriPage() {
         </section>
 
         {/* ── 6. SERVICES ─────────────────────────────────────── */}
-        <section style={{ background: "#000000", padding: "96px 48px", position: "relative", overflow: "hidden" }}>
+        <section className="nri-services" style={{ background: "#000000", padding: "96px 48px", position: "relative", overflow: "hidden" }}>
           <div style={{ position: "absolute", inset: 0, backgroundImage: "linear-gradient(rgba(201,168,76,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(201,168,76,0.04) 1px, transparent 1px)", backgroundSize: "52px 52px", pointerEvents: "none" }} />
           <div style={{ maxWidth: "1200px", margin: "0 auto", position: "relative", zIndex: 2 }}>
             <div style={{ textAlign: "center", marginBottom: "52px" }}>
@@ -413,7 +443,7 @@ export default function NriPage() {
                 Services We<br /><em style={{ fontStyle: "italic", color: "#2BA8E0" }}>Offer</em>
               </h2>
             </div>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "16px" }}>
+            <div className="nri-services-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "16px" }}>
               <ServiceCard icon="🎥" title="Virtual Property Tours" desc="HD live video walkthroughs conducted by our ground team on WhatsApp or Zoom. See the actual property, neighbourhood streets, and building amenities — not just photos." />
               <ServiceCard icon="⚖" title="Legal Due Diligence" desc="Comprehensive title search, RERA verification, encumbrance certificate review, builder track record check, and legal clearance report before you commit a single rupee." />
               <ServiceCard icon="📋" title="Power of Attorney Assistance" desc="We draft your POA, guide you through consulate attestation or apostille (depending on your country), and ensure your representative is briefed for every step." />
@@ -425,7 +455,7 @@ export default function NriPage() {
         </section>
 
         {/* ── 7. TESTIMONIALS ─────────────────────────────────── */}
-        <section style={{ background: "#000000", padding: "96px 48px" }}>
+        <section className="nri-testimonials" style={{ background: "#000000", padding: "96px 48px" }}>
           <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
             <div style={{ textAlign: "center", marginBottom: "52px" }}>
               <Eyebrow label="NRI Stories" />
@@ -433,7 +463,7 @@ export default function NriPage() {
                 NRIs Who Trusted<br /><em style={{ fontStyle: "italic", color: "#2BA8E0" }}>Nilay 360</em>
               </h2>
             </div>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "20px" }}>
+            <div className="nri-testimonials-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "20px" }}>
               {TESTIMONIALS.map((t, i) => (
                 <div key={i} style={{ background: "#fff", border: "1px solid rgba(13,43,31,0.07)", borderRadius: "18px", padding: "36px 32px" }}>
                   <div style={{ fontSize: "36px", fontFamily: "Georgia, serif", color: "#2BA8E0", lineHeight: 0.9, marginBottom: "18px", opacity: 0.7 }}>"</div>
@@ -453,7 +483,7 @@ export default function NriPage() {
         </section>
 
         {/* ── 8. CONSULTATION FORM ────────────────────────────── */}
-        <section id="consultation" style={{ background: "#F8F6F1", padding: "96px 48px", borderTop: "1px solid rgba(13,43,31,0.06)" }}>
+        <section id="consultation" className="nri-consult" style={{ background: "#F8F6F1", padding: "96px 48px", borderTop: "1px solid rgba(13,43,31,0.06)" }}>
           <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
             <div style={{ textAlign: "center", marginBottom: "52px" }}>
               <Eyebrow label="Free Consultation" />
@@ -461,7 +491,7 @@ export default function NriPage() {
                 Book Your NRI<br /><em style={{ fontStyle: "italic", color: "#2BA8E0" }}>Consultation</em>
               </h2>
             </div>
-            <div style={{ display: "grid", gridTemplateColumns: "0.85fr 1fr", gap: "28px", alignItems: "stretch" }}>
+            <div className="nri-consult-grid" style={{ display: "grid", gridTemplateColumns: "0.85fr 1fr", gap: "28px", alignItems: "stretch" }}>
               {/* Left panel */}
               <div style={{ background: "#000000", borderRadius: "20px", padding: "44px 36px", position: "relative", overflow: "hidden" }}>
                 <div style={{ position: "absolute", inset: 0, backgroundImage: "linear-gradient(rgba(201,168,76,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(201,168,76,0.04) 1px, transparent 1px)", backgroundSize: "36px 36px", pointerEvents: "none" }} />
@@ -504,11 +534,11 @@ export default function NriPage() {
                   </div>
                 ) : (
                   <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "18px" }}>
-                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px" }}>
+                    <div className="nri-form-row" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px" }}>
                       <div><label style={LBL}>Full Name *</label><input required type="text" placeholder="Rajiv Menon" value={form.name} onChange={set("name")} style={INP} /></div>
                       <div><label style={LBL}>Email *</label><input required type="email" placeholder="rajiv@email.com" value={form.email} onChange={set("email")} style={INP} /></div>
                     </div>
-                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px" }}>
+                    <div className="nri-form-row" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px" }}>
                       <div><label style={LBL}>Phone / WhatsApp *</label><input required type="tel" placeholder="+971 50 000 0000" value={form.phone} onChange={set("phone")} style={INP} /></div>
                       <div>
                         <label style={LBL}>Country of Residence *</label>
@@ -518,7 +548,7 @@ export default function NriPage() {
                         </select>
                       </div>
                     </div>
-                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px" }}>
+                    <div className="nri-form-row" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px" }}>
                       <div>
                         <label style={LBL}>Budget</label>
                         <select value={form.budget} onChange={set("budget")} style={SEL}>
@@ -558,7 +588,7 @@ export default function NriPage() {
         </section>
 
         {/* ── 9. FAQ ──────────────────────────────────────────── */}
-        <section style={{ background: "#000000", padding: "96px 48px" }}>
+        <section className="nri-faq" style={{ background: "#000000", padding: "96px 48px" }}>
           <div style={{ maxWidth: "820px", margin: "0 auto" }}>
             <div style={{ textAlign: "center", marginBottom: "52px" }}>
               <Eyebrow label="Common Questions" />
@@ -573,7 +603,7 @@ export default function NriPage() {
         </section>
 
         {/* ── CTA BANNER ─────────────────────────────────────── */}
-        <section style={{ background: "#000000", padding: "90px 48px", position: "relative", overflow: "hidden" }}>
+        <section className="nri-cta" style={{ background: "#000000", padding: "90px 48px", position: "relative", overflow: "hidden" }}>
           <div style={{ position: "absolute", inset: 0, backgroundImage: "linear-gradient(rgba(201,168,76,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(201,168,76,0.04) 1px, transparent 1px)", backgroundSize: "52px 52px", pointerEvents: "none" }} />
           <div style={{ position: "absolute", inset: 0, background: "radial-gradient(ellipse 60% 55% at 50% 110%, rgba(201,168,76,0.1) 0%, transparent 55%)", pointerEvents: "none" }} />
           <div style={{ position: "relative", zIndex: 2, maxWidth: "680px", margin: "0 auto", textAlign: "center" }}>
@@ -596,9 +626,9 @@ export default function NriPage() {
         </section>
 
         {/* ── FOOTER ─────────────────────────────────────────── */}
-        <footer style={{ background: "#05080C", padding: "72px 48px 0" }}>
+        <footer className="nri-footer" style={{ background: "#05080C", padding: "72px 48px 0" }}>
           <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
-            <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1fr 1fr", gap: "48px", paddingBottom: "56px", borderBottom: "1px solid rgba(245,242,236,0.06)" }}>
+            <div className="nri-footer-grid" style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1fr 1fr", gap: "48px", paddingBottom: "56px", borderBottom: "1px solid rgba(245,242,236,0.06)" }}>
               <div>
                 <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "18px", fontWeight: 600, color: "#fff", letterSpacing: "0.16em", marginBottom: "14px" }}>Nilay 360 <span style={{ color: "#2BA8E0" }}>·</span></div>
                 <p style={{ fontSize: "13px", color: "rgba(245,242,236,0.35)", lineHeight: 1.75, maxWidth: "280px", marginBottom: "22px" }}>India's most trusted premium real estate platform. Verified listings, certified agents, independent legal guidance.</p>

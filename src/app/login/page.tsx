@@ -340,6 +340,9 @@ export default function LoginPage() {
           .auth-right { padding: 32px 16px; }
           .auth-left-heading { font-size: 32px; }
           .form-row-between { flex-direction: column; align-items: flex-start; }
+          .auth-left-sub { display: none; }
+          .auth-left-divider { display: none; }
+          .auth-trust-badges { display: none; }
         }
       `}</style>
 

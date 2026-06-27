@@ -250,6 +250,15 @@ export default function BlogPage() {
         @keyframes pulse { 0%,100%{opacity:1}50%{opacity:0.4} }
         @keyframes fadeUp { from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)} }
         .cat-scroll::-webkit-scrollbar { display: none; }
+        @media (max-width: 768px) {
+          .bl-featured-outer { padding: 0 16px !important; }
+          .bl-featured-inner { padding: 28px 20px !important; }
+          .bl-categories { padding: 0 16px !important; }
+          .bl-layout { flex-direction: column !important; padding: 32px 16px 60px !important; gap: 24px !important; }
+          .bl-articles { flex: none !important; width: 100% !important; }
+          .bl-sidebar { flex: none !important; width: 100% !important; position: static !important; top: auto !important; }
+          .bl-footer { padding: 32px 16px !important; }
+        }
       `}</style>
 
       <div style={{ minHeight: "100vh", background: "#000000" }}>
@@ -295,7 +304,7 @@ export default function BlogPage() {
         {/* ── FEATURED ARTICLE ── */}
         {!search && activeCat === "all" && featured && (
           <section style={{ background: "#000000", paddingBottom: "0" }}>
-            <div style={{ maxWidth: "1320px", margin: "0 auto", padding: "0 48px 0" }}>
+            <div className="bl-featured-outer" style={{ maxWidth: "1320px", margin: "0 auto", padding: "0 48px 0" }}>
               <div style={{ position: "relative", borderRadius: "18px 18px 0 0", overflow: "hidden", minHeight: "480px", display: "flex", alignItems: "flex-end" }}>
                 <img
                   src={featured.featured_image || `https://images.unsplash.com/photo-1560520653-9e0e4c89eb11?w=1400&q=80`}
@@ -303,7 +312,7 @@ export default function BlogPage() {
                   style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }}
                 />
                 <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(5,8,12,0.95) 0%, rgba(5,8,12,0.55) 50%, rgba(5,8,12,0.15) 100%)" }} />
-                <div style={{ position: "relative", zIndex: 2, padding: "52px 56px", maxWidth: "680px" }}>
+                <div className="bl-featured-inner" style={{ position: "relative", zIndex: 2, padding: "52px 56px", maxWidth: "680px" }}>
                   <div style={{ display: "flex", gap: "10px", alignItems: "center", marginBottom: "18px" }}>
                     <span style={{ padding: "4px 12px", borderRadius: "100px", fontSize: "10px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", background: "#2BA8E0", color: "#000000" }}>
                       {catName(featured.category_id, cats)}
@@ -336,7 +345,7 @@ export default function BlogPage() {
 
         {/* ── CATEGORIES ROW ── */}
         <section style={{ background: "#000000", position: "sticky", top: "68px", zIndex: 100, borderBottom: "1px solid rgba(201,168,76,0.12)" }}>
-          <div style={{ maxWidth: "1320px", margin: "0 auto", padding: "0 48px" }}>
+          <div className="bl-categories" style={{ maxWidth: "1320px", margin: "0 auto", padding: "0 48px" }}>
             <div className="cat-scroll" style={{ display: "flex", gap: "6px", overflowX: "auto", padding: "16px 0", scrollbarWidth: "none" }}>
               {[{ id: "all", name: "All Articles" }, ...cats].map(c => (
                 <button
@@ -350,10 +359,10 @@ export default function BlogPage() {
         </section>
 
         {/* ── CONTENT + SIDEBAR ── */}
-        <section style={{ maxWidth: "1320px", margin: "0 auto", padding: "48px 48px 80px", display: "flex", gap: "32px", alignItems: "flex-start" }}>
+        <section className="bl-layout" style={{ maxWidth: "1320px", margin: "0 auto", padding: "48px 48px 80px", display: "flex", gap: "32px", alignItems: "flex-start" }}>
 
           {/* ── ARTICLES GRID ── */}
-          <div style={{ flex: "0 0 calc(70% - 16px)", minWidth: 0 }}>
+          <div className="bl-articles" style={{ flex: "0 0 calc(70% - 16px)", minWidth: 0 }}>
             {/* Result count */}
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "24px" }}>
               {loading ? (
@@ -401,7 +410,7 @@ export default function BlogPage() {
           </div>
 
           {/* ── SIDEBAR ── */}
-          <aside style={{ flex: "0 0 calc(30% - 16px)", position: "sticky", top: "136px", display: "flex", flexDirection: "column", gap: "20px" }}>
+          <aside className="bl-sidebar" style={{ flex: "0 0 calc(30% - 16px)", position: "sticky", top: "136px", display: "flex", flexDirection: "column", gap: "20px" }}>
 
             {/* Market snapshot */}
             <div style={{ background: "#000000", borderRadius: "14px", padding: "26px", overflow: "hidden", position: "relative" }}>
@@ -483,7 +492,7 @@ export default function BlogPage() {
         </section>
 
         {/* ── FOOTER BAND ── */}
-        <div style={{ background: "#000000", borderTop: "1px solid rgba(201,168,76,0.12)", padding: "32px 48px", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "16px" }}>
+        <div className="bl-footer" style={{ background: "#000000", borderTop: "1px solid rgba(201,168,76,0.12)", padding: "32px 48px", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "16px" }}>
           <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "14px", fontWeight: 600, color: "#fff", letterSpacing: "0.16em" }}>Nilay 360 <span style={{ color: "#2BA8E0" }}>·</span></span>
           <p style={{ fontSize: "12px", color: "rgba(245,242,236,0.3)" }}>© 2025 Nilay 360. Premium Real Estate Intelligence.</p>
           <div style={{ display: "flex", gap: "20px" }}>

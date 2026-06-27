@@ -297,16 +297,35 @@ export default function CityPage() {
         ::-webkit-scrollbar-thumb { background: rgba(201,168,76,0.3); border-radius: 2px; }
         @keyframes fadeUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes shimmer { 0%,100%{opacity:1}50%{opacity:0.45} }
+        @media (max-width: 768px) {
+          .loc-nav { padding: 0 16px !important; }
+          .loc-nav-links { display: none !important; }
+          .loc-hero-inner { padding: 0 16px 40px !important; }
+          .loc-overview { padding: 48px 16px !important; }
+          .loc-overview-grid { grid-template-columns: 1fr !important; }
+          .loc-stats-grid { grid-template-columns: 1fr 1fr !important; }
+          .loc-listings { padding: 48px 16px !important; }
+          .loc-amenities-grid { grid-template-columns: repeat(2,1fr) !important; }
+          .loc-faq { padding: 48px 16px !important; }
+          .loc-cta { padding: 56px 16px !important; }
+          .loc-footer { padding: 48px 16px 0 !important; }
+          .loc-footer-grid { grid-template-columns: 1fr 1fr !important; gap: 32px !important; }
+        }
+        @media (max-width: 480px) {
+          .loc-amenities-grid { grid-template-columns: 1fr !important; }
+          .loc-footer-grid { grid-template-columns: 1fr !important; }
+          .loc-stats-grid { grid-template-columns: 1fr !important; }
+        }
       `}</style>
 
       <div style={{ minHeight: "100vh", background: "#000000" }}>
 
         {/* ── NAVBAR ─────────────────────────────────────────── */}
-        <nav style={{ position: "fixed", top: 0, left: 0, right: 0, zIndex: 200, height: "68px", display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 48px", background: "rgba(5,8,12,0.88)", backdropFilter: "blur(20px) saturate(180%)", borderBottom: "0.5px solid rgba(201,168,76,0.18)" }}>
+        <nav className="loc-nav" style={{ position: "fixed", top: 0, left: 0, right: 0, zIndex: 200, height: "68px", display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 48px", background: "rgba(5,8,12,0.88)", backdropFilter: "blur(20px) saturate(180%)", borderBottom: "0.5px solid rgba(201,168,76,0.18)" }}>
           <a href="/" style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "19px", fontWeight: 600, color: "#fff", letterSpacing: "0.16em", textDecoration: "none" }}>
             Nilay 360 <span style={{ color: "#2BA8E0" }}>·</span>
           </a>
-          <div style={{ display: "flex", gap: "2px" }}>
+          <div className="loc-nav-links" style={{ display: "flex", gap: "2px" }}>
             {[["Home", "/"], ["Properties", "/properties"], ["Search", "/search"], ["Locations", "/locations"], ["Blog", "/blog"], ["Contact", "/contact"]].map(([l, h]) => (
               <a key={l} href={h} style={{ padding: "7px 14px", borderRadius: "6px", fontSize: "13px", fontWeight: 500, color: "rgba(255,255,255,0.5)", textDecoration: "none" }}>{l}</a>
             ))}
@@ -322,7 +341,7 @@ export default function CityPage() {
           <img src={cfg.img} alt={cfg.name} style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }} />
           <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(5,8,12,0.92) 0%, rgba(5,8,12,0.5) 50%, rgba(5,8,12,0.2) 100%)" }} />
           <div style={{ position: "absolute", inset: 0, background: "radial-gradient(ellipse 60% 60% at 80% 110%, rgba(201,168,76,0.1) 0%, transparent 55%)", pointerEvents: "none" }} />
-          <div style={{ position: "relative", zIndex: 2, maxWidth: "1280px", width: "100%", margin: "0 auto", padding: "0 48px 60px" }}>
+          <div className="loc-hero-inner" style={{ position: "relative", zIndex: 2, maxWidth: "1280px", width: "100%", margin: "0 auto", padding: "0 48px 60px" }}>
             {/* Breadcrumb */}
             <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "18px" }}>
               {[["Home", "/"], ["Locations", "/locations"], [cfg.name, ""]].map(([l, h], i, arr) => (
@@ -354,8 +373,8 @@ export default function CityPage() {
         </section>
 
         {/* ── CITY OVERVIEW ──────────────────────────────────── */}
-        <section style={{ maxWidth: "1280px", margin: "0 auto", padding: "72px 48px" }}>
-          <div style={{ display: "grid", gridTemplateColumns: "1.1fr 0.9fr", gap: "40px", alignItems: "flex-start" }}>
+        <section className="loc-overview" style={{ maxWidth: "1280px", margin: "0 auto", padding: "72px 48px" }}>
+          <div className="loc-overview-grid" style={{ display: "grid", gridTemplateColumns: "1.1fr 0.9fr", gap: "40px", alignItems: "flex-start" }}>
             {/* Text */}
             <div>
               <Eyebrow label="About the City" />
@@ -363,7 +382,7 @@ export default function CityPage() {
                 Living in <em style={{ fontStyle: "italic", color: "#2BA8E0" }}>{cfg.name}</em>
               </h2>
               <p style={{ fontSize: "14px", color: "#4B5563", lineHeight: 1.85, marginBottom: "24px" }}>{cfg.lifestyle}</p>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
+              <div className="loc-stats-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
                 {[
                   { icon: "👥", label: "Population",      value: cfg.population },
                   { icon: "🚆", label: "Transport",       value: cfg.transport.split(",")[0] + "…" },
@@ -406,7 +425,7 @@ export default function CityPage() {
         </section>
 
         {/* ── PROPERTY LISTINGS ──────────────────────────────── */}
-        <section style={{ background: "#F8F6F1", padding: "72px 48px", borderTop: "1px solid rgba(13,43,31,0.06)" }}>
+        <section className="loc-listings" style={{ background: "#F8F6F1", padding: "72px 48px", borderTop: "1px solid rgba(13,43,31,0.06)" }}>
           <div style={{ maxWidth: "1280px", margin: "0 auto" }}>
             <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", flexWrap: "wrap", gap: "16px", marginBottom: "28px" }}>
               <div>
@@ -565,7 +584,7 @@ export default function CityPage() {
               Amenities & Infrastructure
             </h2>
           </div>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "18px" }}>
+          <div className="loc-amenities-grid" style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "18px" }}>
             {AMENITY_CATS.map(cat => (
               <div key={cat.label} style={{ background: "#fff", border: "1px solid rgba(13,43,31,0.07)", borderRadius: "16px", padding: "24px 20px" }}>
                 <div style={{ fontSize: "26px", marginBottom: "12px" }}>{cat.icon}</div>
@@ -586,7 +605,7 @@ export default function CityPage() {
         </section>
 
         {/* ── FAQ ────────────────────────────────────────────── */}
-        <section style={{ background: "#F8F6F1", padding: "72px 48px", borderTop: "1px solid rgba(13,43,31,0.06)" }}>
+        <section className="loc-faq" style={{ background: "#F8F6F1", padding: "72px 48px", borderTop: "1px solid rgba(13,43,31,0.06)" }}>
           <div style={{ maxWidth: "820px", margin: "0 auto" }}>
             <div style={{ textAlign: "center", marginBottom: "44px" }}>
               <Eyebrow label="Common Questions" />
@@ -601,7 +620,7 @@ export default function CityPage() {
         </section>
 
         {/* ── CTA ────────────────────────────────────────────── */}
-        <section style={{ background: "#000000", padding: "90px 48px", position: "relative", overflow: "hidden" }}>
+        <section className="loc-cta" style={{ background: "#000000", padding: "90px 48px", position: "relative", overflow: "hidden" }}>
           <div style={{ position: "absolute", inset: 0, backgroundImage: "linear-gradient(rgba(201,168,76,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(201,168,76,0.04) 1px, transparent 1px)", backgroundSize: "52px 52px", pointerEvents: "none" }} />
           <div style={{ position: "absolute", inset: 0, background: "radial-gradient(ellipse 60% 55% at 50% 110%, rgba(201,168,76,0.1) 0%, transparent 55%)", pointerEvents: "none" }} />
           <div style={{ position: "relative", zIndex: 2, maxWidth: "660px", margin: "0 auto", textAlign: "center" }}>
@@ -624,9 +643,9 @@ export default function CityPage() {
         </section>
 
         {/* ── FOOTER ─────────────────────────────────────────── */}
-        <footer style={{ background: "#05080C", padding: "72px 48px 0" }}>
+        <footer className="loc-footer" style={{ background: "#05080C", padding: "72px 48px 0" }}>
           <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
-            <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1fr 1fr", gap: "48px", paddingBottom: "56px", borderBottom: "1px solid rgba(245,242,236,0.06)" }}>
+            <div className="loc-footer-grid" style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1fr 1fr", gap: "48px", paddingBottom: "56px", borderBottom: "1px solid rgba(245,242,236,0.06)" }}>
               <div>
                 <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "18px", fontWeight: 600, color: "#fff", letterSpacing: "0.16em", marginBottom: "14px" }}>Nilay 360 <span style={{ color: "#2BA8E0" }}>·</span></div>
                 <p style={{ fontSize: "13px", color: "rgba(245,242,236,0.35)", lineHeight: 1.75, maxWidth: "280px", marginBottom: "22px" }}>India's most trusted premium real estate platform.</p>

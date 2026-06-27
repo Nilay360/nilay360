@@ -164,6 +164,22 @@ export default function ContactPage() {
         @keyframes fadeUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes scaleIn { from { opacity: 0; transform: scale(0.88); } to { opacity: 1; transform: scale(1); } }
         select option { background: #fff; color: #000000; }
+        @media (max-width: 768px) {
+          .ct-hero-inner { padding: 48px 20px 56px !important; }
+          .ct-hero-pills { flex-direction: column !important; align-items: stretch !important; }
+          .ct-main { grid-template-columns: 1fr !important; padding: 40px 16px !important; }
+          .ct-form-row { grid-template-columns: 1fr !important; }
+          .ct-offices { padding: 56px 16px !important; }
+          .ct-offices-grid { grid-template-columns: 1fr !important; }
+          .ct-faq { padding: 64px 16px !important; }
+          .ct-cta { padding: 64px 16px !important; }
+          .ct-footer { padding: 56px 16px 0 !important; }
+          .ct-footer-grid { grid-template-columns: 1fr 1fr !important; gap: 32px !important; }
+        }
+        @media (max-width: 480px) {
+          .ct-footer-grid { grid-template-columns: 1fr !important; }
+          .ct-hero-inner { padding: 36px 16px 40px !important; }
+        }
       `}</style>
 
       <div style={{ minHeight: "100vh", background: "#000000" }}>
@@ -172,7 +188,7 @@ export default function ContactPage() {
         <section style={{ paddingTop: "64px", background: "#000000", position: "relative", overflow: "hidden" }}>
           <div style={{ position: "absolute", inset: 0, backgroundImage: "linear-gradient(rgba(201,168,76,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(201,168,76,0.04) 1px, transparent 1px)", backgroundSize: "52px 52px", pointerEvents: "none" }} />
           <div style={{ position: "absolute", inset: 0, background: "radial-gradient(ellipse 65% 70% at 85% 110%, rgba(201,168,76,0.09) 0%, transparent 55%), radial-gradient(ellipse 50% 55% at 5% -5%, rgba(45,106,79,0.25) 0%, transparent 50%)", pointerEvents: "none" }} />
-          <div style={{ position: "relative", zIndex: 2, maxWidth: "800px", margin: "0 auto", padding: "72px 48px 80px", textAlign: "center" }}>
+          <div className="ct-hero-inner" style={{ position: "relative", zIndex: 2, maxWidth: "800px", margin: "0 auto", padding: "72px 48px 80px", textAlign: "center" }}>
             <div style={{ display: "inline-flex", alignItems: "center", gap: "8px", padding: "5px 16px", background: "rgba(201,168,76,0.1)", border: "1px solid rgba(201,168,76,0.25)", borderRadius: "100px", marginBottom: "24px" }}>
               <div style={{ width: "5px", height: "5px", borderRadius: "50%", background: "#2BA8E0", boxShadow: "0 0 6px rgba(201,168,76,0.5)" }} />
               <span style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.2em", color: "#2BA8E0", textTransform: "uppercase" }}>We're Here to Help</span>
@@ -184,7 +200,7 @@ export default function ContactPage() {
               Our team responds within 2 hours during business hours.<br />Premium service, every step of the way.
             </p>
             {/* Quick contact pills */}
-            <div style={{ display: "flex", gap: "12px", justifyContent: "center", flexWrap: "wrap", animation: "fadeUp 0.55s 0.2s ease-out both" }}>
+            <div className="ct-hero-pills" style={{ display: "flex", gap: "12px", justifyContent: "center", flexWrap: "wrap", animation: "fadeUp 0.55s 0.2s ease-out both" }}>
               {[
                 { icon: "📞", label: "Call Us", value: "+91 40 0000 0000", href: "tel:+914000000000" },
                 { icon: "✉", label: "Email",   value: "hello@nilay360.com",  href: "mailto:hello@nilay360.com" },
@@ -203,7 +219,7 @@ export default function ContactPage() {
         </section>
 
         {/* ── MAIN CONTENT ───────────────────────────────────── */}
-        <section style={{ maxWidth: "1280px", margin: "0 auto", padding: "72px 48px", display: "grid", gridTemplateColumns: "1fr 0.65fr", gap: "40px", alignItems: "flex-start" }}>
+        <section className="ct-main" style={{ maxWidth: "1280px", margin: "0 auto", padding: "72px 48px", display: "grid", gridTemplateColumns: "1fr 0.65fr", gap: "40px", alignItems: "flex-start" }}>
 
           {/* ── LEFT: FORM ─────────────────────────────────── */}
           <div style={{ background: "#fff", borderRadius: "20px", padding: "48px 44px", border: "1px solid rgba(13,43,31,0.07)", boxShadow: "0 2px 20px rgba(13,43,31,0.05)" }}>
@@ -228,7 +244,7 @@ export default function ContactPage() {
             ) : (
               <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
                 {/* Row 1 */}
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
+                <div className="ct-form-row" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
                   <Field label="Full Name" required>
                     <input type="text" placeholder="Arjun Mehta" value={form.full_name} onChange={set("full_name")} style={inputStyle("full_name")} {...focusHandlers("full_name")} />
                   </Field>
@@ -237,7 +253,7 @@ export default function ContactPage() {
                   </Field>
                 </div>
                 {/* Row 2 */}
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
+                <div className="ct-form-row" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
                   <Field label="Phone Number">
                     <div style={{ position: "relative", display: "flex" }}>
                       <span style={{ display: "flex", alignItems: "center", padding: "0 12px", background: "#F0EDE7", border: "1.5px solid rgba(13,43,31,0.12)", borderRight: "none", borderRadius: "9px 0 0 9px", fontSize: "13px", fontWeight: 600, color: "#4B5563", whiteSpace: "nowrap" }}>+91</span>
@@ -263,7 +279,7 @@ export default function ContactPage() {
                 {/* Row 3 — optional */}
                 <div style={{ borderTop: "1px dashed rgba(13,43,31,0.1)", paddingTop: "20px" }}>
                   <p style={{ fontSize: "11px", fontWeight: 700, letterSpacing: "0.12em", color: "#9CA3AF", textTransform: "uppercase", marginBottom: "16px" }}>Optional — helps us serve you better</p>
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
+                  <div className="ct-form-row" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
                     <Field label="Property Type">
                       <select value={form.property_type} onChange={set("property_type")} style={{ ...inputStyle("property_type"), appearance: "none", backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236B7C72' stroke-width='2.5'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E")`, backgroundRepeat: "no-repeat", backgroundPosition: "right 14px center" }} {...focusHandlers("property_type")}>
                         <option value="">Any type</option>
@@ -380,7 +396,7 @@ export default function ContactPage() {
         </section>
 
         {/* ── OFFICE LOCATIONS ───────────────────────────────── */}
-        <section style={{ background: "#F8F6F1", padding: "80px 48px", borderTop: "1px solid rgba(13,43,31,0.06)" }}>
+        <section className="ct-offices" style={{ background: "#F8F6F1", padding: "80px 48px", borderTop: "1px solid rgba(13,43,31,0.06)" }}>
           <div style={{ maxWidth: "1280px", margin: "0 auto" }}>
             <div style={{ textAlign: "center", marginBottom: "48px" }}>
               <div style={{ display: "inline-flex", alignItems: "center", gap: "8px", marginBottom: "14px" }}>
@@ -390,7 +406,7 @@ export default function ContactPage() {
               </div>
               <h2 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "clamp(30px, 3.8vw, 46px)", fontWeight: 400, color: "#000000" }}>Our Office Locations</h2>
             </div>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "20px" }}>
+            <div className="ct-offices-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "20px" }}>
               {[
                 { city: "Hyderabad", sub: "Headquarters", address: "Road No. 12, Jubilee Hills\nHyderabad, Telangana 500 033", phone: "+91 40 0000 0000", status: "Open", statusColor: "#059669", statusBg: "rgba(5,150,105,0.08)", main: true },
                 { city: "Mumbai",    sub: "Regional Office", address: "Bandra Kurla Complex\nMumbai, Maharashtra 400 051", phone: "Coming soon",       status: "Coming Soon", statusColor: "#D97706", statusBg: "rgba(217,119,6,0.08)", main: false },
@@ -421,7 +437,7 @@ export default function ContactPage() {
         </section>
 
         {/* ── FAQ ────────────────────────────────────────────── */}
-        <section style={{ background: "#000000", padding: "100px 48px" }}>
+        <section className="ct-faq" style={{ background: "#000000", padding: "100px 48px" }}>
           <div style={{ maxWidth: "820px", margin: "0 auto" }}>
             <div style={{ textAlign: "center", marginBottom: "56px" }}>
               <div style={{ display: "inline-flex", alignItems: "center", gap: "8px", marginBottom: "14px" }}>
@@ -443,7 +459,7 @@ export default function ContactPage() {
         </section>
 
         {/* ── CTA ────────────────────────────────────────────── */}
-        <section style={{ background: "#000000", padding: "90px 48px", position: "relative", overflow: "hidden" }}>
+        <section className="ct-cta" style={{ background: "#000000", padding: "90px 48px", position: "relative", overflow: "hidden" }}>
           <div style={{ position: "absolute", inset: 0, backgroundImage: "linear-gradient(rgba(201,168,76,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(201,168,76,0.04) 1px, transparent 1px)", backgroundSize: "52px 52px", pointerEvents: "none" }} />
           <div style={{ position: "absolute", inset: 0, background: "radial-gradient(ellipse 60% 55% at 50% 110%, rgba(201,168,76,0.1) 0%, transparent 55%)", pointerEvents: "none" }} />
           <div style={{ position: "relative", zIndex: 2, maxWidth: "660px", margin: "0 auto", textAlign: "center" }}>
@@ -466,9 +482,9 @@ export default function ContactPage() {
         </section>
 
         {/* ── FOOTER ─────────────────────────────────────────── */}
-        <footer style={{ background: "#05080C", padding: "72px 48px 0" }}>
+        <footer className="ct-footer" style={{ background: "#05080C", padding: "72px 48px 0" }}>
           <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
-            <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1fr 1fr", gap: "48px", paddingBottom: "56px", borderBottom: "1px solid rgba(245,242,236,0.06)" }}>
+            <div className="ct-footer-grid" style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1fr 1fr", gap: "48px", paddingBottom: "56px", borderBottom: "1px solid rgba(245,242,236,0.06)" }}>
               <div>
                 <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "18px", fontWeight: 600, color: "#fff", letterSpacing: "0.16em", marginBottom: "14px" }}>Nilay 360 <span style={{ color: "#2BA8E0" }}>·</span></div>
                 <p style={{ fontSize: "13px", color: "rgba(245,242,236,0.35)", lineHeight: 1.75, maxWidth: "280px", marginBottom: "22px" }}>India's most trusted premium real estate platform. Verified listings, certified agents, independent legal guidance.</p>

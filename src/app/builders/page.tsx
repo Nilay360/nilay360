@@ -559,6 +559,29 @@ export default function BuildersPage() {
           border-top: 2px dashed ${GOLD};
           opacity: 0.4;
         }
+        @media (max-width: 768px) {
+          .bd-nav { padding: 0 16px !important; }
+          .bd-nav-links { display: none !important; }
+          .bd-hero { padding: 80px 16px 56px !important; }
+          .bd-hero-stats { gap: 24px !important; flex-wrap: wrap !important; justify-content: center !important; }
+          .bd-search { padding: 32px 16px !important; }
+          .bd-search-input { width: 100% !important; }
+          .bd-filter-row { flex-wrap: wrap !important; gap: 10px !important; }
+          .bd-filter-row select { flex: 1 1 calc(50% - 5px) !important; }
+          .bd-featured { padding: 0 16px 56px !important; }
+          .bd-all { padding: 56px 16px !important; }
+          .bd-dev-grid { grid-template-columns: repeat(2,1fr) !important; gap: 16px !important; }
+          .bd-verify { padding: 56px 16px !important; }
+          .bd-steps { flex-direction: column !important; gap: 24px !important; }
+          .bd-partner { padding: 56px 16px !important; }
+          .bd-cta { padding: 56px 16px !important; }
+          .bd-footer-grid { padding: 48px 16px 0 !important; grid-template-columns: 1fr 1fr !important; gap: 32px !important; }
+          .bd-footer-bottom { padding: 24px 16px 32px !important; flex-direction: column !important; text-align: center !important; gap: 8px !important; }
+        }
+        @media (max-width: 480px) {
+          .bd-dev-grid { grid-template-columns: 1fr !important; }
+          .bd-footer-grid { grid-template-columns: 1fr !important; }
+        }
       `}</style>
 
       {/* ══════════════════════════════════════════════════════
@@ -586,6 +609,7 @@ export default function BuildersPage() {
           justifyContent: "space-between",
           padding: "0 40px",
         }}
+        className="bd-nav"
       >
         {/* Logo */}
         <Link
@@ -603,7 +627,7 @@ export default function BuildersPage() {
         </Link>
 
         {/* Center nav links */}
-        <div style={{ display: "flex", gap: 32, alignItems: "center" }}>
+        <div className="bd-nav-links" style={{ display: "flex", gap: 32, alignItems: "center" }}>
           <Link href="/" className="nav-link">Home</Link>
           <Link href="/buy" className="nav-link">Buy</Link>
           <Link href="/rent" className="nav-link">Rent</Link>
@@ -649,6 +673,7 @@ export default function BuildersPage() {
           1. HERO
       ══════════════════════════════════════════════════════ */}
       <section
+        className="bd-hero"
         style={{
           background: DARK_GREEN,
           minHeight: "60vh",
@@ -716,7 +741,7 @@ export default function BuildersPage() {
         {/* Stats */}
         <div
           className="fade-in-delay-2"
-          style={{ display: "flex", gap: 64, alignItems: "flex-start" }}
+          className="bd-hero-stats" style={{ display: "flex", gap: 64, alignItems: "flex-start" }}
         >
           {[
             { num: "48", label: "Verified Developers" },
@@ -757,6 +782,7 @@ export default function BuildersPage() {
           2. SEARCH + FILTER BAR
       ══════════════════════════════════════════════════════ */}
       <section
+        className="bd-search"
         style={{
           background: IVORY,
           padding: "48px 40px",
@@ -780,10 +806,10 @@ export default function BuildersPage() {
             placeholder="Search developers by name..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            style={{ ...inputStyle, width: 300 }}
+            className="bd-search-input" style={{ ...inputStyle, width: 300 }}
           />
 
-          <div style={{ display: "flex", gap: 12, flexWrap: "wrap", alignItems: "center" }}>
+          <div className="bd-filter-row" style={{ display: "flex", gap: 12, flexWrap: "wrap", alignItems: "center" }}>
             {/* City filter */}
             <div style={{ position: "relative" }}>
               <select
@@ -834,7 +860,7 @@ export default function BuildersPage() {
       {/* ══════════════════════════════════════════════════════
           3. FEATURED DEVELOPERS
       ══════════════════════════════════════════════════════ */}
-      <section style={{ background: IVORY, padding: "0 40px 80px" }}>
+      <section className="bd-featured" style={{ background: IVORY, padding: "0 40px 80px" }}>
         <div style={{ maxWidth: 1200, margin: "0 auto" }}>
           <h2
             style={{
@@ -860,6 +886,7 @@ export default function BuildersPage() {
           4. ALL DEVELOPERS GRID
       ══════════════════════════════════════════════════════ */}
       <section
+        className="bd-all"
         style={{
           background: DARK_GREEN,
           padding: "80px 40px",
@@ -880,7 +907,7 @@ export default function BuildersPage() {
 
           {gridLoading ? (
             <div
-              style={{
+              className="bd-dev-grid" style={{
                 display: "grid",
                 gridTemplateColumns: "repeat(4, 1fr)",
                 gap: 24,
@@ -892,7 +919,7 @@ export default function BuildersPage() {
             </div>
           ) : (
             <div
-              style={{
+              className="bd-dev-grid" style={{
                 display: "grid",
                 gridTemplateColumns: "repeat(4, 1fr)",
                 gap: 24,
@@ -923,7 +950,7 @@ export default function BuildersPage() {
       {/* ══════════════════════════════════════════════════════
           5. VERIFICATION PROCESS
       ══════════════════════════════════════════════════════ */}
-      <section style={{ background: IVORY, padding: "80px 40px" }}>
+      <section className="bd-verify" style={{ background: IVORY, padding: "80px 40px" }}>
         <div
           style={{
             maxWidth: 1100,
@@ -959,6 +986,7 @@ export default function BuildersPage() {
 
           {/* Steps row */}
           <div
+            className="bd-steps"
             style={{
               display: "flex",
               gap: 0,
@@ -1082,6 +1110,7 @@ export default function BuildersPage() {
           6. BECOME A PARTNER
       ══════════════════════════════════════════════════════ */}
       <section
+        className="bd-partner"
         style={{
           background: DARK_GREEN,
           padding: "80px 40px",
@@ -1213,6 +1242,7 @@ export default function BuildersPage() {
           7. CTA SECTION
       ══════════════════════════════════════════════════════ */}
       <section
+        className="bd-cta"
         style={{
           background: IVORY,
           padding: "80px 40px",
@@ -1290,6 +1320,7 @@ export default function BuildersPage() {
       ══════════════════════════════════════════════════════ */}
       <footer style={{ background: FOOTER_BG }}>
         <div
+          className="bd-footer-grid"
           style={{
             maxWidth: 1200,
             margin: "0 auto",
@@ -1413,6 +1444,7 @@ export default function BuildersPage() {
 
         {/* Bottom bar */}
         <div
+          className="bd-footer-bottom"
           style={{
             maxWidth: 1200,
             margin: "0 auto",

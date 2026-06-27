@@ -442,6 +442,9 @@ export default function RegisterPage() {
           .rp-field-row { flex-direction: column; gap: 14px; }
           .rp-field-row .rp-field { margin-bottom: 0; }
           .rp-heading { font-size: 30px; }
+          .rp-eyebrow { display: none; }
+          .rp-tagline { display: none; }
+          .rp-left-foot { display: none; }
         }
       `}</style>
 

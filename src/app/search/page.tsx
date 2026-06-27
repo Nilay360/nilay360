@@ -260,7 +260,7 @@ function PropertyCard({ p, comparing, onCompare, onSave, saved }: { p: Property;
 function ListRow({ p, comparing, onCompare, onSave, saved }: { p: Property; comparing: boolean; onCompare: () => void; onSave: () => void; saved: boolean }) {
   const img = p.images?.[0] || `https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800&q=80`;
   return (
-    <div style={{ background: "#161A1F", border: comparing ? "2px solid #2BA8E0" : "1px solid rgba(255,255,255,0.07)", borderRadius: "12px", overflow: "hidden", display: "flex", transition: "box-shadow 0.18s, border-color 0.15s" }}
+    <div className="search-list-card" style={{ background: "#161A1F", border: comparing ? "2px solid #2BA8E0" : "1px solid rgba(255,255,255,0.07)", borderRadius: "12px", overflow: "hidden", display: "flex", transition: "box-shadow 0.18s, border-color 0.15s" }}
       onMouseEnter={e => { if (!comparing) (e.currentTarget as HTMLDivElement).style.boxShadow = "0 4px 20px rgba(43,168,224,0.08)"; }}
       onMouseLeave={e => { if (!comparing) (e.currentTarget as HTMLDivElement).style.boxShadow = "none"; }}
     >
@@ -325,6 +325,7 @@ function SearchPageInner() {
   const [savedSearches, setSavedSearches] = useState<string[]>([]);
   const [viewMode, setViewMode] = useState<"grid" | "list" | "map">("grid");
   const [page, setPage] = useState(1);
+  const [filtersOpen, setFiltersOpen] = useState(false);
 
   // Filters
   const [listingType, setListingType] = useState<"all" | "sale" | "rent">("all");
@@ -629,6 +630,27 @@ function SearchPageInner() {
         @keyframes slideUp { from{transform:translateY(100%);opacity:0} to{transform:translateY(0);opacity:1} }
         ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-thumb { background: rgba(201,168,76,0.25); border-radius: 2px; }
+
+        .mobile-filter-toggle { display: none; }
+
+        @media (max-width: 768px) {
+          .mobile-filter-toggle { display: flex !important; align-items: center; gap: 8px; background: #1a1a2e; color: #2BA8E0; border: 1px solid #2BA8E0; padding: 10px 20px; border-radius: 8px; font-size: 14px; cursor: pointer; margin: 12px 16px; width: calc(100% - 32px); justify-content: center; font-family: 'DM Sans', sans-serif; }
+          .search-layout { flex-direction: column !important; padding: 0 !important; }
+          .search-sidebar { width: 100% !important; position: fixed !important; top: 0 !important; left: 0 !important; height: 100vh !important; z-index: 999 !important; overflow-y: auto !important; transform: translateX(-100%) !important; transition: transform 0.3s ease !important; background: #0B0D10 !important; padding: 24px 16px !important; }
+          .search-sidebar.open { transform: translateX(0) !important; }
+          .search-summary { padding: 12px 16px !important; flex-wrap: wrap !important; gap: 8px !important; }
+          .search-bar-row { padding: 12px 16px !important; flex-wrap: wrap !important; gap: 8px !important; }
+          .search-bar-row select, .search-bar-row input { width: 100% !important; min-width: unset !important; }
+          .search-results-grid { padding: 0 16px !important; grid-template-columns: 1fr !important; }
+          .search-list-card { flex-direction: column !important; width: 100% !important; }
+          .search-list-card img { width: 100% !important; height: 200px !important; object-fit: cover !important; }
+          .search-save-modal { width: min(420px, 92vw) !important; margin: 0 auto !important; }
+        }
+
+        @media (max-width: 480px) {
+          .search-bar-row { padding: 10px 12px !important; }
+          .search-results-grid { padding: 0 12px !important; }
+        }
       `}</style>
 
       <div style={{ minHeight: "100vh", background: "#000000" }}>
@@ -650,7 +672,7 @@ function SearchPageInner() {
         </nav>
 
         {/* ── SEARCH SUMMARY BAND ── */}
-        <div style={{ marginTop: "68px", background: "#000000", padding: "14px 48px", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "12px" }}>
+        <div className="search-summary" style={{ marginTop: "68px", background: "#000000", padding: "14px 48px", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "12px" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
             {loading ? (
               <div style={{ height: "14px", width: "200px", borderRadius: "4px", background: "rgba(245,242,236,0.1)", animation: "pulse 1.6s ease-in-out infinite" }} />
@@ -677,7 +699,7 @@ function SearchPageInner() {
         </div>
 
         {/* ── SEARCH BAR ROW ── */}
-        <div style={{ background: "#0B0D10", borderBottom: "1px solid rgba(255,255,255,0.07)", padding: "16px 48px" }}>
+        <div className="search-bar-row" style={{ background: "#0B0D10", borderBottom: "1px solid rgba(255,255,255,0.07)", padding: "16px 48px" }}>
           <div style={{ display: "flex", gap: "10px", alignItems: "center", maxWidth: "1400px", margin: "0 auto", flexWrap: "wrap" }}>
             {/* City */}
             <div style={{ position: "relative", flex: "1 1 160px" }}>
@@ -720,10 +742,13 @@ function SearchPageInner() {
         </div>
 
         {/* ── MAIN LAYOUT ── */}
-        <div style={{ maxWidth: "1400px", margin: "0 auto", padding: "28px 48px 80px", display: "flex", gap: "24px", alignItems: "flex-start" }}>
+        <div className="search-layout" style={{ maxWidth: "1400px", margin: "0 auto", padding: "28px 48px 80px", display: "flex", gap: "24px", alignItems: "flex-start" }}>
 
           {/* ══ SIDEBAR ══ */}
-          <aside style={{ width: "272px", flexShrink: 0, position: "sticky", top: "88px", background: "#000000", borderRadius: "14px", overflow: "hidden", maxHeight: "calc(100vh - 108px)", overflowY: "auto" }}>
+          <button className="mobile-filter-toggle" onClick={() => setFiltersOpen(prev => !prev)}>
+            ☰ Filters
+          </button>
+          <aside className={filtersOpen ? "search-sidebar open" : "search-sidebar"} style={{ width: "272px", flexShrink: 0, position: "sticky", top: "88px", background: "#000000", borderRadius: "14px", overflow: "hidden", maxHeight: "calc(100vh - 108px)", overflowY: "auto" }}>
             <div style={{ padding: "18px 18px 14px", borderBottom: "1px solid rgba(245,242,236,0.07)", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
               <span style={{ fontSize: "12px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "rgba(245,242,236,0.45)" }}>Filters</span>
               {hasFilters && <button onClick={clearFilters} style={{ fontSize: "11px", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "#2BA8E0", background: "transparent", border: "none", cursor: "pointer", fontFamily: "'DM Sans', sans-serif" }}>Clear All</button>}
@@ -995,7 +1020,7 @@ function SearchPageInner() {
                       Showing all properties — no exact match found for <span style={{ color: "#2BA8E0", fontWeight: 600 }}>{textQuery}</span>
                     </div>
                   )}
-                  <div style={{ display: "grid", gridTemplateColumns: viewMode === "grid" ? "repeat(auto-fill, minmax(270px, 1fr))" : "1fr", gap: "16px" }}>
+                  <div className="search-results-grid" style={{ display: "grid", gridTemplateColumns: viewMode === "grid" ? "repeat(auto-fill, minmax(270px, 1fr))" : "1fr", gap: "16px" }}>
                     {viewMode === "grid"
                       ? displayList.map(p => <PropertyCard key={p.id} p={p} comparing={compareIds.has(p.id)} onCompare={() => { if (compareIds.has(p.id)) { setCompareIds(s => { const n = new Set(s); n.delete(p.id); return n; }); } else if (compareIds.size < 3) { setCompareIds(s => new Set([...s, p.id])); } }} onSave={() => setSavedIds(s => { const n = new Set(s); if (n.has(p.id)) n.delete(p.id); else n.add(p.id); return n; })} saved={savedIds.has(p.id)} />)
                       : displayList.map(p => <ListRow key={p.id} p={p} comparing={compareIds.has(p.id)} onCompare={() => { if (compareIds.has(p.id)) { setCompareIds(s => { const n = new Set(s); n.delete(p.id); return n; }); } else if (compareIds.size < 3) { setCompareIds(s => new Set([...s, p.id])); } }} onSave={() => setSavedIds(s => { const n = new Set(s); if (n.has(p.id)) n.delete(p.id); else n.add(p.id); return n; })} saved={savedIds.has(p.id)} />)
@@ -1049,7 +1074,7 @@ function SearchPageInner() {
         {/* ── SAVE SEARCH MODAL ── */}
         {showSaveModal && (
           <div style={{ position: "fixed", inset: 0, zIndex: 300, background: "rgba(0,0,0,0.5)", backdropFilter: "blur(6px)", display: "flex", alignItems: "center", justifyContent: "center" }} onClick={() => setShowSaveModal(false)}>
-            <div style={{ background: "#161A1F", borderRadius: "16px", padding: "36px", width: "420px", boxShadow: "0 24px 80px rgba(0,0,0,0.6)", border: "1px solid rgba(255,255,255,0.07)" }} onClick={e => e.stopPropagation()}>
+            <div className="search-save-modal" style={{ background: "#161A1F", borderRadius: "16px", padding: "36px", width: "420px", boxShadow: "0 24px 80px rgba(0,0,0,0.6)", border: "1px solid rgba(255,255,255,0.07)" }} onClick={e => e.stopPropagation()}>
               <h3 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "26px", fontWeight: 500, color: "#E8EAED", marginBottom: "8px" }}>Save This Search</h3>
               <p style={{ fontSize: "13px", color: "rgba(255,255,255,0.45)", marginBottom: "24px" }}>Get notified when new properties match your criteria.</p>
               <input

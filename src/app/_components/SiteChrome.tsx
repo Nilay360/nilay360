@@ -13,7 +13,7 @@ const FONTS = "https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,
 
 export function Navbar() {
   return (
-    <nav style={{ position:"fixed", top:0, left:0, right:0, zIndex:200, height:60, display:"flex", alignItems:"center", justifyContent:"space-between", padding:"0 40px", background:"rgba(0,0,0,0.96)", backdropFilter:"blur(20px)", borderBottom:"0.5px solid rgba(43,168,224,0.15)" }}>
+    <nav className="sc-nav" style={{ position:"fixed", top:0, left:0, right:0, zIndex:200, height:60, display:"flex", alignItems:"center", justifyContent:"space-between", padding:"0 40px", background:"rgba(0,0,0,0.96)", backdropFilter:"blur(20px)", borderBottom:"0.5px solid rgba(43,168,224,0.15)" }}>
       <a href="/" style={{ display:"flex", alignItems:"center" }}>
         <img src="/nilay_final.jpg" alt="Nilay 360" style={{ height: 36, width: 'auto', objectFit: 'contain' }} />
       </a>
@@ -22,7 +22,7 @@ export function Navbar() {
           <a key={l} href={h} style={{ padding:"6px 14px", borderRadius:6, fontSize:13, fontWeight:500, color:"rgba(255,255,255,0.6)" }}>{l}</a>
         ))}
       </div>
-      <div style={{ display:"flex", alignItems:"center", gap:10 }}>
+      <div className="sc-nav-actions" style={{ display:"flex", alignItems:"center", gap:10 }}>
         <a href="/saved" title="Saved" style={{ color:"rgba(255,255,255,0.6)", display:"flex", padding:6 }}>
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
         </a>
@@ -41,9 +41,9 @@ export function Footer() {
     { heading:"Legal",      links:[["Privacy Policy","/privacy"],["Terms of Service","/terms"],["Cookie Policy","/cookies"],["Refund Policy","/refund-policy"]] },
   ];
   return (
-    <footer style={{ background:"#000000", padding:"56px 56px 28px", color:"rgba(255,255,255,0.55)" }}>
+    <footer className="sc-footer" style={{ background:"#000000", padding:"56px 56px 28px", color:"rgba(255,255,255,0.55)" }}>
       <div style={{ maxWidth:1280, margin:"0 auto" }}>
-        <div style={{ display:"grid", gridTemplateColumns:"2fr 1fr 1fr 1fr 1fr", gap:40, marginBottom:48 }}>
+        <div className="sc-footer-grid" style={{ display:"grid", gridTemplateColumns:"2fr 1fr 1fr 1fr 1fr", gap:40, marginBottom:48 }}>
           <div>
             <a href="/" style={{ display:"inline-block", marginBottom:12 }}>
               <img src="/nilay_final.jpg" alt="Nilay 360" style={{ height: 32, width: 'auto', objectFit: 'contain' }} />
@@ -59,7 +59,7 @@ export function Footer() {
             </div>
           ))}
         </div>
-        <div style={{ borderTop:"1px solid rgba(255,255,255,0.08)", paddingTop:24, display:"flex", justifyContent:"space-between", alignItems:"center", flexWrap:"wrap", gap:12 }}>
+        <div className="sc-footer-bottom" style={{ borderTop:"1px solid rgba(255,255,255,0.08)", paddingTop:24, display:"flex", justifyContent:"space-between", alignItems:"center", flexWrap:"wrap", gap:12 }}>
           <p style={{ fontSize:12 }}>© {new Date().getFullYear()} Nilay 360 · All rights reserved.</p>
           <p style={{ fontSize:12 }}>All listings subject to availability. Verify with RERA before purchase.</p>
         </div>
@@ -79,11 +79,11 @@ export function PageShell({
   return (
     <>
       <link rel="stylesheet" href={FONTS} />
-      <style>{`*{box-sizing:border-box;margin:0;padding:0}body{font-family:'DM Sans',system-ui,sans-serif;background:#000000;color:#FFFFFF}a{text-decoration:none;color:inherit}@media(max-width:820px){.nv-center{display:none!important}}`}</style>
+      <style>{`*{box-sizing:border-box;margin:0;padding:0}body{font-family:'DM Sans',system-ui,sans-serif;background:#000000;color:#FFFFFF}a{text-decoration:none;color:inherit}@media(max-width:820px){.nv-center{display:none!important}}@media(max-width:768px){.sc-nav{padding:0 16px!important}.sc-nav-actions{gap:8px!important}.sc-hero{padding:90px 16px 48px!important}.sc-body{padding:32px 16px!important}.sc-bullets{grid-template-columns:1fr!important;gap:12px!important}.sc-cta-banner{padding:28px 20px!important;flex-direction:column!important;gap:16px!important}.sc-footer{padding:48px 16px 24px!important}.sc-footer-grid{grid-template-columns:1fr 1fr!important;gap:28px!important}.sc-footer-bottom{flex-direction:column!important;text-align:center!important;gap:8px!important}}@media(max-width:480px){.sc-footer-grid{grid-template-columns:1fr!important}.sc-bullets{grid-template-columns:1fr!important}}`}</style>
       <Navbar />
 
       {/* Hero */}
-      <section style={{ background:"#050810", position:"relative", overflow:"hidden", padding:"140px 56px 72px" }}>
+      <section className="sc-hero" style={{ background:"#050810", position:"relative", overflow:"hidden", padding:"140px 56px 72px" }}>
         <div style={{ position:"absolute", inset:0, background:`radial-gradient(ellipse 70% 60% at 70% 30%, rgba(43,168,224,0.06) 0%, transparent 65%), radial-gradient(ellipse 50% 70% at 25% 70%, rgba(43,168,224,0.03) 0%, transparent 60%)` }} />
         <div style={{ position:"relative", maxWidth:1280, margin:"0 auto" }}>
           {badge && (
@@ -102,11 +102,11 @@ export function PageShell({
       </section>
 
       {/* Body */}
-      <section style={{ background:"#000000", padding:"56px" }}>
+      <section className="sc-body" style={{ background:"#000000", padding:"56px" }}>
         <div style={{ maxWidth:1280, margin:"0 auto" }}>
           {children}
           {bullets && (
-            <div style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:16, marginTop: children ? 40 : 0 }}>
+            <div className="sc-bullets" style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:16, marginTop: children ? 40 : 0 }}>
               {bullets.map(b => (
                 <div key={b.t} style={{ border:"1px solid rgba(255,255,255,0.08)", borderRadius:14, padding:28, background:"#0B0D10" }}>
                   <div style={{ width:40, height:40, borderRadius:10, background:"rgba(43,168,224,0.08)", display:"flex", alignItems:"center", justifyContent:"center", marginBottom:14 }}>
@@ -120,7 +120,7 @@ export function PageShell({
           )}
 
           {/* Never dead-end: always links back */}
-          <div style={{ marginTop:48, padding:"36px 40px", background:"linear-gradient(135deg, #0B0D10 0%, #121519 100%)", borderRadius:16, display:"flex", justifyContent:"space-between", alignItems:"center", flexWrap:"wrap", gap:20 }}>
+          <div className="sc-cta-banner" style={{ marginTop:48, padding:"36px 40px", background:"linear-gradient(135deg, #0B0D10 0%, #121519 100%)", borderRadius:16, display:"flex", justifyContent:"space-between", alignItems:"center", flexWrap:"wrap", gap:20 }}>
             <div>
               <h3 style={{ fontFamily:"'Cormorant Garamond',Georgia,serif", fontSize:24, fontWeight:600, color:"#FFFFFF", marginBottom:6 }}>Looking for something now?</h3>
               <p style={{ fontSize:14, color:"rgba(255,255,255,0.6)" }}>Browse live listings or talk to a Nilay 360 property expert.</p>
