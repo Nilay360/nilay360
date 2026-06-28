@@ -214,7 +214,7 @@ function UserDropdown({ user, profile, onClose, onSignOut, open, wrapperRef }: D
         borderRadius: 14,
         boxShadow: "0 20px 60px rgba(0,0,0,0.55), 0 0 0 1px rgba(43,168,224,0.06)",
         overflow: "hidden",
-        zIndex: 200,
+        zIndex: 9999,
         animation: "ddFadeIn 0.15s ease",
       }}
       onClick={e => e.stopPropagation()}
@@ -703,6 +703,7 @@ export function Navbar() {
         boxShadow: scrolled ? "0 2px 24px rgba(0,0,0,0.35)" : "none",
         transition: "background 0.3s, box-shadow 0.3s",
         overflow: "visible",
+        isolation: "isolate",
       }}>
 
         {/* ── Main bar ── */}
@@ -798,7 +799,7 @@ export function Navbar() {
                   </svg>
                 </button>
 
-                {dropdown && (
+                {dropdown && window.innerWidth >= 1024 && (
                   <UserDropdown
                     user={user}
                     profile={profile}
@@ -868,24 +869,27 @@ export function Navbar() {
           />
         )}
 
-        {/* ── Mobile Menu ── */}
-        {menuOpen && (
-          <div
-            className="nvl-mobile"
-            style={{
-              position: "fixed",
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              background: "#0B0D10",
-              borderTop: "1px solid rgba(43,168,224,0.15)",
-              padding: "12px 16px",
-              overflowY: "auto",
-              zIndex: 999,
-              paddingBottom: 40,
-            }}
-          >
+
+      </header>
+
+      {/* ── Mobile Menu ── */}
+      {menuOpen && (
+        <div
+          className="nvl-mobile"
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: "#0B0D10",
+            borderTop: "1px solid rgba(43,168,224,0.15)",
+            padding: "12px 16px",
+            overflowY: "auto",
+            zIndex: 99999,
+            paddingBottom: 40,
+          }}
+        >
             {/* Nav links with accordion for mega-menu items */}
             <nav style={{ display: "flex", flexDirection: "column", gap: 2, marginBottom: 12 }}>
               {NAV_LINKS.map(link => {
@@ -1140,8 +1144,6 @@ export function Navbar() {
             </div>
           </div>
         )}
-
-      </header>
     </>
   )
 }

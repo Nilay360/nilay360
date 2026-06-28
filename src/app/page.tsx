@@ -440,12 +440,12 @@ export default function HomePage() {
           position:"absolute", top:-80, bottom:-80, left:0, right:0,
           backgroundImage:"url('https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1920&q=80')",
           backgroundSize:"cover", backgroundPosition:"center top",
-          opacity:0.35, willChange:"transform",
+          opacity:0.35, willChange:"transform", zIndex:0,
         }} />
         {/* Silk texture overlay */}
         <div style={{ position:"absolute", inset:0, zIndex:0, backgroundImage:"url('https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&q=40')", backgroundSize:"cover", opacity:0.04, mixBlendMode:"overlay", pointerEvents:"none" }} />
         {/* Cursor glow */}
-        <div ref={glowRef} aria-hidden style={{position:"absolute", top:0, left:0, width:400, height:400, borderRadius:"50%", background:"radial-gradient(circle, rgba(43,168,224,0.08) 0%, transparent 70%)", pointerEvents:"none", opacity:0, transition:"opacity 0.3s ease", zIndex:1, willChange:"transform, opacity"}} />
+        <div ref={glowRef} aria-hidden style={{position:"absolute", top:0, left:0, width:400, height:400, borderRadius:"50%", background:"radial-gradient(circle, rgba(43,168,224,0.08) 0%, transparent 70%)", pointerEvents:"none", opacity:0, transition:"opacity 0.3s ease", zIndex:0, willChange:"transform, opacity"}} />
         <div style={{position:"absolute", inset:0, background:"radial-gradient(ellipse 80% 60% at 65% 40%, rgba(11,13,16,0.65) 0%, transparent 65%), radial-gradient(ellipse 60% 80% at 30% 60%, rgba(43,168,224,0.08) 0%, transparent 60%), rgba(5,8,12,0.72)"}} />
 
         {/* Animated premium SVG city skyline */}
