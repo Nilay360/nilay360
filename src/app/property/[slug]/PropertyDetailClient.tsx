@@ -1007,7 +1007,7 @@ export default function PropertyDetailClient() {
             </div>
 
             {/* ══ RIGHT SIDEBAR ══ */}
-            <div className="pd-right" style={{ flex: "0 0 35%", position: "sticky", top: "88px" }}>
+            <div className="pd-right" style={{ flex: "0 0 35%", position: "sticky", top: "72px" }}>
 
               {/* ── CONTACT FORM ── */}
               <Card style={{ marginBottom: "20px" }}>

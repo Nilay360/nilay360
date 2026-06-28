@@ -322,7 +322,7 @@ export default function PropertiesPage() {
         <div className="pr-layout" style={{ position: "relative", zIndex: 1, maxWidth: "1400px", margin: "0 auto", padding: "32px 48px 80px", display: "flex", gap: "28px", alignItems: "flex-start" }}>
 
           {/* Sidebar */}
-          <aside className="pr-sidebar" style={{ width: "280px", flexShrink: 0, position: "sticky", top: "88px", background: "rgba(245,242,236,0.03)", border: "1px solid rgba(245,242,236,0.08)", borderRadius: "16px", overflow: "hidden", maxHeight: "calc(100vh - 108px)", overflowY: "auto" }}>
+          <aside className="pr-sidebar" style={{ width: "280px", flexShrink: 0, position: "sticky", top: "72px", background: "rgba(245,242,236,0.03)", border: "1px solid rgba(245,242,236,0.08)", borderRadius: "16px", overflow: "hidden", maxHeight: "calc(100vh - 108px)", overflowY: "auto" }}>
             <div style={{ padding: "20px 20px 16px", borderBottom: "1px solid rgba(245,242,236,0.07)", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
               <span style={{ fontSize: "13px", fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", color: "rgba(245,242,236,0.5)" }}>Filters</span>
               {hasFilters && <button onClick={clearFilters} style={{ fontSize: "11px", fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase", color: "#2BA8E0", background: "transparent", border: "none", cursor: "pointer", fontFamily: "'DM Sans', sans-serif" }}>Clear All</button>}

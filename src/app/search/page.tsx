@@ -748,7 +748,7 @@ function SearchPageInner() {
           <button className="mobile-filter-toggle" onClick={() => setFiltersOpen(prev => !prev)}>
             ☰ Filters
           </button>
-          <aside className={filtersOpen ? "search-sidebar open" : "search-sidebar"} style={{ width: "272px", flexShrink: 0, position: "sticky", top: "88px", background: "#000000", borderRadius: "14px", overflow: "hidden", maxHeight: "calc(100vh - 108px)", overflowY: "auto" }}>
+          <aside className={filtersOpen ? "search-sidebar open" : "search-sidebar"} style={{ width: "272px", flexShrink: 0, position: "sticky", top: "72px", background: "#000000", borderRadius: "14px", overflow: "hidden", maxHeight: "calc(100vh - 108px)", overflowY: "auto" }}>
             <div style={{ padding: "18px 18px 14px", borderBottom: "1px solid rgba(245,242,236,0.07)", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
               <span style={{ fontSize: "12px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "rgba(245,242,236,0.45)" }}>Filters</span>
               {hasFilters && <button onClick={clearFilters} style={{ fontSize: "11px", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "#2BA8E0", background: "transparent", border: "none", cursor: "pointer", fontFamily: "'DM Sans', sans-serif" }}>Clear All</button>}

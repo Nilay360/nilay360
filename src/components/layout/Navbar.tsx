@@ -695,7 +695,7 @@ export function Navbar() {
         position: "fixed",
         top: 0, left: 0, right: 0,
         zIndex: 1000,
-        height: 64,
+        height: 52,
         background: headerBg,
         backdropFilter: "blur(14px)",
         WebkitBackdropFilter: "blur(14px)",
@@ -707,14 +707,14 @@ export function Navbar() {
       }}>
 
         {/* ── Main bar ── */}
-        <div className="nilay360-container" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", height: 64 }}>
+        <div className="nilay360-container" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%", height: "100%" }}>
 
           {/* Logo */}
           <Link href="/" style={{ textDecoration: "none", display: "flex", alignItems: "center", flexShrink: 0 }}>
             <img
               src="/nilay_final.jpg"
               alt="Nilay 360"
-              style={{ height: 52, width: "auto", objectFit: "contain" }}
+              style={{ height: 38, width: "auto", objectFit: "contain" }}
             />
           </Link>
 
@@ -744,6 +744,17 @@ export function Navbar() {
 
           {/* Desktop right actions */}
           <div className="nvl-desktop" style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <Link href="/dashboard/saved" style={{
+              display: "flex", alignItems: "center", justifyContent: "center",
+              width: 36, height: 36, borderRadius: 8,
+              border: "1px solid rgba(255,255,255,0.12)",
+              color: "rgba(255,255,255,0.7)", textDecoration: "none",
+              transition: "all 0.15s",
+            }} title="Saved Properties">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+              </svg>
+            </Link>
             <button
               className="nvl-list-btn"
               onClick={handleListProperty}
@@ -831,7 +842,16 @@ export function Navbar() {
             ))}
           </div>
 
-          {/* Mobile hamburger */}
+          {/* Mobile saved + hamburger */}
+          <Link href="/dashboard/saved" className="nvl-mobile" style={{
+            display: "flex", alignItems: "center", justifyContent: "center",
+            width: 36, height: 36, borderRadius: 8,
+            color: "rgba(255,255,255,0.7)", textDecoration: "none",
+          }}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+            </svg>
+          </Link>
           <button
             className="nvl-mobile"
             onClick={() => setMenuOpen(v => !v)}
@@ -878,272 +898,205 @@ export function Navbar() {
           className="nvl-mobile"
           style={{
             position: "fixed",
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            background: "#0B0D10",
-            borderTop: "1px solid rgba(43,168,224,0.15)",
-            padding: "12px 16px",
-            overflowY: "auto",
+            top: 0, left: 0, right: 0, bottom: 0,
+            background: "#000000",
             zIndex: 99999,
-            paddingBottom: 40,
+            overflowY: "auto",
+            display: "flex",
+            flexDirection: "column",
           }}
         >
-            {/* Nav links with accordion for mega-menu items */}
-            <nav style={{ display: "flex", flexDirection: "column", gap: 2, marginBottom: 12 }}>
-              {NAV_LINKS.map(link => {
-                const hasMenu   = link.label in NAV_MENUS
-                const isActive  = pathname === link.href
-                const isExpanded = mobileExpandedMenu === link.label
+          {/* Header bar */}
+          <div style={{
+            display: "flex", alignItems: "center", justifyContent: "space-between",
+            padding: "0 20px", height: 64, borderBottom: "1px solid rgba(255,255,255,0.06)",
+            background: "#000000", flexShrink: 0,
+          }}>
+            <Link href="/" onClick={() => setMenuOpen(false)}>
+              <img src="/nilay_final.jpg" alt="Nilay 360" style={{ height: 40, width: "auto", borderRadius: 6 }} />
+            </Link>
+            <button onClick={() => setMenuOpen(false)} style={{
+              background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)",
+              borderRadius: 8, width: 36, height: 36, display: "flex", alignItems: "center",
+              justifyContent: "center", cursor: "pointer", color: "#fff",
+            }}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M18 6L6 18M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
 
-                if (hasMenu) {
-                  const mobileMenu = NAV_MENUS[link.label]
-                  return (
-                    <div key={link.href}>
-                      {/* Accordion trigger */}
+          {/* Scrollable content */}
+          <div style={{ flex: 1, overflowY: "auto", padding: "8px 0 40px" }}>
+
+            {/* Nav links */}
+            <nav style={{ padding: "8px 16px" }}>
+              {NAV_LINKS.map(link => (
+                <div key={link.label}>
+                  {link.menu ? (
+                    <div>
                       <button
-                        onClick={() => setMobileExpandedMenu(isExpanded ? null : link.label)}
+                        onClick={() => setOpenMenu(currentMenu === link.label ? null : link.label)}
                         style={{
-                          width: "100%",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "space-between",
-                          padding: "14px 24px",
-                          borderRadius: 6,
-                          background: isActive || isExpanded ? "rgba(255,255,255,0.06)" : "transparent",
-                          border: "none",
-                          cursor: "pointer",
-                          fontSize: 16,
-                          fontWeight: 500,
-                          fontFamily: "'DM Sans', sans-serif",
-                          color: isActive ? "#3DBEF5" : "rgba(255,255,255,0.65)",
-                          textAlign: "left",
-                          minHeight: 44,
+                          width: "100%", display: "flex", alignItems: "center",
+                          justifyContent: "space-between", padding: "14px 12px",
+                          background: currentMenu === link.label ? "rgba(43,168,224,0.08)" : "transparent",
+                          border: "none", borderRadius: 10, cursor: "pointer",
+                          color: currentMenu === link.label ? "#2BA8E0" : "rgba(255,255,255,0.85)",
+                          fontSize: 15, fontWeight: 500, fontFamily: "'DM Sans', sans-serif",
+                          transition: "all 0.15s",
                         }}
                       >
-                        <span>{link.label}</span>
-                        <span style={{ color: "rgba(43,168,224,0.6)" }}>
-                          <Chevron rotated={isExpanded} />
-                        </span>
+                        {link.label}
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
+                          style={{ transform: currentMenu === link.label ? "rotate(180deg)" : "none", transition: "transform 0.2s" }}>
+                          <path d="M6 9l6 6 6-6" />
+                        </svg>
                       </button>
-
-                      {/* Accordion body */}
-                      {isExpanded && (
-                        <div style={{
-                          marginLeft: 12,
-                          marginBottom: 6,
-                          paddingLeft: 12,
-                          borderLeft: "1px solid rgba(43,168,224,0.2)",
-                          paddingBottom: 6,
-                        }}>
-                          {/* Quick links (left column) */}
-                          <div style={{ marginBottom: 8 }}>
-                            {mobileMenu.leftColumn.links.map(l => (
-                              <Link
-                                key={l.href + l.label}
-                                href={l.href}
-                                onClick={() => setMenuOpen(false)}
-                                style={{
-                                  display: "block",
-                                  padding: "6px 0",
-                                  fontSize: 13,
-                                  fontFamily: "'DM Sans', sans-serif",
-                                  textDecoration: "none",
-                                  color: "rgba(43,168,224,0.82)",
-                                  fontWeight: 500,
-                                }}
-                              >
-                                {l.label}
-                              </Link>
-                            ))}
-                          </div>
-
-                          {/* First column (cities / top items) */}
-                          {mobileMenu.columns[0] && (
-                            <div>
-                              <div style={{
-                                fontSize: 10,
-                                fontWeight: 700,
-                                color: "rgba(43,168,224,0.5)",
-                                letterSpacing: "0.1em",
-                                textTransform: "uppercase",
-                                padding: "4px 0 6px",
-                                fontFamily: "'DM Sans', sans-serif",
+                      {currentMenu === link.label && (
+                        <div style={{ padding: "4px 12px 8px 24px", display: "flex", flexDirection: "column", gap: 2 }}>
+                          {link.menu.columns?.[0]?.items?.slice(0, 5).map((item: any) => (
+                            <Link key={item.href} href={item.href} onClick={() => { setMenuOpen(false); setOpenMenu(null); }}
+                              style={{
+                                padding: "10px 12px", borderRadius: 8, color: "rgba(255,255,255,0.6)",
+                                fontSize: 14, display: "block", textDecoration: "none",
+                                borderLeft: "2px solid rgba(43,168,224,0.3)",
+                                paddingLeft: 16, transition: "all 0.15s",
                               }}>
-                                {mobileMenu.columns[0].heading}
-                              </div>
-                              {mobileMenu.columns[0].links.map(l => (
-                                <Link
-                                  key={l.href + l.label}
-                                  href={l.href}
-                                  onClick={() => setMenuOpen(false)}
-                                  style={{
-                                    display: "block",
-                                    padding: "5px 0",
-                                    fontSize: 12.5,
-                                    fontFamily: "'DM Sans', sans-serif",
-                                    textDecoration: "none",
-                                    color: "rgba(255,255,255,0.45)",
-                                  }}
-                                >
-                                  {l.label}
-                                </Link>
-                              ))}
-                            </div>
-                          )}
+                              {item.label}
+                            </Link>
+                          ))}
                         </div>
                       )}
                     </div>
-                  )
-                }
-
-                // Plain nav link (no mega menu)
-                return (
-                  <Link
-                    key={link.href}
-                    href={link.href}
-                    onClick={() => setMenuOpen(false)}
-                    style={{
-                      padding: "14px 24px",
-                      borderRadius: 6,
-                      fontSize: 16,
-                      fontWeight: 500,
-                      fontFamily: "'DM Sans', sans-serif",
-                      textDecoration: "none",
-                      color: isActive ? "#3DBEF5" : "rgba(255,255,255,0.65)",
-                      background: isActive ? "rgba(255,255,255,0.06)" : "transparent",
-                      display: "block",
-                      minHeight: 44,
-                    }}
-                  >
-                    {link.label}
-                  </Link>
-                )
-              })}
+                  ) : (
+                    <Link href={link.href ?? "#"} onClick={() => setMenuOpen(false)}
+                      style={{
+                        display: "block", padding: "14px 12px", borderRadius: 10,
+                        color: "rgba(255,255,255,0.85)", fontSize: 15, fontWeight: 500,
+                        textDecoration: "none", fontFamily: "'DM Sans', sans-serif",
+                      }}>
+                      {link.label}
+                    </Link>
+                  )}
+                </div>
+              ))}
             </nav>
 
+            {/* Divider */}
+            <div style={{ height: 1, background: "rgba(255,255,255,0.06)", margin: "8px 16px" }} />
+
             {/* Auth section */}
-            <div style={{ borderTop: "1px solid rgba(255,255,255,0.08)", paddingTop: 12 }}>
+            <div style={{ padding: "12px 16px" }}>
               {mounted && (user ? (
                 <>
                   {/* Profile card */}
                   <div style={{
-                    display: "flex", alignItems: "center", gap: 12,
-                    padding: "10px 12px", marginBottom: 6,
-                    background: "linear-gradient(135deg, #121519 0%, #0B0D10 100%)",
-                    borderRadius: 10, border: "1px solid rgba(43,168,224,0.2)",
+                    display: "flex", alignItems: "center", gap: 12, padding: "14px 16px",
+                    background: "linear-gradient(135deg, rgba(43,168,224,0.08) 0%, rgba(43,168,224,0.03) 100%)",
+                    borderRadius: 12, border: "1px solid rgba(43,168,224,0.2)", marginBottom: 12,
                   }}>
-                    <Avatar initial={avatarInitial} size={38} ring />
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{
-                        color: "#FFFFFF", fontWeight: 600, fontSize: 14,
-                        fontFamily: "'DM Sans', sans-serif",
-                        overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
-                      }}>
-                        {displayName}
-                      </div>
-                      {profile?.city && (
-                        <div style={{
-                          color: "rgba(43,168,224,0.7)", fontSize: 11.5,
-                          fontFamily: "'DM Sans', sans-serif",
-                        }}>
-                          {profile.city}
-                        </div>
-                      )}
+                    <div style={{
+                      width: 44, height: 44, borderRadius: "50%", flexShrink: 0,
+                      background: "linear-gradient(135deg, #2BA8E0, #1577B8)",
+                      display: "flex", alignItems: "center", justifyContent: "center",
+                      fontSize: 18, fontWeight: 700, color: "#fff",
+                    }}>
+                      {avatarInitial}
                     </div>
-                    <Link
-                      href="/profile/edit"
-                      onClick={() => setMenuOpen(false)}
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ color: "#fff", fontWeight: 600, fontSize: 15, marginBottom: 2 }}>
+                        {profile?.full_name ?? user.email?.split("@")[0]}
+                      </div>
+                      <div style={{ color: "rgba(43,168,224,0.8)", fontSize: 12 }}>
+                        {profile?.city ?? user.email}
+                      </div>
+                    </div>
+                    <Link href="/profile/edit" onClick={() => setMenuOpen(false)}
                       style={{
-                        fontSize: 11, fontWeight: 600, color: "#2BA8E0",
-                        fontFamily: "'DM Sans', sans-serif",
-                        background: "rgba(43,168,224,0.1)",
-                        border: "1px solid rgba(43,168,224,0.25)",
-                        borderRadius: 6, padding: "3px 8px",
-                        textDecoration: "none",
-                      }}
-                    >
+                        padding: "6px 12px", borderRadius: 7, border: "1px solid rgba(43,168,224,0.4)",
+                        color: "#2BA8E0", fontSize: 12, fontWeight: 600, textDecoration: "none",
+                        background: "rgba(43,168,224,0.08)",
+                      }}>
                       Edit
                     </Link>
                   </div>
 
-                  {/* Quick links */}
-                  <div style={{ display: "flex", flexDirection: "column", gap: 1, marginBottom: 8 }}>
-                    {MENU_ITEMS.flatMap(g => g.items).map(item => (
-                      <Link
-                        key={item.href}
-                        href={item.href}
-                        onClick={() => setMenuOpen(false)}
+                  {/* Quick links grid */}
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 12 }}>
+                    {[
+                      { href: "/dashboard", label: "Dashboard", icon: "⊞" },
+                      { href: "/dashboard/my-listings", label: "My Listings", icon: "🏠" },
+                      { href: "/post-property", label: "List Property", icon: "+" },
+                      { href: "/dashboard/saved", label: "Saved", icon: "♡" },
+                      { href: "/dashboard/searches", label: "My Searches", icon: "⌕" },
+                      { href: "/calculator", label: "Calculator", icon: "⊟" },
+                    ].map(item => (
+                      <Link key={item.href} href={item.href} onClick={() => setMenuOpen(false)}
                         style={{
-                          display: "flex", alignItems: "center", gap: 10,
-                          padding: "9px 12px", borderRadius: 8,
-                          color: "rgba(255,255,255,0.7)",
-                          textDecoration: "none", fontSize: 13.5,
-                          fontFamily: "'DM Sans', sans-serif",
-                        }}
-                      >
-                        <span style={{ color: "rgba(43,168,224,0.55)" }}>
-                          <item.icon />
-                        </span>
+                          display: "flex", alignItems: "center", gap: 8, padding: "11px 12px",
+                          borderRadius: 10, background: "rgba(255,255,255,0.04)",
+                          border: "1px solid rgba(255,255,255,0.07)",
+                          color: "rgba(255,255,255,0.75)", fontSize: 13, fontWeight: 500,
+                          textDecoration: "none", transition: "all 0.15s",
+                        }}>
+                        <span style={{ color: "#2BA8E0", fontSize: 16 }}>{item.icon}</span>
                         {item.label}
                       </Link>
                     ))}
                   </div>
 
-                  <button
-                    onClick={handleSignOut}
+                  {/* Admin panel link — only for admins */}
+                  {profile?.role === "admin" && (
+                    <Link href="/admin" onClick={() => setMenuOpen(false)}
+                      style={{
+                        display: "flex", alignItems: "center", gap: 10, padding: "12px 16px",
+                        borderRadius: 10, background: "rgba(43,168,224,0.1)",
+                        border: "1px solid rgba(43,168,224,0.3)",
+                        color: "#2BA8E0", fontSize: 14, fontWeight: 600,
+                        textDecoration: "none", marginBottom: 12,
+                      }}>
+                      <span>⚙</span> Admin Panel
+                    </Link>
+                  )}
+
+                  {/* Sign out */}
+                  <button onClick={() => { handleSignOut(); setMenuOpen(false); }}
                     style={{
-                      width: "100%", padding: "10px 12px",
-                      display: "flex", alignItems: "center", gap: 10,
-                      background: "rgba(224,85,85,0.08)",
-                      border: "1px solid rgba(224,85,85,0.2)",
-                      borderRadius: 8, cursor: "pointer",
-                      color: "#e05555", fontSize: 13.5,
-                      fontFamily: "'DM Sans', sans-serif", fontWeight: 500,
-                      marginBottom: 8,
-                    }}
-                  >
-                    <IconSignOut />
+                      width: "100%", padding: "12px 16px", borderRadius: 10,
+                      background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.2)",
+                      color: "#EF4444", fontSize: 14, fontWeight: 600, cursor: "pointer",
+                      fontFamily: "'DM Sans', sans-serif",
+                    }}>
                     Sign Out
                   </button>
                 </>
               ) : (
-                <button
-                  onClick={() => { setMenuOpen(false); openAuthModal("signin") }}
-                  style={{
-                    width: "100%", padding: "10px 16px", marginBottom: 8,
-                    fontSize: 14, fontWeight: 500,
-                    color: "rgba(255,255,255,0.75)",
-                    border: "1px solid rgba(255,255,255,0.2)",
-                    background: "transparent",
-                    borderRadius: 8,
-                    cursor: "pointer",
-                    fontFamily: "'DM Sans', sans-serif",
-                    display: "block",
-                  }}>
-                  Sign In
-                </button>
+                <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                  <button onClick={() => { openAuthModal("signin"); setMenuOpen(false); }}
+                    style={{
+                      width: "100%", padding: "13px 16px", borderRadius: 10,
+                      background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.12)",
+                      color: "#fff", fontSize: 15, fontWeight: 600, cursor: "pointer",
+                      fontFamily: "'DM Sans', sans-serif",
+                    }}>
+                    Sign In
+                  </button>
+                  <button onClick={() => { handleListProperty(); setMenuOpen(false); }}
+                    style={{
+                      width: "100%", padding: "13px 16px", borderRadius: 10,
+                      background: "linear-gradient(135deg, #2BA8E0, #1577B8)",
+                      border: "none", color: "#fff", fontSize: 15, fontWeight: 600,
+                      cursor: "pointer", fontFamily: "'DM Sans', sans-serif",
+                    }}>
+                    List Property
+                  </button>
+                </div>
               ))}
-
-              <button
-                onClick={handleListProperty}
-                style={{
-                  width: "100%", padding: "11px 16px",
-                  fontSize: 14, fontWeight: 600,
-                  color: "#0a0a0a",
-                  background: "#2BA8E0",
-                  border: "none",
-                  borderRadius: 8,
-                  cursor: "pointer",
-                  fontFamily: "'DM Sans', sans-serif",
-                  display: "block",
-                }}>
-                List Property
-              </button>
             </div>
           </div>
-        )}
+        </div>
+      )}
     </>
   )
 }
