@@ -279,7 +279,10 @@ export default function HomePage() {
             addressRegion: "Telangana",
             addressCountry: "IN",
           },
-          sameAs: ["https://www.instagram.com/nilay360"],
+          sameAs: [
+            "https://www.instagram.com/nilay360_",
+            "https://www.instagram.com/nivila_in",
+          ],
           areaServed: { "@type": "Country", name: "India" },
           serviceType: ["Property Discovery", "Virtual Property Tours", "Real Estate Transactions", "PropTech Solutions"],
         }) }}
