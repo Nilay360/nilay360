@@ -179,15 +179,16 @@ function Avatar({
 // ─── User dropdown panel ───────────────────────────────────────────────────────
 
 interface DropdownProps {
-  user:       User
-  profile:    Profile | null
-  onClose:    () => void
-  onSignOut:  () => void
-  open:       boolean
-  wrapperRef: React.RefObject<HTMLDivElement>
+  user:        User
+  profile:     Profile | null
+  onClose:     () => void
+  onSignOut:   () => void
+  open:        boolean
+  wrapperRef:  React.RefObject<HTMLDivElement>
+  dropdownRef: React.RefObject<HTMLDivElement>
 }
 
-function UserDropdown({ user, profile, onClose, onSignOut, open, wrapperRef }: DropdownProps) {
+function UserDropdown({ user, profile, onClose, onSignOut, open, wrapperRef, dropdownRef }: DropdownProps) {
   const displayName = profile?.full_name ?? user.email?.split("@")[0] ?? "User"
   const initial     = (displayName || "U")[0].toUpperCase()
   const city        = profile?.city ?? null
@@ -206,6 +207,7 @@ function UserDropdown({ user, profile, onClose, onSignOut, open, wrapperRef }: D
 
   return createPortal(
     <div
+      ref={dropdownRef}
       style={{
         position: "fixed", right: dropdownPos.right, top: dropdownPos.top,
         width: 272,
@@ -597,6 +599,7 @@ export function Navbar() {
   useEffect(() => { setMounted(true) }, [])
 
   const wrapperRef   = useRef<HTMLDivElement>(null)
+  const dropdownRef  = useRef<HTMLDivElement>(null)
   const closeTimerRef = useRef<number | null>(null)
 
   // ── Mega-menu hover helpers ──
@@ -630,7 +633,10 @@ export function Navbar() {
   useEffect(() => {
     if (!dropdown) return
     const handler = (e: MouseEvent) => {
-      if (wrapperRef.current && !wrapperRef.current.contains(e.target as Node)) {
+      if (
+        wrapperRef.current && !wrapperRef.current.contains(e.target as Node) &&
+        dropdownRef.current && !dropdownRef.current.contains(e.target as Node)
+      ) {
         setDropdown(false)
       }
     }
@@ -817,6 +823,7 @@ export function Navbar() {
                     onSignOut={handleSignOut}
                     open={dropdown}
                     wrapperRef={wrapperRef}
+                    dropdownRef={dropdownRef}
                   />
                 )}
               </div>
