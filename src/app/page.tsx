@@ -3,6 +3,8 @@ import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { motion, useScroll, useTransform } from "framer-motion";
 import Reveal from "@/components/ui/Reveal";
+import { createClient } from "@/lib/supabase/client";
+import { useSavedProperties } from "@/hooks/useSavedProperties";
 
 /* ─── Palette ─────────────────────────────────────────────── */
 const G = {
@@ -113,6 +115,16 @@ function StarRow({ n }: { n:number }) {
 /* ─── Main ─────────────────────────────────────────────────── */
 export default function HomePage() {
   const router = useRouter();
+  const [userId, setUserId] = useState<string | null>(null)
+  const { savedIds, toggleSave } = useSavedProperties(userId)
+
+  useEffect(() => {
+    const supabase = createClient()
+    supabase.auth.getUser().then(({ data }) => {
+      setUserId(data.user?.id ?? null)
+    })
+  }, [])
+
   const [searchTab, setSearchTab] = useState("Buy");
   const [searchCity, setSearchCity] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
@@ -882,6 +894,14 @@ export default function HomePage() {
                   <div className="card-img" style={{position:"absolute", inset:0, backgroundImage:`url(${p.img})`, backgroundSize:"cover", backgroundPosition:"center"}} />
                   <div style={{position:"absolute", inset:0, background:"linear-gradient(to top, rgba(0,0,0,0.4) 0%, transparent 50%)"}} />
                   <span className="badge-tag" style={{position:"absolute", top:12, left:12, zIndex:1}}>{p.tag}</span>
+                  <button
+                    onClick={(e) => { e.preventDefault(); toggleSave(p.id) }}
+                    style={{position:"absolute", top:12, right:12, zIndex:2, background:"rgba(0,0,0,0.5)", backdropFilter:"blur(6px)", border:"1px solid rgba(255,255,255,0.15)", borderRadius:"50%", width:34, height:34, display:"flex", alignItems:"center", justifyContent:"center", cursor:"pointer", transition:"all 0.2s"}}
+                  >
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill={savedIds.has(p.id) ? "#2BA8E0" : "none"} stroke={savedIds.has(p.id) ? "#2BA8E0" : "rgba(255,255,255,0.8)"} strokeWidth="2">
+                      <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+                    </svg>
+                  </button>
                   <div style={{position:"absolute", bottom:12, right:12, zIndex:1, background:"rgba(0,0,0,0.5)", backdropFilter:"blur(6px)", borderRadius:6, padding:"4px 10px"}}>
                     <span style={{fontFamily:"'Cormorant Garamond',Georgia,serif", fontSize:18, fontWeight:700, color:"#fff"}}>{p.price}</span>
                   </div>
