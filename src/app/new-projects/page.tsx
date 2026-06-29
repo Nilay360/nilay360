@@ -348,12 +348,31 @@ export default function NewProjectsPage() {
         @keyframes fadeUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
         input::placeholder, textarea::placeholder { color: #9CA3AF; }
         input:focus, textarea:focus, select:focus { border-color: rgba(201,168,76,0.5) !important; box-shadow: 0 0 0 3px rgba(201,168,76,0.08); }
+        @media (max-width: 768px) {
+          .np-hero { padding: 80px 16px 48px !important; }
+          .np-filters { padding: 24px 16px !important; }
+          .np-filters-row { flex-wrap: wrap !important; gap: 10px !important; }
+          .np-filters-row select { width: 100% !important; }
+          .np-grid { grid-template-columns: 1fr !important; padding: 0 16px !important; gap: 16px !important; }
+          .np-developers { padding: 48px 16px !important; }
+          .np-dev-grid { grid-template-columns: repeat(2,1fr) !important; gap: 16px !important; }
+          .np-why { padding: 48px 16px !important; }
+          .np-why-grid { grid-template-columns: repeat(2,1fr) !important; gap: 16px !important; }
+          .np-alert { padding: 48px 16px !important; }
+          .np-footer { padding: 48px 16px 0 !important; }
+          .np-footer-grid { grid-template-columns: 1fr 1fr !important; gap: 32px !important; }
+        }
+        @media (max-width: 480px) {
+          .np-dev-grid { grid-template-columns: 1fr !important; }
+          .np-why-grid { grid-template-columns: 1fr !important; }
+          .np-footer-grid { grid-template-columns: 1fr !important; }
+        }
       `}</style>
 
       <div style={{ minHeight: "100vh", background: "#000000" }}>
 
         {/* ── HERO ───────────────────────────────────────────── */}
-        <section style={{ paddingTop: "64px", background: "#000000", minHeight: "520px", display: "flex", alignItems: "center", position: "relative", overflow: "hidden" }}>
+        <section className="np-hero" style={{ paddingTop: "64px", background: "#000000", minHeight: "520px", display: "flex", alignItems: "center", position: "relative", overflow: "hidden" }}>
           {/* Grid texture */}
           <div style={{ position: "absolute", inset: 0, backgroundImage: "linear-gradient(rgba(201,168,76,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(201,168,76,0.04) 1px, transparent 1px)", backgroundSize: "60px 60px", pointerEvents: "none" }} />
           {/* Glow */}
@@ -458,8 +477,8 @@ export default function NewProjectsPage() {
         )}
 
         {/* ── FILTERS ROW ────────────────────────────────────── */}
-        <div style={{ maxWidth: "1280px", margin: "0 auto", padding: "44px 48px 0" }}>
-          <div style={{ background: "#fff", border: "1px solid rgba(13,43,31,0.07)", borderRadius: "14px", padding: "18px 22px", display: "flex", gap: "14px", alignItems: "center", flexWrap: "wrap", boxShadow: "0 2px 12px rgba(13,43,31,0.04)" }}>
+        <div className="np-filters" style={{ maxWidth: "1280px", margin: "0 auto", padding: "44px 48px 0" }}>
+          <div className="np-filters-row" style={{ background: "#fff", border: "1px solid rgba(13,43,31,0.07)", borderRadius: "14px", padding: "18px 22px", display: "flex", gap: "14px", alignItems: "center", flexWrap: "wrap", boxShadow: "0 2px 12px rgba(13,43,31,0.04)" }}>
             {/* City tabs */}
             <div style={{ display: "flex", gap: "4px", background: "#F8F6F1", borderRadius: "9px", padding: "3px" }}>
               {["All Cities", "Hyderabad", "Mumbai", "Bengaluru", "Delhi NCR"].map(c => (
@@ -486,14 +505,14 @@ export default function NewProjectsPage() {
                 style={{ fontSize: "13px", fontWeight: 600, color: "#2BA8E0", background: "transparent", border: "none", cursor: "pointer", fontFamily: "'DM Sans', sans-serif" }}>Clear all filters</button>
             </div>
           ) : (
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "22px" }}>
+            <div className="np-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "22px" }}>
               {filtered.map(p => <ProjectCard key={p.id} p={p} onInterest={setInterestProject} />)}
             </div>
           )}
         </section>
 
         {/* ── DEVELOPER SPOTLIGHT ────────────────────────────── */}
-        <section style={{ background: "#F8F6F1", padding: "72px 48px", borderTop: "1px solid rgba(13,43,31,0.06)" }}>
+        <section className="np-developers" style={{ background: "#F8F6F1", padding: "72px 48px", borderTop: "1px solid rgba(13,43,31,0.06)" }}>
           <div style={{ maxWidth: "1280px", margin: "0 auto" }}>
             <div style={{ textAlign: "center", marginBottom: "44px" }}>
               <Eyebrow label="Trusted Partners" />
@@ -501,7 +520,7 @@ export default function NewProjectsPage() {
                 Featured<br /><em style={{ fontStyle: "italic", color: "#2BA8E0" }}>Developers</em>
               </h2>
             </div>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "18px" }}>
+            <div className="np-dev-grid" style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "18px" }}>
               {DEVELOPERS.map((d, i) => {
                 const [hover, setHover] = useState(false);
                 return (
@@ -532,14 +551,14 @@ export default function NewProjectsPage() {
         </section>
 
         {/* ── WHY BUY NEW ────────────────────────────────────── */}
-        <section style={{ maxWidth: "1280px", margin: "0 auto", padding: "72px 48px" }}>
+        <section className="np-why" style={{ maxWidth: "1280px", margin: "0 auto", padding: "72px 48px" }}>
           <div style={{ textAlign: "center", marginBottom: "44px" }}>
             <Eyebrow label="The Advantage" />
             <h2 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "clamp(28px, 3.5vw, 44px)", fontWeight: 400, color: "#000000" }}>
               Why Buy a<br /><em style={{ fontStyle: "italic", color: "#2BA8E0" }}>New Project?</em>
             </h2>
           </div>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "20px" }}>
+          <div className="np-why-grid" style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "20px" }}>
             {[
               {
                 icon: "🛡", color: "#059669", bg: "rgba(5,150,105,0.06)", border: "rgba(5,150,105,0.12)",
@@ -584,7 +603,7 @@ export default function NewProjectsPage() {
         </section>
 
         {/* ── PRE-LAUNCH ALERTS ──────────────────────────────── */}
-        <section style={{ background: "#000000", padding: "90px 48px", position: "relative", overflow: "hidden" }}>
+        <section className="np-alert" style={{ background: "#000000", padding: "90px 48px", position: "relative", overflow: "hidden" }}>
           <div style={{ position: "absolute", inset: 0, backgroundImage: "linear-gradient(rgba(201,168,76,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(201,168,76,0.04) 1px, transparent 1px)", backgroundSize: "52px 52px", pointerEvents: "none" }} />
           <div style={{ position: "absolute", inset: 0, background: "radial-gradient(ellipse 60% 55% at 50% 110%, rgba(201,168,76,0.1) 0%, transparent 55%)", pointerEvents: "none" }} />
           <div style={{ position: "relative", zIndex: 2, maxWidth: "680px", margin: "0 auto", textAlign: "center" }}>
@@ -658,9 +677,9 @@ export default function NewProjectsPage() {
         </section>
 
         {/* ── FOOTER ─────────────────────────────────────────── */}
-        <footer style={{ background: "#05080C", padding: "72px 48px 0" }}>
+        <footer className="np-footer" style={{ background: "#05080C", padding: "72px 48px 0" }}>
           <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
-            <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1fr", gap: "48px", paddingBottom: "56px", borderBottom: "1px solid rgba(245,242,236,0.06)" }}>
+            <div className="np-footer-grid" style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1fr", gap: "48px", paddingBottom: "56px", borderBottom: "1px solid rgba(245,242,236,0.06)" }}>
               <div>
                 <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "18px", fontWeight: 600, color: "#fff", letterSpacing: "0.16em", marginBottom: "14px" }}>Nilay 360 <span style={{ color: "#2BA8E0" }}>·</span></div>
                 <p style={{ fontSize: "13px", color: "rgba(245,242,236,0.35)", lineHeight: 1.75, maxWidth: "280px", marginBottom: "22px" }}>India's most trusted premium real estate platform. Every listing verified, every project curated.</p>

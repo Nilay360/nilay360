@@ -137,9 +137,15 @@ export default function ProfileEditPage() {
 
   return (
     <div style={{ minHeight: "100vh", background: G.ivory, paddingTop: 64 }}>
+      <style>{`
+@media (max-width: 768px) {
+  .pe-header { flex-direction: column !important; align-items: flex-start !important; gap: 12px !important; padding: 16px !important; }
+  .pe-card { padding: 20px 16px !important; margin: 0 16px !important; }
+}
+`}</style>
       <div style={{ maxWidth: 720, margin: "0 auto", padding: "40px 40px" }}>
 
-        <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 36, flexWrap: "wrap", gap: 16 }}>
+        <div className="pe-header" style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 36, flexWrap: "wrap", gap: 16 }}>
           <div>
             <h1 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: 34, fontWeight: 600, color: G.dark, margin: 0, lineHeight: 1.15 }}>
               Edit Profile
@@ -162,6 +168,7 @@ export default function ProfileEditPage() {
         </div>
 
         <form
+          className="pe-card"
           onSubmit={handleSubmit}
           style={{
             background: "#ffffff", borderRadius: 14,

@@ -306,12 +306,16 @@ export default function EditListingPage() {
         select option { background: ${C.surface2}; }
         ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-thumb { background: rgba(201,168,76,0.2); border-radius: 2px; }
+        @media (max-width: 768px) {
+          .ppe-header { padding: 20px 16px !important; }
+          .ppe-form { padding: 16px 16px 64px !important; }
+        }
       `}</style>
 
       <div style={{ minHeight: '100vh', background: C.bg, paddingTop: 64 }}>
 
         {/* Header */}
-        <div style={{ background: `linear-gradient(135deg, #081c12 0%, #000000 100%)`, borderBottom: `1px solid rgba(201,168,76,0.12)`, padding: '36px 48px 32px' }}>
+        <div className="ppe-header" style={{ background: `linear-gradient(135deg, #081c12 0%, #000000 100%)`, borderBottom: `1px solid rgba(201,168,76,0.12)`, padding: '36px 48px 32px' }}>
           <div style={{ maxWidth: 900, margin: '0 auto' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
               <a href="/dashboard/my-listings" style={{ fontSize: 12, color: 'rgba(245,242,236,0.4)', textDecoration: 'none' }}>My Listings</a>
@@ -325,7 +329,7 @@ export default function EditListingPage() {
           </div>
         </div>
 
-        <form onSubmit={handleSubmit} style={{ maxWidth: 900, margin: '0 auto', padding: '32px 48px 80px' }}>
+        <form className="ppe-form" onSubmit={handleSubmit} style={{ maxWidth: 900, margin: '0 auto', padding: '32px 48px 80px' }}>
 
           {/* Step 1 — Listing type */}
           <SectionCard title="1. Listing Type">

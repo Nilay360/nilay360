@@ -364,6 +364,27 @@ export default function CommercialPage() {
 
         a { text-decoration: none; }
 
+        @media (max-width: 768px) {
+          .cm-hero { padding: 80px 0 0 !important; }
+          .cm-hero-inner { padding: 48px 16px !important; }
+          .cm-types { padding: 48px 16px !important; }
+          .cm-types-grid { grid-template-columns: 1fr !important; gap: 16px !important; }
+          .cm-roi { padding: 48px 16px !important; }
+          .cm-roi-grid { grid-template-columns: 1fr !important; gap: 24px !important; }
+          .cm-listings { padding: 48px 16px !important; }
+          .cm-filters { flex-wrap: wrap !important; gap: 10px !important; }
+          .cm-filters select { width: 100% !important; }
+          .cm-grid { grid-template-columns: 1fr !important; }
+          .cm-advantages { padding: 48px 16px !important; }
+          .cm-why { padding: 48px 16px !important; }
+          .cm-cta { padding: 56px 16px !important; }
+          .cm-footer { padding: 48px 16px 0 !important; }
+          .cm-footer-grid { grid-template-columns: 1fr 1fr !important; gap: 32px !important; }
+        }
+        @media (max-width: 480px) {
+          .cm-footer-grid { grid-template-columns: 1fr !important; }
+        }
+
         .type-card:hover {
           box-shadow: 0 16px 48px rgba(0,0,0,0.35) !important;
           transform: translateY(-4px) !important;
@@ -375,7 +396,7 @@ export default function CommercialPage() {
       `}</style>
 
       {/* ── HERO ─────────────────────────────────────────────────────── */}
-      <section style={{
+      <section className="cm-hero" style={{
         background: "#000000",
         minHeight: "60vh",
         paddingTop: 64,
@@ -383,7 +404,7 @@ export default function CommercialPage() {
         alignItems: "center",
         justifyContent: "center",
       }}>
-        <div style={{
+        <div className="cm-hero-inner" style={{
           textAlign: "center",
           padding: "80px 24px",
           maxWidth: 800,
@@ -481,7 +502,7 @@ export default function CommercialPage() {
       </section>
 
       {/* ── COMMERCIAL TYPES ─────────────────────────────────────────── */}
-      <section style={{
+      <section className="cm-types" style={{
         background: "#000000",
         padding: "80px 40px",
       }}>
@@ -497,7 +518,7 @@ export default function CommercialPage() {
             Explore by Type
           </h2>
 
-          <div style={{
+          <div className="cm-types-grid" style={{
             display: "grid",
             gridTemplateColumns: "repeat(2, 1fr)",
             gap: 24,
@@ -562,7 +583,7 @@ export default function CommercialPage() {
       </section>
 
       {/* ── ROI CALCULATOR ───────────────────────────────────────────── */}
-      <section style={{
+      <section className="cm-roi" style={{
         background: "#000000",
         padding: "80px 40px",
       }}>
@@ -588,7 +609,7 @@ export default function CommercialPage() {
           </div>
 
           {/* Two columns */}
-          <div style={{
+          <div className="cm-roi-grid" style={{
             display: "grid",
             gridTemplateColumns: "1fr 1fr",
             gap: 32,
@@ -789,7 +810,7 @@ export default function CommercialPage() {
       </section>
 
       {/* ── FILTERS + LISTINGS ───────────────────────────────────────── */}
-      <section style={{
+      <section className="cm-listings" style={{
         background: "#000000",
         padding: "80px 40px",
       }}>
@@ -806,7 +827,7 @@ export default function CommercialPage() {
           </h2>
 
           {/* Filters */}
-          <div style={{
+          <div className="cm-filters" style={{
             display: "flex",
             gap: 16,
             marginBottom: 48,
@@ -845,7 +866,7 @@ export default function CommercialPage() {
           </div>
 
           {/* Grid */}
-          <div style={{
+          <div className="cm-grid" style={{
             display: "grid",
             gridTemplateColumns: "repeat(auto-fill, minmax(340px, 1fr))",
             gap: 28,
@@ -875,7 +896,7 @@ export default function CommercialPage() {
       </section>
 
       {/* ── COMMERCIAL ADVANTAGES ────────────────────────────────────── */}
-      <section style={{
+      <section className="cm-advantages" style={{
         background: "#000000",
         padding: "80px 40px",
       }}>
@@ -938,7 +959,7 @@ export default function CommercialPage() {
       </section>
 
       {/* ── WHY LEASE THROUGH Nilay 360 ─────────────────────────────────── */}
-      <section style={{
+      <section className="cm-why" style={{
         background: "#000000",
         padding: "80px 40px",
       }}>
@@ -1027,7 +1048,7 @@ export default function CommercialPage() {
       </section>
 
       {/* ── CTA SECTION ──────────────────────────────────────────────── */}
-      <section style={{
+      <section className="cm-cta" style={{
         background: "#000000",
         padding: "80px 40px",
         textAlign: "center",
@@ -1095,7 +1116,7 @@ export default function CommercialPage() {
       </section>
 
       {/* ── FOOTER ───────────────────────────────────────────────────── */}
-      <footer style={{
+      <footer className="cm-footer" style={{
         background: "#05080C",
         padding: "60px 80px 0",
       }}>
@@ -1123,7 +1144,7 @@ export default function CommercialPage() {
         </div>
 
         {/* 4-column grid */}
-        <div style={{
+        <div className="cm-footer-grid" style={{
           display: "grid",
           gridTemplateColumns: "repeat(4, 1fr)",
           gap: 40,

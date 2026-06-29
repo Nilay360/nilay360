@@ -88,10 +88,23 @@ export default function MyListingsPage() {
 
   return (
     <div style={{ minHeight: "100vh", background: G.ivory, paddingTop: 64 }}>
+      <style>{`
+@media (max-width: 768px) {
+  .ml-header { flex-direction: column !important; align-items: flex-start !important; gap: 12px !important; padding: 16px !important; }
+  .ml-card { flex-direction: column !important; }
+  .ml-thumb { width: 100% !important; height: 180px !important; flex-shrink: unset !important; }
+  .ml-body { padding: 12px 16px !important; }
+  .ml-actions { flex-direction: row !important; flex-wrap: wrap !important; padding: 12px 16px !important; gap: 8px !important; border-top: 1px solid rgba(255,255,255,0.06) !important; }
+  .ml-actions a, .ml-actions button { flex: 1 1 calc(50% - 4px) !important; justify-content: center !important; }
+}
+@media (max-width: 480px) {
+  .ml-actions a, .ml-actions button { flex: 1 1 100% !important; }
+}
+`}</style>
       <div style={{ maxWidth: 1000, margin: "0 auto", padding: "40px 40px" }}>
 
         {/* Header */}
-        <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 36, flexWrap: "wrap", gap: 16 }}>
+        <div className="ml-header" style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 36, flexWrap: "wrap", gap: 16 }}>
           <div>
             <h1 style={{
               fontFamily: "'Cormorant Garamond', Georgia, serif",
@@ -162,6 +175,7 @@ export default function MyListingsPage() {
             return (
               <div
                 key={listing.id}
+                className="ml-card"
                 style={{
                   background: "#ffffff",
                   borderRadius: 12,
@@ -172,7 +186,7 @@ export default function MyListingsPage() {
                 }}
               >
                 {/* Thumbnail */}
-                <div style={{
+                <div className="ml-thumb" style={{
                   width: 152, minHeight: 110, flexShrink: 0,
                   background: thumb
                     ? `url(${thumb}) center/cover no-repeat`
@@ -188,7 +202,7 @@ export default function MyListingsPage() {
                 </div>
 
                 {/* Body */}
-                <div style={{ flex: 1, padding: "16px 20px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16, flexWrap: "wrap" }}>
+                <div className="ml-body" style={{ flex: 1, padding: "16px 20px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16, flexWrap: "wrap" }}>
                   <div style={{ flex: 1, minWidth: 200 }}>
                     <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 5 }}>
                       <span style={{
@@ -224,7 +238,7 @@ export default function MyListingsPage() {
                   </div>
 
                   {/* Actions */}
-                  <div style={{ display: "flex", gap: 8, flexShrink: 0 }}>
+                  <div className="ml-actions" style={{ display: "flex", gap: 8, flexShrink: 0 }}>
                     {listing.status === "active" && listing.slug && (
                       <Link href={`/properties/${listing.slug}`} style={{ textDecoration: "none" }}>
                         <button style={{

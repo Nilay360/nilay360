@@ -87,12 +87,26 @@ export default function LocationsPage() {
         ::-webkit-scrollbar-thumb { background: rgba(201,168,76,0.3); border-radius: 2px; }
         @keyframes fadeUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
         .scroll-row::-webkit-scrollbar { display: none; }
+        @media (max-width: 768px) {
+          .loc-pg-hero { padding: 80px 16px 48px !important; }
+          .loc-pg-grid { grid-template-columns: 1fr !important; padding: 0 16px !important; gap: 16px !important; }
+          .loc-pg-trending { padding: 48px 16px !important; }
+          .loc-pg-scroll { gap: 12px !important; padding-bottom: 12px !important; }
+          .loc-pg-market { padding: 48px 16px !important; flex-wrap: wrap !important; gap: 24px !important; justify-content: center !important; }
+          .loc-pg-cta { padding: 48px 16px !important; }
+          .loc-pg-footer { padding: 48px 16px 0 !important; }
+          .loc-pg-footer-grid { grid-template-columns: 1fr 1fr !important; gap: 32px !important; }
+        }
+        @media (max-width: 480px) {
+          .loc-pg-grid { grid-template-columns: 1fr !important; }
+          .loc-pg-footer-grid { grid-template-columns: 1fr !important; }
+        }
       `}</style>
 
       <div style={{ minHeight: "100vh", background: "#000000" }}>
 
         {/* ── HERO ───────────────────────────────────────────── */}
-        <section style={{ paddingTop: "64px", background: "#000000", position: "relative", overflow: "hidden" }}>
+        <section className="loc-pg-hero" style={{ paddingTop: "64px", background: "#000000", position: "relative", overflow: "hidden" }}>
           <div style={{ position: "absolute", inset: 0, backgroundImage: "linear-gradient(rgba(201,168,76,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(201,168,76,0.04) 1px, transparent 1px)", backgroundSize: "52px 52px", pointerEvents: "none" }} />
           <div style={{ position: "absolute", inset: 0, background: "radial-gradient(ellipse 65% 70% at 85% 110%, rgba(201,168,76,0.09) 0%, transparent 55%), radial-gradient(ellipse 50% 55% at 5% -5%, rgba(45,106,79,0.24) 0%, transparent 50%)", pointerEvents: "none" }} />
           <div style={{ position: "relative", zIndex: 2, maxWidth: "760px", margin: "0 auto", padding: "72px 48px 80px", textAlign: "center" }}>
@@ -126,7 +140,7 @@ export default function LocationsPage() {
             <p style={{ fontSize: "13px", color: "#9CA3AF" }}>Avg price data · Q2 2025</p>
           </div>
 
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: "22px" }}>
+          <div className="loc-pg-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: "22px" }}>
             {CITIES.map(city => {
               const [hover, setHover] = useState(false);
               const count = counts[city.name] ?? 0;
@@ -172,7 +186,7 @@ export default function LocationsPage() {
         </section>
 
         {/* ── TRENDING NEIGHBOURHOODS ─────────────────────────── */}
-        <section style={{ background: "#fff", padding: "64px 0", borderTop: "1px solid rgba(13,43,31,0.06)", borderBottom: "1px solid rgba(13,43,31,0.06)" }}>
+        <section className="loc-pg-trending" style={{ background: "#fff", padding: "64px 0", borderTop: "1px solid rgba(13,43,31,0.06)", borderBottom: "1px solid rgba(13,43,31,0.06)" }}>
           <div style={{ maxWidth: "1280px", margin: "0 auto", padding: "0 48px 0" }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "24px" }}>
               <div>
@@ -182,7 +196,7 @@ export default function LocationsPage() {
               <a href="/search" style={{ fontSize: "12px", fontWeight: 700, color: "#2BA8E0", textDecoration: "none", letterSpacing: "0.06em" }}>View All →</a>
             </div>
           </div>
-          <div className="scroll-row" style={{ display: "flex", gap: "12px", overflowX: "auto", padding: "4px 48px", scrollbarWidth: "none" }}>
+          <div className="scroll-row loc-pg-scroll" style={{ display: "flex", gap: "12px", overflowX: "auto", padding: "4px 48px", scrollbarWidth: "none" }}>
             {NEIGHBOURHOODS.map(n => {
               const [hover, setHover] = useState(false);
               return (
@@ -200,7 +214,7 @@ export default function LocationsPage() {
         </section>
 
         {/* ── MARKET OVERVIEW ────────────────────────────────── */}
-        <section style={{ background: "#000000", padding: "72px 48px", position: "relative", overflow: "hidden" }}>
+        <section className="loc-pg-market" style={{ background: "#000000", padding: "72px 48px", position: "relative", overflow: "hidden" }}>
           <div style={{ position: "absolute", inset: 0, backgroundImage: "linear-gradient(rgba(201,168,76,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(201,168,76,0.04) 1px, transparent 1px)", backgroundSize: "52px 52px", pointerEvents: "none" }} />
           <div style={{ maxWidth: "1000px", margin: "0 auto", position: "relative", zIndex: 2 }}>
             <div style={{ textAlign: "center", marginBottom: "48px" }}>
@@ -227,7 +241,7 @@ export default function LocationsPage() {
         </section>
 
         {/* ── CTA ────────────────────────────────────────────── */}
-        <section style={{ background: "#000000", padding: "80px 48px", textAlign: "center" }}>
+        <section className="loc-pg-cta" style={{ background: "#000000", padding: "80px 48px", textAlign: "center" }}>
           <div style={{ maxWidth: "560px", margin: "0 auto" }}>
             <h2 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "clamp(30px, 4vw, 46px)", fontWeight: 400, color: "#000000", marginBottom: "14px", lineHeight: 1.2 }}>
               Can't find your city?<br /><em style={{ fontStyle: "italic", color: "#2BA8E0" }}>We're expanding.</em>
@@ -243,9 +257,9 @@ export default function LocationsPage() {
         </section>
 
         {/* ── FOOTER ─────────────────────────────────────────── */}
-        <footer style={{ background: "#05080C", padding: "72px 48px 0" }}>
+        <footer className="loc-pg-footer" style={{ background: "#05080C", padding: "72px 48px 0" }}>
           <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
-            <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1fr 1fr", gap: "48px", paddingBottom: "56px", borderBottom: "1px solid rgba(245,242,236,0.06)" }}>
+            <div className="loc-pg-footer-grid" style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1fr 1fr", gap: "48px", paddingBottom: "56px", borderBottom: "1px solid rgba(245,242,236,0.06)" }}>
               <div>
                 <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "18px", fontWeight: 600, color: "#fff", letterSpacing: "0.16em", marginBottom: "14px" }}>Nilay 360 <span style={{ color: "#2BA8E0" }}>·</span></div>
                 <p style={{ fontSize: "13px", color: "rgba(245,242,236,0.35)", lineHeight: 1.75, maxWidth: "280px", marginBottom: "22px" }}>India's most trusted premium real estate platform. Verified listings, certified agents, independent legal guidance.</p>

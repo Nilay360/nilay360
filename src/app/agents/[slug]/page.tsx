@@ -246,16 +246,35 @@ export default function AgentProfilePage() {
         @keyframes fadeUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
         input::placeholder, textarea::placeholder { color: #9CA3AF; }
         input:focus, textarea:focus { border-color: rgba(201,168,76,0.5) !important; box-shadow: 0 0 0 3px rgba(201,168,76,0.08); }
+        @media (max-width: 768px) {
+          .as-nav { padding: 0 16px !important; }
+          .as-nav-links { display: none !important; }
+          .as-hero { padding: 80px 16px 40px !important; }
+          .as-hero-actions { flex-wrap: wrap !important; gap: 10px !important; }
+          .as-hero-actions a, .as-hero-actions button { flex: 1 1 calc(50% - 5px) !important; justify-content: center !important; }
+          .as-stats { grid-template-columns: repeat(2,1fr) !important; gap: 16px !important; padding: 24px 16px !important; }
+          .as-layout { grid-template-columns: 1fr !important; padding: 24px 16px !important; gap: 24px !important; }
+          .as-left { width: 100% !important; }
+          .as-right { width: 100% !important; position: static !important; }
+          .as-listings-grid { grid-template-columns: 1fr !important; }
+          .as-footer { padding: 48px 16px 0 !important; }
+          .as-footer-grid { grid-template-columns: 1fr 1fr !important; gap: 32px !important; }
+        }
+        @media (max-width: 480px) {
+          .as-stats { grid-template-columns: 1fr 1fr !important; }
+          .as-footer-grid { grid-template-columns: 1fr !important; }
+          .as-hero-actions a, .as-hero-actions button { flex: 1 1 100% !important; }
+        }
       `}</style>
 
       <div style={{ minHeight: "100vh", background: "#000000" }}>
 
         {/* ── NAVBAR ─────────────────────────────────────────── */}
-        <nav style={{ position: "fixed", top: 0, left: 0, right: 0, zIndex: 200, height: "68px", display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 48px", background: "rgba(5,8,12,0.9)", backdropFilter: "blur(20px) saturate(180%)", borderBottom: "0.5px solid rgba(201,168,76,0.18)" }}>
+        <nav className="as-nav" style={{ position: "fixed", top: 0, left: 0, right: 0, zIndex: 200, height: "68px", display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 48px", background: "rgba(5,8,12,0.9)", backdropFilter: "blur(20px) saturate(180%)", borderBottom: "0.5px solid rgba(201,168,76,0.18)" }}>
           <a href="/" style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "19px", fontWeight: 600, color: "#fff", letterSpacing: "0.16em", textDecoration: "none" }}>
             Nilay 360 <span style={{ color: "#2BA8E0" }}>·</span>
           </a>
-          <div style={{ display: "flex", gap: "2px" }}>
+          <div className="as-nav-links" style={{ display: "flex", gap: "2px" }}>
             {[["Home","/"],["Properties","/properties"],["New Projects","/new-projects"],["Agents","/agents"],["Locations","/locations"],["Contact","/contact"]].map(([l,h]) => (
               <a key={l} href={h} style={{ padding: "7px 14px", borderRadius: "6px", fontSize: "13px", fontWeight: 500, color: l === "Agents" ? "#2BA8E0" : "rgba(255,255,255,0.5)", textDecoration: "none", background: l === "Agents" ? "rgba(201,168,76,0.08)" : "transparent" }}>{l}</a>
             ))}
@@ -267,7 +286,7 @@ export default function AgentProfilePage() {
         </nav>
 
         {/* ── AGENT HERO ─────────────────────────────────────── */}
-        <section style={{ paddingTop: "68px", background: "#000000", position: "relative", overflow: "hidden" }}>
+        <section className="as-hero" style={{ paddingTop: "68px", background: "#000000", position: "relative", overflow: "hidden" }}>
           <div style={{ position: "absolute", inset: 0, backgroundImage: "linear-gradient(rgba(201,168,76,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(201,168,76,0.04) 1px, transparent 1px)", backgroundSize: "60px 60px", pointerEvents: "none" }} />
           <div style={{ position: "absolute", inset: 0, background: "radial-gradient(ellipse 70% 55% at 30% 120%, rgba(201,168,76,0.1) 0%, transparent 55%)", pointerEvents: "none" }} />
           <div style={{ position: "relative", zIndex: 2, maxWidth: "1280px", margin: "0 auto", padding: "60px 48px 0" }}>
@@ -325,7 +344,7 @@ export default function AgentProfilePage() {
               </div>
 
               {/* Action buttons */}
-              <div style={{ display: "flex", flexDirection: "column", gap: "10px", minWidth: "200px" }}>
+              <div className="as-hero-actions" style={{ display: "flex", flexDirection: "column", gap: "10px", minWidth: "200px" }}>
                 <a href={`tel:${agent.phone}`} style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", padding: "13px 22px", background: "#2BA8E0", borderRadius: "10px", color: "#000000", fontSize: "13px", fontWeight: 700, textDecoration: "none" }}>
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.71 3.53 2 2 0 0 1 3.71 1.35h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9.91a16 16 0 0 0 6.13 6.13l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
                   Call Agent
@@ -347,7 +366,7 @@ export default function AgentProfilePage() {
         {/* ── STATS ROW ──────────────────────────────────────── */}
         <section style={{ background: "#000000" }}>
           <div style={{ maxWidth: "1280px", margin: "0 auto", padding: "0 48px" }}>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", borderTop: "1px solid rgba(245,242,236,0.06)" }}>
+            <div className="as-stats" style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", borderTop: "1px solid rgba(245,242,236,0.06)" }}>
               {[
                 { label: "Properties Listed", value: agent.properties_listed, suffix: "" },
                 { label: "Properties Sold",   value: agent.properties_sold,   suffix: "" },
@@ -364,10 +383,10 @@ export default function AgentProfilePage() {
         </section>
 
         {/* ── MAIN CONTENT ───────────────────────────────────── */}
-        <div style={{ maxWidth: "1280px", margin: "0 auto", padding: "60px 48px 80px", display: "grid", gridTemplateColumns: "1fr 360px", gap: "36px", alignItems: "flex-start" }}>
+        <div className="as-layout" style={{ maxWidth: "1280px", margin: "0 auto", padding: "60px 48px 80px", display: "grid", gridTemplateColumns: "1fr 360px", gap: "36px", alignItems: "flex-start" }}>
 
           {/* LEFT COL */}
-          <div>
+          <div className="as-left">
             {/* ── About ─── */}
             <div style={{ background: "#fff", border: "1px solid rgba(13,43,31,0.07)", borderRadius: "18px", padding: "32px 28px", marginBottom: "24px" }}>
               <div style={{ marginBottom: "20px" }}><Eyebrow label="About" /></div>
@@ -417,7 +436,7 @@ export default function AgentProfilePage() {
                   properties.length === 0 ? (
                     <p style={{ textAlign: "center", color: "#9CA3AF", fontSize: "14px", padding: "40px" }}>No active listings at the moment.</p>
                   ) : (
-                    <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "16px" }}>
+                    <div className="as-listings-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "16px" }}>
                       {properties.map(p => <PropCard key={p.id} p={p} />)}
                     </div>
                   )
@@ -454,7 +473,7 @@ export default function AgentProfilePage() {
           </div>
 
           {/* RIGHT COL — sticky sidebar */}
-          <div style={{ position: "sticky", top: "84px", display: "flex", flexDirection: "column", gap: "18px" }}>
+          <div className="as-right" style={{ position: "sticky", top: "84px", display: "flex", flexDirection: "column", gap: "18px" }}>
             {/* Contact card */}
             <div id="send-message" style={{ background: "#fff", border: "1px solid rgba(13,43,31,0.07)", borderRadius: "18px", padding: "26px 22px", boxShadow: "0 4px 20px rgba(13,43,31,0.06)" }}>
               <div style={{ marginBottom: "16px" }}><Eyebrow label="Get in Touch" /></div>
@@ -489,9 +508,9 @@ export default function AgentProfilePage() {
         </div>
 
         {/* ── FOOTER ─────────────────────────────────────────── */}
-        <footer style={{ background: "#05080C", padding: "72px 48px 0" }}>
+        <footer className="as-footer" style={{ background: "#05080C", padding: "72px 48px 0" }}>
           <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
-            <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1fr", gap: "48px", paddingBottom: "56px", borderBottom: "1px solid rgba(245,242,236,0.06)" }}>
+            <div className="as-footer-grid" style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1fr", gap: "48px", paddingBottom: "56px", borderBottom: "1px solid rgba(245,242,236,0.06)" }}>
               <div>
                 <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "18px", fontWeight: 600, color: "#fff", letterSpacing: "0.16em", marginBottom: "14px" }}>Nilay 360 <span style={{ color: "#2BA8E0" }}>·</span></div>
                 <p style={{ fontSize: "13px", color: "rgba(245,242,236,0.35)", lineHeight: 1.75, maxWidth: "280px" }}>India's most trusted premium real estate platform. Every agent RERA verified.</p>

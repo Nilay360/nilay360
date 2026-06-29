@@ -7,9 +7,15 @@ const G = { dark: "#000000", gold: "#2BA8E0", ivory: "#000000", mid: "#0B0D10" }
 export default function SearchesPage() {
   return (
     <div style={{ minHeight: "100vh", background: G.ivory, paddingTop: 64 }}>
+      <style>{`
+@media (max-width: 768px) {
+  .sr-header { flex-direction: column !important; align-items: flex-start !important; gap: 12px !important; padding: 16px !important; }
+  .sr-card { padding: 32px 16px !important; margin: 0 16px !important; }
+}
+`}</style>
       <div style={{ maxWidth: 1000, margin: "0 auto", padding: "40px 40px" }}>
 
-        <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 36, flexWrap: "wrap", gap: 16 }}>
+        <div className="sr-header" style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 36, flexWrap: "wrap", gap: 16 }}>
           <div>
             <h1 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: 34, fontWeight: 600, color: G.dark, margin: 0, lineHeight: 1.15 }}>
               Recent Searches
@@ -30,7 +36,7 @@ export default function SearchesPage() {
           </Link>
         </div>
 
-        <div style={{
+        <div className="sr-card" style={{
           background: "#ffffff", borderRadius: 14,
           border: "1px solid rgba(13,43,31,0.07)",
           boxShadow: "0 2px 12px rgba(13,43,31,0.04)",

@@ -147,9 +147,22 @@ export default function SavedPropertiesPage() {
 
   return (
     <div style={{ minHeight: "100vh", background: G.ivory, paddingTop: 64 }}>
+      <style>{`
+@media (max-width: 768px) {
+  .sv-header { flex-direction: column !important; align-items: flex-start !important; gap: 12px !important; padding: 16px !important; }
+  .sv-card { flex-direction: column !important; }
+  .sv-thumb { width: 100% !important; height: 180px !important; flex-shrink: unset !important; }
+  .sv-body { padding: 12px 16px !important; }
+  .sv-actions { flex-direction: row !important; flex-wrap: wrap !important; padding: 12px 16px !important; gap: 8px !important; border-top: 1px solid rgba(255,255,255,0.06) !important; }
+  .sv-actions a, .sv-actions button { flex: 1 1 calc(50% - 4px) !important; justify-content: center !important; }
+}
+@media (max-width: 480px) {
+  .sv-actions a, .sv-actions button { flex: 1 1 100% !important; }
+}
+`}</style>
       <div style={{ maxWidth: 1000, margin: "0 auto", padding: "40px 40px" }}>
 
-        <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 36, flexWrap: "wrap", gap: 16 }}>
+        <div className="sv-header" style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 36, flexWrap: "wrap", gap: 16 }}>
           <div>
             <h1 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: 34, fontWeight: 600, color: G.dark, margin: 0, lineHeight: 1.15 }}>
               Saved Properties
@@ -187,13 +200,13 @@ export default function SavedPropertiesPage() {
               const thumb = d?.images?.[0] ?? null;
 
               return (
-                <div key={item.id} style={{
+                <div key={item.id} className="sv-card" style={{
                   background: "#ffffff", borderRadius: 12,
                   border: "1px solid rgba(13,43,31,0.09)",
                   boxShadow: "0 2px 12px rgba(13,43,31,0.05)",
                   overflow: "hidden", display: "flex",
                 }}>
-                  <div style={{
+                  <div className="sv-thumb" style={{
                     width: 152, minHeight: 110, flexShrink: 0,
                     background: thumb ? `url(${thumb}) center/cover no-repeat`
                                       : `linear-gradient(135deg, ${G.mid} 0%, ${G.dark} 100%)`,
@@ -206,7 +219,7 @@ export default function SavedPropertiesPage() {
                     )}
                   </div>
 
-                  <div style={{ flex: 1, padding: "16px 20px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16, flexWrap: "wrap" }}>
+                  <div className="sv-body" style={{ flex: 1, padding: "16px 20px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16, flexWrap: "wrap" }}>
                     {d ? (
                       <>
                         <div style={{ flex: 1, minWidth: 200 }}>
@@ -252,7 +265,7 @@ export default function SavedPropertiesPage() {
                           </div>
                         </div>
 
-                        <div style={{ display: "flex", gap: 8, flexShrink: 0 }}>
+                        <div className="sv-actions" style={{ display: "flex", gap: 8, flexShrink: 0 }}>
                           {d.slug && (
                             <Link href={`/properties/${d.slug}`} style={{ textDecoration: "none" }}>
                               <button style={{
@@ -294,7 +307,7 @@ export default function SavedPropertiesPage() {
                             Saved {fmtDate(item.created_at)}
                           </div>
                         </div>
-                        <div style={{ display: "flex", gap: 8, flexShrink: 0 }}>
+                        <div className="sv-actions" style={{ display: "flex", gap: 8, flexShrink: 0 }}>
                           <button
                             onClick={() => handleUnsave(item.id)}
                             disabled={removing === item.id}
