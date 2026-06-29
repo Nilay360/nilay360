@@ -719,7 +719,7 @@ export function Navbar() {
             <img
               src="/nilay_final.jpg"
               alt="Nilay 360"
-              style={{ height: 38, width: "auto", objectFit: "contain" }}
+              style={{ height: 46, width: "auto", objectFit: "contain" }}
             />
           </Link>
 
@@ -919,7 +919,7 @@ export function Navbar() {
             background: "#000000", flexShrink: 0,
           }}>
             <Link href="/" onClick={() => setMenuOpen(false)}>
-              <img src="/nilay_final.jpg" alt="Nilay 360" style={{ height: 40, width: "auto", borderRadius: 6 }} />
+              <img src="/nilay_final.jpg" alt="Nilay 360" style={{ height: 46, width: "auto", borderRadius: 6 }} />
             </Link>
             <button onClick={() => setMenuOpen(false)} style={{
               background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)",

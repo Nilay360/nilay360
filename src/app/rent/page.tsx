@@ -181,12 +181,33 @@ export default function RentPage() {
         ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-thumb { background: rgba(201,168,76,0.3); border-radius: 2px; }
         @keyframes fadeUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+        @media (max-width: 768px) {
+          .rn-hero { padding: 80px 16px 48px !important; }
+          .rn-guide { padding: 48px 16px !important; }
+          .rn-guide-grid { grid-template-columns: repeat(2,1fr) !important; gap: 16px !important; }
+          .rn-filters { padding: 0 16px !important; flex-wrap: wrap !important; gap: 10px !important; }
+          .rn-filters select { width: 100% !important; }
+          .rn-listings { padding: 24px 16px 48px !important; }
+          .rn-grid { grid-template-columns: 1fr !important; }
+          .rn-benefits { padding: 48px 16px !important; }
+          .rn-benefits-grid { grid-template-columns: repeat(2,1fr) !important; gap: 16px !important; }
+          .rn-zones { padding: 48px 16px !important; }
+          .rn-zones-grid { grid-template-columns: 1fr !important; gap: 16px !important; }
+          .rn-cta { padding: 56px 16px !important; }
+          .rn-footer { padding: 48px 16px 0 !important; }
+          .rn-footer-grid { grid-template-columns: 1fr 1fr !important; gap: 32px !important; }
+        }
+        @media (max-width: 480px) {
+          .rn-guide-grid { grid-template-columns: 1fr !important; }
+          .rn-benefits-grid { grid-template-columns: 1fr !important; }
+          .rn-footer-grid { grid-template-columns: 1fr !important; }
+        }
       `}</style>
 
       <div style={{ minHeight: "100vh", background: "#000000" }}>
 
         {/* ── HERO ─────────────────────────────────────────────── */}
-        <section style={{ paddingTop: "64px", background: "#000000", minHeight: "520px", display: "flex", alignItems: "center", position: "relative", overflow: "hidden" }}>
+        <section className="rn-hero" style={{ paddingTop: "64px", background: "#000000", minHeight: "520px", display: "flex", alignItems: "center", position: "relative", overflow: "hidden" }}>
           <div style={{ position: "absolute", inset: 0, backgroundImage: "linear-gradient(rgba(201,168,76,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(201,168,76,0.04) 1px, transparent 1px)", backgroundSize: "60px 60px", pointerEvents: "none" }} />
           <div style={{ position: "absolute", inset: 0, background: "radial-gradient(ellipse 65% 65% at 50% 130%, rgba(201,168,76,0.12) 0%, transparent 55%)", pointerEvents: "none" }} />
           <div style={{ position: "absolute", right: 0, top: 0, bottom: 0, width: "40%", backgroundImage: "radial-gradient(circle, rgba(201,168,76,0.1) 1px, transparent 1px)", backgroundSize: "24px 24px", pointerEvents: "none", maskImage: "linear-gradient(to left, rgba(0,0,0,0.4), transparent)" }} />
@@ -212,7 +233,7 @@ export default function RentPage() {
         </section>
 
         {/* ── RENTING GUIDE ────────────────────────────────────── */}
-        <section style={{ background: "#000000", padding: "72px 48px" }}>
+        <section className="rn-guide" style={{ background: "#000000", padding: "72px 48px" }}>
           <div style={{ maxWidth: "1280px", margin: "0 auto" }}>
             <div style={{ textAlign: "center", marginBottom: "48px" }}>
               <Eyebrow label="How To Rent" />
@@ -220,7 +241,7 @@ export default function RentPage() {
                 Renting Made<br /><em style={{ fontStyle: "italic", color: "#2BA8E0" }}>Effortless</em>
               </h2>
             </div>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "22px" }}>
+            <div className="rn-guide-grid" style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "22px" }}>
               {[
                 { n: "01", icon: "🔍", title: "Browse Listings", desc: "Filter by city, BHK, and budget to find your ideal rental. Every property is verified with photos and floor plans." },
                 { n: "02", icon: "📅", title: "Schedule Viewing", desc: "Book a free site visit at your convenience. Our agents accompany you and answer all your questions on-site." },
@@ -239,7 +260,7 @@ export default function RentPage() {
         </section>
 
         {/* ── FILTERS ──────────────────────────────────────────── */}
-        <div style={{ maxWidth: "1280px", margin: "0 auto", padding: "0 48px" }}>
+        <div className="rn-filters" style={{ maxWidth: "1280px", margin: "0 auto", padding: "0 48px" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "22px" }}>
             <Eyebrow label="Browse Rentals" />
           </div>
@@ -269,7 +290,7 @@ export default function RentPage() {
         </div>
 
         {/* ── LISTINGS GRID ────────────────────────────────────── */}
-        <section style={{ maxWidth: "1280px", margin: "0 auto", padding: "28px 48px 72px" }}>
+        <section className="rn-listings" style={{ maxWidth: "1280px", margin: "0 auto", padding: "28px 48px 72px" }}>
           {filtered.length === 0 ? (
             <div style={{ padding: "80px", textAlign: "center", background: "#161A1F", borderRadius: "18px", border: "1px solid rgba(255,255,255,0.07)" }}>
               {properties.length === 0 ? (
@@ -289,14 +310,14 @@ export default function RentPage() {
               )}
             </div>
           ) : (
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "22px" }}>
+            <div className="rn-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "22px" }}>
               {filtered.map(p => <RentalCard key={p.id} p={p} />)}
             </div>
           )}
         </section>
 
         {/* ── TENANT BENEFITS ──────────────────────────────────── */}
-        <section style={{ background: "#0B0D10", padding: "72px 48px", borderTop: "1px solid rgba(255,255,255,0.06)" }}>
+        <section className="rn-benefits" style={{ background: "#0B0D10", padding: "72px 48px", borderTop: "1px solid rgba(255,255,255,0.06)" }}>
           <div style={{ maxWidth: "1280px", margin: "0 auto" }}>
             <div style={{ textAlign: "center", marginBottom: "44px" }}>
               <Eyebrow label="Tenant Advantages" />
@@ -304,7 +325,7 @@ export default function RentPage() {
                 Why Rent Through<br /><em style={{ fontStyle: "italic", color: "#2BA8E0" }}>Nilay 360?</em>
               </h2>
             </div>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "20px" }}>
+            <div className="rn-benefits-grid" style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "20px" }}>
               {[
                 { icon: "✦", color: "#059669", bg: "rgba(5,150,105,0.06)", border: "rgba(5,150,105,0.12)", title: "Zero Brokerage", desc: "We charge landlords, not tenants. You pay zero brokerage and no hidden platform fees — ever.", pts: ["No tenant commission", "No processing fee", "Transparent costs"] },
                 { icon: "🛡", color: "#2BA8E0", bg: "rgba(201,168,76,0.06)", border: "rgba(201,168,76,0.18)", title: "Verified Properties", desc: "Every rental is physically inspected, landlord KYC verified, and legal status confirmed before listing.", pts: ["KYC-verified landlords", "Physical inspection done", "Legal status confirmed"] },
@@ -330,14 +351,14 @@ export default function RentPage() {
         </section>
 
         {/* ── POPULAR RENTAL ZONES ─────────────────────────────── */}
-        <section style={{ maxWidth: "1280px", margin: "0 auto", padding: "72px 48px" }}>
+        <section className="rn-zones" style={{ maxWidth: "1280px", margin: "0 auto", padding: "72px 48px" }}>
           <div style={{ textAlign: "center", marginBottom: "44px" }}>
             <Eyebrow label="Top Locations" />
             <h2 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "clamp(28px, 3.5vw, 44px)", fontWeight: 400, color: "#E8EAED" }}>
               Popular Rental<br /><em style={{ fontStyle: "italic", color: "#2BA8E0" }}>Neighbourhoods</em>
             </h2>
           </div>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "16px" }}>
+          <div className="rn-zones-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "16px" }}>
             {ZONES.map(zone => {
               const [hover, setHover] = useState(false);
               return (
@@ -359,7 +380,7 @@ export default function RentPage() {
         </section>
 
         {/* ── CTA ──────────────────────────────────────────────── */}
-        <section style={{ background: "#000000", padding: "90px 48px", position: "relative", overflow: "hidden" }}>
+        <section className="rn-cta" style={{ background: "#000000", padding: "90px 48px", position: "relative", overflow: "hidden" }}>
           <div style={{ position: "absolute", inset: 0, backgroundImage: "linear-gradient(rgba(201,168,76,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(201,168,76,0.04) 1px, transparent 1px)", backgroundSize: "52px 52px", pointerEvents: "none" }} />
           <div style={{ position: "absolute", inset: 0, background: "radial-gradient(ellipse 60% 55% at 50% 110%, rgba(201,168,76,0.1) 0%, transparent 55%)", pointerEvents: "none" }} />
           <div style={{ position: "relative", zIndex: 2, maxWidth: "680px", margin: "0 auto", textAlign: "center" }}>
@@ -383,9 +404,9 @@ export default function RentPage() {
         </section>
 
         {/* ── FOOTER ───────────────────────────────────────────── */}
-        <footer style={{ background: "#05080C", padding: "72px 48px 0" }}>
+        <footer className="rn-footer" style={{ background: "#05080C", padding: "72px 48px 0" }}>
           <div style={{ maxWidth: "1280px", margin: "0 auto" }}>
-            <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1fr 1fr", gap: "40px", paddingBottom: "56px", borderBottom: "1px solid rgba(245,242,236,0.06)" }}>
+            <div className="rn-footer-grid" style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1fr 1fr", gap: "40px", paddingBottom: "56px", borderBottom: "1px solid rgba(245,242,236,0.06)" }}>
               <div>
                 <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "18px", fontWeight: 600, color: "#fff", letterSpacing: "0.16em", marginBottom: "14px" }}>Nilay 360 <span style={{ color: "#2BA8E0" }}>·</span></div>
                 <p style={{ fontSize: "13px", color: "rgba(245,242,236,0.35)", lineHeight: 1.75, maxWidth: "260px" }}>India's most trusted premium real estate platform. Every listing verified, every project curated.</p>
