@@ -217,7 +217,6 @@ function UserDropdown({ user, profile, onClose, onSignOut, open, wrapperRef }: D
         zIndex: 9999,
         animation: "ddFadeIn 0.15s ease",
       }}
-      onClick={e => e.stopPropagation()}
     >
       {/* Profile header */}
       <div style={{
