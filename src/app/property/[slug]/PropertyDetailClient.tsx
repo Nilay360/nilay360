@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/client";
 import Reveal from "@/components/ui/Reveal";
 import { useRecentlyViewed } from "@/hooks/useRecentlyViewed";
 import { useAuth } from "@/context/AuthContext";
+import { useSavedProperties } from "@/hooks/useSavedProperties";
 
 // ── Types ────────────────────────────────────────────────────
 type Property = {
@@ -360,7 +361,15 @@ export default function PropertyDetailClient() {
 
   // Gallery state
   const [activeImg, setActiveImg] = useState(0);
-  const [saved, setSaved] = useState(false);
+  const [userId, setUserId] = useState<string | null>(null)
+  const { savedIds, toggleSave } = useSavedProperties(userId)
+
+  useEffect(() => {
+    const supabase = createClient()
+    supabase.auth.getUser().then(({ data }) => {
+      setUserId(data.user?.id ?? null)
+    })
+  }, []);
 
   // Contact form state
   const [contactName, setContactName] = useState("");
@@ -752,11 +761,11 @@ export default function PropertyDetailClient() {
                   Share
                 </button>
                 <button
-                  onClick={() => setSaved(s => !s)}
-                  style={{ display: "flex", alignItems: "center", gap: "7px", padding: "8px 16px", borderRadius: "8px", background: saved ? "rgba(201,168,76,0.2)" : "rgba(255,255,255,0.12)", border: saved ? "1px solid rgba(201,168,76,0.5)" : "1px solid rgba(255,255,255,0.2)", color: saved ? "#2BA8E0" : "#fff", fontSize: "12px", fontWeight: 500, cursor: "pointer", fontFamily: "'DM Sans', sans-serif", backdropFilter: "blur(8px)", transition: "all 0.15s" }}
+                  onClick={() => toggleSave(property.id)}
+                  style={{ display: "flex", alignItems: "center", gap: "7px", padding: "8px 16px", borderRadius: "8px", background: savedIds.has(property.id) ? "rgba(201,168,76,0.2)" : "rgba(255,255,255,0.12)", border: savedIds.has(property.id) ? "1px solid rgba(201,168,76,0.5)" : "1px solid rgba(255,255,255,0.2)", color: savedIds.has(property.id) ? "#2BA8E0" : "#fff", fontSize: "12px", fontWeight: 500, cursor: "pointer", fontFamily: "'DM Sans', sans-serif", backdropFilter: "blur(8px)", transition: "all 0.15s" }}
                 >
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill={saved ? "#2BA8E0" : "none"} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" /></svg>
-                  {saved ? "Saved" : "Save"}
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill={savedIds.has(property.id) ? "#2BA8E0" : "none"} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" /></svg>
+                  {savedIds.has(property.id) ? "Saved" : "Save"}
                 </button>
               </div>
 

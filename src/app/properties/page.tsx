@@ -197,8 +197,8 @@ export default function PropertiesPage() {
   useEffect(() => {
     async function loadUser() {
       const supabase = createClient()
-      const { data } = await supabase.auth.getSession()
-      const uid = data.session?.user?.id ?? null
+      const { data } = await supabase.auth.getUser()
+      const uid = data.user?.id ?? null
       setUserId(uid)
       console.log('properties page userId:', uid)
     }
