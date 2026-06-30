@@ -731,7 +731,7 @@ export default function HomePage() {
           animate={{ opacity:1, y:0 }}
           transition={{ duration:0.8, ease:[0.16,1,0.3,1] }}
           className="hero-content"
-          style={{position:"relative", zIndex:2, padding:"0 16px 48px", maxWidth:"min(860px, 100%)", paddingTop:80, margin:"0 auto", textAlign:"center", width:"100%", boxSizing:"border-box"}}
+          style={{position:"relative", zIndex:2, padding:"0 16px 48px", maxWidth:"min(860px, 100%)", margin:"0 auto", textAlign:"center", width:"100%", boxSizing:"border-box"}}
         >
           {/* 1 — Rating pill */}
           <div className="hero-pill" style={{display:"inline-flex", alignItems:"center", gap:8, background:"rgba(43,168,224,0.06)", border:"0.5px solid rgba(43,168,224,0.30)", borderRadius:999, padding:"6px 16px", marginBottom:28, backdropFilter:"blur(12px)"}}>
@@ -785,7 +785,7 @@ export default function HomePage() {
           </div>
 
           {/* 3 — Stats strip */}
-          <div className="hero-stats" style={{display:"flex", flexWrap:"wrap", justifyContent:"center", gap:"12px", width:"100%", maxWidth:"100%", boxSizing:"border-box", marginBottom:40, paddingBottom:32, borderBottom:"1px solid rgba(43,168,224,0.12)"}}>
+          <div className="hero-stats" style={{display:"flex", flexWrap:"wrap", justifyContent:"center", gap:"12px", width:"100%", maxWidth:"100%", boxSizing:"border-box", marginBottom:40, paddingBottom:32, borderBottom:"1px solid rgba(43,168,224,0.12)", position:"relative", zIndex:2}}>
             {[["2,400+","Listings"],["500+","Agents"],["14","Cities"],["₹18,000Cr","Deals Closed"]].map(([v,l])=>(
               <div key={l} className="hero-stat" style={{background:"rgba(255,255,255,0.04)", backdropFilter:"blur(12px)", WebkitBackdropFilter:"blur(12px)", border:"1px solid rgba(43,168,224,0.12)", borderRadius:16, flex:"1 1 auto"}}>
                 <div className="stat-value" style={{fontFamily:"'Cormorant Garamond',Georgia,serif", fontSize:26, fontWeight:600, background:"linear-gradient(135deg, #E8EAED 0%, #2BA8E0 100%)", WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent"}}>{v}</div>
@@ -865,7 +865,7 @@ export default function HomePage() {
 
       {/* ══════════ SECTION 4 — FEATURED PROPERTIES CAROUSEL ══════════ */}
       <section className="featured-section" style={{background:"#0B0D10", padding:"96px 0 96px 56px"}}>
-        <div style={{maxWidth:1280+56, paddingRight:0}}>
+        <div style={{maxWidth:1280+56, paddingRight:0, margin:"0 auto"}}>
           <Reveal>
           <div style={{display:"flex", justifyContent:"space-between", alignItems:"flex-end", marginBottom:20, paddingRight:56, flexWrap:"wrap", gap:12}}>
             <div>
@@ -1111,7 +1111,7 @@ export default function HomePage() {
 
       {/* ══════════ SECTION 8 — TRENDING LOCATIONS ══════════ */}
       <section className="trending-section" style={{background:"#000000", padding:"96px 0 96px 56px"}}>
-        <div style={{maxWidth:1280+56}}>
+        <div style={{maxWidth:1280+56, margin:"0 auto"}}>
           <Reveal>
           <div style={{display:"flex", justifyContent:"space-between", alignItems:"flex-end", marginBottom:28, paddingRight:56}}>
             <div>
