@@ -730,7 +730,7 @@ const styles = `
   .am-title {
     font-family: 'Cormorant Garamond', Georgia, serif;
     font-size: 30px; font-weight: 500; line-height: 1.1;
-    color: #000000; margin: 0 0 6px;
+    color: #FFFFFF; margin: 0 0 6px;
   }
   .am-sub { font-size: 13.5px; color: rgba(245,242,236,0.55); line-height: 1.55; margin: 0 0 22px; }
 

@@ -120,7 +120,7 @@ const C = {
   gold: '#2BA8E0',
   goldDim: 'rgba(201,168,76,0.10)',
   goldBorder: 'rgba(201,168,76,0.30)',
-  text: '#000000',
+  text: '#F5F2EC',
   textSub: '#9a9a9a',
   textMuted: '#525252',
   errorBg: 'rgba(224,85,85,0.10)',

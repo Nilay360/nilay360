@@ -35,6 +35,7 @@ const MENU_ITEMS: MenuGroup[] = [
   {
     group: "listings",
     items: [
+      { label: "Dashboard",        href: "/dashboard",              icon: IconDashboard },
       { label: "My Listings",      href: "/dashboard/my-listings", icon: IconListings  },
       { label: "List Property",    href: "/post-property",          icon: IconPlus      },
       { label: "Saved Properties", href: "/dashboard/saved",        icon: IconHeart     },
@@ -59,6 +60,14 @@ const MENU_ITEMS: MenuGroup[] = [
 
 // ─── SVG icon components ───────────────────────────────────────────────────────
 
+function IconDashboard() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+      <rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/>
+    </svg>
+  )
+}
 function IconListings() {
   return (
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
