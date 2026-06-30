@@ -175,7 +175,7 @@ function EmptyState({ icon, title, subtitle, cta, ctaHref }: {
       <h4 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "22px", fontWeight: 500, color: "#000000", marginBottom: "8px" }}>{title}</h4>
       <p style={{ fontSize: "13px", color: "#6B7C72", marginBottom: "22px", maxWidth: "310px", lineHeight: 1.65 }}>{subtitle}</p>
       {cta && ctaHref && (
-        <a href={ctaHref} style={{ padding: "11px 28px", background: "#000000", borderRadius: "8px", color: "#000000", fontSize: "13px", fontWeight: 600, letterSpacing: "0.06em", textDecoration: "none" }}>{cta}</a>
+        <a href={ctaHref} style={{ padding: "11px 28px", background: "#000000", borderRadius: "8px", color: "#FFFFFF", fontSize: "13px", fontWeight: 600, letterSpacing: "0.06em", textDecoration: "none" }}>{cta}</a>
       )}
     </div>
   );
@@ -312,7 +312,7 @@ function OverviewTab({ email, fullName, listings, savedItems, profile }: {
       <Card style={{ padding: "28px" }}>
         <h3 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "20px", fontWeight: 600, color: "#000000", marginBottom: "18px" }}>Quick Actions</h3>
         <div style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>
-          <a href="/properties"    style={{ padding: "12px 24px", borderRadius: "8px", fontSize: "13px", fontWeight: 600, letterSpacing: "0.05em", textDecoration: "none", background: "#000000", color: "#000000" }}>Browse Properties</a>
+          <a href="/properties"    style={{ padding: "12px 24px", borderRadius: "8px", fontSize: "13px", fontWeight: 600, letterSpacing: "0.05em", textDecoration: "none", background: "#000000", color: "#FFFFFF" }}>Browse Properties</a>
           <a href="/post-property" style={{ padding: "12px 24px", borderRadius: "8px", fontSize: "13px", fontWeight: 600, letterSpacing: "0.05em", textDecoration: "none", background: "transparent", border: "1.5px solid rgba(13,43,31,0.2)", color: "#374151" }}>List Your Property</a>
           <a href="/calculator"    style={{ padding: "12px 24px", borderRadius: "8px", fontSize: "13px", fontWeight: 600, letterSpacing: "0.05em", textDecoration: "none", background: "transparent", border: "1.5px solid rgba(13,43,31,0.2)", color: "#374151" }}>Calculate EMI</a>
         </div>

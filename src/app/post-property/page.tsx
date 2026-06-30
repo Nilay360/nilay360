@@ -1552,7 +1552,7 @@ export default function PostPropertyPage() {
           box-shadow: 0 0 0 3px rgba(201,168,76,0.15);
         }
         input::placeholder, textarea::placeholder { color: ${C.textMuted}; }
-        option { background: #161616; color: #000000; }
+        option { background: #161616; color: #FFFFFF; }
         ::-webkit-scrollbar { width: 5px; }
         ::-webkit-scrollbar-track { background: ${C.surface}; }
         ::-webkit-scrollbar-thumb { background: ${C.green}; border-radius: 3px; }

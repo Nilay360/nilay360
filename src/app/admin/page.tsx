@@ -423,7 +423,7 @@ function PendingSection({
                   <button
                     onClick={() => onApprove(l.id)}
                     disabled={inFlight === l.id}
-                    style={{ display: "flex", alignItems: "center", gap: "6px", padding: "7px 16px", borderRadius: "7px", fontSize: "11px", fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase" as const, background: "#121519", color: "#0B0D10", border: "none", cursor: inFlight === l.id ? "not-allowed" : "pointer", fontFamily: "'DM Sans', sans-serif", opacity: inFlight === l.id ? 0.6 : 1 }}
+                    style={{ display: "flex", alignItems: "center", gap: "6px", padding: "7px 16px", borderRadius: "7px", fontSize: "11px", fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase" as const, background: "#121519", color: "#FFFFFF", border: "none", cursor: inFlight === l.id ? "not-allowed" : "pointer", fontFamily: "'DM Sans', sans-serif", opacity: inFlight === l.id ? 0.6 : 1 }}
                   >
                     <IconApprove /> Approve
                   </button>
@@ -517,7 +517,7 @@ function RejectedSection({
                 <button
                   onClick={() => onReApprove(l.id)}
                   disabled={inFlight === l.id}
-                  style={{ display: "flex", alignItems: "center", gap: "6px", padding: "7px 14px", borderRadius: "7px", fontSize: "11px", fontWeight: 700, background: "#121519", color: "#0B0D10", border: "none", cursor: inFlight === l.id ? "not-allowed" : "pointer", fontFamily: "'DM Sans', sans-serif", opacity: inFlight === l.id ? 0.6 : 1 }}
+                  style={{ display: "flex", alignItems: "center", gap: "6px", padding: "7px 14px", borderRadius: "7px", fontSize: "11px", fontWeight: 700, background: "#121519", color: "#FFFFFF", border: "none", cursor: inFlight === l.id ? "not-allowed" : "pointer", fontFamily: "'DM Sans', sans-serif", opacity: inFlight === l.id ? 0.6 : 1 }}
                 >
                   <IconApprove /> Re-approve
                 </button>
@@ -948,7 +948,7 @@ export default function AdminPage() {
 
       {/* Toast */}
       {toast && (
-        <div style={{ position: "fixed", top: "88px", right: "24px", zIndex: 999, padding: "12px 20px", borderRadius: "10px", background: toast.ok ? "#000000" : "#B91C1C", color: "#000000", fontSize: "13px", fontWeight: 600, boxShadow: "0 4px 24px rgba(0,0,0,0.25)", fontFamily: "'DM Sans', sans-serif", display: "flex", alignItems: "center", gap: "8px", animation: "toastIn 0.2s ease-out" }}>
+        <div style={{ position: "fixed", top: "88px", right: "24px", zIndex: 999, padding: "12px 20px", borderRadius: "10px", background: toast.ok ? "#000000" : "#B91C1C", color: "#FFFFFF", fontSize: "13px", fontWeight: 600, boxShadow: "0 4px 24px rgba(0,0,0,0.25)", fontFamily: "'DM Sans', sans-serif", display: "flex", alignItems: "center", gap: "8px", animation: "toastIn 0.2s ease-out" }}>
           {toast.ok ? "✓" : "✗"} {toast.msg}
         </div>
       )}
