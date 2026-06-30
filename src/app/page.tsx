@@ -185,7 +185,7 @@ export default function HomePage() {
       if (raf) return;
       raf = requestAnimationFrame(() => {
         raf = 0;
-        glow.style.transform = `translate3d(${mx - 200}px, ${my - 200}px, 0)`;
+        glow.style.transform = `translate3d(${mx - 300}px, ${my - 300}px, 0)`;
       });
     };
     const onEnter = () => { glow.style.opacity = "1"; };
@@ -301,20 +301,22 @@ export default function HomePage() {
         .hide-scroll::-webkit-scrollbar { display:none; }
         .hide-scroll { -ms-overflow-style:none; scrollbar-width:none; }
 
-        .card-hover { transition:transform 0.35s cubic-bezier(0.16,1,0.3,1), box-shadow 0.35s cubic-bezier(0.16,1,0.3,1); }
-        .card-hover:hover { transform:translateY(-6px); box-shadow:0 12px 32px rgba(0,0,0,0.18), 0 0 0 1px rgba(43,168,224,0.15) !important; }
-        .card-img { transition:transform 0.35s cubic-bezier(0.16,1,0.3,1); }
-        .card-hover:hover .card-img { transform:scale(1.04); }
+        /* ── Card hover / image-zoom — unified shadow system ── */
+        .card-hover { transition:transform 0.4s cubic-bezier(0.16,1,0.3,1), box-shadow 0.4s cubic-bezier(0.16,1,0.3,1); will-change:transform; }
+        .card-hover:hover { transform:translateY(-8px); box-shadow:0 20px 60px rgba(0,0,0,0.45), 0 0 0 1px rgba(43,168,224,0.22) !important; }
+        .card-img { transition:transform 0.55s cubic-bezier(0.16,1,0.3,1); will-change:transform; }
+        .card-hover:hover .card-img { transform:scale(1.07); }
 
         .nav-drop-item { display:block; padding:9px 14px; border-radius:6px; font-size:13px; color:#111; transition:background 0.15s, color 0.15s; white-space:nowrap; }
         .nav-drop-item:hover { background:rgba(11,13,16,0.06); color:#111; }
 
-        .city-tab { padding:8px 18px; border-radius:999px; font-size:13px; font-weight:500; cursor:pointer; border:1px solid rgba(255,255,255,0.10); transition:all 0.15s; background:transparent; color:rgba(255,255,255,0.45); }
+        .city-tab { padding:8px 18px; border-radius:999px; font-size:13px; font-weight:500; cursor:pointer; border:1px solid rgba(255,255,255,0.10); transition:all 0.2s; background:transparent; color:rgba(255,255,255,0.45); }
         .city-tab.active { background:${G.gold}; color:#fff; border-color:${G.gold}; }
-        .city-tab:not(.active):hover { border-color:rgba(43,168,224,0.30); color:rgba(255,255,255,0.75); }
+        .city-tab:not(.active):hover { border-color:rgba(43,168,224,0.35); color:rgba(255,255,255,0.80); box-shadow:0 0 12px rgba(43,168,224,0.10); }
 
-        .svc-card { display:flex; flex-direction:column; align-items:center; gap:12px; padding:20px 12px; border-radius:16px; border:1px solid rgba(255,255,255,0.06); background:rgba(255,255,255,0.03); cursor:pointer; transition:transform 0.35s cubic-bezier(0.16,1,0.3,1), box-shadow 0.35s cubic-bezier(0.16,1,0.3,1), border-color 0.35s ease; min-width:110px; }
-        .svc-card:hover { border-color:${G.gold}; box-shadow:0 12px 32px rgba(0,0,0,0.4); transform:translateY(-6px); border-bottom:2px solid ${G.gold}; }
+        /* ── Glass service cards ── */
+        .svc-card { display:flex; flex-direction:column; align-items:center; gap:12px; padding:22px 14px; border-radius:16px; border:1px solid rgba(255,255,255,0.08); background:rgba(255,255,255,0.04); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px); cursor:pointer; transition:transform 0.35s cubic-bezier(0.16,1,0.3,1), box-shadow 0.35s cubic-bezier(0.16,1,0.3,1), border-color 0.35s ease; min-width:110px; will-change:transform; }
+        .svc-card:hover { border-color:rgba(43,168,224,0.45); box-shadow:0 20px 60px rgba(0,0,0,0.45), 0 0 24px rgba(43,168,224,0.12); transform:translateY(-6px); }
 
         .search-tab { padding:9px 20px; font-size:13px; font-weight:500; cursor:pointer; border:none; background:transparent; color:rgba(255,255,255,0.55); border-bottom:2px solid transparent; transition:all 0.15s; white-space:nowrap; }
         .search-tab.active { color:#fff; border-bottom-color:${G.gold}; }
@@ -325,31 +327,40 @@ export default function HomePage() {
 
         .insight-bar { height:6px; border-radius:6px; background:${G.gold}; transition:width 0.5s ease; }
 
-        .hero-stat { flex:1; padding: 0 24px; border-left: 1px solid rgba(43,168,224,0.15); }
-        .hero-stat:first-child { border-left: none; }
+        /* ── Stats as glass pills ── */
+        .hero-stat { flex:1; padding:14px 22px; border-left:1px solid rgba(43,168,224,0.15); position:relative; }
+        .hero-stat:first-child { border-left:none; }
 
         .section-divider { height: 1px; background: linear-gradient(90deg, transparent 0%, rgba(43,168,224,0.20) 50%, transparent 100%); margin: 0; }
 
-        .premium-card { background: linear-gradient(135deg, #161A1F 0%, #0B0D10 100%); border: 1px solid rgba(255,255,255,0.06); transition: transform 0.4s cubic-bezier(0.16,1,0.3,1), box-shadow 0.4s cubic-bezier(0.16,1,0.3,1), border-color 0.4s ease; }
-        .premium-card:hover { transform: translateY(-8px) scale(1.01); box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(43,168,224,0.20); border-color: rgba(43,168,224,0.20); }
+        /* ── Premium glass cards — unified system ── */
+        .premium-card { background:rgba(255,255,255,0.04); backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px); border:1px solid rgba(255,255,255,0.08); box-shadow:0 4px 24px rgba(0,0,0,0.18); transition:transform 0.4s cubic-bezier(0.16,1,0.3,1), box-shadow 0.4s cubic-bezier(0.16,1,0.3,1), border-color 0.4s ease; will-change:transform; }
+        .premium-card:hover { transform:translateY(-8px); box-shadow:0 20px 60px rgba(0,0,0,0.45), 0 0 0 1px rgba(43,168,224,0.22), 0 0 30px rgba(43,168,224,0.08); border-color:rgba(43,168,224,0.25); }
 
-        .svc-icon-wrap { width: 52px; height: 52px; border-radius: 14px; background: linear-gradient(135deg, rgba(43,168,224,0.15) 0%, rgba(43,168,224,0.05) 100%); border: 1px solid rgba(43,168,224,0.20); display: flex; align-items: center; justify-content: center; transition: all 0.3s ease; }
-        .svc-card:hover .svc-icon-wrap { background: linear-gradient(135deg, rgba(43,168,224,0.25) 0%, rgba(43,168,224,0.10) 100%); box-shadow: 0 0 20px rgba(43,168,224,0.20); }
+        /* ── Icon wrap + glow on hover ── */
+        .svc-icon-wrap { width:52px; height:52px; border-radius:14px; background:linear-gradient(135deg, rgba(43,168,224,0.14) 0%, rgba(43,168,224,0.04) 100%); border:1px solid rgba(43,168,224,0.18); display:flex; align-items:center; justify-content:center; transition:all 0.3s ease; will-change:box-shadow; }
+        .svc-card:hover .svc-icon-wrap { background:linear-gradient(135deg, rgba(43,168,224,0.30) 0%, rgba(43,168,224,0.10) 100%); box-shadow:0 0 28px rgba(43,168,224,0.32), 0 0 8px rgba(43,168,224,0.16); border-color:rgba(43,168,224,0.42); }
 
-        .cat-card { position: relative; border-radius: 20px; overflow: hidden; min-height: 280px; cursor: pointer; display: flex; flex-direction: column; justify-content: flex-end; transition: transform 0.4s cubic-bezier(0.16,1,0.3,1), box-shadow 0.4s; }
-        .cat-card:hover { transform: translateY(-8px); box-shadow: 0 24px 60px rgba(0,0,0,0.6), 0 0 0 1px rgba(43,168,224,0.15); }
-        .cat-card:hover .cat-img { transform: scale(1.06); }
-        .cat-img { position: absolute; inset: 0; background-size: cover; background-position: center; transition: transform 0.6s cubic-bezier(0.16,1,0.3,1); }
+        /* ── Category cards ── */
+        .cat-card { position:relative; border-radius:24px; overflow:hidden; min-height:280px; cursor:pointer; display:flex; flex-direction:column; justify-content:flex-end; transition:transform 0.4s cubic-bezier(0.16,1,0.3,1), box-shadow 0.4s; will-change:transform; }
+        .cat-card:hover { transform:translateY(-8px); box-shadow:0 20px 60px rgba(0,0,0,0.45), 0 0 0 1px rgba(43,168,224,0.22), 0 0 28px rgba(43,168,224,0.10); }
+        .cat-card:hover .cat-img { transform:scale(1.07); }
+        .cat-img { position:absolute; inset:0; background-size:cover; background-position:center; transition:transform 0.6s cubic-bezier(0.16,1,0.3,1); will-change:transform; }
 
-        .loc-card { position: relative; border-radius: 20px; overflow: hidden; height: 240px; cursor: pointer; flex-shrink: 0; width: 240px; transition: transform 0.4s cubic-bezier(0.16,1,0.3,1), box-shadow 0.4s; }
-        .loc-card:hover { transform: translateY(-8px); box-shadow: 0 24px 60px rgba(0,0,0,0.6); }
+        /* ── Location cards ── */
+        .loc-card { position:relative; border-radius:20px; overflow:hidden; height:240px; cursor:pointer; flex-shrink:0; width:240px; transition:transform 0.4s cubic-bezier(0.16,1,0.3,1), box-shadow 0.4s; will-change:transform; }
+        .loc-card:hover { transform:translateY(-8px); box-shadow:0 20px 60px rgba(0,0,0,0.45), 0 0 0 1px rgba(43,168,224,0.18), 0 0 20px rgba(43,168,224,0.08); }
 
-        .glow-dot { width: 6px; height: 6px; border-radius: 50%; background: #2BA8E0; box-shadow: 0 0 8px rgba(43,168,224,0.8), 0 0 16px rgba(43,168,224,0.4); animation: pulse-dot 2s ease-in-out infinite; flex-shrink:0; }
+        .glow-dot { width:6px; height:6px; border-radius:50%; background:#2BA8E0; box-shadow:0 0 8px rgba(43,168,224,0.8), 0 0 16px rgba(43,168,224,0.4); animation:pulse-dot 2s ease-in-out infinite; flex-shrink:0; }
         @keyframes pulse-dot { 0%,100% { opacity:1; transform:scale(1); } 50% { opacity:0.6; transform:scale(1.3); } }
         @keyframes mic-pulse { 0%,100% { opacity:1; transform:scale(1); } 50% { opacity:0.5; transform:scale(1.2); } }
-        .mic-listening { animation: mic-pulse 1s ease-in-out infinite; color: #2BA8E0 !important; }
+        .mic-listening { animation:mic-pulse 1s ease-in-out infinite; color:#2BA8E0 !important; }
 
-        .blue-line { height: 1px; background: linear-gradient(90deg, #2BA8E0 0%, #3DBEF5 50%, #2BA8E0 100%); box-shadow: 0 0 8px rgba(43,168,224,0.5); }
+        .blue-line { height:1px; background:linear-gradient(90deg, #2BA8E0 0%, #3DBEF5 50%, #2BA8E0 100%); box-shadow:0 0 8px rgba(43,168,224,0.5); }
+
+        /* ── Stat reveal animation ── */
+        @keyframes stat-reveal { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+        .stat-value { animation:stat-reveal 0.7s cubic-bezier(0.16,1,0.3,1) both; }
 
         @media (max-width:900px) {
           .nav-center { display:none !important; }
@@ -368,8 +379,8 @@ export default function HomePage() {
           .hero-h1 { font-size: clamp(30px, 8vw, 44px) !important; line-height: 1.1 !important; margin-bottom: 12px !important; }
           .hero-subline { font-size: 14px !important; margin-bottom: 24px !important; line-height: 1.6 !important; }
           .hero-searchbox { margin-bottom: 24px !important; border-radius: 16px !important; }
-          .hero-stats { padding-top: 20px !important; padding-bottom: 0 !important; margin-bottom: 0 !important; gap: 16px 0 !important; }
-          .hero-stat { padding: 0 10px; }
+          .hero-stats { padding-top: 20px !important; padding-bottom: 0 !important; margin-bottom: 0 !important; gap: 10px !important; }
+          .hero-stat { padding: 10px 10px; border-left: none !important; }
           .hero-stat div:first-child { font-size: 18px !important; }
           .svc-card { min-width: 85px; padding: 14px 8px; gap: 8px; }
           .svc-icon-wrap { width: 38px; height: 38px; border-radius: 10px; }
@@ -377,7 +388,7 @@ export default function HomePage() {
           .search-tab { padding: 7px 10px; font-size: 11px; }
           .badge-free { display: none; }
           .premium-card { width: 260px !important; }
-          .cat-card { min-height: 180px !important; }
+          .cat-card { min-height: 180px !important; border-radius: 16px !important; }
           .loc-card { width: 160px !important; height: 160px !important; }
           .hero-search-row { flex-direction: column !important; align-items: stretch !important; gap: 10px !important; padding: 12px !important; width: 100% !important; box-sizing: border-box !important; }
           .hero-search-row > * { width: 100% !important; max-width: 100% !important; box-sizing: border-box !important; flex: none !important; }
@@ -389,7 +400,7 @@ export default function HomePage() {
         @media (max-width: 480px) {
           .hero-content { padding-top: 84px !important; }
           .hero-h1 { font-size: clamp(28px, 9vw, 38px) !important; }
-          .hero-stat { flex: 1 1 50% !important; padding: 8px 4px !important; min-width: 0 !important; border-left: none !important; }
+          .hero-stat { flex: 1 1 50% !important; padding: 8px 8px !important; min-width: 0 !important; border-left: none !important; }
           .hero-stat div:first-child { font-size: 18px !important; }
           .hero-stat div:last-child { font-size: 9px !important; }
           .svc-card { min-width: 75px; padding: 10px 4px; font-size: 10px; }
@@ -467,7 +478,7 @@ export default function HomePage() {
       <section ref={heroRef} className="hero-section" style={{
         position:"relative", minHeight:"100vh", paddingTop:"64px",
         display:"flex", flexDirection:"column", justifyContent:"center",
-        background:"radial-gradient(ellipse 100% 50% at 50% 0%, rgba(43,168,224,0.08) 0%, transparent 60%), radial-gradient(ellipse 80% 80% at 80% 100%, rgba(43,168,224,0.04) 0%, transparent 50%), linear-gradient(180deg, #000000 0%, #050810 50%, #000000 100%)",
+        background:"radial-gradient(ellipse 130% 65% at 50% 0%, rgba(43,168,224,0.13) 0%, transparent 52%), radial-gradient(ellipse 80% 80% at 88% 100%, rgba(43,168,224,0.08) 0%, transparent 50%), radial-gradient(ellipse 60% 55% at 12% 55%, rgba(43,168,224,0.06) 0%, transparent 58%), linear-gradient(180deg, #000000 0%, #050810 50%, #000000 100%)",
         overflow:"hidden",
       }}>
         {/* BG texture layer */}
@@ -480,7 +491,7 @@ export default function HomePage() {
         {/* Silk texture overlay */}
         <div style={{ position:"absolute", inset:0, zIndex:0, backgroundImage:"url('https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&q=40')", backgroundSize:"cover", opacity:0.04, mixBlendMode:"overlay", pointerEvents:"none" }} />
         {/* Cursor glow */}
-        <div ref={glowRef} aria-hidden style={{position:"absolute", top:0, left:0, width:400, height:400, borderRadius:"50%", background:"radial-gradient(circle, rgba(43,168,224,0.08) 0%, transparent 70%)", pointerEvents:"none", opacity:0, transition:"opacity 0.3s ease", zIndex:0, willChange:"transform, opacity"}} />
+        <div ref={glowRef} aria-hidden style={{position:"absolute", top:0, left:0, width:600, height:600, borderRadius:"50%", background:"radial-gradient(circle, rgba(43,168,224,0.14) 0%, transparent 70%)", pointerEvents:"none", opacity:0, transition:"opacity 0.3s ease", zIndex:0, willChange:"transform, opacity"}} />
         <div style={{position:"absolute", inset:0, background:"radial-gradient(ellipse 80% 60% at 65% 40%, rgba(11,13,16,0.65) 0%, transparent 65%), radial-gradient(ellipse 60% 80% at 30% 60%, rgba(43,168,224,0.08) 0%, transparent 60%), rgba(5,8,12,0.72)"}} />
 
         {/* Animated premium SVG city skyline */}
@@ -729,7 +740,7 @@ export default function HomePage() {
           </div>
 
           {/* 2 — Search bar */}
-          <div className="hero-searchbox" style={{background:"rgba(255,255,255,0.06)", backdropFilter:"blur(20px)", border:"0.5px solid rgba(255,255,255,0.12)", borderRadius:12, overflow:"hidden", maxWidth:"min(820px, 100%)", marginBottom:36, margin:"0 auto 36px", width:"100%", boxSizing:"border-box"}}>
+          <div className="hero-searchbox" style={{background:"rgba(255,255,255,0.06)", backdropFilter:"blur(30px)", WebkitBackdropFilter:"blur(30px)", border:"1px solid rgba(255,255,255,0.10)", borderRadius:24, overflow:"hidden", maxWidth:"min(820px, 100%)", marginBottom:36, margin:"0 auto 36px", width:"100%", boxSizing:"border-box", boxShadow:"0 20px 60px rgba(0,0,0,0.45), 0 0 0 1px rgba(43,168,224,0.08), inset 0 1px 0 rgba(255,255,255,0.06)"}}>
             <div style={{display:"flex", borderBottom:"1px solid rgba(255,255,255,0.08)", paddingLeft:4, overflowX:"auto"}} className="hide-scroll">
               {["Buy","Rent","New Projects","Valuation","List Property","Agents"].map(t=>(
                 <button key={t} onClick={()=>setSearchTab(t)} className={`search-tab${searchTab===t?" active":""}`}>
@@ -764,7 +775,7 @@ export default function HomePage() {
               </div>
               <button
                 onClick={() => router.push(`/search?tab=${searchTab.toLowerCase().replace(/ /g, '-')}&city=${encodeURIComponent(searchCity)}&q=${encodeURIComponent(searchQuery)}`)}
-                style={{padding:"0 28px", background:G.gold, borderRadius:10, color:"#000", fontSize:14, fontWeight:700, display:"flex", alignItems:"center", gap:8, whiteSpace:"nowrap", transition:"background 0.15s", border:"none", cursor:"pointer", height:"100%", minHeight:44}}
+                style={{padding:"0 28px", background:G.gold, borderRadius:10, color:"#000", fontSize:14, fontWeight:700, display:"flex", alignItems:"center", gap:8, whiteSpace:"nowrap", transition:"background 0.15s, box-shadow 0.15s", border:"none", cursor:"pointer", height:"100%", minHeight:44, boxShadow:"0 10px 30px rgba(43,168,224,0.35)"}}
                 onMouseOver={e=>(e.currentTarget.style.background=G.goldLt)}
                 onMouseOut={e=>(e.currentTarget.style.background=G.gold)}>
                 <SvgIcon d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" size={15} color="#000" />
@@ -774,11 +785,11 @@ export default function HomePage() {
           </div>
 
           {/* 3 — Stats strip */}
-          <div className="hero-stats" style={{display:"flex", flexWrap:"wrap", justifyContent:"center", gap:"20px 0", width:"100%", maxWidth:"100%", boxSizing:"border-box", marginBottom:40, paddingBottom:32, borderBottom:"1px solid rgba(43,168,224,0.12)"}}>
+          <div className="hero-stats" style={{display:"flex", flexWrap:"wrap", justifyContent:"center", gap:"12px", width:"100%", maxWidth:"100%", boxSizing:"border-box", marginBottom:40, paddingBottom:32, borderBottom:"1px solid rgba(43,168,224,0.12)"}}>
             {[["2,400+","Listings"],["500+","Agents"],["14","Cities"],["₹18,000Cr","Deals Closed"]].map(([v,l])=>(
-              <div key={l} className="hero-stat">
-                <div style={{fontFamily:"'Cormorant Garamond',Georgia,serif", fontSize:26, fontWeight:600, background:"linear-gradient(135deg, #E8EAED 0%, #2BA8E0 100%)", WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent"}}>{v}</div>
-                <div style={{fontSize:11, color:"rgba(255,255,255,0.45)", marginTop:2, letterSpacing:"0.05em"}}>{l}</div>
+              <div key={l} className="hero-stat" style={{background:"rgba(255,255,255,0.04)", backdropFilter:"blur(12px)", WebkitBackdropFilter:"blur(12px)", border:"1px solid rgba(43,168,224,0.12)", borderRadius:16, flex:"1 1 auto"}}>
+                <div className="stat-value" style={{fontFamily:"'Cormorant Garamond',Georgia,serif", fontSize:26, fontWeight:600, background:"linear-gradient(135deg, #E8EAED 0%, #2BA8E0 100%)", WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent"}}>{v}</div>
+                <div style={{fontSize:11, color:"rgba(255,255,255,0.50)", marginTop:3, letterSpacing:"0.06em", textTransform:"uppercase"}}>{l}</div>
               </div>
             ))}
           </div>
@@ -910,7 +921,7 @@ export default function HomePage() {
                   </div>
                 </div>
                 {/* Info */}
-                <div style={{padding:"18px", background:G.card}}>
+                <div style={{padding:"18px", background:"rgba(11,13,16,0.96)"}}>
                   <div style={{fontSize:11, color:"rgba(255,255,255,0.45)", fontWeight:500, letterSpacing:"0.05em", marginBottom:4}}>{p.city} · {p.type}</div>
                   <h3 style={{fontFamily:"'Cormorant Garamond',Georgia,serif", fontSize:18, fontWeight:700, color:"#fff", marginBottom:10}}>{p.title}</h3>
                   <div style={{display:"flex", gap:14, fontSize:12, color:"rgba(255,255,255,0.45)"}}>
@@ -997,7 +1008,7 @@ export default function HomePage() {
           <div className="market-grid" style={{display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:16}}>
             {/* Price trend mini chart */}
             <Reveal delay={0}>
-            <div style={{background:"#000000", borderRadius:16, padding:24, border:"1px solid rgba(255,255,255,0.05)", height:"100%"}}>
+            <div style={{background:"rgba(255,255,255,0.03)", backdropFilter:"blur(16px)", WebkitBackdropFilter:"blur(16px)", borderRadius:16, padding:24, border:"1px solid rgba(255,255,255,0.07)", boxShadow:"0 4px 24px rgba(0,0,0,0.2)", height:"100%"}}>
               <div style={{fontSize:11, color:"rgba(255,255,255,0.4)", fontWeight:600, letterSpacing:1, textTransform:"uppercase", marginBottom:16}}>Price Trend (₹/sqft)</div>
               <div style={{display:"flex", alignItems:"flex-end", gap:6, height:80, marginBottom:12}}>
                 {md.trend.map((v,i)=>(
@@ -1014,7 +1025,7 @@ export default function HomePage() {
 
             {/* Avg price */}
             <Reveal delay={0.08}>
-            <div style={{background:"#000000", borderRadius:16, padding:24, border:"1px solid rgba(255,255,255,0.05)", height:"100%"}}>
+            <div style={{background:"rgba(255,255,255,0.03)", backdropFilter:"blur(16px)", WebkitBackdropFilter:"blur(16px)", borderRadius:16, padding:24, border:"1px solid rgba(255,255,255,0.07)", boxShadow:"0 4px 24px rgba(0,0,0,0.2)", height:"100%"}}>
               <div style={{fontSize:11, color:"rgba(255,255,255,0.4)", fontWeight:600, letterSpacing:1, textTransform:"uppercase", marginBottom:16}}>Avg Price / Sqft</div>
               <div style={{fontFamily:"'Cormorant Garamond',Georgia,serif", fontSize:40, fontWeight:700, color:"#fff", lineHeight:1, marginBottom:8}}>{md.price}</div>
               <span style={{display:"inline-block", background:"rgba(26,122,60,0.15)", color:"#4ade80", fontSize:12, fontWeight:700, padding:"4px 10px", borderRadius:6, border:"1px solid rgba(74,222,128,0.2)"}}>
@@ -1026,7 +1037,7 @@ export default function HomePage() {
 
             {/* Top localities */}
             <Reveal delay={0.16}>
-            <div style={{background:"#000000", borderRadius:16, padding:24, border:"1px solid rgba(255,255,255,0.05)", height:"100%"}}>
+            <div style={{background:"rgba(255,255,255,0.03)", backdropFilter:"blur(16px)", WebkitBackdropFilter:"blur(16px)", borderRadius:16, padding:24, border:"1px solid rgba(255,255,255,0.07)", boxShadow:"0 4px 24px rgba(0,0,0,0.2)", height:"100%"}}>
               <div style={{fontSize:11, color:"rgba(255,255,255,0.4)", fontWeight:600, letterSpacing:1, textTransform:"uppercase", marginBottom:16}}>Top Localities</div>
               {md.localities.map((loc,i)=>(
                 <div key={loc.name} style={{display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:10}}>
@@ -1042,7 +1053,7 @@ export default function HomePage() {
 
             {/* New listings */}
             <Reveal delay={0.24}>
-            <div style={{background:"#000000", borderRadius:16, padding:24, border:"1px solid rgba(255,255,255,0.05)", height:"100%"}}>
+            <div style={{background:"rgba(255,255,255,0.03)", backdropFilter:"blur(16px)", WebkitBackdropFilter:"blur(16px)", borderRadius:16, padding:24, border:"1px solid rgba(255,255,255,0.07)", boxShadow:"0 4px 24px rgba(0,0,0,0.2)", height:"100%"}}>
               <div style={{fontSize:11, color:"rgba(255,255,255,0.4)", fontWeight:600, letterSpacing:1, textTransform:"uppercase", marginBottom:16}}>New Listings This Month</div>
               <div style={{fontFamily:"'Cormorant Garamond',Georgia,serif", fontSize:40, fontWeight:700, color:"#fff", lineHeight:1, marginBottom:8}}>{md.newListings}</div>
               <div style={{display:"flex", alignItems:"center", gap:6, marginBottom:16}}>
@@ -1193,16 +1204,16 @@ export default function HomePage() {
         <div style={{position:"absolute", right:-150, bottom:-150, width:500, height:500, borderRadius:"50%", background:"radial-gradient(circle, rgba(43,168,224,0.10) 0%, transparent 70%)", pointerEvents:"none"}} />
         <div style={{position:"absolute", inset:0, backgroundImage:"radial-gradient(ellipse 50% 80% at 80% 50%, rgba(43,168,224,0.1) 0%, transparent 60%)", pointerEvents:"none"}} />
         <Reveal style={{maxWidth:720, margin:"0 auto", position:"relative", zIndex:1}}>
-        <div style={{textAlign:"center"}}>
+        <div style={{textAlign:"center", background:"rgba(255,255,255,0.04)", backdropFilter:"blur(24px)", WebkitBackdropFilter:"blur(24px)", border:"1px solid rgba(255,255,255,0.10)", borderRadius:32, padding:"clamp(32px,5vw,56px) clamp(24px,4vw,48px)", boxShadow:"0 20px 60px rgba(0,0,0,0.45), 0 0 0 1px rgba(43,168,224,0.08)"}}>
           <h2 className="cta-heading" style={{fontFamily:"'Cormorant Garamond',Georgia,serif", fontSize:"clamp(26px,5vw,40px)", fontWeight:300, color:"#fff", marginBottom:14, wordBreak:"break-word", maxWidth:"100%"}}>
             Ready to Find Your<br /><em style={{fontStyle:"italic", color:G.goldLt}}>Perfect Property?</em>
           </h2>
-          <p style={{fontSize:15, color:"rgba(255,255,255,0.6)", marginBottom:32, lineHeight:1.7}}>
+          <p style={{fontSize:15, color:"rgba(255,255,255,0.65)", marginBottom:32, lineHeight:1.7}}>
             Join 50,000+ buyers and investors who found their dream property through Nilay 360.
           </p>
           <div className="cta-buttons" style={{display:"flex", gap:14, justifyContent:"center", flexWrap:"wrap"}}>
-            <a href="/search" style={{padding:"14px 32px", background:G.gold, borderRadius:10, color:"#000", fontSize:15, fontWeight:700, transition:"background 0.15s"}}
-              onMouseOver={e=>(e.currentTarget.style.background=G.goldLt)} onMouseOut={e=>(e.currentTarget.style.background=G.gold)}>Browse Properties</a>
+            <a href="/search" style={{padding:"14px 32px", background:G.gold, borderRadius:10, color:"#000", fontSize:15, fontWeight:700, transition:"background 0.15s, box-shadow 0.15s", boxShadow:"0 10px 30px rgba(43,168,224,0.35)"}}
+              onMouseOver={e=>{e.currentTarget.style.background=G.goldLt; e.currentTarget.style.boxShadow="0 10px 30px rgba(61,190,245,0.45)";}} onMouseOut={e=>{e.currentTarget.style.background=G.gold; e.currentTarget.style.boxShadow="0 10px 30px rgba(43,168,224,0.35)";}}>Browse Properties</a>
             <a href="/contact" style={{padding:"14px 32px", border:"1px solid rgba(255,255,255,0.25)", borderRadius:10, color:"#fff", fontSize:15, fontWeight:500, transition:"all 0.15s"}}
               onMouseOver={e=>{e.currentTarget.style.borderColor=G.gold;e.currentTarget.style.color=G.gold;}}
               onMouseOut={e=>{e.currentTarget.style.borderColor="rgba(255,255,255,0.25)";e.currentTarget.style.color="#fff";}}>Contact an Expert</a>
