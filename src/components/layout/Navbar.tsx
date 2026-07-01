@@ -721,16 +721,19 @@ export function Navbar() {
       }}>
 
         {/* ── Main bar ── */}
-        <div className="nilay360-container" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%", height: "100%" }}>
+        <div style={{ display: "flex", alignItems: "center", width: "100%", height: "100%" }}>
 
-          {/* Logo */}
-          <Link href="/" style={{ textDecoration: "none", display: "flex", alignItems: "center", flexShrink: 0 }}>
+          {/* Logo — flush left, outside max-width constraint */}
+          <Link href="/" style={{ textDecoration: "none", display: "flex", alignItems: "center", flexShrink: 0, paddingLeft: 24 }}>
             <img
               src="/nilay_logo_final.png"
               alt="Nilay 360"
               style={{ height: 44, width: "auto", objectFit: "contain" }}
             />
           </Link>
+
+          {/* Nav + right buttons — centered max-width container */}
+          <div className="nilay360-container" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flex: 1, height: "100%", paddingRight: 24 }}>
 
           {/* Desktop nav */}
           <nav className="nvl-desktop" style={{ display: "flex", alignItems: "center", gap: 2 }} aria-label="Main navigation">
@@ -856,6 +859,8 @@ export function Navbar() {
               </button>
             ))}
           </div>
+
+          </div>{/* end nilay360-container */}
 
           {/* Mobile saved + hamburger */}
           <Link href="/dashboard/saved" className="nvl-mobile" style={{
