@@ -1,10 +1,12 @@
 import type { Metadata } from "next"
+import { Suspense } from "react"
 import "@/styles/globals.css"
 import { Navbar } from "@/components/layout/Navbar"
 import { CompareProvider } from "@/context/CompareContext"
 import CompareBar from "@/components/property/CompareBar"
 import { AuthProvider } from "@/context/AuthContext"
 import AuthModal from "@/components/auth/AuthModal"
+import { PostHogProvider, PostHogPageView } from "@/components/providers/PostHogProvider"
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://nilay360.com"),
@@ -64,14 +66,19 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
       </head>
       <body className="antialiased" style={{ fontFamily: "'DM Sans', system-ui, sans-serif" }}>
-        <AuthProvider>
-          <CompareProvider>
-            <Navbar />
-            {children}
-            <CompareBar />
-          </CompareProvider>
-          <AuthModal />
-        </AuthProvider>
+        <PostHogProvider>
+          <AuthProvider>
+            <CompareProvider>
+              <Navbar />
+              <Suspense fallback={null}>
+                <PostHogPageView />
+              </Suspense>
+              {children}
+              <CompareBar />
+            </CompareProvider>
+            <AuthModal />
+          </AuthProvider>
+        </PostHogProvider>
       </body>
     </html>
   )
