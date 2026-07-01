@@ -134,9 +134,16 @@ export default function HomePage() {
   const [insightCity, setInsightCity] = useState("Hyderabad");
   const [reviewIdx, setReviewIdx] = useState(0);
   const [isListening, setIsListening] = useState(false);
+  const [cityOpen, setCityOpen] = useState(false);
+  const cityDropRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!cityOpen) return;
+    const handler = (e: MouseEvent) => { if (cityDropRef.current && !cityDropRef.current.contains(e.target as Node)) setCityOpen(false); };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, [cityOpen]);
   const carouselRef = useRef<HTMLDivElement>(null);
   const heroRef = useRef<HTMLElement>(null);
-  const bgRef = useRef<HTMLDivElement>(null);
   const glowRef = useRef<HTMLDivElement>(null);
 
   const filteredProps = propCity === "All" ? PROPERTIES : PROPERTIES.filter(p => p.city === propCity);
@@ -151,25 +158,6 @@ export default function HomePage() {
     return () => clearInterval(t);
   }, []);
 
-  // Hero parallax — translate bg layer at ~0.3x scroll speed (transform only, rAF-throttled)
-  useEffect(() => {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    let raf = 0;
-    const onScroll = () => {
-      if (raf) return;
-      raf = requestAnimationFrame(() => {
-        raf = 0;
-        const y = Math.min(window.scrollY * 0.3, 80);
-        if (bgRef.current) bgRef.current.style.transform = `translate3d(0, ${y}px, 0)`;
-      });
-    };
-    window.addEventListener("scroll", onScroll, { passive: true });
-    onScroll();
-    return () => {
-      window.removeEventListener("scroll", onScroll);
-      if (raf) cancelAnimationFrame(raf);
-    };
-  }, []);
 
   // Hero cursor glow — soft gold radial that follows the cursor within the hero only
   useEffect(() => {
@@ -293,7 +281,9 @@ export default function HomePage() {
         html { scroll-behavior:smooth; }
         body { font-family:'DM Sans',system-ui,sans-serif; background:#000000; color:#E8EAED; overflow-x:hidden; }
         html, body { max-width: 100vw; overflow-x: hidden !important; }
-        #__next, main, section { max-width: 100vw; overflow-x: hidden; }
+        #__next, main { max-width: 100vw; overflow-x: hidden; }
+        section { max-width: 100vw; overflow-x: clip; }
+        .hero-section { overflow: visible !important; }
         * { max-width: 100%; }
         a { color:inherit; text-decoration:none; }
         button { font-family:'DM Sans',system-ui,sans-serif; }
@@ -479,15 +469,8 @@ export default function HomePage() {
         position:"relative", minHeight:"100vh", paddingTop:"64px",
         display:"flex", flexDirection:"column", justifyContent:"center",
         background:"radial-gradient(ellipse 130% 65% at 50% 0%, rgba(43,168,224,0.13) 0%, transparent 52%), radial-gradient(ellipse 80% 80% at 88% 100%, rgba(43,168,224,0.08) 0%, transparent 50%), radial-gradient(ellipse 60% 55% at 12% 55%, rgba(43,168,224,0.06) 0%, transparent 58%), linear-gradient(180deg, #000000 0%, #050810 50%, #000000 100%)",
-        overflow:"hidden",
+        overflow:"visible",
       }}>
-        {/* BG texture layer */}
-        <div ref={bgRef} style={{
-          position:"absolute", top:-80, bottom:-80, left:0, right:0,
-          backgroundImage:"url('https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1920&q=80')",
-          backgroundSize:"cover", backgroundPosition:"center top",
-          opacity:0.35, willChange:"transform", zIndex:0,
-        }} />
         {/* Silk texture overlay */}
         <div style={{ position:"absolute", inset:0, zIndex:0, backgroundImage:"url('https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&q=40')", backgroundSize:"cover", opacity:0.04, mixBlendMode:"overlay", pointerEvents:"none" }} />
         {/* Cursor glow */}
@@ -740,7 +723,7 @@ export default function HomePage() {
           </div>
 
           {/* 2 — Search bar */}
-          <div className="hero-searchbox" style={{background:"rgba(255,255,255,0.06)", backdropFilter:"blur(30px)", WebkitBackdropFilter:"blur(30px)", border:"1px solid rgba(255,255,255,0.10)", borderRadius:24, overflow:"hidden", maxWidth:"min(820px, 100%)", marginBottom:36, margin:"0 auto 36px", width:"100%", boxSizing:"border-box", boxShadow:"0 20px 60px rgba(0,0,0,0.45), 0 0 0 1px rgba(43,168,224,0.08), inset 0 1px 0 rgba(255,255,255,0.06)"}}>
+          <div className="hero-searchbox" style={{background:"rgba(255,255,255,0.06)", backdropFilter:"blur(30px)", WebkitBackdropFilter:"blur(30px)", border:"1px solid rgba(255,255,255,0.10)", borderRadius:24, overflow:"visible", maxWidth:"min(820px, 100%)", marginBottom:36, margin:"0 auto 36px", width:"100%", boxSizing:"border-box", boxShadow:"0 20px 60px rgba(0,0,0,0.45), 0 0 0 1px rgba(43,168,224,0.08), inset 0 1px 0 rgba(255,255,255,0.06)", position:"relative", zIndex:10}}>
             <div style={{display:"flex", borderBottom:"1px solid rgba(255,255,255,0.08)", paddingLeft:4, overflowX:"auto"}} className="hide-scroll">
               {["Buy","Rent","New Projects","Valuation","List Property","Agents"].map(t=>(
                 <button key={t} onClick={()=>setSearchTab(t)} className={`search-tab${searchTab===t?" active":""}`}>
@@ -749,11 +732,31 @@ export default function HomePage() {
               ))}
             </div>
             <div className="hero-search-row" style={{display:"flex", gap:0, alignItems:"stretch", padding:"12px 12px 12px 4px"}}>
-              <select value={searchCity} onChange={e=>setSearchCity(e.target.value)}
-                style={{flex:"0 0 160px", background:"transparent", border:"none", borderRight:"1px solid rgba(255,255,255,0.1)", color: searchCity ? "#fff" : "rgba(255,255,255,0.45)", fontSize:13, padding:"0 16px", outline:"none", cursor:"pointer", fontFamily:"'DM Sans',sans-serif"}}>
-                <option value="" style={{color:"#111"}}>Select City</option>
-                {CITIES.map(c=><option key={c} value={c} style={{color:"#111"}}>{c}</option>)}
-              </select>
+              {/* Custom city dropdown */}
+              <div ref={cityDropRef} style={{flex:"0 0 160px", position:"relative", borderRight:"1px solid rgba(255,255,255,0.1)"}}>
+                <button
+                  type="button"
+                  onClick={()=>setCityOpen(o=>!o)}
+                  style={{width:"100%", height:"100%", minHeight:44, background:"transparent", border:"none", padding:"0 14px 0 16px", display:"flex", alignItems:"center", justifyContent:"space-between", gap:6, cursor:"pointer", fontFamily:"'DM Sans',sans-serif", fontSize:13, color: searchCity ? "#fff" : "rgba(255,255,255,0.45)", outline:"none"}}
+                >
+                  <span style={{overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap"}}>{searchCity || "Select City"}</span>
+                  <svg width="12" height="12" viewBox="0 0 12 12" fill="none" style={{flexShrink:0, transition:"transform 0.2s", transform: cityOpen ? "rotate(180deg)" : "rotate(0deg)"}}>
+                    <path d="M2 4l4 4 4-4" stroke="rgba(255,255,255,0.4)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </button>
+                {cityOpen && (
+                  <div style={{position:"absolute", top:"calc(100% + 8px)", left:0, minWidth:180, background:"#0b0d10", border:"1px solid rgba(43,168,224,0.22)", borderRadius:14, boxShadow:"0 24px 64px rgba(0,0,0,0.7), 0 0 0 1px rgba(43,168,224,0.10)", zIndex:9999, overflowY:"auto", overflowX:"hidden", maxHeight:320, padding:"6px"}}>
+                    {["", ...CITIES].map((c,i)=>(
+                      <button key={i} type="button"
+                        onClick={()=>{ setSearchCity(c); setCityOpen(false); }}
+                        style={{width:"100%", padding:"9px 14px", background: searchCity===c ? "rgba(43,168,224,0.12)" : "transparent", border:"none", borderRadius:9, textAlign:"left", fontFamily:"'DM Sans',sans-serif", fontSize:13, color: c ? "#fff" : "rgba(255,255,255,0.35)", cursor:"pointer", transition:"background 0.15s", display:"block"}}
+                        onMouseOver={e=>(e.currentTarget.style.background="rgba(43,168,224,0.10)")}
+                        onMouseOut={e=>(e.currentTarget.style.background= searchCity===c ? "rgba(43,168,224,0.12)" : "transparent")}
+                      >{c || "All Cities"}</button>
+                    ))}
+                  </div>
+                )}
+              </div>
               <div style={{flex:1, display:"flex", alignItems:"center", padding:"0 16px", gap:10}}>
                 <SvgIcon d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" size={16} color="rgba(255,255,255,0.4)" />
                 <input value={searchQuery} onChange={e=>setSearchQuery(e.target.value)}

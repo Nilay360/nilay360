@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import { withSentryConfig } from "@sentry/nextjs";
 
 const nextConfig: NextConfig = {
   images: {
@@ -13,4 +14,8 @@ const nextConfig: NextConfig = {
   allowedDevOrigins: ['192.168.10.39'],
 };
 
-export default nextConfig;
+export default withSentryConfig(nextConfig, {
+  silent: true,
+  org: "nilay360",
+  project: "nilay360",
+});

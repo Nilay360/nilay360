@@ -393,8 +393,7 @@ function AuthModalInner({
 
           {/* Brand */}
           <div className="am-brand">
-            <span className="am-brand-name">Nilay 360</span>
-            <span className="am-brand-dot">·</span>
+            <img src="/nilay_logo_final.png" alt="Nilay 360" style={{ height: 36, width: "auto", objectFit: "contain" }} />
           </div>
 
           {/* Tabs */}
@@ -705,9 +704,7 @@ const styles = `
   }
   .am-close:hover { color: ${GOLD}; background: rgba(201,168,76,0.1); }
 
-  .am-brand { display: flex; align-items: center; gap: 6px; margin-bottom: 18px; }
-  .am-brand-name { font-size: 16px; font-weight: 600; letter-spacing: 0.22em; color: #fff; }
-  .am-brand-dot { color: ${GOLD}; font-size: 22px; line-height: 1; }
+  .am-brand { display: flex; align-items: center; margin-bottom: 18px; }
 
   .am-tabs {
     display: flex; gap: 4px; padding: 4px;
@@ -747,14 +744,14 @@ const styles = `
     background: rgba(255,255,255,0.04);
     border: 1.5px solid rgba(255,255,255,0.12);
     border-radius: 9px;
-    font-family: 'DM Sans', sans-serif; font-size: 14px; color: #000000;
+    font-family: 'DM Sans', sans-serif; font-size: 14px; color: #F5F2EC;
     outline: none; transition: border-color 0.18s, box-shadow 0.18s;
     -webkit-appearance: none;
   }
   .am-input::placeholder { color: rgba(245,242,236,0.3); }
   .am-input:focus { border-color: ${GOLD}; box-shadow: 0 0 0 3px rgba(201,168,76,0.14); }
   .am-select { cursor: pointer; }
-  .am-select option { background: #0a0a0a; color: #000000; }
+  .am-select option { background: #0a0a0a; color: #F5F2EC; }
 
   .am-phone-wrap { position: relative; display: flex; align-items: center; }
   .am-phone-prefix {
@@ -767,7 +764,7 @@ const styles = `
   .am-otp-box {
     width: 100%; aspect-ratio: 1 / 1; min-width: 0;
     text-align: center; font-size: 22px; font-weight: 600;
-    color: #000000; background: rgba(255,255,255,0.04);
+    color: #F5F2EC; background: rgba(255,255,255,0.04);
     border: 1.5px solid rgba(255,255,255,0.14); border-radius: 10px;
     outline: none; font-family: 'DM Sans', sans-serif;
     transition: border-color 0.15s, box-shadow 0.15s;
@@ -829,7 +826,7 @@ const styles = `
   .am-role.sel .am-role-radio-dot { opacity: 1; transform: scale(1); }
   .am-role-main { display: flex; flex-direction: column; gap: 3px; flex: 1; min-width: 0; }
   .am-role-top { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-  .am-role-title { font-size: 15px; font-weight: 600; color: #000000; }
+  .am-role-title { font-size: 15px; font-weight: 600; color: #FFFFFF; }
   .am-role-perk { font-size: 12.5px; font-weight: 600; color: ${GOLD}; }
   .am-role-desc { font-size: 12px; color: rgba(245,242,236,0.45); }
   .am-role-badge {

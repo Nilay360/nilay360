@@ -124,7 +124,7 @@ export async function POST(req: NextRequest) {
 
   try {
     await resend.emails.send({
-      from: "Nilay 360 <onboarding@resend.dev>",
+      from: "Nilay 360 <contact@nilay360.com>",
       to: sellerEmail,
       subject,
       html,
