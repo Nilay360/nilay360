@@ -148,6 +148,8 @@ export default function SavedPropertiesPage() {
   return (
     <div style={{ minHeight: "100vh", background: G.ivory, paddingTop: 64 }}>
       <style>{`
+.sv-card { transition: transform 0.4s cubic-bezier(0.16,1,0.3,1), box-shadow 0.4s cubic-bezier(0.16,1,0.3,1); will-change: transform; }
+.sv-card:hover { transform: translateY(-8px); box-shadow: 0 20px 60px rgba(0,0,0,.45), 0 0 0 1px rgba(43,168,224,0.22); }
 @media (max-width: 768px) {
   .sv-header { flex-direction: column !important; align-items: flex-start !important; gap: 12px !important; padding: 16px !important; }
   .sv-card { flex-direction: column !important; }
