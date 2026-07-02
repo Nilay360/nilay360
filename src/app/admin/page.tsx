@@ -40,6 +40,12 @@ type UserRow = {
   role: string | null;
   phone: string | null;
   created_at: string;
+  is_verified: boolean | null;
+  is_active: boolean | null;
+  is_nri: boolean | null;
+  whatsapp: string | null;
+  nationality: string | null;
+  bio: string | null;
 };
 
 type InquiryRow = {
@@ -537,6 +543,110 @@ const ROLE_OPTIONS = [
   "content_manager", "support", "finance_manager", "sales_manager", "admin",
 ];
 
+// Full user_role enum (001_nivila_schema.sql) — includes super_admin, which is
+// intentionally absent from the role-change dropdown above but valid as a filter.
+const ROLE_FILTER_OPTIONS = [
+  "buyer", "seller", "agent", "agency", "moderator",
+  "content_manager", "support", "finance_manager", "sales_manager", "admin", "super_admin",
+];
+
+type UserSort = "newest" | "oldest" | "name_az" | "name_za";
+
+const USER_SORT_LABELS: Record<UserSort, string> = {
+  newest:  "Joined — newest first",
+  oldest:  "Joined — oldest first",
+  name_az: "Name — A to Z",
+  name_za: "Name — Z to A",
+};
+
+function UserDetailModal({ user, onClose }: { user: UserRow; onClose: () => void }) {
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [onClose]);
+
+  const field = (label: string, value: React.ReactNode) => (
+    <div>
+      <div style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" as const, color: "#9CA3AF", marginBottom: "3px" }}>{label}</div>
+      <div style={{ fontSize: "13px", color: "#374151" }}>{value ?? "—"}</div>
+    </div>
+  );
+
+  return (
+    <div
+      onClick={onClose}
+      role="dialog"
+      aria-modal="true"
+      aria-label={`User details — ${user.full_name ?? "Unnamed user"}`}
+      style={{ position: "fixed", inset: 0, zIndex: 500, background: "rgba(0,0,0,0.48)", backdropFilter: "blur(2px)", display: "flex", alignItems: "center", justifyContent: "center", padding: "20px" }}
+    >
+      <div
+        onClick={e => e.stopPropagation()}
+        style={{ background: "#fff", borderRadius: "20px", border: "1px solid rgba(13,43,31,0.07)", boxShadow: "0 12px 48px rgba(0,0,0,0.22)", width: "100%", maxWidth: "480px", maxHeight: "85vh", overflowY: "auto", padding: "28px 30px", animation: "fadeSlide 0.18s ease-out", fontFamily: "'DM Sans', sans-serif" }}
+      >
+        {/* Header */}
+        <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "14px", marginBottom: "20px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "14px", minWidth: 0 }}>
+            <div style={{ width: "48px", height: "48px", borderRadius: "50%", background: "rgba(201,168,76,0.12)", border: "1.5px solid rgba(201,168,76,0.3)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, fontSize: "17px", fontWeight: 700, color: "#2BA8E0" }}>
+              {(user.full_name ?? "?").slice(0, 1).toUpperCase()}
+            </div>
+            <div style={{ minWidth: 0 }}>
+              <h3 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "24px", fontWeight: 600, color: "#000000", lineHeight: 1.2, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                {user.full_name ?? "—"}
+              </h3>
+              <div style={{ display: "flex", alignItems: "center", gap: "8px", marginTop: "5px", flexWrap: "wrap" }}>
+                <RoleBadge role={user.role} />
+                <span style={{ display: "inline-block", padding: "2px 8px", borderRadius: "100px", fontSize: "9px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" as const, background: user.is_verified ? "rgba(45,106,79,0.1)" : "rgba(107,114,128,0.1)", color: user.is_verified ? "#065F46" : "#374151", border: `1px solid ${user.is_verified ? "rgba(45,106,79,0.3)" : "rgba(107,114,128,0.2)"}` }}>
+                  {user.is_verified ? "Verified" : "Unverified"}
+                </span>
+                {user.is_active === false && (
+                  <span style={{ display: "inline-block", padding: "2px 8px", borderRadius: "100px", fontSize: "9px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" as const, background: "rgba(239,68,68,0.1)", color: "#B91C1C", border: "1px solid rgba(239,68,68,0.3)" }}>
+                    Inactive
+                  </span>
+                )}
+                {user.is_nri && (
+                  <span style={{ display: "inline-block", padding: "2px 8px", borderRadius: "100px", fontSize: "9px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" as const, background: "rgba(59,130,246,0.1)", color: "#1D4ED8", border: "1px solid rgba(59,130,246,0.25)" }}>
+                    NRI
+                  </span>
+                )}
+              </div>
+            </div>
+          </div>
+          <button
+            onClick={onClose}
+            aria-label="Close user details"
+            style={{ width: "30px", height: "30px", borderRadius: "8px", background: "#F8F6F1", border: "1px solid rgba(13,43,31,0.1)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: "#374151", flexShrink: 0 }}
+          >
+            <IconX />
+          </button>
+        </div>
+
+        {/* Fields */}
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px 20px", paddingTop: "18px", borderTop: "1px solid rgba(13,43,31,0.07)" }}>
+          {field("Phone", user.phone)}
+          {field("WhatsApp", user.whatsapp)}
+          {field("City", user.city)}
+          {field("Nationality", user.nationality)}
+          {field("Joined", fmtDate(user.created_at))}
+          {field("Role", user.role ?? "buyer")}
+        </div>
+
+        {user.bio && (
+          <div style={{ marginTop: "18px" }}>
+            <div style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" as const, color: "#9CA3AF", marginBottom: "5px" }}>Bio</div>
+            <div style={{ background: "#F8F6F1", borderRadius: "8px", padding: "10px 14px", fontSize: "12px", color: "#374151", lineHeight: 1.6 }}>{user.bio}</div>
+          </div>
+        )}
+
+        <p style={{ marginTop: "18px", fontSize: "11px", color: "#9CA3AF" }}>
+          Email not stored in profiles.
+        </p>
+      </div>
+    </div>
+  );
+}
+
 function UsersSection({
   users, loading, onRoleChange,
 }: {
@@ -544,18 +654,104 @@ function UsersSection({
   loading: boolean;
   onRoleChange: (userId: string, newRole: string) => void;
 }) {
+  const [search,     setSearch]     = useState("");
+  const [roleFilter, setRoleFilter] = useState<string>("all");
+  const [sort,       setSort]       = useState<UserSort>("newest");
+  const [selected,   setSelected]   = useState<UserRow | null>(null);
+
+  const filtered = React.useMemo(() => {
+    const q = search.trim().toLowerCase();
+    let list = users;
+    if (q) {
+      list = list.filter(u =>
+        (u.full_name ?? "").toLowerCase().includes(q) ||
+        (u.phone ?? "").toLowerCase().includes(q)
+      );
+    }
+    if (roleFilter !== "all") list = list.filter(u => (u.role ?? "buyer") === roleFilter);
+    const sorted = [...list];
+    if (sort === "newest")  sorted.sort((a, b) => (b.created_at ?? "").localeCompare(a.created_at ?? ""));
+    if (sort === "oldest")  sorted.sort((a, b) => (a.created_at ?? "").localeCompare(b.created_at ?? ""));
+    if (sort === "name_az") sorted.sort((a, b) => (a.full_name ?? "").localeCompare(b.full_name ?? ""));
+    if (sort === "name_za") sorted.sort((a, b) => (b.full_name ?? "").localeCompare(a.full_name ?? ""));
+    return sorted;
+  }, [users, search, roleFilter, sort]);
+
   if (loading) return <Spinner />;
+
+  const filtersActive = search.trim() !== "" || roleFilter !== "all";
+
   return (
     <div>
       <SectionHeading title="All Users" subtitle="Manage user roles across the platform." count={users.length} />
+
+      {/* Controls */}
+      <div style={{ display: "flex", flexDirection: "column", gap: "12px", marginBottom: "18px" }}>
+        <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", alignItems: "center" }}>
+          <input
+            type="text"
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            placeholder="Search by name or phone…"
+            aria-label="Search users by name or phone"
+            style={{ flex: "1 1 240px", padding: "10px 14px", background: "#fff", border: "1.5px solid rgba(13,43,31,0.12)", borderRadius: "9px", fontSize: "13px", color: "#374151", fontFamily: "'DM Sans', sans-serif", outlineColor: "#2BA8E0" }}
+          />
+          <div style={{ position: "relative", flexShrink: 0 }}>
+            <select
+              value={sort}
+              onChange={e => setSort(e.target.value as UserSort)}
+              aria-label="Sort users"
+              style={{ padding: "10px 30px 10px 12px", background: "#fff", border: "1.5px solid rgba(13,43,31,0.12)", borderRadius: "9px", fontSize: "12px", color: "#374151", fontFamily: "'DM Sans', sans-serif", outlineColor: "#2BA8E0", appearance: "none", cursor: "pointer" }}
+            >
+              {(Object.keys(USER_SORT_LABELS) as UserSort[]).map(k => (
+                <option key={k} value={k}>{USER_SORT_LABELS[k]}</option>
+              ))}
+            </select>
+            <span style={{ position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)", pointerEvents: "none", color: "#9CA3AF", fontSize: 9 }}>▼</span>
+          </div>
+        </div>
+        {/* Role filter pills */}
+        <div style={{ display: "flex", gap: "6px", flexWrap: "wrap" }}>
+          {["all", ...ROLE_FILTER_OPTIONS].map(r => {
+            const on = roleFilter === r;
+            return (
+              <button
+                key={r}
+                onClick={() => setRoleFilter(r)}
+                style={{ padding: "5px 12px", borderRadius: "100px", fontSize: "11px", fontWeight: on ? 700 : 500, letterSpacing: "0.03em", background: on ? "#121519" : "#fff", color: on ? "#FFFFFF" : "#374151", border: on ? "1.5px solid #121519" : "1.5px solid rgba(13,43,31,0.12)", cursor: "pointer", fontFamily: "'DM Sans', sans-serif", textTransform: "capitalize" as const, transition: "all 0.14s" }}
+              >
+                {r === "all" ? "All" : r.replace(/_/g, " ")}
+              </button>
+            );
+          })}
+        </div>
+        {filtersActive && (
+          <div style={{ fontSize: "12px", color: "#6B7C72" }}>
+            {filtered.length} of {users.length} users
+          </div>
+        )}
+      </div>
+
       {users.length === 0 ? (
         <div style={{ padding: "60px 24px", textAlign: "center", background: "#fff", borderRadius: "18px", border: "1px solid rgba(13,43,31,0.07)" }}>
           <p style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "20px", color: "#000000" }}>No users found</p>
         </div>
+      ) : filtered.length === 0 ? (
+        <div style={{ padding: "60px 24px", textAlign: "center", background: "#fff", borderRadius: "18px", border: "1px solid rgba(13,43,31,0.07)" }}>
+          <p style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "20px", color: "#000000", marginBottom: "6px" }}>No users match</p>
+          <p style={{ fontSize: "13px", color: "#9CA3AF" }}>Try adjusting the search or role filter.</p>
+        </div>
       ) : (
         <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-          {users.map(u => (
-            <div key={u.id} style={{ background: "#fff", borderRadius: "12px", border: "1px solid rgba(13,43,31,0.07)", padding: "16px 20px", display: "flex", alignItems: "center", gap: "16px", flexWrap: "wrap" }}>
+          {filtered.map(u => (
+            <div
+              key={u.id}
+              onClick={() => setSelected(u)}
+              role="button"
+              tabIndex={0}
+              onKeyDown={e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setSelected(u); } }}
+              style={{ background: "#fff", borderRadius: "12px", border: "1px solid rgba(13,43,31,0.07)", padding: "16px 20px", display: "flex", alignItems: "center", gap: "16px", flexWrap: "wrap", cursor: "pointer" }}
+            >
               {/* Avatar */}
               <div style={{ width: "40px", height: "40px", borderRadius: "50%", background: "rgba(201,168,76,0.12)", border: "1.5px solid rgba(201,168,76,0.3)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, fontSize: "14px", fontWeight: 700, color: "#2BA8E0", fontFamily: "'DM Sans', sans-serif" }}>
                 {(u.full_name ?? "?").slice(0, 1).toUpperCase()}
@@ -567,15 +763,16 @@ function UsersSection({
                 </div>
                 <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", marginTop: "3px" }}>
                   {u.city && <span style={{ fontSize: "11px", color: "#9CA3AF" }}>{u.city}</span>}
-                  <span style={{ fontSize: "11px", color: "#9CA3AF" }}>Joined {fmtDate(u.created_at)}</span>
+                  <span style={{ fontSize: "11px", color: "#9CA3AF" }}>Joined {u.created_at ? fmtDate(u.created_at) : "—"}</span>
                 </div>
               </div>
               <RoleBadge role={u.role} />
               {/* Role dropdown */}
-              <div style={{ position: "relative", flexShrink: 0 }}>
+              <div style={{ position: "relative", flexShrink: 0 }} onClick={e => e.stopPropagation()}>
                 <select
                   value={u.role ?? "buyer"}
                   onChange={e => onRoleChange(u.id, e.target.value)}
+                  onKeyDown={e => e.stopPropagation()}
                   style={{ padding: "6px 28px 6px 10px", background: "#F8F6F1", border: "1.5px solid rgba(13,43,31,0.12)", borderRadius: "7px", fontSize: "12px", color: "#374151", fontFamily: "'DM Sans', sans-serif", outline: "none", appearance: "none", cursor: "pointer" }}
                 >
                   {ROLE_OPTIONS.map(r => (
@@ -588,6 +785,8 @@ function UsersSection({
           ))}
         </div>
       )}
+
+      {selected && <UserDetailModal user={selected} onClose={() => setSelected(null)} />}
     </div>
   );
 }
@@ -784,7 +983,7 @@ export default function AdminPage() {
       setUsersLoading(true);
       supabase
         .from("profiles")
-        .select("id, full_name, city, role, phone, created_at")
+        .select("id, full_name, city, role, phone, created_at, is_verified, is_active, is_nri, whatsapp, nationality, bio")
         .order("created_at", { ascending: false })
         .then((res: { data: unknown }) => {
           setUsers((res.data as UserRow[] | null) ?? []);
