@@ -39,6 +39,7 @@ type UserRow = {
   city: string | null;
   role: string | null;
   phone: string | null;
+  email: string | null;
   created_at: string;
   is_verified: boolean | null;
   is_active: boolean | null;
@@ -624,6 +625,7 @@ function UserDetailModal({ user, onClose }: { user: UserRow; onClose: () => void
 
         {/* Fields */}
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px 20px", paddingTop: "18px", borderTop: "1px solid rgba(13,43,31,0.07)" }}>
+          {field("Email", user.email ? <a href={`mailto:${user.email}`} style={{ color: "#374151" }}>{user.email}</a> : null)}
           {field("Phone", user.phone)}
           {field("WhatsApp", user.whatsapp)}
           {field("City", user.city)}
@@ -639,9 +641,6 @@ function UserDetailModal({ user, onClose }: { user: UserRow; onClose: () => void
           </div>
         )}
 
-        <p style={{ marginTop: "18px", fontSize: "11px", color: "#9CA3AF" }}>
-          Email not stored in profiles.
-        </p>
       </div>
     </div>
   );
@@ -665,7 +664,8 @@ function UsersSection({
     if (q) {
       list = list.filter(u =>
         (u.full_name ?? "").toLowerCase().includes(q) ||
-        (u.phone ?? "").toLowerCase().includes(q)
+        (u.phone ?? "").toLowerCase().includes(q) ||
+        (u.email ?? "").toLowerCase().includes(q)
       );
     }
     if (roleFilter !== "all") list = list.filter(u => (u.role ?? "buyer") === roleFilter);
@@ -692,8 +692,8 @@ function UsersSection({
             type="text"
             value={search}
             onChange={e => setSearch(e.target.value)}
-            placeholder="Search by name or phone…"
-            aria-label="Search users by name or phone"
+            placeholder="Search by name, phone, or email…"
+            aria-label="Search users by name, phone, or email"
             style={{ flex: "1 1 240px", padding: "10px 14px", background: "#fff", border: "1.5px solid rgba(13,43,31,0.12)", borderRadius: "9px", fontSize: "13px", color: "#374151", fontFamily: "'DM Sans', sans-serif", outlineColor: "#2BA8E0" }}
           />
           <div style={{ position: "relative", flexShrink: 0 }}>
@@ -983,7 +983,7 @@ export default function AdminPage() {
       setUsersLoading(true);
       supabase
         .from("profiles")
-        .select("id, full_name, city, role, phone, created_at, is_verified, is_active, is_nri, whatsapp, nationality, bio")
+        .select("id, full_name, city, role, phone, email, created_at, is_verified, is_active, is_nri, whatsapp, nationality, bio")
         .order("created_at", { ascending: false })
         .then((res: { data: unknown }) => {
           setUsers((res.data as UserRow[] | null) ?? []);
