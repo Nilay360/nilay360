@@ -318,7 +318,7 @@ export default function HomePage() {
         .insight-bar { height:6px; border-radius:6px; background:${G.gold}; transition:width 0.5s ease; }
 
         /* ── Stats as glass pills ── */
-        .hero-stat { flex:1; padding:14px 22px; border-left:1px solid rgba(43,168,224,0.15); position:relative; }
+        .hero-stat { flex:1; padding:9px 14px; border-left:1px solid rgba(43,168,224,0.15); position:relative; box-sizing:border-box; }
         .hero-stat:first-child { border-left:none; }
 
         .section-divider { height: 1px; background: linear-gradient(90deg, transparent 0%, rgba(43,168,224,0.20) 50%, transparent 100%); margin: 0; }
@@ -370,8 +370,8 @@ export default function HomePage() {
           .hero-subline { font-size: 14px !important; margin-bottom: 24px !important; line-height: 1.6 !important; }
           .hero-searchbox { margin-bottom: 24px !important; border-radius: 16px !important; }
           .hero-stats { padding-top: 20px !important; padding-bottom: 0 !important; margin-bottom: 0 !important; gap: 10px !important; }
-          .hero-stat { padding: 10px 10px; border-left: none !important; }
-          .hero-stat div:first-child { font-size: 18px !important; }
+          .hero-stat { padding: 7px 8px; border-left: none !important; }
+          .hero-stat div:first-child { font-size: 15px !important; }
           .svc-card { min-width: 85px; padding: 14px 8px; gap: 8px; }
           .svc-icon-wrap { width: 38px; height: 38px; border-radius: 10px; }
           .city-tab { padding: 6px 10px; font-size: 11px; }
@@ -390,9 +390,9 @@ export default function HomePage() {
         @media (max-width: 480px) {
           .hero-content { padding-top: 84px !important; }
           .hero-h1 { font-size: clamp(28px, 9vw, 38px) !important; }
-          .hero-stat { flex: 1 1 50% !important; padding: 8px 8px !important; min-width: 0 !important; border-left: none !important; }
-          .hero-stat div:first-child { font-size: 18px !important; }
-          .hero-stat div:last-child { font-size: 9px !important; }
+          .hero-stat { flex: 1 1 calc(50% - 6px) !important; padding: 6px 6px !important; min-width: 0 !important; border-left: none !important; }
+          .hero-stat div:first-child { font-size: 15px !important; }
+          .hero-stat div:last-child { font-size: 8px !important; }
           .svc-card { min-width: 75px; padding: 10px 4px; font-size: 10px; }
           .premium-card { width: 230px !important; }
           .loc-card { width: 140px !important; height: 140px !important; }
@@ -790,9 +790,9 @@ export default function HomePage() {
           {/* 3 — Stats strip */}
           <div className="hero-stats" style={{display:"flex", flexWrap:"wrap", justifyContent:"center", gap:"12px", width:"100%", maxWidth:"100%", boxSizing:"border-box", marginBottom:40, paddingBottom:32, borderBottom:"1px solid rgba(43,168,224,0.12)", position:"relative", zIndex:2}}>
             {[["2,400+","Listings"],["500+","Agents"],["14","Cities"],["₹18,000Cr","Deals Closed"]].map(([v,l])=>(
-              <div key={l} className="hero-stat" style={{background:"rgba(255,255,255,0.04)", backdropFilter:"blur(12px)", WebkitBackdropFilter:"blur(12px)", border:"1px solid rgba(43,168,224,0.12)", borderRadius:16, flex:"1 1 auto"}}>
-                <div className="stat-value" style={{fontFamily:"'Cormorant Garamond',Georgia,serif", fontSize:26, fontWeight:600, background:"linear-gradient(135deg, #E8EAED 0%, #2BA8E0 100%)", WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent"}}>{v}</div>
-                <div style={{fontSize:11, color:"rgba(255,255,255,0.50)", marginTop:3, letterSpacing:"0.06em", textTransform:"uppercase"}}>{l}</div>
+              <div key={l} className="hero-stat" style={{background:"rgba(255,255,255,0.04)", backdropFilter:"blur(12px)", WebkitBackdropFilter:"blur(12px)", border:"1px solid rgba(43,168,224,0.12)", borderRadius:12, flex:"1 1 auto"}}>
+                <div className="stat-value" style={{fontFamily:"'Cormorant Garamond',Georgia,serif", fontSize:19, fontWeight:600, background:"linear-gradient(135deg, #E8EAED 0%, #2BA8E0 100%)", WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent"}}>{v}</div>
+                <div style={{fontSize:9.5, color:"rgba(255,255,255,0.50)", marginTop:2, letterSpacing:"0.06em", textTransform:"uppercase"}}>{l}</div>
               </div>
             ))}
           </div>
