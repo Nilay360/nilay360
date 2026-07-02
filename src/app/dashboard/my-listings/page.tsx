@@ -72,7 +72,7 @@ export default function MyListingsPage() {
   if (loading) {
     return (
       <div style={{ minHeight: "100vh", background: G.ivory, display: "flex", alignItems: "center", justifyContent: "center" }}>
-        <span style={{ color: G.dark, fontFamily: "'DM Sans', sans-serif", fontSize: 14, opacity: 0.5 }}>Loading…</span>
+        <span style={{ color: "#AEB4BC", fontFamily: "'DM Sans', sans-serif", fontSize: 14 }}>Loading…</span>
       </div>
     );
   }
@@ -80,7 +80,7 @@ export default function MyListingsPage() {
   if (!email) {
     return (
       <div style={{ minHeight: "100vh", background: G.ivory, paddingTop: 64, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 16 }}>
-        <p style={{ color: G.dark, fontFamily: "'DM Sans', sans-serif", fontSize: 16 }}>Please sign in to view your listings.</p>
+        <p style={{ color: "#E8EAED", fontFamily: "'DM Sans', sans-serif", fontSize: 16 }}>Please sign in to view your listings.</p>
         <Link href="/login" style={{ color: G.gold, fontWeight: 600, fontFamily: "'DM Sans', sans-serif", textDecoration: "none" }}>Sign In →</Link>
       </div>
     );
@@ -108,12 +108,12 @@ export default function MyListingsPage() {
           <div>
             <h1 style={{
               fontFamily: "'Cormorant Garamond', Georgia, serif",
-              fontSize: 34, fontWeight: 600, color: G.dark,
+              fontSize: 34, fontWeight: 600, color: "#E8EAED",
               margin: 0, lineHeight: 1.15,
             }}>
               My Listings
             </h1>
-            <p style={{ color: "rgba(13,43,31,0.5)", fontFamily: "'DM Sans', sans-serif", fontSize: 14, margin: "6px 0 0" }}>
+            <p style={{ color: "#AEB4BC", fontFamily: "'DM Sans', sans-serif", fontSize: 14, margin: "6px 0 0" }}>
               {listings.length} {listings.length === 1 ? "property" : "properties"} · {email}
             </p>
           </div>
@@ -121,8 +121,8 @@ export default function MyListingsPage() {
             <Link href="/dashboard" style={{ textDecoration: "none" }}>
               <button style={{
                 padding: "9px 16px", fontSize: 13, fontWeight: 500,
-                color: G.dark, background: "transparent",
-                border: "1px solid rgba(13,43,31,0.2)", borderRadius: 8,
+                color: "#E8EAED", background: "rgba(255,255,255,0.05)",
+                border: "1px solid rgba(255,255,255,0.15)", borderRadius: 8,
                 cursor: "pointer", fontFamily: "'DM Sans', sans-serif",
               }}>
                 ← Dashboard
@@ -131,8 +131,9 @@ export default function MyListingsPage() {
             <Link href="/post-property" style={{ textDecoration: "none" }}>
               <button style={{
                 padding: "9px 18px", fontSize: 13, fontWeight: 600,
-                color: "#0a0a0a", background: G.gold,
-                border: "none", borderRadius: 8,
+                color: "#000000", background: G.gold,
+                border: "none", borderRadius: 999,
+                boxShadow: "0 10px 30px rgba(30,167,255,.35)",
                 cursor: "pointer", fontFamily: "'DM Sans', sans-serif",
               }}>
                 + New Listing
@@ -145,7 +146,7 @@ export default function MyListingsPage() {
         {listings.length === 0 && (
           <div style={{
             textAlign: "center", padding: "80px 0",
-            color: "rgba(13,43,31,0.38)", fontFamily: "'DM Sans', sans-serif",
+            color: "rgba(255,255,255,0.45)", fontFamily: "'DM Sans', sans-serif",
           }}>
             <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.25" style={{ opacity: 0.35, marginBottom: 16 }}>
               <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
@@ -163,24 +164,26 @@ export default function MyListingsPage() {
           {listings.map(listing => {
             const thumb = listing.images?.[0] ?? null;
             const statusColors: Record<string, { text: string; bg: string; label: string }> = {
-              active:         { text: "#065F46", bg: "rgba(16,185,129,0.1)",   label: "Active"          },
-              pending_review: { text: "#92400E", bg: "rgba(245,158,11,0.1)",   label: "Pending Review"  },
-              pending:        { text: "#92400E", bg: "rgba(245,158,11,0.1)",   label: "Pending"         },
-              rejected:       { text: "#B91C1C", bg: "rgba(239,68,68,0.1)",    label: "Rejected"        },
-              inactive:       { text: "#6b7280", bg: "rgba(107,114,128,0.08)", label: "Inactive"        },
-              sold:           { text: "#7c3aed", bg: "rgba(124,58,237,0.08)",  label: "Sold"            },
+              active:         { text: "#2BA8E0", bg: "rgba(43,168,224,0.15)",   label: "Active"          },
+              pending_review: { text: "#AEB4BC", bg: "rgba(255,255,255,0.10)",   label: "Pending Review"  },
+              pending:        { text: "#AEB4BC", bg: "rgba(255,255,255,0.10)",   label: "Pending"         },
+              rejected:       { text: "#F87171", bg: "rgba(248,113,113,0.15)",    label: "Rejected"        },
+              inactive:       { text: "#AEB4BC", bg: "rgba(255,255,255,0.10)", label: "Inactive"        },
+              sold:           { text: "#C4B5FD", bg: "rgba(139,92,246,0.15)",  label: "Sold"            },
             };
-            const sc = statusColors[listing.status] ?? { text: "#6b7280", bg: "rgba(107,114,128,0.08)", label: listing.status };
+            const sc = statusColors[listing.status] ?? { text: "#AEB4BC", bg: "rgba(255,255,255,0.10)", label: listing.status };
 
             return (
               <div
                 key={listing.id}
                 className="ml-card"
                 style={{
-                  background: "#ffffff",
-                  borderRadius: 12,
-                  border: "1px solid rgba(13,43,31,0.09)",
-                  boxShadow: "0 2px 12px rgba(13,43,31,0.05)",
+                  background: "rgba(255,255,255,0.05)",
+                  backdropFilter: "blur(24px)",
+                  WebkitBackdropFilter: "blur(24px)",
+                  borderRadius: 16,
+                  border: "1px solid rgba(255,255,255,0.08)",
+                  boxShadow: "0 4px 24px rgba(0,0,0,0.18)",
                   overflow: "hidden",
                   display: "flex",
                 }}
@@ -194,7 +197,7 @@ export default function MyListingsPage() {
                   display: "flex", alignItems: "center", justifyContent: "center",
                 }}>
                   {!thumb && (
-                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="rgba(201,168,76,0.35)" strokeWidth="1.5">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="rgba(43,168,224,0.35)" strokeWidth="1.5">
                       <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
                       <polyline points="9 22 9 12 15 12 15 22"/>
                     </svg>
@@ -213,26 +216,26 @@ export default function MyListingsPage() {
                       }}>
                         {sc.label}
                       </span>
-                      <span style={{ fontSize: 12, color: "rgba(13,43,31,0.4)", fontFamily: "'DM Sans', sans-serif" }}>
+                      <span style={{ fontSize: 12, color: "rgba(255,255,255,0.45)", fontFamily: "'DM Sans', sans-serif" }}>
                         {[listing.property_category, listing.listing_type].filter(Boolean).join(" · ")}
                       </span>
                     </div>
                     <h3 style={{
                       fontFamily: "'Cormorant Garamond', Georgia, serif",
-                      fontSize: 19, fontWeight: 600, color: G.dark,
+                      fontSize: 19, fontWeight: 600, color: "#E8EAED",
                       margin: "0 0 4px", lineHeight: 1.2,
                     }}>
                       {listing.title ?? "Untitled"}
                     </h3>
                     <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
-                      <span style={{ fontSize: 13, color: "rgba(13,43,31,0.55)", fontFamily: "'DM Sans', sans-serif" }}>
+                      <span style={{ fontSize: 13, color: "#AEB4BC", fontFamily: "'DM Sans', sans-serif" }}>
                         {listing.city ?? "—"}
                       </span>
-                      <span style={{ fontSize: 13, fontWeight: 600, color: G.dark, fontFamily: "'DM Sans', sans-serif" }}>
+                      <span style={{ fontSize: 13, fontWeight: 600, color: "#E8EAED", fontFamily: "'DM Sans', sans-serif" }}>
                         {listing.price != null ? fmtPrice(listing.price) : "Price on request"}
                       </span>
                     </div>
-                    <div style={{ fontSize: 11.5, color: "rgba(13,43,31,0.35)", fontFamily: "'DM Sans', sans-serif", marginTop: 4 }}>
+                    <div style={{ fontSize: 11.5, color: "rgba(255,255,255,0.45)", fontFamily: "'DM Sans', sans-serif", marginTop: 4 }}>
                       Listed {fmtDate(listing.submitted_at)}
                     </div>
                   </div>
@@ -243,8 +246,8 @@ export default function MyListingsPage() {
                       <Link href={`/properties/${listing.slug}`} style={{ textDecoration: "none" }}>
                         <button style={{
                           padding: "7px 14px", fontSize: 13, fontWeight: 500,
-                          color: G.dark, background: "transparent",
-                          border: "1px solid rgba(13,43,31,0.18)",
+                          color: "#E8EAED", background: "rgba(255,255,255,0.05)",
+                          border: "1px solid rgba(255,255,255,0.15)",
                           borderRadius: 7, cursor: "pointer",
                           fontFamily: "'DM Sans', sans-serif",
                         }}>
@@ -254,8 +257,9 @@ export default function MyListingsPage() {
                     )}
                     <Link href={`/post-property/edit/${listing.id}`} style={{ textDecoration: "none" }}>
                       <button style={{
-                        padding: "7px 14px", fontSize: 13, fontWeight: 500,
-                        color: "#ffffff", background: G.dark,
+                        padding: "7px 14px", fontSize: 13, fontWeight: 600,
+                        color: "#000000", background: G.gold,
+                        boxShadow: "0 10px 30px rgba(30,167,255,.35)",
                         border: "none", borderRadius: 7, cursor: "pointer",
                         fontFamily: "'DM Sans', sans-serif",
                       }}>
@@ -267,9 +271,9 @@ export default function MyListingsPage() {
                       disabled={deleting === listing.id}
                       style={{
                         padding: "7px 14px", fontSize: 13, fontWeight: 500,
-                        color: deleting === listing.id ? "#aaa" : "#e05555",
-                        background: "transparent",
-                        border: `1px solid ${deleting === listing.id ? "rgba(170,170,170,0.3)" : "rgba(224,85,85,0.25)"}`,
+                        color: deleting === listing.id ? "rgba(255,255,255,0.45)" : "#F87171",
+                        background: "rgba(248,113,113,0.10)",
+                        border: `1px solid ${deleting === listing.id ? "rgba(255,255,255,0.20)" : "rgba(248,113,113,0.30)"}`,
                         borderRadius: 7, cursor: deleting === listing.id ? "not-allowed" : "pointer",
                         fontFamily: "'DM Sans', sans-serif",
                         transition: "border-color 0.15s, color 0.15s",
