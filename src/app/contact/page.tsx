@@ -127,6 +127,18 @@ export default function ContactPage() {
         message: form.message,
       });
       if (dbErr) throw dbErr;
+      // Fire-and-forget email notification to support inbox
+      fetch("/api/send-support-email", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: form.full_name,
+          email: form.email,
+          phone: form.phone ? `+91${form.phone}` : undefined,
+          subject: form.subject,
+          message: form.message,
+        }),
+      }).catch(() => {/* non-fatal */});
       setSuccess(true);
       setForm(EMPTY_FORM);
     } catch (err) {

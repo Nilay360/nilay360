@@ -7,6 +7,7 @@ import CompareBar from "@/components/property/CompareBar"
 import { AuthProvider } from "@/context/AuthContext"
 import AuthModal from "@/components/auth/AuthModal"
 import { PostHogProvider, PostHogPageView } from "@/components/providers/PostHogProvider"
+import FloatingContactMenu from "@/components/contact/FloatingContactMenu"
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://nilay360.com"),
@@ -75,6 +76,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               </Suspense>
               {children}
               <CompareBar />
+              <FloatingContactMenu />
             </CompareProvider>
             <AuthModal />
           </AuthProvider>
