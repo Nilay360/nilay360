@@ -214,9 +214,9 @@ export default function ContactPage() {
             {/* Quick contact pills */}
             <div className="ct-hero-pills" style={{ display: "flex", gap: "12px", justifyContent: "center", flexWrap: "wrap", animation: "fadeUp 0.55s 0.2s ease-out both" }}>
               {[
-                { icon: "📞", label: "Call Us", value: "+91 40 0000 0000", href: "tel:+914000000000" },
-                { icon: "✉", label: "Email",   value: "hello@nilay360.com",  href: "mailto:hello@nilay360.com" },
-                { icon: "💬", label: "WhatsApp",value: "+91 90000 00000",  href: "https://wa.me/919000000000" },
+                { icon: "📞", label: "Call Us",  value: "+91 7075 792497",        href: "tel:+917075792497" },
+                { icon: "✉",  label: "Email",   value: "contact@nilay360.com", href: "mailto:contact@nilay360.com" },
+                { icon: "💬", label: "WhatsApp", value: "+91 7075 792497",      href: "https://wa.me/917075792497?text=Hi%2C%20I%27m%20interested%20in%20a%20property%20on%20Nilay%20360" },
               ].map(p => (
                 <a key={p.label} href={p.href} style={{ display: "flex", alignItems: "center", gap: "10px", padding: "10px 20px", background: "rgba(245,242,236,0.06)", border: "1px solid rgba(245,242,236,0.13)", borderRadius: "100px", textDecoration: "none", transition: "border-color 0.15s" }}
                   onMouseEnter={e => (e.currentTarget.style.borderColor = "rgba(201,168,76,0.4)")}
@@ -349,9 +349,9 @@ export default function ContactPage() {
                 </div>
                 {[
                   { icon: "📍", label: "Address",  value: "Jubilee Hills, Hyderabad\nTelangana — 500 033" },
-                  { icon: "📞", label: "Phone",    value: "+91 40 0000 0000", href: "tel:+914000000000" },
-                  { icon: "✉",  label: "Email",    value: "hello@nilay360.com",  href: "mailto:hello@nilay360.com" },
-                  { icon: "💬", label: "WhatsApp", value: "+91 90000 00000",   href: "https://wa.me/919000000000" },
+                  { icon: "📞", label: "Phone",    value: "+91 7075 792497",        href: "tel:+917075792497" },
+                  { icon: "✉",  label: "Email",    value: "contact@nilay360.com",   href: "mailto:contact@nilay360.com" },
+                  { icon: "💬", label: "WhatsApp", value: "+91 7075 792497",         href: "https://wa.me/917075792497?text=Hi%2C%20I%27m%20interested%20in%20a%20property%20on%20Nilay%20360" },
                   { icon: "🕐", label: "Hours",    value: "Mon – Sat · 9 AM – 7 PM IST" },
                 ].map(item => (
                   <div key={item.label} style={{ display: "flex", gap: "14px", alignItems: "flex-start", padding: "14px 0", borderBottom: "1px solid rgba(245,242,236,0.06)" }}>
@@ -486,7 +486,7 @@ export default function ContactPage() {
                 Browse Properties
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" /></svg>
               </a>
-              <a href="https://wa.me/919000000000" style={{ padding: "14px 36px", background: "transparent", border: "1.5px solid rgba(245,242,236,0.2)", borderRadius: "9px", color: "rgba(245,242,236,0.75)", fontSize: "13px", fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase", textDecoration: "none", display: "inline-flex", alignItems: "center", gap: "8px" }}>
+              <a href="https://wa.me/917075792497?text=Hi%2C%20I%27m%20interested%20in%20a%20property%20on%20Nilay%20360" style={{ padding: "14px 36px", background: "transparent", border: "1.5px solid rgba(245,242,236,0.2)", borderRadius: "9px", color: "rgba(245,242,236,0.75)", fontSize: "13px", fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase", textDecoration: "none", display: "inline-flex", alignItems: "center", gap: "8px" }}>
                 <span style={{ fontSize: "16px" }}>💬</span> WhatsApp Us
               </a>
             </div>
