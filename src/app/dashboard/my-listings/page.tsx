@@ -15,7 +15,7 @@ interface Listing {
   status: string;
   submitted_at: string;
   slug: string | null;
-  images: string[] | null;
+  photo_urls: string[] | null;
 }
 
 const G = { dark: "#000000", gold: "#2BA8E0", ivory: "#000000", mid: "#0B0D10" };
@@ -41,12 +41,16 @@ export default function MyListingsPage() {
     const supabase = createClient();
     supabase.auth.getSession().then(({ data }: { data: { session: Session | null } }) => {
       const userEmail = data.session?.user?.email ?? null;
+      const userId    = data.session?.user?.id ?? null;
       setEmail(userEmail);
-      if (!userEmail) { setLoading(false); return; }
+      if (!userEmail && !userId) { setLoading(false); return; }
+      const filter = userId && userEmail
+        ? `seller_email.eq.${userEmail},user_id.eq.${userId}`
+        : userEmail ? `seller_email.eq.${userEmail}` : `user_id.eq.${userId}`;
       supabase
         .from("property_listings")
-        .select("id, title, city, property_category, listing_type, price, status, submitted_at, slug, images")
-        .eq("seller_email", userEmail)
+        .select("id, title, city, property_category, listing_type, price, status, submitted_at, slug, photo_urls")
+        .or(filter)
         .order("submitted_at", { ascending: false })
         .then(({ data: rows }: { data: Listing[] | null }) => {
           setListings(rows ?? []);
@@ -164,7 +168,7 @@ export default function MyListingsPage() {
         {/* Listing cards */}
         <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
           {listings.map(listing => {
-            const thumb = listing.images?.[0] ?? null;
+            const thumb = listing.photo_urls?.[0] ?? null;
             const statusColors: Record<string, { text: string; bg: string; label: string }> = {
               active:         { text: "#2BA8E0", bg: "rgba(43,168,224,0.15)",   label: "Active"          },
               pending_review: { text: "#AEB4BC", bg: "rgba(255,255,255,0.10)",   label: "Pending Review"  },

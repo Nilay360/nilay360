@@ -106,7 +106,7 @@ export function Footer() {
                   <li key={link.href}>
                     <Link
                       href={link.href}
-                      className="text-[13px] text-white/50 hover:text-white transition-colors duration-150"
+                      className="text-[13px] text-white/65 hover:text-white transition-colors duration-150"
                     >
                       {link.label}
                     </Link>
@@ -127,7 +127,7 @@ export function Footer() {
               <Link
                 key={city}
                 href={`/locations/${city.toLowerCase().replace(/\s+/g, "-")}`}
-                className="text-[12px] text-white/40 hover:text-[#3DBEF5] transition-colors"
+                className="text-[12px] text-white/60 hover:text-[#3DBEF5] transition-colors"
               >
                 {city}
               </Link>

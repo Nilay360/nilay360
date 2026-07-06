@@ -15,13 +15,13 @@ interface PropertyDetail {
   id: string;
   slug: string | null;
   title: string | null;
-  type: string | null;
+  property_category: string | null;
   listing_type: string | null;
   price: number | null;
   city: string | null;
-  neighbourhood: string | null;
+  locality: string | null;
   bedrooms: number | null;
-  images: string[] | null;
+  photo_urls: string[] | null;
 }
 
 interface SavedItem extends SaveRow {
@@ -82,8 +82,8 @@ export default function SavedPropertiesPage() {
         const propMap: Record<string, PropertyDetail> = {};
         if (ids.length > 0) {
           const { data: props, error: propsErr } = await supabase
-            .from("properties")
-            .select("id, slug, title, type, listing_type, price, city, neighbourhood, bedrooms, images")
+            .from("property_listings")
+            .select("id, slug, title, property_category, listing_type, price, city, locality, bedrooms, photo_urls")
             .in("id", ids);
           if (propsErr) {
             console.error("Saved page — properties join error:", propsErr);
@@ -199,7 +199,7 @@ export default function SavedPropertiesPage() {
           <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
             {items.map(item => {
               const d = item.detail;
-              const thumb = d?.images?.[0] ?? null;
+              const thumb = d?.photo_urls?.[0] ?? null;
 
               return (
                 <div key={item.id} className="sv-card" style={{
@@ -238,9 +238,9 @@ export default function SavedPropertiesPage() {
                             }}>
                               {d.listing_type === "rent" ? "For Rent" : "For Sale"}
                             </span>
-                            {d.type && (
+                            {d.property_category && (
                               <span style={{ fontSize: 12, color: "rgba(255,255,255,0.45)", fontFamily: "'DM Sans', sans-serif", textTransform: "capitalize" }}>
-                                {d.type}
+                                {d.property_category}
                               </span>
                             )}
                           </div>
@@ -253,7 +253,7 @@ export default function SavedPropertiesPage() {
                           </h3>
                           <div style={{ display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
                             <span style={{ fontSize: 13, color: "#AEB4BC", fontFamily: "'DM Sans', sans-serif" }}>
-                              {[d.neighbourhood, d.city].filter(Boolean).join(", ") || "—"}
+                              {[d.locality, d.city].filter(Boolean).join(", ") || "—"}
                             </span>
                             {d.bedrooms != null && (
                               <span style={{ fontSize: 13, color: "#AEB4BC", fontFamily: "'DM Sans', sans-serif" }}>

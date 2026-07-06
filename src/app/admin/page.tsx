@@ -112,11 +112,11 @@ function IconBuilding(){ return <svg width="13" height="13" viewBox="0 0 24 24" 
 
 function StatusBadge({ status }: { status: string }) {
   const cfg: Record<string, { label: string; bg: string; color: string; border: string }> = {
-    pending_review: { label: "Pending",  bg: "rgba(245,158,11,0.1)",  color: "#92400E", border: "rgba(245,158,11,0.3)"  },
-    active:         { label: "Active",   bg: "rgba(16,185,129,0.1)",  color: "#065F46", border: "rgba(16,185,129,0.3)"  },
-    rejected:       { label: "Rejected", bg: "rgba(239,68,68,0.1)",   color: "#B91C1C", border: "rgba(239,68,68,0.3)"   },
+    pending_review: { label: "Pending",  bg: "rgba(245,158,11,0.15)",  color: "#F59E0B", border: "rgba(245,158,11,0.3)"  },
+    active:         { label: "Active",   bg: "rgba(52,211,153,0.15)",  color: "#34D399", border: "rgba(52,211,153,0.3)"  },
+    rejected:       { label: "Rejected", bg: "rgba(248,113,113,0.15)", color: "#F87171", border: "rgba(248,113,113,0.3)" },
   };
-  const c = cfg[status] ?? { label: status, bg: "rgba(107,114,128,0.1)", color: "#374151", border: "rgba(107,114,128,0.3)" };
+  const c = cfg[status] ?? { label: status, bg: "rgba(255,255,255,0.08)", color: "#AEB4BC", border: "rgba(255,255,255,0.12)" };
   return (
     <span style={{ display: "inline-block", padding: "3px 10px", borderRadius: "100px", fontSize: "10px", fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase" as const, background: c.bg, color: c.color, border: `1px solid ${c.border}` }}>
       {c.label}
@@ -127,7 +127,7 @@ function StatusBadge({ status }: { status: string }) {
 function RoleBadge({ role }: { role: string | null }) {
   const isAdmin = role === "admin" || role === "super_admin";
   return (
-    <span style={{ display: "inline-block", padding: "2px 8px", borderRadius: "100px", fontSize: "9px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" as const, background: isAdmin ? "rgba(201,168,76,0.15)" : "rgba(45,106,79,0.1)", color: isAdmin ? "#92400E" : "#065F46", border: `1px solid ${isAdmin ? "rgba(201,168,76,0.3)" : "rgba(45,106,79,0.2)"}` }}>
+    <span style={{ display: "inline-block", padding: "2px 8px", borderRadius: "100px", fontSize: "9px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" as const, background: isAdmin ? "rgba(43,168,224,0.15)" : "rgba(255,255,255,0.06)", color: isAdmin ? "#2BA8E0" : "#AEB4BC", border: `1px solid ${isAdmin ? "rgba(43,168,224,0.3)" : "rgba(255,255,255,0.1)"}` }}>
       {role ?? "user"}
     </span>
   );
@@ -138,21 +138,21 @@ function StatCard({ label, value, icon, accent, note }: {
   icon: React.ReactNode; accent?: "gold" | "green" | "red" | "blue"; note?: string;
 }) {
   const map = {
-    gold:  { bg: "rgba(201,168,76,0.1)",   color: "#2BA8E0" },
-    green: { bg: "rgba(45,106,79,0.1)",    color: "#121519" },
-    red:   { bg: "rgba(239,68,68,0.1)",    color: "#DC2626" },
-    blue:  { bg: "rgba(59,130,246,0.1)",   color: "#3B82F6" },
+    gold:  { bg: "rgba(43,168,224,0.12)",  color: "#2BA8E0" },
+    green: { bg: "rgba(52,211,153,0.12)",  color: "#34D399" },
+    red:   { bg: "rgba(248,113,113,0.12)", color: "#F87171" },
+    blue:  { bg: "rgba(96,165,250,0.12)",  color: "#60A5FA" },
   };
   const a = map[accent ?? "gold"];
   return (
-    <div style={{ background: "#fff", borderRadius: "14px", border: "1px solid rgba(13,43,31,0.07)", boxShadow: "0 1px 8px rgba(13,43,31,0.04)", padding: "22px 24px", display: "flex", alignItems: "center", gap: "18px", flex: "1 1 160px" }}>
+    <div style={{ background: "rgba(255,255,255,0.05)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", borderRadius: "14px", border: "1px solid rgba(255,255,255,0.08)", boxShadow: "0 4px 24px rgba(0,0,0,0.18)", padding: "22px 24px", display: "flex", alignItems: "center", gap: "18px", flex: "1 1 160px" }}>
       <div style={{ width: "46px", height: "46px", borderRadius: "12px", background: a.bg, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, color: a.color }}>
         {icon}
       </div>
       <div>
-        <div style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "30px", fontWeight: 600, color: "#000000", lineHeight: 1.1 }}>{value}</div>
-        <div style={{ fontSize: "12px", color: "#6B7C72", marginTop: "2px" }}>{label}</div>
-        {note && <div style={{ fontSize: "11px", color: "#9CA3AF", marginTop: "2px" }}>{note}</div>}
+        <div style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "30px", fontWeight: 600, color: "#E8EAED", lineHeight: 1.1 }}>{value}</div>
+        <div style={{ fontSize: "12px", color: "#AEB4BC", marginTop: "2px" }}>{label}</div>
+        {note && <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.45)", marginTop: "2px" }}>{note}</div>}
       </div>
     </div>
   );
@@ -162,11 +162,11 @@ function SectionHeading({ title, subtitle, count }: { title: string; subtitle?: 
   return (
     <div style={{ marginBottom: "24px", display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "12px", flexWrap: "wrap" }}>
       <div>
-        <h2 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "30px", fontWeight: 500, color: "#000000", lineHeight: 1.2 }}>{title}</h2>
-        {subtitle && <p style={{ fontSize: "13px", color: "#6B7C72", marginTop: "4px" }}>{subtitle}</p>}
+        <h2 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "30px", fontWeight: 500, color: "#E8EAED", lineHeight: 1.2 }}>{title}</h2>
+        {subtitle && <p style={{ fontSize: "13px", color: "#AEB4BC", marginTop: "4px" }}>{subtitle}</p>}
       </div>
       {count != null && count > 0 && (
-        <span style={{ padding: "5px 14px", borderRadius: "100px", fontSize: "12px", fontWeight: 700, background: "rgba(201,168,76,0.1)", color: "#92400E", border: "1px solid rgba(201,168,76,0.3)", flexShrink: 0 }}>
+        <span style={{ padding: "5px 14px", borderRadius: "100px", fontSize: "12px", fontWeight: 700, background: "rgba(43,168,224,0.12)", color: "#2BA8E0", border: "1px solid rgba(43,168,224,0.25)", flexShrink: 0 }}>
           {count}
         </span>
       )}
@@ -190,10 +190,10 @@ function ListingCard({
   const loc   = [listing.locality, listing.city].filter(Boolean).join(", ");
 
   return (
-    <div style={{ background: "#fff", borderRadius: "14px", border: "1px solid rgba(13,43,31,0.07)", boxShadow: "0 1px 8px rgba(13,43,31,0.04)", overflow: "hidden", opacity: inFlight ? 0.55 : 1, transition: "opacity 0.2s" }}>
+    <div style={{ background: "rgba(255,255,255,0.05)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", borderRadius: "14px", border: "1px solid rgba(255,255,255,0.08)", boxShadow: "0 4px 24px rgba(0,0,0,0.18)", overflow: "hidden", opacity: inFlight ? 0.55 : 1, transition: "opacity 0.2s" }}>
       <div style={{ display: "flex", gap: 0 }}>
         {/* Thumbnail */}
-        <div style={{ width: "150px", flexShrink: 0, position: "relative", background: "#000000", overflow: "hidden", minHeight: "140px" }}>
+        <div style={{ width: "150px", flexShrink: 0, position: "relative", background: "#0B0D10", overflow: "hidden", minHeight: "140px" }}>
           {thumb ? (
             <img src={thumb} alt={listing.title ?? "Property"} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
           ) : (
@@ -201,7 +201,7 @@ function ListingCard({
               <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
             </div>
           )}
-          <div style={{ position: "absolute", top: "8px", left: "8px", padding: "2px 8px", borderRadius: "100px", fontSize: "8px", fontWeight: 800, letterSpacing: "0.1em", textTransform: "uppercase" as const, background: listing.listing_type === "rent" ? "rgba(45,106,79,0.9)" : "rgba(201,168,76,0.9)", color: listing.listing_type === "rent" ? "#0B0D10" : "#000000" }}>
+          <div style={{ position: "absolute", top: "8px", left: "8px", padding: "2px 8px", borderRadius: "100px", fontSize: "8px", fontWeight: 800, letterSpacing: "0.1em", textTransform: "uppercase" as const, background: listing.listing_type === "rent" ? "rgba(52,211,153,0.85)" : "rgba(43,168,224,0.85)", color: "#000000" }}>
             {label}
           </div>
         </div>
@@ -211,12 +211,12 @@ function ListingCard({
             <div style={{ flex: 1, minWidth: 0 }}>
               <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px", flexWrap: "wrap" }}>
                 <StatusBadge status={listing.status} />
-                <span style={{ fontSize: "11px", color: "#9CA3AF" }}>{fmtDate(listing.submitted_at)}</span>
+                <span style={{ fontSize: "11px", color: "rgba(255,255,255,0.45)" }}>{fmtDate(listing.submitted_at)}</span>
               </div>
-              <h3 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "19px", fontWeight: 600, color: "#000000", lineHeight: 1.25, marginBottom: "4px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+              <h3 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "19px", fontWeight: 600, color: "#E8EAED", lineHeight: 1.25, marginBottom: "4px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                 {listing.title ?? `${listing.property_category ?? "Property"} in ${listing.city ?? "—"}`}
               </h3>
-              <div style={{ display: "flex", gap: "12px", fontSize: "12px", color: "#6B7C72", flexWrap: "wrap", alignItems: "center" }}>
+              <div style={{ display: "flex", gap: "12px", fontSize: "12px", color: "#AEB4BC", flexWrap: "wrap", alignItems: "center" }}>
                 {listing.property_category && <span style={{ textTransform: "capitalize" as const }}>{listing.property_category}</span>}
                 {loc && (
                   <span style={{ display: "flex", alignItems: "center", gap: "3px" }}>
@@ -224,7 +224,7 @@ function ListingCard({
                     {loc}
                   </span>
                 )}
-                <span style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "15px", fontWeight: 600, color: "#000000" }}>
+                <span style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "15px", fontWeight: 600, color: "#E8EAED" }}>
                   {fmtPrice(listing.price, listing.listing_type)}
                 </span>
               </div>
@@ -232,21 +232,21 @@ function ListingCard({
           </div>
 
           {/* Seller row */}
-          <div style={{ display: "flex", gap: "16px", flexWrap: "wrap", padding: "8px 12px", background: "#F8F6F1", borderRadius: "8px", fontSize: "12px" }}>
+          <div style={{ display: "flex", gap: "16px", flexWrap: "wrap", padding: "8px 12px", background: "rgba(255,255,255,0.04)", borderRadius: "8px", border: "1px solid rgba(255,255,255,0.06)", fontSize: "12px" }}>
             {listing.seller_name && (
-              <span style={{ display: "flex", alignItems: "center", gap: "5px", color: "#374151", fontWeight: 500 }}>
+              <span style={{ display: "flex", alignItems: "center", gap: "5px", color: "#AEB4BC", fontWeight: 500 }}>
                 <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#2BA8E0" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
                 {listing.seller_name}
               </span>
             )}
             {listing.seller_email && (
-              <a href={`mailto:${listing.seller_email}`} style={{ display: "flex", alignItems: "center", gap: "5px", color: "#374151", textDecoration: "none" }}>
+              <a href={`mailto:${listing.seller_email}`} style={{ display: "flex", alignItems: "center", gap: "5px", color: "#AEB4BC", textDecoration: "none" }}>
                 <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#2BA8E0" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 5L2 7"/></svg>
                 {listing.seller_email}
               </a>
             )}
             {listing.seller_phone && (
-              <a href={`tel:${listing.seller_phone}`} style={{ display: "flex", alignItems: "center", gap: "5px", color: "#374151", textDecoration: "none" }}>
+              <a href={`tel:${listing.seller_phone}`} style={{ display: "flex", alignItems: "center", gap: "5px", color: "#AEB4BC", textDecoration: "none" }}>
                 <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#2BA8E0" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
                 {listing.seller_phone}
               </a>
@@ -260,7 +260,7 @@ function ListingCard({
                 href={`/property/${listing.slug}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                style={{ display: "flex", alignItems: "center", gap: "5px", padding: "7px 14px", borderRadius: "7px", fontSize: "11px", fontWeight: 600, color: "#000000", border: "1.5px solid rgba(13,43,31,0.18)", background: "transparent", textDecoration: "none", letterSpacing: "0.04em" }}
+                style={{ display: "flex", alignItems: "center", gap: "5px", padding: "7px 14px", borderRadius: "7px", fontSize: "11px", fontWeight: 600, color: "#E8EAED", border: "1.5px solid rgba(255,255,255,0.15)", background: "transparent", textDecoration: "none", letterSpacing: "0.04em" }}
               >
                 View Full <IconArrow />
               </a>
@@ -321,7 +321,7 @@ function OverviewSection({ stats, loading }: { stats: Stats; loading: boolean })
       {loading ? (
         <div style={{ display: "flex", gap: "12px", flexWrap: "wrap", marginBottom: "28px" }}>
           {[...Array(5)].map((_, i) => (
-            <div key={i} style={{ flex: "1 1 160px", height: "90px", borderRadius: "14px", background: "#E8E4DC" }} />
+            <div key={i} style={{ flex: "1 1 160px", height: "90px", borderRadius: "14px", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.06)" }} />
           ))}
         </div>
       ) : (
@@ -335,21 +335,21 @@ function OverviewSection({ stats, loading }: { stats: Stats; loading: boolean })
       )}
 
       {sectionLoading ? <Spinner /> : (
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "20px" }}>
+        <div className="admin-overview-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "20px" }}>
           {/* Recent activity */}
-          <div style={{ background: "#fff", borderRadius: "14px", border: "1px solid rgba(13,43,31,0.07)", padding: "24px" }}>
-            <h3 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "20px", fontWeight: 500, color: "#000000", marginBottom: "18px" }}>Recent Submissions</h3>
+          <div style={{ background: "rgba(255,255,255,0.05)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", borderRadius: "14px", border: "1px solid rgba(255,255,255,0.08)", padding: "24px" }}>
+            <h3 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "20px", fontWeight: 500, color: "#E8EAED", marginBottom: "18px" }}>Recent Submissions</h3>
             {recent.length === 0 ? (
-              <p style={{ fontSize: "13px", color: "#9CA3AF" }}>No listings yet.</p>
+              <p style={{ fontSize: "13px", color: "rgba(255,255,255,0.45)" }}>No listings yet.</p>
             ) : (
               <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
                 {recent.map(r => (
                   <div key={r.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "12px" }}>
                     <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ fontSize: "13px", fontWeight: 500, color: "#000000", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                      <div style={{ fontSize: "13px", fontWeight: 500, color: "#E8EAED", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                         {r.title ?? r.city ?? "Untitled"}
                       </div>
-                      <div style={{ fontSize: "11px", color: "#9CA3AF" }}>{fmtDate(r.submitted_at)}</div>
+                      <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.45)" }}>{fmtDate(r.submitted_at)}</div>
                     </div>
                     <StatusBadge status={r.status} />
                   </div>
@@ -359,10 +359,10 @@ function OverviewSection({ stats, loading }: { stats: Stats; loading: boolean })
           </div>
 
           {/* City breakdown */}
-          <div style={{ background: "#fff", borderRadius: "14px", border: "1px solid rgba(13,43,31,0.07)", padding: "24px" }}>
-            <h3 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "20px", fontWeight: 500, color: "#000000", marginBottom: "18px" }}>Top Cities</h3>
+          <div style={{ background: "rgba(255,255,255,0.05)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", borderRadius: "14px", border: "1px solid rgba(255,255,255,0.08)", padding: "24px" }}>
+            <h3 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "20px", fontWeight: 500, color: "#E8EAED", marginBottom: "18px" }}>Top Cities</h3>
             {cityBreakdown.length === 0 ? (
-              <p style={{ fontSize: "13px", color: "#9CA3AF" }}>No data yet.</p>
+              <p style={{ fontSize: "13px", color: "rgba(255,255,255,0.45)" }}>No data yet.</p>
             ) : (
               <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
                 {cityBreakdown.map((c, i) => {
@@ -370,11 +370,11 @@ function OverviewSection({ stats, loading }: { stats: Stats; loading: boolean })
                   return (
                     <div key={c.city}>
                       <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "5px" }}>
-                        <span style={{ fontSize: "13px", color: "#374151", fontWeight: i === 0 ? 600 : 400 }}>{c.city}</span>
-                        <span style={{ fontSize: "12px", color: "#9CA3AF" }}>{c.count}</span>
+                        <span style={{ fontSize: "13px", color: i === 0 ? "#E8EAED" : "#AEB4BC", fontWeight: i === 0 ? 600 : 400 }}>{c.city}</span>
+                        <span style={{ fontSize: "12px", color: "rgba(255,255,255,0.45)" }}>{c.count}</span>
                       </div>
-                      <div style={{ height: "5px", background: "rgba(13,43,31,0.06)", borderRadius: "3px", overflow: "hidden" }}>
-                        <div style={{ height: "100%", width: `${(c.count / max) * 100}%`, background: i === 0 ? "#2BA8E0" : "#121519", borderRadius: "3px" }} />
+                      <div style={{ height: "5px", background: "rgba(255,255,255,0.08)", borderRadius: "3px", overflow: "hidden" }}>
+                        <div style={{ height: "100%", width: `${(c.count / max) * 100}%`, background: i === 0 ? "#2BA8E0" : "rgba(43,168,224,0.35)", borderRadius: "3px" }} />
                       </div>
                     </div>
                   );
@@ -404,12 +404,12 @@ function PendingSection({
     <div>
       <SectionHeading title="Pending Review" subtitle="Oldest submissions first — approve or reject each listing." count={listings.length} />
       {listings.length === 0 ? (
-        <div style={{ padding: "72px 24px", textAlign: "center", background: "#fff", borderRadius: "18px", border: "1px solid rgba(13,43,31,0.07)" }}>
-          <div style={{ width: "52px", height: "52px", borderRadius: "50%", background: "rgba(45,106,79,0.08)", border: "1.5px solid rgba(45,106,79,0.2)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px", color: "#121519" }}>
+        <div style={{ padding: "72px 24px", textAlign: "center", background: "rgba(255,255,255,0.05)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", borderRadius: "18px", border: "1px solid rgba(255,255,255,0.08)" }}>
+          <div style={{ width: "52px", height: "52px", borderRadius: "50%", background: "rgba(52,211,153,0.08)", border: "1.5px solid rgba(52,211,153,0.2)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px", color: "#34D399" }}>
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75"><polyline points="20 6 9 17 4 12"/></svg>
           </div>
-          <p style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "22px", color: "#000000", marginBottom: "8px" }}>All clear</p>
-          <p style={{ fontSize: "13px", color: "#9CA3AF" }}>No listings pending review.</p>
+          <p style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "22px", color: "#E8EAED", marginBottom: "8px" }}>All clear</p>
+          <p style={{ fontSize: "13px", color: "rgba(255,255,255,0.45)" }}>No listings pending review.</p>
         </div>
       ) : (
         <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
@@ -423,14 +423,14 @@ function PendingSection({
                   <button
                     onClick={() => onApprove(l.id)}
                     disabled={inFlight === l.id}
-                    style={{ display: "flex", alignItems: "center", gap: "6px", padding: "7px 16px", borderRadius: "7px", fontSize: "11px", fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase" as const, background: "#121519", color: "#FFFFFF", border: "none", cursor: inFlight === l.id ? "not-allowed" : "pointer", fontFamily: "'DM Sans', sans-serif", opacity: inFlight === l.id ? 0.6 : 1 }}
+                    style={{ display: "flex", alignItems: "center", gap: "6px", padding: "7px 16px", borderRadius: "7px", fontSize: "11px", fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase" as const, background: "#2BA8E0", color: "#000000", border: "none", cursor: inFlight === l.id ? "not-allowed" : "pointer", fontFamily: "'DM Sans', sans-serif", opacity: inFlight === l.id ? 0.6 : 1 }}
                   >
                     <IconApprove /> Approve
                   </button>
                   <button
                     onClick={() => onReject(l.id)}
                     disabled={inFlight === l.id}
-                    style={{ display: "flex", alignItems: "center", gap: "6px", padding: "7px 16px", borderRadius: "7px", fontSize: "11px", fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase" as const, background: "rgba(220,38,38,0.08)", color: "#B91C1C", border: "1.5px solid rgba(220,38,38,0.25)", cursor: inFlight === l.id ? "not-allowed" : "pointer", fontFamily: "'DM Sans', sans-serif", opacity: inFlight === l.id ? 0.6 : 1 }}
+                    style={{ display: "flex", alignItems: "center", gap: "6px", padding: "7px 16px", borderRadius: "7px", fontSize: "11px", fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase" as const, background: "rgba(248,113,113,0.1)", color: "#F87171", border: "1.5px solid rgba(248,113,113,0.3)", cursor: inFlight === l.id ? "not-allowed" : "pointer", fontFamily: "'DM Sans', sans-serif", opacity: inFlight === l.id ? 0.6 : 1 }}
                   >
                     <IconReject /> Reject
                   </button>
@@ -459,8 +459,8 @@ function ApprovedSection({
     <div>
       <SectionHeading title="Approved Listings" subtitle="Currently live on the platform." count={listings.length} />
       {listings.length === 0 ? (
-        <div style={{ padding: "60px 24px", textAlign: "center", background: "#fff", borderRadius: "18px", border: "1px solid rgba(13,43,31,0.07)" }}>
-          <p style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "20px", color: "#000000" }}>No active listings</p>
+        <div style={{ padding: "60px 24px", textAlign: "center", background: "rgba(255,255,255,0.05)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", borderRadius: "18px", border: "1px solid rgba(255,255,255,0.08)" }}>
+          <p style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "20px", color: "#E8EAED" }}>No active listings</p>
         </div>
       ) : (
         <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
@@ -475,7 +475,7 @@ function ApprovedSection({
                     if (window.confirm("Unpublish this listing? It will return to pending review.")) onUnpublish(l.id);
                   }}
                   disabled={inFlight === l.id}
-                  style={{ display: "flex", alignItems: "center", gap: "6px", padding: "7px 14px", borderRadius: "7px", fontSize: "11px", fontWeight: 600, background: "rgba(245,158,11,0.1)", color: "#92400E", border: "1.5px solid rgba(245,158,11,0.3)", cursor: inFlight === l.id ? "not-allowed" : "pointer", fontFamily: "'DM Sans', sans-serif", opacity: inFlight === l.id ? 0.6 : 1 }}
+                  style={{ display: "flex", alignItems: "center", gap: "6px", padding: "7px 14px", borderRadius: "7px", fontSize: "11px", fontWeight: 600, background: "rgba(245,158,11,0.1)", color: "#F59E0B", border: "1.5px solid rgba(245,158,11,0.3)", cursor: inFlight === l.id ? "not-allowed" : "pointer", fontFamily: "'DM Sans', sans-serif", opacity: inFlight === l.id ? 0.6 : 1 }}
                 >
                   Unpublish
                 </button>
@@ -503,8 +503,8 @@ function RejectedSection({
     <div>
       <SectionHeading title="Rejected Listings" subtitle="Listings that have been declined." count={listings.length} />
       {listings.length === 0 ? (
-        <div style={{ padding: "60px 24px", textAlign: "center", background: "#fff", borderRadius: "18px", border: "1px solid rgba(13,43,31,0.07)" }}>
-          <p style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "20px", color: "#000000" }}>No rejected listings</p>
+        <div style={{ padding: "60px 24px", textAlign: "center", background: "rgba(255,255,255,0.05)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", borderRadius: "18px", border: "1px solid rgba(255,255,255,0.08)" }}>
+          <p style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "20px", color: "#E8EAED" }}>No rejected listings</p>
         </div>
       ) : (
         <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
@@ -517,7 +517,7 @@ function RejectedSection({
                 <button
                   onClick={() => onReApprove(l.id)}
                   disabled={inFlight === l.id}
-                  style={{ display: "flex", alignItems: "center", gap: "6px", padding: "7px 14px", borderRadius: "7px", fontSize: "11px", fontWeight: 700, background: "#121519", color: "#FFFFFF", border: "none", cursor: inFlight === l.id ? "not-allowed" : "pointer", fontFamily: "'DM Sans', sans-serif", opacity: inFlight === l.id ? 0.6 : 1 }}
+                  style={{ display: "flex", alignItems: "center", gap: "6px", padding: "7px 14px", borderRadius: "7px", fontSize: "11px", fontWeight: 700, background: "#2BA8E0", color: "#000000", border: "none", cursor: inFlight === l.id ? "not-allowed" : "pointer", fontFamily: "'DM Sans', sans-serif", opacity: inFlight === l.id ? 0.6 : 1 }}
                 >
                   <IconApprove /> Re-approve
                 </button>
@@ -549,25 +549,25 @@ function UsersSection({
     <div>
       <SectionHeading title="All Users" subtitle="Manage user roles across the platform." count={users.length} />
       {users.length === 0 ? (
-        <div style={{ padding: "60px 24px", textAlign: "center", background: "#fff", borderRadius: "18px", border: "1px solid rgba(13,43,31,0.07)" }}>
-          <p style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "20px", color: "#000000" }}>No users found</p>
+        <div style={{ padding: "60px 24px", textAlign: "center", background: "rgba(255,255,255,0.05)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", borderRadius: "18px", border: "1px solid rgba(255,255,255,0.08)" }}>
+          <p style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "20px", color: "#E8EAED" }}>No users found</p>
         </div>
       ) : (
         <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
           {users.map(u => (
-            <div key={u.id} style={{ background: "#fff", borderRadius: "12px", border: "1px solid rgba(13,43,31,0.07)", padding: "16px 20px", display: "flex", alignItems: "center", gap: "16px", flexWrap: "wrap" }}>
+            <div key={u.id} style={{ background: "rgba(255,255,255,0.05)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", borderRadius: "12px", border: "1px solid rgba(255,255,255,0.08)", padding: "16px 20px", display: "flex", alignItems: "center", gap: "16px", flexWrap: "wrap" }}>
               {/* Avatar */}
-              <div style={{ width: "40px", height: "40px", borderRadius: "50%", background: "rgba(201,168,76,0.12)", border: "1.5px solid rgba(201,168,76,0.3)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, fontSize: "14px", fontWeight: 700, color: "#2BA8E0", fontFamily: "'DM Sans', sans-serif" }}>
+              <div style={{ width: "40px", height: "40px", borderRadius: "50%", background: "rgba(43,168,224,0.12)", border: "1.5px solid rgba(43,168,224,0.25)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, fontSize: "14px", fontWeight: 700, color: "#2BA8E0", fontFamily: "'DM Sans', sans-serif" }}>
                 {(u.full_name ?? "?").slice(0, 1).toUpperCase()}
               </div>
               {/* Info */}
               <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontSize: "14px", fontWeight: 600, color: "#000000", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                <div style={{ fontSize: "14px", fontWeight: 600, color: "#E8EAED", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                   {u.full_name ?? "—"}
                 </div>
                 <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", marginTop: "3px" }}>
-                  {u.city && <span style={{ fontSize: "11px", color: "#9CA3AF" }}>{u.city}</span>}
-                  <span style={{ fontSize: "11px", color: "#9CA3AF" }}>Joined {fmtDate(u.created_at)}</span>
+                  {u.city && <span style={{ fontSize: "11px", color: "rgba(255,255,255,0.45)" }}>{u.city}</span>}
+                  <span style={{ fontSize: "11px", color: "rgba(255,255,255,0.45)" }}>Joined {fmtDate(u.created_at)}</span>
                 </div>
               </div>
               <RoleBadge role={u.role} />
@@ -576,13 +576,13 @@ function UsersSection({
                 <select
                   value={u.role ?? "buyer"}
                   onChange={e => onRoleChange(u.id, e.target.value)}
-                  style={{ padding: "6px 28px 6px 10px", background: "#F8F6F1", border: "1.5px solid rgba(13,43,31,0.12)", borderRadius: "7px", fontSize: "12px", color: "#374151", fontFamily: "'DM Sans', sans-serif", outline: "none", appearance: "none", cursor: "pointer" }}
+                  style={{ padding: "6px 28px 6px 10px", background: "rgba(255,255,255,0.06)", border: "1.5px solid rgba(255,255,255,0.12)", borderRadius: "7px", fontSize: "12px", color: "#E8EAED", fontFamily: "'DM Sans', sans-serif", outline: "none", appearance: "none", cursor: "pointer" }}
                 >
                   {ROLE_OPTIONS.map(r => (
-                    <option key={r} value={r}>{r}</option>
+                    <option key={r} value={r} style={{ background: "#0B0D10", color: "#E8EAED" }}>{r}</option>
                   ))}
                 </select>
-                <span style={{ position: "absolute", right: 8, top: "50%", transform: "translateY(-50%)", pointerEvents: "none", color: "#9CA3AF", fontSize: 9 }}>▼</span>
+                <span style={{ position: "absolute", right: 8, top: "50%", transform: "translateY(-50%)", pointerEvents: "none", color: "rgba(255,255,255,0.45)", fontSize: 9 }}>▼</span>
               </div>
             </div>
           ))}
@@ -600,51 +600,51 @@ function InquiriesSection({ inquiries, loading }: { inquiries: InquiryRow[]; loa
     <div>
       <SectionHeading title="All Inquiries" subtitle="Platform-wide buyer inquiries." count={inquiries.length} />
       {inquiries.length === 0 ? (
-        <div style={{ padding: "60px 24px", textAlign: "center", background: "#fff", borderRadius: "18px", border: "1px solid rgba(13,43,31,0.07)" }}>
-          <p style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "20px", color: "#000000" }}>No inquiries yet</p>
+        <div style={{ padding: "60px 24px", textAlign: "center", background: "rgba(255,255,255,0.05)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", borderRadius: "18px", border: "1px solid rgba(255,255,255,0.08)" }}>
+          <p style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "20px", color: "#E8EAED" }}>No inquiries yet</p>
         </div>
       ) : (
         <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
           {inquiries.map(inq => (
-            <div key={inq.id} style={{ background: "#fff", borderRadius: "12px", border: "1px solid rgba(13,43,31,0.07)", padding: "18px 22px" }}>
+            <div key={inq.id} style={{ background: "rgba(255,255,255,0.05)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", borderRadius: "12px", border: "1px solid rgba(255,255,255,0.08)", padding: "18px 22px" }}>
               {/* Header */}
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: "12px", flexWrap: "wrap", marginBottom: "10px" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
-                  <span style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "18px", fontWeight: 600, color: "#000000" }}>
+                  <span style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "18px", fontWeight: 600, color: "#E8EAED" }}>
                     {inq.inquirer_name ?? "Anonymous"}
                   </span>
                   {inq.inquiry_type && (
-                    <span style={{ display: "inline-block", padding: "2px 8px", borderRadius: "100px", fontSize: "9px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" as const, background: inq.inquiry_type === "viewing" ? "rgba(45,106,79,0.1)" : "rgba(201,168,76,0.12)", color: inq.inquiry_type === "viewing" ? "#065F46" : "#92400E", border: `1px solid ${inq.inquiry_type === "viewing" ? "rgba(45,106,79,0.3)" : "rgba(201,168,76,0.3)"}` }}>
+                    <span style={{ display: "inline-block", padding: "2px 8px", borderRadius: "100px", fontSize: "9px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" as const, background: inq.inquiry_type === "viewing" ? "rgba(52,211,153,0.1)" : "rgba(43,168,224,0.12)", color: inq.inquiry_type === "viewing" ? "#34D399" : "#2BA8E0", border: `1px solid ${inq.inquiry_type === "viewing" ? "rgba(52,211,153,0.25)" : "rgba(43,168,224,0.3)"}` }}>
                       {inq.inquiry_type}
                     </span>
                   )}
                   {inq.status && (
-                    <span style={{ display: "inline-block", padding: "2px 8px", borderRadius: "100px", fontSize: "9px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" as const, background: "rgba(107,114,128,0.1)", color: "#374151", border: "1px solid rgba(107,114,128,0.2)" }}>
+                    <span style={{ display: "inline-block", padding: "2px 8px", borderRadius: "100px", fontSize: "9px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" as const, background: "rgba(255,255,255,0.07)", color: "#AEB4BC", border: "1px solid rgba(255,255,255,0.1)" }}>
                       {inq.status}
                     </span>
                   )}
                 </div>
-                <span style={{ fontSize: "11px", color: "#9CA3AF", flexShrink: 0 }}>{fmtDate(inq.created_at)}</span>
+                <span style={{ fontSize: "11px", color: "rgba(255,255,255,0.45)", flexShrink: 0 }}>{fmtDate(inq.created_at)}</span>
               </div>
               {/* Property */}
               {inq.property_title && (
-                <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "8px", fontSize: "12px", color: "#6B7C72" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "8px", fontSize: "12px", color: "#AEB4BC" }}>
                   <IconBuilding />
                   {inq.property_slug
-                    ? <a href={`/property/${inq.property_slug}`} style={{ color: "#000000", fontWeight: 500, textDecoration: "none" }}>{inq.property_title}</a>
-                    : <span style={{ color: "#000000", fontWeight: 500 }}>{inq.property_title}</span>
+                    ? <a href={`/property/${inq.property_slug}`} style={{ color: "#E8EAED", fontWeight: 500, textDecoration: "none" }}>{inq.property_title}</a>
+                    : <span style={{ color: "#E8EAED", fontWeight: 500 }}>{inq.property_title}</span>
                   }
-                  {inq.seller_email && <span style={{ color: "#9CA3AF" }}>→ {inq.seller_email}</span>}
+                  {inq.seller_email && <span style={{ color: "rgba(255,255,255,0.45)" }}>→ {inq.seller_email}</span>}
                 </div>
               )}
               {/* Contact */}
               <div style={{ display: "flex", gap: "16px", flexWrap: "wrap", marginBottom: inq.message ? "10px" : 0, fontSize: "12px" }}>
-                {inq.inquirer_phone && <a href={`tel:${inq.inquirer_phone}`} style={{ color: "#374151", textDecoration: "none" }}>{inq.inquirer_phone}</a>}
-                {inq.inquirer_email && <a href={`mailto:${inq.inquirer_email}`} style={{ color: "#374151", textDecoration: "none" }}>{inq.inquirer_email}</a>}
+                {inq.inquirer_phone && <a href={`tel:${inq.inquirer_phone}`} style={{ color: "#AEB4BC", textDecoration: "none" }}>{inq.inquirer_phone}</a>}
+                {inq.inquirer_email && <a href={`mailto:${inq.inquirer_email}`} style={{ color: "#AEB4BC", textDecoration: "none" }}>{inq.inquirer_email}</a>}
               </div>
               {/* Message */}
               {inq.message && (
-                <div style={{ background: "#F8F6F1", borderRadius: "8px", padding: "10px 14px", fontSize: "12px", color: "#374151", lineHeight: 1.6, borderLeft: "3px solid rgba(201,168,76,0.45)" }}>
+                <div style={{ background: "rgba(255,255,255,0.04)", borderRadius: "8px", padding: "10px 14px", fontSize: "12px", color: "#AEB4BC", lineHeight: 1.6, borderLeft: "3px solid rgba(43,168,224,0.4)" }}>
                   {inq.message}
                 </div>
               )}
@@ -674,19 +674,15 @@ export default function AdminPage() {
   const { user, profile, loading: authLoading } = useAuth();
 
   const isAdmin = profile?.role === "admin" || profile?.role === "super_admin";
-  // Keep the verifying screen up until auth resolves AND we've confirmed admin,
-  // so non-admins never flash the panel before the redirect kicks in.
   const authChecking = authLoading || !isAdmin;
 
   const [active,       setActive]       = useState<AdminSection>("overview");
   const [sidebarOpen,  setSidebarOpen]  = useState(false);
   const [toast,        setToast]        = useState<{ ok: boolean; msg: string } | null>(null);
 
-  // Stats (always loaded on mount)
   const [stats,        setStats]        = useState<Stats>({ pending: 0, active: 0, rejected: 0, users: 0, inquiries: 0 });
   const [statsLoading, setStatsLoading] = useState(true);
 
-  // Section data
   const [pendingListings,  setPendingListings]  = useState<AdminListing[]>([]);
   const [approvedListings, setApprovedListings] = useState<AdminListing[]>([]);
   const [rejectedListings, setRejectedListings] = useState<AdminListing[]>([]);
@@ -703,15 +699,11 @@ export default function AdminPage() {
 
   const loaded = useRef(new Set<AdminSection>());
 
-  // ── Auth guard ────────────────────────────────────────────────────────────────
-  // Session + profile (incl. role) come from AuthContext — no duplicate query.
-  // Once auth has resolved, redirect anyone who isn't an admin.
   useEffect(() => {
     if (authLoading) return;
     if (!user || !isAdmin) router.replace("/");
   }, [authLoading, user, isAdmin, router]);
 
-  // ── Stats load on auth ────────────────────────────────────────────────────────
   useEffect(() => {
     if (!isAdmin) return;
     async function loadStats() {
@@ -741,7 +733,6 @@ export default function AdminPage() {
     void loadStats();
   }, [isAdmin]);
 
-  // ── Lazy section loader ───────────────────────────────────────────────────────
   useEffect(() => {
     if (!isAdmin || loaded.current.has(active)) return;
     loaded.current.add(active);
@@ -803,7 +794,6 @@ export default function AdminPage() {
     }
   }, [active, isAdmin]);
 
-  // ── Listing status update ─────────────────────────────────────────────────────
   const handleListingStatus = useCallback(async (
     id: string,
     newStatus: "active" | "rejected" | "pending_review",
@@ -817,11 +807,9 @@ export default function AdminPage() {
       console.error("Admin — listing status error:", error);
       setToast({ ok: false, msg: "Update failed — please try again." });
     } else {
-      // Move listing out of current section
       if (fromSection === "pending") {
         setPendingListings(prev => prev.filter(l => l.id !== id));
         setStats(s => ({ ...s, pending: Math.max(0, s.pending - 1), ...(newStatus === "active" ? { active: s.active + 1 } : { rejected: s.rejected + 1 }) }));
-        // Invalidate destination so it reloads on next visit
         if (newStatus === "active")   loaded.current.delete("approved");
         if (newStatus === "rejected") loaded.current.delete("rejected");
       } else if (fromSection === "approved") {
@@ -844,7 +832,6 @@ export default function AdminPage() {
     setTimeout(() => setToast(null), 3000);
   }, []);
 
-  // ── User role update ──────────────────────────────────────────────────────────
   const handleUserRole = useCallback(async (userId: string, newRole: string) => {
     const prev = users.find(u => u.id === userId)?.role ?? null;
     setUsers(list => list.map(u => u.id === userId ? { ...u, role: newRole } : u));
@@ -860,7 +847,6 @@ export default function AdminPage() {
     }
   }, [users]);
 
-  // ── Auth loading screen ───────────────────────────────────────────────────────
   if (authChecking) {
     return (
       <>
@@ -868,7 +854,7 @@ export default function AdminPage() {
         <div style={{ minHeight: "100vh", background: "#000000", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "20px" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
             <div style={{ color: "#2BA8E0" }}><IconShield /></div>
-            <span style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "22px", color: "#000000", letterSpacing: "0.08em" }}>Verifying access…</span>
+            <span style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "22px", color: "#E8EAED", letterSpacing: "0.08em" }}>Verifying access…</span>
           </div>
           <Spinner size={26} pad={0} />
         </div>
@@ -876,7 +862,6 @@ export default function AdminPage() {
     );
   }
 
-  // ── Render section content ────────────────────────────────────────────────────
   let content: React.ReactNode;
   if (active === "overview") {
     content = <OverviewSection stats={stats} loading={statsLoading} />;
@@ -927,11 +912,11 @@ export default function AdminPage() {
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: 'DM Sans', system-ui, sans-serif; background: #000000; }
         ::-webkit-scrollbar { width: 4px; }
-        ::-webkit-scrollbar-thumb { background: rgba(13,43,31,0.15); border-radius: 2px; }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 2px; }
         @keyframes spin { to { transform: rotate(360deg); } }
         @keyframes fadeSlide { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
         @keyframes toastIn { from { opacity:0; transform:translateX(20px); } to { opacity:1; transform:translateX(0); } }
-        .admin-sb-btn:hover { color: rgba(245,242,236,0.9) !important; }
+        .admin-sb-btn:hover { color: #E8EAED !important; background: rgba(255,255,255,0.06) !important; }
         @media (max-width: 840px) {
           .admin-aside {
             position: fixed !important; top: 0 !important; bottom: 0 !important; left: 0 !important;
@@ -948,7 +933,7 @@ export default function AdminPage() {
 
       {/* Toast */}
       {toast && (
-        <div style={{ position: "fixed", top: "88px", right: "24px", zIndex: 999, padding: "12px 20px", borderRadius: "10px", background: toast.ok ? "#000000" : "#B91C1C", color: "#FFFFFF", fontSize: "13px", fontWeight: 600, boxShadow: "0 4px 24px rgba(0,0,0,0.25)", fontFamily: "'DM Sans', sans-serif", display: "flex", alignItems: "center", gap: "8px", animation: "toastIn 0.2s ease-out" }}>
+        <div style={{ position: "fixed", top: "88px", right: "24px", zIndex: 999, padding: "12px 20px", borderRadius: "10px", background: toast.ok ? "rgba(43,168,224,0.9)" : "rgba(248,113,113,0.9)", color: "#000000", fontSize: "13px", fontWeight: 600, boxShadow: "0 4px 24px rgba(0,0,0,0.4)", fontFamily: "'DM Sans', sans-serif", display: "flex", alignItems: "center", gap: "8px", animation: "toastIn 0.2s ease-out", backdropFilter: "blur(12px)" }}>
           {toast.ok ? "✓" : "✗"} {toast.msg}
         </div>
       )}
@@ -956,10 +941,10 @@ export default function AdminPage() {
       <div style={{ minHeight: "100dvh", background: "#000000", display: "flex", flexDirection: "column" }}>
 
         {/* Mobile toggle bar */}
-        <div className="admin-mob-bar" style={{ display: "none", position: "sticky", top: "64px", zIndex: 200, padding: "10px 16px", background: "#000000", alignItems: "center", gap: "12px", borderBottom: "1px solid rgba(201,168,76,0.1)", flexShrink: 0 }}>
+        <div className="admin-mob-bar" style={{ display: "none", position: "sticky", top: "64px", zIndex: 200, padding: "10px 16px", background: "rgba(0,0,0,0.85)", backdropFilter: "blur(12px)", alignItems: "center", gap: "12px", borderBottom: "1px solid rgba(255,255,255,0.07)", flexShrink: 0 }}>
           <button
             onClick={() => setSidebarOpen(v => !v)}
-            style={{ display: "flex", width: "34px", height: "34px", alignItems: "center", justifyContent: "center", background: "rgba(255,255,255,0.07)", border: "none", borderRadius: "7px", cursor: "pointer", color: "#fff" }}
+            style={{ display: "flex", width: "34px", height: "34px", alignItems: "center", justifyContent: "center", background: "rgba(255,255,255,0.07)", border: "none", borderRadius: "7px", cursor: "pointer", color: "#E8EAED" }}
           >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
           </button>
@@ -971,15 +956,15 @@ export default function AdminPage() {
           {/* Sidebar */}
           <aside
             className={`admin-aside${sidebarOpen ? " sb-open" : ""}`}
-            style={{ width: "260px", flexShrink: 0, background: "#000000", height: "calc(100vh - 64px)", position: "sticky", top: "64px", display: "flex", flexDirection: "column", overflowY: "auto" }}
+            style={{ width: "260px", flexShrink: 0, background: "rgba(0,0,0,0.7)", backdropFilter: "blur(24px)", WebkitBackdropFilter: "blur(24px)", borderRight: "1px solid rgba(255,255,255,0.07)", height: "calc(100vh - 64px)", position: "sticky", top: "64px", display: "flex", flexDirection: "column", overflowY: "auto" }}
           >
             {/* Brand card */}
-            <div style={{ padding: "26px 18px 20px", borderBottom: "1px solid rgba(245,242,236,0.08)" }}>
+            <div style={{ padding: "26px 18px 20px", borderBottom: "1px solid rgba(255,255,255,0.07)" }}>
               <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "6px" }}>
                 <div style={{ color: "#2BA8E0" }}><IconShield /></div>
-                <span style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "18px", fontWeight: 500, color: "#000000", letterSpacing: "0.04em" }}>Admin Panel</span>
+                <span style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "18px", fontWeight: 500, color: "#E8EAED", letterSpacing: "0.04em" }}>Admin Panel</span>
               </div>
-              <span style={{ display: "inline-block", padding: "2px 9px", borderRadius: "100px", fontSize: "8px", fontWeight: 800, letterSpacing: "0.14em", textTransform: "uppercase" as const, background: "rgba(201,168,76,0.14)", color: "#2BA8E0", border: "1px solid rgba(201,168,76,0.28)" }}>Nilay 360</span>
+              <span style={{ display: "inline-block", padding: "2px 9px", borderRadius: "100px", fontSize: "8px", fontWeight: 800, letterSpacing: "0.14em", textTransform: "uppercase" as const, background: "rgba(43,168,224,0.12)", color: "#2BA8E0", border: "1px solid rgba(43,168,224,0.25)" }}>Nilay 360</span>
             </div>
 
             {/* Nav */}
@@ -994,12 +979,12 @@ export default function AdminPage() {
                     key={item.id}
                     className="admin-sb-btn"
                     onClick={() => { setActive(item.id); setSidebarOpen(false); }}
-                    style={{ width: "100%", display: "flex", alignItems: "center", gap: "11px", padding: "10px 14px", borderRadius: "9px", marginBottom: "3px", background: active === item.id ? "rgba(201,168,76,0.11)" : "transparent", border: active === item.id ? "1px solid rgba(201,168,76,0.18)" : "1px solid transparent", color: active === item.id ? "#2BA8E0" : "rgba(245,242,236,0.45)", fontSize: "13px", fontWeight: active === item.id ? 600 : 400, cursor: "pointer", fontFamily: "'DM Sans', sans-serif", textAlign: "left" as const, transition: "all 0.14s" }}
+                    style={{ width: "100%", display: "flex", alignItems: "center", gap: "11px", padding: "10px 14px", borderRadius: "9px", marginBottom: "3px", background: active === item.id ? "rgba(43,168,224,0.1)" : "transparent", border: active === item.id ? "1px solid rgba(43,168,224,0.2)" : "1px solid transparent", color: active === item.id ? "#2BA8E0" : "rgba(255,255,255,0.45)", fontSize: "13px", fontWeight: active === item.id ? 600 : 400, cursor: "pointer", fontFamily: "'DM Sans', sans-serif", textAlign: "left" as const, transition: "all 0.14s" }}
                   >
                     {item.icon}
                     <span style={{ flex: 1 }}>{item.label}</span>
                     {badge > 0 && (
-                      <span style={{ padding: "1px 7px", borderRadius: "100px", fontSize: "9px", fontWeight: 700, background: active === item.id ? "rgba(201,168,76,0.2)" : "rgba(201,168,76,0.1)", color: "#2BA8E0", border: "1px solid rgba(201,168,76,0.25)" }}>
+                      <span style={{ padding: "1px 7px", borderRadius: "100px", fontSize: "9px", fontWeight: 700, background: active === item.id ? "rgba(43,168,224,0.2)" : "rgba(43,168,224,0.08)", color: "#2BA8E0", border: "1px solid rgba(43,168,224,0.2)" }}>
                         {badge}
                       </span>
                     )}
@@ -1009,10 +994,10 @@ export default function AdminPage() {
             </nav>
 
             {/* Footer links */}
-            <div style={{ padding: "12px 10px 18px", borderTop: "1px solid rgba(245,242,236,0.07)", display: "flex", flexDirection: "column", gap: "4px" }}>
+            <div style={{ padding: "12px 10px 18px", borderTop: "1px solid rgba(255,255,255,0.07)", display: "flex", flexDirection: "column", gap: "4px" }}>
               <a
                 href="/dashboard"
-                style={{ display: "flex", alignItems: "center", gap: "10px", padding: "9px 14px", borderRadius: "8px", fontSize: "12px", color: "rgba(245,242,236,0.4)", textDecoration: "none", fontFamily: "'DM Sans', sans-serif" }}
+                style={{ display: "flex", alignItems: "center", gap: "10px", padding: "9px 14px", borderRadius: "8px", fontSize: "12px", color: "rgba(255,255,255,0.4)", textDecoration: "none", fontFamily: "'DM Sans', sans-serif" }}
               >
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
                 Back to Dashboard
@@ -1023,7 +1008,7 @@ export default function AdminPage() {
 
           {/* Mobile overlay */}
           {sidebarOpen && (
-            <div onClick={() => setSidebarOpen(false)} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.48)", zIndex: 390, backdropFilter: "blur(2px)" }} />
+            <div onClick={() => setSidebarOpen(false)} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.6)", zIndex: 390, backdropFilter: "blur(4px)" }} />
           )}
 
           {/* Main content */}

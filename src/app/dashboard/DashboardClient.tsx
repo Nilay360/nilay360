@@ -1108,10 +1108,11 @@ export default function DashboardClient({ email, userId, fullName, accountType }
 
     const load = async () => {
       // ── My Listings ──────────────────────────────────────────
+      const listingsFilter = `seller_email.eq.${email},user_id.eq.${userId}`;
       const { data: listData, error: listErr } = await supabase
         .from("property_listings")
         .select("id, slug, title, property_category, listing_type, city, locality, price, status, submitted_at")
-        .eq("user_id", userId)
+        .or(listingsFilter)
         .order("submitted_at", { ascending: false });
       if (listErr) console.error("Dashboard — property_listings query error:", listErr);
       if (!cancelled) setListings((listData as Listing[] | null) ?? []);
