@@ -53,7 +53,8 @@ export default function SearchesPage() {
         .select("id, name, filters, alert_email, created_at")
         .eq("user_id", userId)
         .order("created_at", { ascending: false })
-        .then(({ data: rows }: { data: SavedSearch[] | null }) => {
+        .then(({ data: rows, error }: { data: SavedSearch[] | null; error: unknown }) => {
+          console.log("Saved searches query result — data:", rows, "error:", error, "userId used:", userId);
           setSearches(rows ?? []);
           setLoading(false);
         });
