@@ -36,7 +36,9 @@ export default function MyListingsPage() {
   const [loading, setLoading]   = useState(true);
   const [email, setEmail]       = useState<string | null>(null);
   const [deleting, setDeleting] = useState<string | null>(null);
-  const [search,   setSearch]   = useState<string>("");
+  const [search,       setSearch]       = useState<string>("");
+  const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [typeFilter,   setTypeFilter]   = useState<string>("all");
 
   useEffect(() => {
     const supabase = createClient();
@@ -91,16 +93,22 @@ export default function MyListingsPage() {
     );
   }
 
-  const filtered = search.trim() === ""
-    ? listings
-    : listings.filter(l => {
-        const q = search.toLowerCase()
-        return (
-          l.title?.toLowerCase().includes(q) ||
-          l.city?.toLowerCase().includes(q) ||
-          l.status.toLowerCase().includes(q)
-        )
-      })
+  const COMMERCIAL = ["office", "retail", "warehouse"];
+  const filtered = listings.filter(l => {
+    if (search.trim() !== "") {
+      const q = search.toLowerCase();
+      if (!(l.title?.toLowerCase().includes(q) || l.city?.toLowerCase().includes(q) || l.status.toLowerCase().includes(q))) return false;
+    }
+    if (statusFilter !== "all" && l.status !== statusFilter) return false;
+    if (typeFilter !== "all") {
+      if (typeFilter === "commercial") {
+        if (!COMMERCIAL.includes(l.property_category ?? "")) return false;
+      } else {
+        if (l.property_category !== typeFilter) return false;
+      }
+    }
+    return true;
+  });
 
   return (
     <div style={{ minHeight: "100vh", background: G.ivory, paddingTop: 64 }}>
@@ -161,7 +169,7 @@ export default function MyListingsPage() {
           </div>
         </div>
 
-        {/* Search */}
+        {/* Search + Filters */}
         {listings.length > 0 && (
           <div style={{ marginBottom: 24 }}>
             <input
@@ -179,8 +187,53 @@ export default function MyListingsPage() {
                 fontFamily: "'DM Sans', sans-serif", outline: "none",
               }}
             />
-            {search.trim() !== "" && (
-              <p style={{ fontSize: 12, color: "rgba(255,255,255,0.45)", fontFamily: "'DM Sans', sans-serif", margin: "8px 0 0" }}>
+
+            {/* Status pills */}
+            <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 14, flexWrap: "wrap" }}>
+              <span style={{ fontSize: 11, color: "rgba(255,255,255,0.35)", fontFamily: "'DM Sans', sans-serif", marginRight: 2, flexShrink: 0 }}>Status</span>
+              {(["all", "active", "pending_review", "rejected"] as const).map(v => {
+                const on = statusFilter === v;
+                const label = v === "all" ? "All" : v === "pending_review" ? "Pending Review" : v.charAt(0).toUpperCase() + v.slice(1);
+                return (
+                  <button key={v} onClick={() => setStatusFilter(v)} style={{
+                    padding: "5px 12px", borderRadius: "100px", fontSize: "11px",
+                    fontWeight: on ? 700 : 500, letterSpacing: "0.03em",
+                    background: on ? "#2BA8E0" : "rgba(255,255,255,0.06)",
+                    color: on ? "#000000" : "#AEB4BC",
+                    border: on ? "1.5px solid #2BA8E0" : "1.5px solid rgba(255,255,255,0.12)",
+                    cursor: "pointer", fontFamily: "'DM Sans', sans-serif",
+                    transition: "all 0.14s",
+                  }}>
+                    {label}
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Type pills */}
+            <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 8, flexWrap: "wrap" }}>
+              <span style={{ fontSize: 11, color: "rgba(255,255,255,0.35)", fontFamily: "'DM Sans', sans-serif", marginRight: 2, flexShrink: 0 }}>Type</span>
+              {(["all", "apartment", "villa", "plot", "penthouse", "commercial"] as const).map(v => {
+                const on = typeFilter === v;
+                const label = v === "all" ? "All" : v.charAt(0).toUpperCase() + v.slice(1);
+                return (
+                  <button key={v} onClick={() => setTypeFilter(v)} style={{
+                    padding: "5px 12px", borderRadius: "100px", fontSize: "11px",
+                    fontWeight: on ? 700 : 500, letterSpacing: "0.03em",
+                    background: on ? "#2BA8E0" : "rgba(255,255,255,0.06)",
+                    color: on ? "#000000" : "#AEB4BC",
+                    border: on ? "1.5px solid #2BA8E0" : "1.5px solid rgba(255,255,255,0.12)",
+                    cursor: "pointer", fontFamily: "'DM Sans', sans-serif",
+                    transition: "all 0.14s",
+                  }}>
+                    {label}
+                  </button>
+                );
+              })}
+            </div>
+
+            {(search.trim() !== "" || statusFilter !== "all" || typeFilter !== "all") && (
+              <p style={{ fontSize: 12, color: "rgba(255,255,255,0.45)", fontFamily: "'DM Sans', sans-serif", margin: "10px 0 0" }}>
                 Showing {filtered.length} of {listings.length} {listings.length === 1 ? "listing" : "listings"}
               </p>
             )}
@@ -216,7 +269,7 @@ export default function MyListingsPage() {
               No listings match
             </p>
             <p style={{ fontSize: 13, color: "rgba(255,255,255,0.45)", fontFamily: "'DM Sans', sans-serif", margin: 0 }}>
-              Try a different title, city, or status.
+              Try adjusting your search or filters.
             </p>
           </div>
         )}
