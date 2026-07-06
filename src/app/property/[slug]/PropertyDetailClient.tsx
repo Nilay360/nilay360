@@ -255,7 +255,7 @@ function buildBrochureHtml(p: Property): string {
   td.v { color: #000000; font-weight: 600; }
   p.desc { font-size: 14px; line-height: 1.7; color: #374151; }
   .amenities { display: flex; flex-wrap: wrap; gap: 8px; }
-  .amenities span { font-size: 12px; padding: 5px 12px; background: #000000; border: 1px solid rgba(201,168,76,0.3); border-radius: 100px; color: #0B0D10; }
+  .amenities span { font-size: 12px; padding: 5px 12px; background: rgba(43,168,224,0.12); border: 1px solid rgba(43,168,224,0.3); border-radius: 100px; color: #1577B8; }
   .footer { margin-top: 36px; padding-top: 20px; border-top: 2px solid #2BA8E0; text-align: center; font-size: 12px; color: #6B7C72; }
   .footer .contact { color: #0B0D10; font-weight: 600; margin-bottom: 6px; }
   @media print { body { padding: 24px; } .noprint { display: none; } }
@@ -301,7 +301,7 @@ const VISIT_SLOTS = [
 function SectionHeading({ children }: { children: React.ReactNode }) {
   return (
     <div style={{ marginBottom: "24px" }}>
-      <h2 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "26px", fontWeight: 500, color: "#000000", lineHeight: 1.2, marginBottom: "8px" }}>{children}</h2>
+      <h2 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "26px", fontWeight: 500, color: "#E8EAED", lineHeight: 1.2, marginBottom: "8px" }}>{children}</h2>
       <div style={{ width: "36px", height: "2px", background: "#2BA8E0", borderRadius: "1px" }} />
     </div>
   );
@@ -310,7 +310,7 @@ function SectionHeading({ children }: { children: React.ReactNode }) {
 // ── Card wrapper ──────────────────────────────────────────────
 function Card({ children, style }: { children: React.ReactNode; style?: React.CSSProperties }) {
   return (
-    <div style={{ background: "#fff", borderRadius: "16px", padding: "32px", boxShadow: "0 2px 24px rgba(13,43,31,0.07)", border: "1px solid rgba(13,43,31,0.06)", marginBottom: "24px", ...style }}>
+    <div style={{ background: "rgba(255,255,255,0.04)", backdropFilter: "blur(24px)", WebkitBackdropFilter: "blur(24px)", borderRadius: "24px", padding: "32px", boxShadow: "0 4px 24px rgba(0,0,0,0.18)", border: "1px solid rgba(255,255,255,0.08)", marginBottom: "24px", ...style }}>
       {children}
     </div>
   );
@@ -321,25 +321,25 @@ function SimilarCard({ p }: { p: Property }) {
   const img = p.images?.[0] || `https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800&q=80`;
   return (
     <a href={`/property/${p.slug}`} style={{ textDecoration: "none", display: "block" }}>
-      <div style={{ background: "#fff", borderRadius: "12px", overflow: "hidden", border: "1px solid rgba(13,43,31,0.08)", boxShadow: "0 2px 16px rgba(13,43,31,0.06)", transition: "transform 0.2s, box-shadow 0.2s" }}
-        onMouseEnter={e => { const d = e.currentTarget as HTMLDivElement; d.style.transform = "translateY(-3px)"; d.style.boxShadow = "0 8px 32px rgba(13,43,31,0.14)"; }}
-        onMouseLeave={e => { const d = e.currentTarget as HTMLDivElement; d.style.transform = "translateY(0)"; d.style.boxShadow = "0 2px 16px rgba(13,43,31,0.06)"; }}
+      <div className="premium-card" style={{ background: "rgba(255,255,255,0.04)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", borderRadius: "16px", overflow: "hidden", border: "1px solid rgba(255,255,255,0.08)", boxShadow: "0 4px 24px rgba(0,0,0,0.18)", transition: "transform 0.4s cubic-bezier(0.16,1,0.3,1), box-shadow 0.4s cubic-bezier(0.16,1,0.3,1)" }}
+        onMouseEnter={e => { const d = e.currentTarget as HTMLDivElement; d.style.transform = "translateY(-8px)"; d.style.boxShadow = "0 20px 60px rgba(0,0,0,.45), 0 0 0 1px rgba(43,168,224,0.22)"; }}
+        onMouseLeave={e => { const d = e.currentTarget as HTMLDivElement; d.style.transform = "translateY(0)"; d.style.boxShadow = "0 4px 24px rgba(0,0,0,0.18)"; }}
       >
         <div style={{ height: "160px", overflow: "hidden", position: "relative" }}>
           <img src={img} alt={p.title} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
-          <span style={{ position: "absolute", top: "10px", left: "10px", padding: "3px 9px", borderRadius: "100px", fontSize: "10px", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", background: p.listing_type === "rent" ? "rgba(45,106,79,0.9)" : "rgba(201,168,76,0.9)", color: p.listing_type === "rent" ? "#0B0D10" : "#000000" }}>
+          <span style={{ position: "absolute", top: "10px", left: "10px", padding: "3px 9px", borderRadius: "100px", fontSize: "10px", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", background: p.listing_type === "rent" ? "rgba(11,13,16,0.85)" : "rgba(43,168,224,0.9)", color: p.listing_type === "rent" ? "#2BA8E0" : "#000000", border: p.listing_type === "rent" ? "1px solid rgba(43,168,224,0.5)" : "none" }}>
             {p.listing_type === "rent" ? "Rent" : "Sale"}
           </span>
         </div>
         <div style={{ padding: "16px" }}>
           <div style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "18px", fontWeight: 600, color: "#2BA8E0", marginBottom: "6px" }}>{formatPrice(p.price, p.listing_type)}</div>
-          <div style={{ fontSize: "13px", fontWeight: 500, color: "#000000", marginBottom: "4px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{p.title}</div>
-          <div style={{ fontSize: "11px", color: "#6B7C72" }}>{p.neighbourhood ? `${p.neighbourhood}, ` : ""}{p.city}</div>
-          <div style={{ display: "flex", gap: "12px", marginTop: "10px", paddingTop: "10px", borderTop: "1px solid rgba(13,43,31,0.07)" }}>
+          <div style={{ fontSize: "13px", fontWeight: 500, color: "#FFFFFF", marginBottom: "4px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{p.title}</div>
+          <div style={{ fontSize: "11px", color: "#AEB4BC" }}>{p.neighbourhood ? `${p.neighbourhood}, ` : ""}{p.city}</div>
+          <div style={{ display: "flex", gap: "12px", marginTop: "10px", paddingTop: "10px", borderTop: "1px solid rgba(255,255,255,0.08)" }}>
             {[{ v: p.bedrooms, l: "Beds" }, { v: p.bathrooms, l: "Bath" }, { v: p.area_sqft?.toLocaleString("en-IN"), l: "sqft" }].map(s => s.v != null && (
               <div key={s.l} style={{ display: "flex", flexDirection: "column", gap: "1px" }}>
-                <span style={{ fontSize: "12px", fontWeight: 600, color: "#000000" }}>{s.v}</span>
-                <span style={{ fontSize: "10px", color: "#9CA3AF", textTransform: "uppercase", letterSpacing: "0.05em" }}>{s.l}</span>
+                <span style={{ fontSize: "12px", fontWeight: 600, color: "#E8EAED" }}>{s.v}</span>
+                <span style={{ fontSize: "10px", color: "rgba(255,255,255,0.45)", textTransform: "uppercase", letterSpacing: "0.05em" }}>{s.l}</span>
               </div>
             ))}
           </div>
@@ -589,10 +589,10 @@ export default function PropertyDetailClient() {
   function inputStyle(focused: boolean): React.CSSProperties {
     return {
       width: "100%", padding: "11px 14px",
-      background: "#F8F6F1",
-      border: focused ? "1.5px solid #2BA8E0" : "1.5px solid rgba(13,43,31,0.12)",
-      borderRadius: "8px",
-      fontSize: "13px", color: "#000000",
+      background: "rgba(255,255,255,0.06)",
+      border: focused ? "1px solid #2BA8E0" : "1px solid rgba(255,255,255,0.10)",
+      borderRadius: "16px",
+      fontSize: "13px", color: "#FFFFFF",
       fontFamily: "'DM Sans', sans-serif",
       outline: "none", transition: "border-color 0.15s",
       marginBottom: "12px",
@@ -652,7 +652,7 @@ export default function PropertyDetailClient() {
       <style>{`@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,600&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap'); *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; } body { font-family: 'DM Sans', sans-serif; background: #000000; } @keyframes pulse { 0%,100%{opacity:1}50%{opacity:0.4} }`}</style>
       <div style={{ minHeight: "100vh", background: "#000000", display: "flex", alignItems: "center", justifyContent: "center" }}>
         <div style={{ textAlign: "center" }}>
-          <div style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "28px", color: "#000000", opacity: 0.4, animation: "pulse 1.6s ease-in-out infinite" }}>Loading property…</div>
+          <div style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "28px", color: "#E8EAED", opacity: 0.6, animation: "pulse 1.6s ease-in-out infinite" }}>Loading property…</div>
         </div>
       </div>
     </>
@@ -662,10 +662,10 @@ export default function PropertyDetailClient() {
     <>
       <style>{`@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,600&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap'); *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; } body { font-family: 'DM Sans', sans-serif; background: #000000; }`}</style>
       <div style={{ minHeight: "100vh", background: "#000000", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "16px" }}>
-        <div style={{ fontSize: "64px", opacity: 0.25 }}>⌂</div>
-        <h1 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "40px", fontWeight: 300, color: "#000000" }}>Property Not Found</h1>
-        <p style={{ fontSize: "14px", color: "#6B7C72" }}>This listing may have been removed or the URL is incorrect.</p>
-        <a href="/properties" style={{ marginTop: "8px", padding: "12px 28px", background: "#2BA8E0", borderRadius: "8px", color: "#000000", fontSize: "13px", fontWeight: 700, textDecoration: "none", letterSpacing: "0.08em", textTransform: "uppercase" }}>Browse Properties</a>
+        <div style={{ fontSize: "64px", opacity: 0.25, color: "#FFFFFF" }}>⌂</div>
+        <h1 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "40px", fontWeight: 300, color: "#E8EAED" }}>Property Not Found</h1>
+        <p style={{ fontSize: "14px", color: "#AEB4BC" }}>This listing may have been removed or the URL is incorrect.</p>
+        <a href="/properties" style={{ marginTop: "8px", padding: "12px 28px", background: "#2BA8E0", borderRadius: "999px", color: "#000000", fontSize: "13px", fontWeight: 700, textDecoration: "none", letterSpacing: "0.08em", textTransform: "uppercase", boxShadow: "0 10px 30px rgba(30,167,255,.35)" }}>Browse Properties</a>
       </div>
     </>
   );
@@ -677,12 +677,17 @@ export default function PropertyDetailClient() {
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,600&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap');
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'DM Sans', system-ui, sans-serif; background: #000000; color: #000000; overflow-x: hidden; }
+        body { font-family: 'DM Sans', system-ui, sans-serif; background: #000000; color: #E8EAED; overflow-x: hidden; }
         select { appearance: none; -webkit-appearance: none; }
         input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; }
-        input[type=range] { -webkit-appearance: none; appearance: none; width: 100%; height: 4px; border-radius: 2px; background: rgba(13,43,31,0.12); outline: none; }
-        input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%; background: #2BA8E0; cursor: pointer; border: 2px solid #fff; box-shadow: 0 1px 4px rgba(0,0,0,0.2); }
+        input[type=range] { -webkit-appearance: none; appearance: none; width: 100%; height: 4px; border-radius: 2px; background: rgba(255,255,255,0.12); outline: none; }
+        input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%; background: #2BA8E0; cursor: pointer; border: 2px solid #0B0D10; box-shadow: 0 1px 4px rgba(0,0,0,0.2); }
         html, body { max-width: 100vw; overflow-x: hidden !important; }
+        input::placeholder, textarea::placeholder { color: rgba(255,255,255,0.45); }
+        input[type=date] { color-scheme: dark; }
+        .pd-lb-btn { transition: border-color 0.2s, color 0.2s, background 0.2s; }
+        .pd-lb-btn:hover { border-color: rgba(43,168,224,0.55) !important; color: #2BA8E0 !important; background: rgba(43,168,224,0.12) !important; }
+        .pd-btn-primary:hover { background: #3DBEF5 !important; }
         @media (max-width: 768px) {
           .pd-nav { padding: 0 16px !important; }
           .pd-nav-links { display: none !important; }
@@ -702,7 +707,7 @@ export default function PropertyDetailClient() {
       <div style={{ background: "#000000", minHeight: "100vh" }}>
 
         {/* ── NAV ── */}
-        <nav className="pd-nav" style={{ position: "fixed", top: 0, left: 0, right: 0, zIndex: 100, height: "68px", display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 48px", background: "rgba(5,8,12,0.82)", backdropFilter: "blur(20px) saturate(180%)", borderBottom: "0.5px solid rgba(201,168,76,0.18)" }}>
+        <nav className="pd-nav" style={{ position: "fixed", top: 0, left: 0, right: 0, zIndex: 100, height: "68px", display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 48px", background: "rgba(5,8,12,0.82)", backdropFilter: "blur(20px) saturate(180%)", borderBottom: "0.5px solid rgba(43,168,224,0.18)" }}>
           <a href="/" style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "19px", fontWeight: 600, color: "#fff", letterSpacing: "0.16em", display: "flex", alignItems: "center", gap: "6px", textDecoration: "none" }}>
             Nilay 360 <span style={{ color: "#2BA8E0", fontSize: "22px", lineHeight: 1 }}>·</span>
           </a>
@@ -720,7 +725,7 @@ export default function PropertyDetailClient() {
         <div style={{ paddingTop: "68px" }}>
 
           {/* ── IMAGE GALLERY ── */}
-          <div style={{ background: "#0a150f", position: "relative" }}>
+          <div style={{ background: "#0B0D10", position: "relative" }}>
             {/* Main image */}
             <div style={{ position: "relative", height: "520px", overflow: "hidden" }}>
               <img
@@ -735,7 +740,8 @@ export default function PropertyDetailClient() {
               {/* View all photos */}
               <button
                 onClick={() => setLightboxOpen(true)}
-                style={{ position: "absolute", bottom: "100px", left: "24px", display: "flex", alignItems: "center", gap: "7px", padding: "8px 16px", borderRadius: "8px", background: "rgba(0,0,0,0.5)", border: "1px solid rgba(255,255,255,0.25)", color: "#fff", fontSize: "12px", fontWeight: 600, cursor: "pointer", fontFamily: "'DM Sans', sans-serif", backdropFilter: "blur(8px)" }}
+                className="pd-lb-btn"
+                style={{ position: "absolute", bottom: "100px", left: "24px", display: "flex", alignItems: "center", gap: "7px", padding: "8px 16px", borderRadius: "999px", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.10)", color: "#fff", fontSize: "12px", fontWeight: 600, cursor: "pointer", fontFamily: "'DM Sans', sans-serif", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)" }}
               >
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2" /><circle cx="8.5" cy="8.5" r="1.5" /><polyline points="21 15 16 10 5 21" /></svg>
                 View All {images.length} Photos
@@ -743,11 +749,11 @@ export default function PropertyDetailClient() {
 
               {/* Badges */}
               <div style={{ position: "absolute", top: "24px", left: "24px", display: "flex", gap: "8px" }}>
-                <span style={{ padding: "6px 14px", borderRadius: "100px", fontSize: "11px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", background: property.listing_type === "rent" ? "rgba(45,106,79,0.92)" : "rgba(201,168,76,0.92)", color: property.listing_type === "rent" ? "#0B0D10" : "#000000", backdropFilter: "blur(8px)" }}>
+                <span style={{ padding: "6px 14px", borderRadius: "100px", fontSize: "11px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", background: property.listing_type === "rent" ? "rgba(11,13,16,0.85)" : "rgba(43,168,224,0.92)", color: property.listing_type === "rent" ? "#2BA8E0" : "#000000", border: property.listing_type === "rent" ? "1px solid rgba(43,168,224,0.5)" : "none", backdropFilter: "blur(8px)" }}>
                   {property.listing_type === "rent" ? "For Rent" : "For Sale"}
                 </span>
                 {property.is_featured && (
-                  <span style={{ padding: "6px 14px", borderRadius: "100px", fontSize: "11px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", background: "rgba(13,43,31,0.85)", color: "#2BA8E0", border: "1px solid rgba(201,168,76,0.5)", backdropFilter: "blur(8px)" }}>Premium</span>
+                  <span style={{ padding: "6px 14px", borderRadius: "100px", fontSize: "11px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", background: "rgba(11,13,16,0.85)", color: "#2BA8E0", border: "1px solid rgba(43,168,224,0.5)", backdropFilter: "blur(8px)" }}>Premium</span>
                 )}
               </div>
 
@@ -755,14 +761,15 @@ export default function PropertyDetailClient() {
               <div style={{ position: "absolute", top: "24px", right: "24px", display: "flex", gap: "10px" }}>
                 <button
                   onClick={() => { if (navigator.share) { navigator.share({ title: property.title, url: window.location.href }); } else { navigator.clipboard.writeText(window.location.href); } }}
-                  style={{ display: "flex", alignItems: "center", gap: "7px", padding: "8px 16px", borderRadius: "8px", background: "rgba(255,255,255,0.12)", border: "1px solid rgba(255,255,255,0.2)", color: "#fff", fontSize: "12px", fontWeight: 500, cursor: "pointer", fontFamily: "'DM Sans', sans-serif", backdropFilter: "blur(8px)" }}
+                  className="pd-lb-btn"
+                  style={{ display: "flex", alignItems: "center", gap: "7px", padding: "8px 16px", borderRadius: "999px", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.10)", color: "#fff", fontSize: "12px", fontWeight: 500, cursor: "pointer", fontFamily: "'DM Sans', sans-serif", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)" }}
                 >
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="18" cy="5" r="3" /><circle cx="6" cy="12" r="3" /><circle cx="18" cy="19" r="3" /><line x1="8.59" y1="13.51" x2="15.42" y2="17.49" /><line x1="15.41" y1="6.51" x2="8.59" y2="10.49" /></svg>
                   Share
                 </button>
                 <button
                   onClick={() => toggleSave(property.id)}
-                  style={{ display: "flex", alignItems: "center", gap: "7px", padding: "8px 16px", borderRadius: "8px", background: savedIds.has(property.id) ? "rgba(201,168,76,0.2)" : "rgba(255,255,255,0.12)", border: savedIds.has(property.id) ? "1px solid rgba(201,168,76,0.5)" : "1px solid rgba(255,255,255,0.2)", color: savedIds.has(property.id) ? "#2BA8E0" : "#fff", fontSize: "12px", fontWeight: 500, cursor: "pointer", fontFamily: "'DM Sans', sans-serif", backdropFilter: "blur(8px)", transition: "all 0.15s" }}
+                  style={{ display: "flex", alignItems: "center", gap: "7px", padding: "8px 16px", borderRadius: "999px", background: savedIds.has(property.id) ? "rgba(43,168,224,0.15)" : "rgba(255,255,255,0.06)", border: savedIds.has(property.id) ? "1px solid rgba(43,168,224,0.5)" : "1px solid rgba(255,255,255,0.10)", color: savedIds.has(property.id) ? "#2BA8E0" : "#fff", fontSize: "12px", fontWeight: 500, cursor: "pointer", fontFamily: "'DM Sans', sans-serif", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", transition: "all 0.15s" }}
                 >
                   <svg width="13" height="13" viewBox="0 0 24 24" fill={savedIds.has(property.id) ? "#2BA8E0" : "none"} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" /></svg>
                   {savedIds.has(property.id) ? "Saved" : "Save"}
@@ -770,13 +777,13 @@ export default function PropertyDetailClient() {
               </div>
 
               {/* Image counter */}
-              <div style={{ position: "absolute", bottom: "100px", right: "24px", padding: "5px 12px", borderRadius: "100px", background: "rgba(0,0,0,0.5)", backdropFilter: "blur(8px)", color: "#fff", fontSize: "12px" }}>
+              <div style={{ position: "absolute", bottom: "100px", right: "24px", padding: "5px 12px", borderRadius: "999px", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.10)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", color: "#fff", fontSize: "12px" }}>
                 {activeImg + 1} / {images.length}
               </div>
             </div>
 
             {/* Thumbnails */}
-            <div style={{ display: "flex", gap: "4px", padding: "4px", background: "#0a150f" }}>
+            <div style={{ display: "flex", gap: "4px", padding: "4px", background: "#0B0D10" }}>
               {images.map((img, i) => (
                 <div
                   key={i}
@@ -792,11 +799,11 @@ export default function PropertyDetailClient() {
           {/* ── BREADCRUMB ── */}
           <div className="pd-breadcrumb" style={{ maxWidth: "1400px", margin: "0 auto", padding: "16px 48px" }}>
             <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-              <a href="/" style={{ fontSize: "12px", color: "#6B7C72", textDecoration: "none" }}>Home</a>
+              <a href="/" style={{ fontSize: "12px", color: "#AEB4BC", textDecoration: "none" }}>Home</a>
               <span style={{ color: "#2BA8E0", fontSize: "10px" }}>›</span>
-              <a href="/properties" style={{ fontSize: "12px", color: "#6B7C72", textDecoration: "none" }}>Properties</a>
+              <a href="/properties" style={{ fontSize: "12px", color: "#AEB4BC", textDecoration: "none" }}>Properties</a>
               <span style={{ color: "#2BA8E0", fontSize: "10px" }}>›</span>
-              <span style={{ fontSize: "12px", color: "#000000", fontWeight: 500, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", maxWidth: "300px" }}>{property.title}</span>
+              <span style={{ fontSize: "12px", color: "#E8EAED", fontWeight: 500, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", maxWidth: "300px" }}>{property.title}</span>
             </div>
           </div>
 
@@ -815,28 +822,28 @@ export default function PropertyDetailClient() {
                         {formatPrice(property.price, property.listing_type)}
                       </span>
                       {property.price_per_sqft && property.listing_type !== "rent" && (
-                        <span style={{ fontSize: "13px", color: "#6B7C72" }}>₹{property.price_per_sqft.toLocaleString("en-IN")}/sqft</span>
+                        <span style={{ fontSize: "13px", color: "#AEB4BC" }}>₹{property.price_per_sqft.toLocaleString("en-IN")}/sqft</span>
                       )}
                     </div>
                     {property.listing_type === "rent" && property.deposit_amount && (
-                      <div style={{ fontSize: "12px", color: "#6B7C72", marginBottom: "4px" }}>
+                      <div style={{ fontSize: "12px", color: "#AEB4BC", marginBottom: "4px" }}>
                         Deposit: {formatPrice(property.deposit_amount, "sale")}
                       </div>
                     )}
                   </div>
                   {property.rera_number && (
-                    <span style={{ display: "inline-flex", alignItems: "center", gap: "6px", padding: "6px 14px", borderRadius: "100px", background: "rgba(45,106,79,0.08)", border: "1px solid rgba(45,106,79,0.2)", fontSize: "11px", fontWeight: 600, color: "#0B0D10", letterSpacing: "0.06em" }}>
-                      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#0B0D10" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" /><polyline points="22 4 12 14.01 9 11.01" /></svg>
+                    <span style={{ display: "inline-flex", alignItems: "center", gap: "6px", padding: "6px 14px", borderRadius: "100px", background: "rgba(43,168,224,0.15)", border: "1px solid rgba(43,168,224,0.3)", fontSize: "11px", fontWeight: 600, color: "#2BA8E0", letterSpacing: "0.06em" }}>
+                      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#2BA8E0" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" /><polyline points="22 4 12 14.01 9 11.01" /></svg>
                       RERA: {property.rera_number}
                     </span>
                   )}
                 </div>
 
-                <h1 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "32px", fontWeight: 500, color: "#000000", lineHeight: 1.2, marginBottom: "12px" }}>{property.title}</h1>
+                <h1 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "32px", fontWeight: 500, color: "#FFFFFF", lineHeight: 1.2, marginBottom: "12px" }}>{property.title}</h1>
 
                 <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "24px" }}>
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#2BA8E0" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" /><circle cx="12" cy="10" r="3" /></svg>
-                  <span style={{ fontSize: "14px", color: "#6B7C72" }}>{property.address}{property.neighbourhood ? `, ${property.neighbourhood}` : ""}, {property.city}, {property.state}</span>
+                  <span style={{ fontSize: "14px", color: "#AEB4BC" }}>{property.address}{property.neighbourhood ? `, ${property.neighbourhood}` : ""}, {property.city}, {property.state}</span>
                 </div>
 
                 {/* Key specs grid */}
@@ -851,10 +858,10 @@ export default function PropertyDetailClient() {
                     { icon: "🧭", label: "Facing", value: property.facing ?? null },
                     { icon: "🏠", label: "Ownership", value: property.ownership_type ?? null },
                   ].filter(s => s.value !== null).map(spec => (
-                    <div key={spec.label} style={{ background: "#F8F6F1", borderRadius: "10px", padding: "14px 12px", textAlign: "center" }}>
+                    <div key={spec.label} style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.10)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", borderRadius: "16px", padding: "14px 12px", textAlign: "center" }}>
                       <div style={{ fontSize: "18px", marginBottom: "6px" }}>{spec.icon}</div>
-                      <div style={{ fontSize: "12px", fontWeight: 600, color: "#000000", marginBottom: "2px" }}>{spec.value}</div>
-                      <div style={{ fontSize: "10px", color: "#9CA3AF", textTransform: "uppercase", letterSpacing: "0.06em" }}>{spec.label}</div>
+                      <div style={{ fontSize: "12px", fontWeight: 600, color: "#E8EAED", marginBottom: "2px" }}>{spec.value}</div>
+                      <div style={{ fontSize: "10px", color: "rgba(255,255,255,0.45)", textTransform: "uppercase", letterSpacing: "0.06em" }}>{spec.label}</div>
                     </div>
                   ))}
                 </div>
@@ -864,7 +871,7 @@ export default function PropertyDetailClient() {
               {video && (
                 <Card>
                   <SectionHeading>Video Tour</SectionHeading>
-                  <div style={{ position: "relative", width: "100%", paddingTop: "56.25%", borderRadius: "12px", overflow: "hidden", background: "#0a150f" }}>
+                  <div style={{ position: "relative", width: "100%", paddingTop: "56.25%", borderRadius: "12px", overflow: "hidden", background: "#0B0D10" }}>
                     {videoPlaying ? (
                       <iframe
                         src={video.embedUrl}
@@ -880,7 +887,7 @@ export default function PropertyDetailClient() {
                         style={{ position: "absolute", inset: 0, width: "100%", height: "100%", border: "none", cursor: "pointer", padding: 0, background: video.thumb ? `center / cover no-repeat url(${video.thumb})` : "linear-gradient(135deg, #000000 0%, #0B0D10 100%)" }}
                       >
                         <span style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,0.35)" }} />
-                        <span style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)", width: "72px", height: "72px", borderRadius: "50%", background: "rgba(201,168,76,0.95)", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 8px 30px rgba(0,0,0,0.4)" }}>
+                        <span style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)", width: "72px", height: "72px", borderRadius: "50%", background: "rgba(43,168,224,0.95)", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 10px 30px rgba(30,167,255,.35)" }}>
                           <svg width="28" height="28" viewBox="0 0 24 24" fill="#000000" style={{ marginLeft: "4px" }}><polygon points="5 3 19 12 5 21 5 3" /></svg>
                         </span>
                       </button>
@@ -893,17 +900,17 @@ export default function PropertyDetailClient() {
               <Card>
                 <SectionHeading>About This Property</SectionHeading>
                 {property.is_furnished && (
-                  <span style={{ display: "inline-block", marginBottom: "16px", padding: "5px 14px", borderRadius: "100px", fontSize: "11px", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", background: "rgba(201,168,76,0.1)", border: "1px solid rgba(201,168,76,0.3)", color: "#1577B8" }}>Fully Furnished</span>
+                  <span style={{ display: "inline-block", marginBottom: "16px", padding: "5px 14px", borderRadius: "100px", fontSize: "11px", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", background: "rgba(43,168,224,0.15)", border: "1px solid rgba(43,168,224,0.3)", color: "#2BA8E0" }}>Fully Furnished</span>
                 )}
                 {!property.is_furnished && (
-                  <span style={{ display: "inline-block", marginBottom: "16px", padding: "5px 14px", borderRadius: "100px", fontSize: "11px", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", background: "rgba(13,43,31,0.05)", border: "1px solid rgba(13,43,31,0.1)", color: "#6B7C72" }}>Unfurnished</span>
+                  <span style={{ display: "inline-block", marginBottom: "16px", padding: "5px 14px", borderRadius: "100px", fontSize: "11px", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.10)", color: "#AEB4BC" }}>Unfurnished</span>
                 )}
-                <p style={{ fontSize: "15px", lineHeight: 1.8, color: "#374151" }}>
+                <p style={{ fontSize: "15px", lineHeight: 1.8, color: "#AEB4BC" }}>
                   {property.description || "No description available for this property."}
                 </p>
                 {property.vastu_compliant && (
-                  <div style={{ marginTop: "16px", display: "inline-flex", alignItems: "center", gap: "7px", fontSize: "12px", color: "#0B0D10", fontWeight: 500 }}>
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0B0D10" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" /><polyline points="22 4 12 14.01 9 11.01" /></svg>
+                  <div style={{ marginTop: "16px", display: "inline-flex", alignItems: "center", gap: "7px", fontSize: "12px", color: "#AEB4BC", fontWeight: 500 }}>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#2BA8E0" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" /><polyline points="22 4 12 14.01 9 11.01" /></svg>
                     Vastu Compliant
                   </div>
                 )}
@@ -915,7 +922,7 @@ export default function PropertyDetailClient() {
                   <SectionHeading>Amenities & Features</SectionHeading>
                   <div style={{ display: "flex", flexWrap: "wrap", gap: "10px" }}>
                     {property.amenities.map(a => (
-                      <div key={a} style={{ display: "inline-flex", alignItems: "center", gap: "8px", padding: "8px 16px", borderRadius: "100px", background: "#F8F6F1", border: "1px solid rgba(13,43,31,0.08)", fontSize: "13px", color: "#374151", fontWeight: 500 }}>
+                      <div key={a} style={{ display: "inline-flex", alignItems: "center", gap: "8px", padding: "8px 16px", borderRadius: "100px", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.10)", fontSize: "13px", color: "#E8EAED", fontWeight: 500 }}>
                         <span style={{ fontSize: "15px" }}>{getAmenityIcon(a)}</span>
                         {a}
                       </div>
@@ -927,10 +934,10 @@ export default function PropertyDetailClient() {
               {/* ── FLOOR PLAN ── */}
               <Card>
                 <SectionHeading>Floor Plan</SectionHeading>
-                <div style={{ border: "2px dashed rgba(13,43,31,0.12)", borderRadius: "12px", padding: "60px 24px", textAlign: "center", background: "#F8F6F1" }}>
+                <div style={{ border: "2px dashed rgba(255,255,255,0.12)", borderRadius: "16px", padding: "60px 24px", textAlign: "center", background: "rgba(255,255,255,0.04)" }}>
                   <div style={{ fontSize: "40px", marginBottom: "14px", opacity: 0.3 }}>📐</div>
-                  <div style={{ fontSize: "16px", fontWeight: 500, color: "#000000", marginBottom: "6px" }}>Floor Plan Available on Request</div>
-                  <div style={{ fontSize: "13px", color: "#6B7C72" }}>Contact our property expert to receive the detailed floor plan.</div>
+                  <div style={{ fontSize: "16px", fontWeight: 500, color: "#E8EAED", marginBottom: "6px" }}>Floor Plan Available on Request</div>
+                  <div style={{ fontSize: "13px", color: "#AEB4BC" }}>Contact our property expert to receive the detailed floor plan.</div>
                 </div>
               </Card>
 
@@ -942,15 +949,15 @@ export default function PropertyDetailClient() {
                     <div>
                       {/* Property price display */}
                       <div style={{ marginBottom: "20px" }}>
-                        <div style={{ fontSize: "11px", fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase", color: "#6B7C72", marginBottom: "8px" }}>Property Price</div>
-                        <div style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "24px", fontWeight: 600, color: "#000000" }}>{formatPrice(property.price, "sale")}</div>
+                        <div style={{ fontSize: "11px", fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase", color: "#AEB4BC", marginBottom: "8px" }}>Property Price</div>
+                        <div style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "24px", fontWeight: 600, color: "#E8EAED" }}>{formatPrice(property.price, "sale")}</div>
                       </div>
 
                       {/* Down payment */}
                       <div style={{ marginBottom: "20px" }}>
                         <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "8px" }}>
-                          <div style={{ fontSize: "11px", fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase", color: "#6B7C72" }}>Down Payment</div>
-                          <div style={{ fontSize: "13px", fontWeight: 600, color: "#000000" }}>{downPct}% — {formatPrice(property.price * downPct / 100, "sale")}</div>
+                          <div style={{ fontSize: "11px", fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase", color: "#AEB4BC" }}>Down Payment</div>
+                          <div style={{ fontSize: "13px", fontWeight: 600, color: "#E8EAED" }}>{downPct}% — {formatPrice(property.price * downPct / 100, "sale")}</div>
                         </div>
                         <input type="range" min={5} max={50} step={5} value={downPct} onChange={e => setDownPct(Number(e.target.value))} />
                       </div>
@@ -958,41 +965,41 @@ export default function PropertyDetailClient() {
                       {/* Interest rate */}
                       <div style={{ marginBottom: "20px" }}>
                         <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "8px" }}>
-                          <div style={{ fontSize: "11px", fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase", color: "#6B7C72" }}>Interest Rate (p.a.)</div>
-                          <div style={{ fontSize: "13px", fontWeight: 600, color: "#000000" }}>{rate}%</div>
+                          <div style={{ fontSize: "11px", fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase", color: "#AEB4BC" }}>Interest Rate (p.a.)</div>
+                          <div style={{ fontSize: "13px", fontWeight: 600, color: "#E8EAED" }}>{rate}%</div>
                         </div>
                         <input type="range" min={6} max={15} step={0.5} value={rate} onChange={e => setRate(Number(e.target.value))} />
                       </div>
 
                       {/* Tenure */}
                       <div>
-                        <div style={{ fontSize: "11px", fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase", color: "#6B7C72", marginBottom: "8px" }}>Loan Tenure</div>
+                        <div style={{ fontSize: "11px", fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase", color: "#AEB4BC", marginBottom: "8px" }}>Loan Tenure</div>
                         <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
                           {[10, 15, 20, 25, 30].map(y => (
-                            <button key={y} onClick={() => setTenure(y)} style={{ padding: "7px 14px", borderRadius: "8px", fontSize: "12px", fontWeight: 600, background: tenure === y ? "#000000" : "#F8F6F1", border: tenure === y ? "none" : "1px solid rgba(13,43,31,0.12)", color: tenure === y ? "#fff" : "#374151", cursor: "pointer", fontFamily: "'DM Sans', sans-serif", transition: "all 0.15s" }}>{y}Y</button>
+                            <button key={y} onClick={() => setTenure(y)} style={{ padding: "7px 14px", borderRadius: "8px", fontSize: "12px", fontWeight: 600, background: tenure === y ? "#2BA8E0" : "rgba(255,255,255,0.06)", border: tenure === y ? "none" : "1px solid rgba(255,255,255,0.12)", color: tenure === y ? "#000000" : "#AEB4BC", cursor: "pointer", fontFamily: "'DM Sans', sans-serif", transition: "all 0.15s" }}>{y}Y</button>
                           ))}
                         </div>
                       </div>
                     </div>
 
                     {/* Results */}
-                    <div style={{ background: "#000000", borderRadius: "12px", padding: "28px", display: "flex", flexDirection: "column", justifyContent: "center", gap: "20px" }}>
+                    <div style={{ background: "#121519", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "16px", padding: "28px", display: "flex", flexDirection: "column", justifyContent: "center", gap: "20px" }}>
                       <div style={{ textAlign: "center" }}>
-                        <div style={{ fontSize: "11px", fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: "rgba(245,242,236,0.45)", marginBottom: "8px" }}>Monthly EMI</div>
+                        <div style={{ fontSize: "11px", fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: "rgba(255,255,255,0.45)", marginBottom: "8px" }}>Monthly EMI</div>
                         <div style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "38px", fontWeight: 600, color: "#2BA8E0", lineHeight: 1 }}>
                           {formatPrice(Math.round(emi), "rent").replace("/mo", "")}
                         </div>
-                        <div style={{ fontSize: "11px", color: "rgba(245,242,236,0.35)", marginTop: "4px" }}>per month</div>
+                        <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.45)", marginTop: "4px" }}>per month</div>
                       </div>
-                      <div style={{ borderTop: "1px solid rgba(245,242,236,0.1)", paddingTop: "20px", display: "flex", flexDirection: "column", gap: "12px" }}>
+                      <div style={{ borderTop: "1px solid rgba(255,255,255,0.1)", paddingTop: "20px", display: "flex", flexDirection: "column", gap: "12px" }}>
                         {[
                           { label: "Loan Amount", value: formatPrice(Math.round(loanAmount), "sale") },
                           { label: "Total Interest", value: formatPrice(Math.round(totalInterest), "sale") },
                           { label: "Total Payable", value: formatPrice(Math.round(totalPayable), "sale") },
                         ].map(row => (
                           <div key={row.label} style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                            <span style={{ fontSize: "12px", color: "rgba(245,242,236,0.45)" }}>{row.label}</span>
-                            <span style={{ fontSize: "13px", fontWeight: 600, color: "#000000" }}>{row.value}</span>
+                            <span style={{ fontSize: "12px", color: "rgba(255,255,255,0.45)" }}>{row.label}</span>
+                            <span style={{ fontSize: "13px", fontWeight: 600, color: "#FFFFFF" }}>{row.value}</span>
                           </div>
                         ))}
                       </div>
@@ -1021,16 +1028,16 @@ export default function PropertyDetailClient() {
               {/* ── CONTACT FORM ── */}
               <Card style={{ marginBottom: "20px" }}>
                 {/* Agent header */}
-                <div style={{ display: "flex", alignItems: "center", gap: "14px", marginBottom: "20px", paddingBottom: "20px", borderBottom: "1px solid rgba(13,43,31,0.08)" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "14px", marginBottom: "20px", paddingBottom: "20px", borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
                   <div style={{ width: "48px", height: "48px", borderRadius: "50%", background: "linear-gradient(135deg, #000000 0%, #121519 100%)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                     <span style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "20px", color: "#2BA8E0", fontWeight: 600 }}>N</span>
                   </div>
                   <div>
-                    <div style={{ fontSize: "14px", fontWeight: 600, color: "#000000" }}>Nilay 360 Expert</div>
-                    <div style={{ fontSize: "12px", color: "#6B7C72" }}>Property Specialist</div>
+                    <div style={{ fontSize: "14px", fontWeight: 600, color: "#E8EAED" }}>Nilay 360 Expert</div>
+                    <div style={{ fontSize: "12px", color: "#AEB4BC" }}>Property Specialist</div>
                     <div style={{ display: "flex", alignItems: "center", gap: "4px", marginTop: "2px" }}>
                       {"★★★★★".split("").map((s, i) => <span key={i} style={{ color: "#2BA8E0", fontSize: "10px" }}>{s}</span>)}
-                      <span style={{ fontSize: "10px", color: "#6B7C72", marginLeft: "2px" }}>5.0</span>
+                      <span style={{ fontSize: "10px", color: "#AEB4BC", marginLeft: "2px" }}>5.0</span>
                     </div>
                   </div>
                 </div>
@@ -1038,15 +1045,15 @@ export default function PropertyDetailClient() {
                 {contactSent ? (
                   <div style={{ textAlign: "center", padding: "24px 0" }}>
                     <div style={{ fontSize: "36px", marginBottom: "12px" }}>✅</div>
-                    <div style={{ fontSize: "16px", fontWeight: 600, color: "#000000", marginBottom: "6px" }}>Request Sent!</div>
-                    <div style={{ fontSize: "13px", color: "#6B7C72" }}>Our expert will contact you shortly.</div>
+                    <div style={{ fontSize: "16px", fontWeight: 600, color: "#E8EAED", marginBottom: "6px" }}>Request Sent!</div>
+                    <div style={{ fontSize: "13px", color: "#AEB4BC" }}>Our expert will contact you shortly.</div>
                   </div>
                 ) : (
                   <>
                     <input placeholder="Your Full Name" value={contactName} onChange={e => setContactName(e.target.value)} onFocus={() => setContactFocus("name")} onBlur={() => setContactFocus(null)} style={inputStyle(contactFocus === "name")} />
                     <input type="email" placeholder="Email Address" value={contactEmail} onChange={e => setContactEmail(e.target.value)} onFocus={() => setContactFocus("email")} onBlur={() => setContactFocus(null)} style={inputStyle(contactFocus === "email")} />
                     <div style={{ position: "relative", marginBottom: "12px" }}>
-                      <span style={{ position: "absolute", left: "14px", top: "50%", transform: "translateY(-50%)", fontSize: "13px", color: "#6B7C72", fontWeight: 500, pointerEvents: "none" }}>+91</span>
+                      <span style={{ position: "absolute", left: "14px", top: "50%", transform: "translateY(-50%)", fontSize: "13px", color: "#AEB4BC", fontWeight: 500, pointerEvents: "none" }}>+91</span>
                       <input type="tel" placeholder="Phone Number" value={contactPhone} onChange={e => setContactPhone(e.target.value)} onFocus={() => setContactFocus("phone")} onBlur={() => setContactFocus(null)} style={{ ...inputStyle(contactFocus === "phone"), paddingLeft: "46px", marginBottom: 0 }} />
                     </div>
                     <textarea
@@ -1056,12 +1063,12 @@ export default function PropertyDetailClient() {
                       onFocus={() => setContactFocus("msg")}
                       onBlur={() => setContactFocus(null)}
                       rows={3}
-                      style={{ width: "100%", padding: "11px 14px", background: "#F8F6F1", border: contactFocus === "msg" ? "1.5px solid #2BA8E0" : "1.5px solid rgba(13,43,31,0.12)", borderRadius: "8px", fontSize: "13px", color: "#000000", fontFamily: "'DM Sans', sans-serif", outline: "none", resize: "vertical", marginBottom: "14px" }}
+                      style={{ width: "100%", padding: "11px 14px", background: "rgba(255,255,255,0.06)", border: contactFocus === "msg" ? "1px solid #2BA8E0" : "1px solid rgba(255,255,255,0.10)", borderRadius: "16px", fontSize: "13px", color: "#FFFFFF", fontFamily: "'DM Sans', sans-serif", outline: "none", resize: "vertical", marginBottom: "14px" }}
                     />
 
                     {/* Error */}
                     {contactError && (
-                      <div style={{ marginBottom: "12px", padding: "10px 14px", background: "rgba(185,28,28,0.08)", border: "1px solid rgba(185,28,28,0.25)", borderRadius: "8px", color: "#B91C1C", fontSize: "12px", fontFamily: "'DM Sans', sans-serif" }}>
+                      <div style={{ marginBottom: "12px", padding: "10px 14px", background: "rgba(185,28,28,0.15)", border: "1px solid rgba(248,113,113,0.35)", borderRadius: "16px", color: "#F87171", fontSize: "12px", fontFamily: "'DM Sans', sans-serif" }}>
                         {contactError}
                       </div>
                     )}
@@ -1070,7 +1077,8 @@ export default function PropertyDetailClient() {
                     <button
                       onClick={handleInquiry}
                       disabled={contactSubmitting}
-                      style={{ width: "100%", padding: "13px", background: "#2BA8E0", border: "none", borderRadius: "8px", color: "#000000", fontSize: "13px", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", cursor: contactSubmitting ? "not-allowed" : "pointer", opacity: contactSubmitting ? 0.65 : 1, fontFamily: "'DM Sans', sans-serif", marginBottom: "10px" }}
+                      style={{ width: "100%", padding: "13px", background: "#2BA8E0", border: "none", borderRadius: "16px", color: "#000000", fontSize: "13px", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", cursor: contactSubmitting ? "not-allowed" : "pointer", opacity: contactSubmitting ? 0.65 : 1, fontFamily: "'DM Sans', sans-serif", marginBottom: "10px", boxShadow: "0 10px 30px rgba(30,167,255,.35)", transition: "background 0.2s" }}
+                      className="pd-btn-primary"
                     >{contactSubmitting ? "Sending…" : "Request Callback"}</button>
 
                     {waNumber && (
@@ -1087,7 +1095,7 @@ export default function PropertyDetailClient() {
 
                     <button
                       onClick={() => { setVisitError(null); setVisitOpen(true); }}
-                      style={{ width: "100%", padding: "13px", background: "transparent", border: "1.5px solid rgba(13,43,31,0.2)", borderRadius: "8px", color: "#000000", fontSize: "13px", fontWeight: 600, letterSpacing: "0.06em", textTransform: "uppercase", cursor: "pointer", fontFamily: "'DM Sans', sans-serif", display: "flex", alignItems: "center", justifyContent: "center", gap: "8px" }}>
+                      style={{ width: "100%", padding: "13px", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.10)", borderRadius: "16px", color: "#FFFFFF", fontSize: "13px", fontWeight: 600, letterSpacing: "0.06em", textTransform: "uppercase", cursor: "pointer", fontFamily: "'DM Sans', sans-serif", display: "flex", alignItems: "center", justifyContent: "center", gap: "8px" }}>
                       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2" /><line x1="16" y1="2" x2="16" y2="6" /><line x1="8" y1="2" x2="8" y2="6" /><line x1="3" y1="10" x2="21" y2="10" /></svg>
                       Schedule Visit
                     </button>
@@ -1098,7 +1106,7 @@ export default function PropertyDetailClient() {
               {/* ── DOWNLOAD BROCHURE ── */}
               <button
                 onClick={downloadBrochure}
-                style={{ width: "100%", padding: "13px", background: "#000000", border: "none", borderRadius: "8px", color: "#2BA8E0", fontSize: "13px", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", cursor: "pointer", fontFamily: "'DM Sans', sans-serif", display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", marginBottom: "20px" }}>
+                style={{ width: "100%", padding: "13px", background: "#121519", border: "1px solid rgba(43,168,224,0.3)", borderRadius: "16px", color: "#2BA8E0", fontSize: "13px", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", cursor: "pointer", fontFamily: "'DM Sans', sans-serif", display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", marginBottom: "20px" }}>
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="7 10 12 15 17 10" /><line x1="12" y1="15" x2="12" y2="3" /></svg>
                 Download Brochure
               </button>
@@ -1115,9 +1123,9 @@ export default function PropertyDetailClient() {
                     { label: "Status", value: property.status.charAt(0).toUpperCase() + property.status.slice(1) },
                     ...(property.pincode ? [{ label: "Pincode", value: property.pincode }] : []),
                   ].map(fact => (
-                    <div key={fact.label} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", paddingBottom: "12px", borderBottom: "1px solid rgba(13,43,31,0.06)" }}>
-                      <span style={{ fontSize: "12px", color: "#6B7C72" }}>{fact.label}</span>
-                      <span style={{ fontSize: "13px", fontWeight: 600, color: "#000000" }}>{fact.value}</span>
+                    <div key={fact.label} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", paddingBottom: "12px", borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
+                      <span style={{ fontSize: "12px", color: "#AEB4BC" }}>{fact.label}</span>
+                      <span style={{ fontSize: "13px", fontWeight: 600, color: "#E8EAED" }}>{fact.value}</span>
                     </div>
                   ))}
                 </div>
@@ -1136,7 +1144,7 @@ export default function PropertyDetailClient() {
               {prevProperty ? (
                 <a href={`/property/${prevProperty.slug}`} style={{
                   display: "flex", alignItems: "center", gap: 16,
-                  background: "#161A1F", border: "1px solid rgba(255,255,255,0.07)",
+                  background: "#121519", border: "1px solid rgba(255,255,255,0.08)",
                   borderRadius: 16, padding: 20, textDecoration: "none",
                   transition: "all 0.3s ease"
                 }}
@@ -1158,7 +1166,7 @@ export default function PropertyDetailClient() {
               {nextProperty ? (
                 <a href={`/property/${nextProperty.slug}`} style={{
                   display: "flex", alignItems: "center", gap: 16,
-                  background: "#161A1F", border: "1px solid rgba(255,255,255,0.07)",
+                  background: "#121519", border: "1px solid rgba(255,255,255,0.08)",
                   borderRadius: 16, padding: 20, textDecoration: "none",
                   transition: "all 0.3s ease", justifyContent: "flex-end"
                 }}
@@ -1192,7 +1200,8 @@ export default function PropertyDetailClient() {
           <button
             onClick={(e) => { e.stopPropagation(); setLightboxOpen(false); }}
             aria-label="Close gallery"
-            style={{ position: "absolute", top: "24px", right: "24px", width: "44px", height: "44px", borderRadius: "50%", background: "rgba(255,255,255,0.1)", border: "1px solid rgba(255,255,255,0.25)", color: "#fff", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 2 }}
+            className="pd-lb-btn"
+            style={{ position: "absolute", top: "24px", right: "24px", width: "44px", height: "44px", borderRadius: "50%", background: "rgba(255,255,255,0.06)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", border: "1px solid rgba(255,255,255,0.10)", color: "#fff", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 2 }}
           >
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M18 6L6 18M6 6l12 12" /></svg>
           </button>
@@ -1201,7 +1210,8 @@ export default function PropertyDetailClient() {
             <button
               onClick={(e) => { e.stopPropagation(); prevImg(); }}
               aria-label="Previous photo"
-              style={{ position: "absolute", left: "24px", top: "50%", transform: "translateY(-50%)", width: "52px", height: "52px", borderRadius: "50%", background: "rgba(255,255,255,0.1)", border: "1px solid rgba(255,255,255,0.25)", color: "#fff", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}
+              className="pd-lb-btn"
+              style={{ position: "absolute", left: "24px", top: "50%", transform: "translateY(-50%)", width: "52px", height: "52px", borderRadius: "50%", background: "rgba(255,255,255,0.06)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", border: "1px solid rgba(255,255,255,0.10)", color: "#fff", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}
             >
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6" /></svg>
             </button>
@@ -1219,13 +1229,14 @@ export default function PropertyDetailClient() {
             <button
               onClick={(e) => { e.stopPropagation(); nextImg(); }}
               aria-label="Next photo"
-              style={{ position: "absolute", right: "24px", top: "50%", transform: "translateY(-50%)", width: "52px", height: "52px", borderRadius: "50%", background: "rgba(255,255,255,0.1)", border: "1px solid rgba(255,255,255,0.25)", color: "#fff", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}
+              className="pd-lb-btn"
+              style={{ position: "absolute", right: "24px", top: "50%", transform: "translateY(-50%)", width: "52px", height: "52px", borderRadius: "50%", background: "rgba(255,255,255,0.06)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", border: "1px solid rgba(255,255,255,0.10)", color: "#fff", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}
             >
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6" /></svg>
             </button>
           )}
 
-          <div style={{ position: "absolute", bottom: "28px", left: "50%", transform: "translateX(-50%)", padding: "6px 16px", borderRadius: "100px", background: "rgba(255,255,255,0.12)", border: "1px solid rgba(255,255,255,0.2)", color: "#fff", fontSize: "13px", fontWeight: 600, letterSpacing: "0.04em" }}>
+          <div style={{ position: "absolute", bottom: "28px", left: "50%", transform: "translateX(-50%)", padding: "6px 16px", borderRadius: "999px", background: "rgba(255,255,255,0.06)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", border: "1px solid rgba(255,255,255,0.10)", color: "#fff", fontSize: "13px", fontWeight: 600, letterSpacing: "0.04em" }}>
             {activeImg + 1} / {images.length}
           </div>
         </div>
@@ -1235,16 +1246,16 @@ export default function PropertyDetailClient() {
       {visitOpen && (
         <div
           onClick={() => { setVisitOpen(false); setVisitDone(false); setVisitError(null); }}
-          style={{ position: "fixed", inset: 0, zIndex: 9999, background: "rgba(5,12,9,0.7)", backdropFilter: "blur(6px)", display: "flex", alignItems: "center", justifyContent: "center", padding: "20px" }}
+          style={{ position: "fixed", inset: 0, zIndex: 9999, background: "rgba(0,0,0,0.7)", backdropFilter: "blur(6px)", WebkitBackdropFilter: "blur(6px)", display: "flex", alignItems: "center", justifyContent: "center", padding: "20px" }}
         >
           <div
             onClick={(e) => e.stopPropagation()}
-            style={{ background: "#fff", borderRadius: "16px", maxWidth: "440px", width: "100%", padding: "32px", boxShadow: "0 30px 80px rgba(0,0,0,0.4)", position: "relative" }}
+            style={{ background: "#121519", border: "1px solid rgba(255,255,255,0.10)", borderRadius: "24px", maxWidth: "440px", width: "100%", padding: "32px", boxShadow: "0 30px 80px rgba(0,0,0,0.6)", position: "relative" }}
           >
             <button
               onClick={() => { setVisitOpen(false); setVisitDone(false); setVisitError(null); }}
               aria-label="Close"
-              style={{ position: "absolute", top: "18px", right: "18px", background: "transparent", border: "none", cursor: "pointer", color: "#6B7C72", padding: 0 }}
+              style={{ position: "absolute", top: "18px", right: "18px", background: "transparent", border: "none", cursor: "pointer", color: "#AEB4BC", padding: 0 }}
             >
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M18 6L6 18M6 6l12 12" /></svg>
             </button>
@@ -1252,54 +1263,54 @@ export default function PropertyDetailClient() {
             {visitDone ? (
               <div style={{ textAlign: "center", padding: "16px 0 4px" }}>
                 <div style={{ fontSize: "40px", marginBottom: "12px" }}>📅</div>
-                <h3 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "26px", fontWeight: 600, color: "#000000", marginBottom: "8px" }}>Visit Scheduled!</h3>
-                <p style={{ fontSize: "14px", color: "#6B7C72", lineHeight: 1.6 }}>The seller will confirm your appointment.</p>
+                <h3 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "26px", fontWeight: 600, color: "#E8EAED", marginBottom: "8px" }}>Visit Scheduled!</h3>
+                <p style={{ fontSize: "14px", color: "#AEB4BC", lineHeight: 1.6 }}>The seller will confirm your appointment.</p>
                 <button
                   onClick={() => { setVisitOpen(false); setVisitDone(false); }}
-                  style={{ marginTop: "22px", padding: "11px 28px", background: "#2BA8E0", border: "none", borderRadius: "8px", color: "#000000", fontSize: "13px", fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", cursor: "pointer", fontFamily: "'DM Sans', sans-serif" }}
+                  style={{ marginTop: "22px", padding: "11px 28px", background: "#2BA8E0", border: "none", borderRadius: "16px", boxShadow: "0 10px 30px rgba(30,167,255,.35)", color: "#000000", fontSize: "13px", fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", cursor: "pointer", fontFamily: "'DM Sans', sans-serif" }}
                 >Done</button>
               </div>
             ) : (
               <>
-                <h3 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "26px", fontWeight: 600, color: "#000000", marginBottom: "4px" }}>Schedule a Site Visit</h3>
-                <p style={{ fontSize: "13px", color: "#6B7C72", marginBottom: "22px" }}>{property.title}</p>
+                <h3 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "26px", fontWeight: 600, color: "#E8EAED", marginBottom: "4px" }}>Schedule a Site Visit</h3>
+                <p style={{ fontSize: "13px", color: "#AEB4BC", marginBottom: "22px" }}>{property.title}</p>
 
-                <label style={{ display: "block", fontSize: "12px", fontWeight: 600, color: "#000000", marginBottom: "6px" }}>Preferred Date</label>
+                <label style={{ display: "block", fontSize: "12px", fontWeight: 600, color: "#E8EAED", marginBottom: "6px" }}>Preferred Date</label>
                 <input
                   type="date" value={visitDate} min={today}
                   onChange={(e) => setVisitDate(e.target.value)}
-                  style={{ width: "100%", padding: "11px 14px", background: "#F8F6F1", border: "1.5px solid rgba(13,43,31,0.12)", borderRadius: "8px", fontSize: "13px", color: "#000000", fontFamily: "'DM Sans', sans-serif", outline: "none", marginBottom: "18px" }}
+                  style={{ width: "100%", padding: "11px 14px", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.10)", borderRadius: "16px", fontSize: "13px", color: "#FFFFFF", fontFamily: "'DM Sans', sans-serif", outline: "none", marginBottom: "18px" }}
                 />
 
-                <label style={{ display: "block", fontSize: "12px", fontWeight: 600, color: "#000000", marginBottom: "8px" }}>Time Slot</label>
+                <label style={{ display: "block", fontSize: "12px", fontWeight: 600, color: "#E8EAED", marginBottom: "8px" }}>Time Slot</label>
                 <div style={{ display: "flex", flexDirection: "column", gap: "8px", marginBottom: "18px" }}>
                   {VISIT_SLOTS.map(s => (
                     <button
                       key={s.id}
                       onClick={() => setVisitSlot(s.id)}
-                      style={{ padding: "11px 14px", borderRadius: "8px", textAlign: "left", fontSize: "13px", fontWeight: 600, fontFamily: "'DM Sans', sans-serif", cursor: "pointer", border: visitSlot === s.id ? "1.5px solid #2BA8E0" : "1.5px solid rgba(13,43,31,0.12)", background: visitSlot === s.id ? "rgba(201,168,76,0.1)" : "#F8F6F1", color: visitSlot === s.id ? "#1577B8" : "#374151" }}
+                      style={{ padding: "11px 14px", borderRadius: "8px", textAlign: "left", fontSize: "13px", fontWeight: 600, fontFamily: "'DM Sans', sans-serif", cursor: "pointer", border: visitSlot === s.id ? "1px solid #2BA8E0" : "1px solid rgba(255,255,255,0.10)", background: visitSlot === s.id ? "rgba(43,168,224,0.15)" : "rgba(255,255,255,0.06)", color: visitSlot === s.id ? "#2BA8E0" : "#AEB4BC" }}
                     >
                       {s.label}
                     </button>
                   ))}
                 </div>
 
-                <label style={{ display: "block", fontSize: "12px", fontWeight: 600, color: "#000000", marginBottom: "6px" }}>Your Name</label>
+                <label style={{ display: "block", fontSize: "12px", fontWeight: 600, color: "#E8EAED", marginBottom: "6px" }}>Your Name</label>
                 <input
                   type="text" value={visitName} placeholder="Full name"
                   onChange={(e) => setVisitName(e.target.value)}
-                  style={{ width: "100%", padding: "11px 14px", background: "#F8F6F1", border: "1.5px solid rgba(13,43,31,0.12)", borderRadius: "8px", fontSize: "13px", color: "#000000", fontFamily: "'DM Sans', sans-serif", outline: "none", marginBottom: "14px" }}
+                  style={{ width: "100%", padding: "11px 14px", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.10)", borderRadius: "16px", fontSize: "13px", color: "#FFFFFF", fontFamily: "'DM Sans', sans-serif", outline: "none", marginBottom: "14px" }}
                 />
 
-                <label style={{ display: "block", fontSize: "12px", fontWeight: 600, color: "#000000", marginBottom: "6px" }}>Phone Number</label>
+                <label style={{ display: "block", fontSize: "12px", fontWeight: 600, color: "#E8EAED", marginBottom: "6px" }}>Phone Number</label>
                 <input
                   type="tel" value={visitPhone} placeholder="10-digit mobile"
                   onChange={(e) => setVisitPhone(e.target.value)}
-                  style={{ width: "100%", padding: "11px 14px", background: "#F8F6F1", border: "1.5px solid rgba(13,43,31,0.12)", borderRadius: "8px", fontSize: "13px", color: "#000000", fontFamily: "'DM Sans', sans-serif", outline: "none", marginBottom: "18px" }}
+                  style={{ width: "100%", padding: "11px 14px", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.10)", borderRadius: "16px", fontSize: "13px", color: "#FFFFFF", fontFamily: "'DM Sans', sans-serif", outline: "none", marginBottom: "18px" }}
                 />
 
                 {visitError && (
-                  <div style={{ marginBottom: "14px", padding: "10px 14px", background: "rgba(185,28,28,0.08)", border: "1px solid rgba(185,28,28,0.25)", borderRadius: "8px", color: "#B91C1C", fontSize: "12px" }}>
+                  <div style={{ marginBottom: "14px", padding: "10px 14px", background: "rgba(185,28,28,0.15)", border: "1px solid rgba(248,113,113,0.35)", borderRadius: "16px", color: "#F87171", fontSize: "12px" }}>
                     {visitError}
                   </div>
                 )}
@@ -1307,7 +1318,8 @@ export default function PropertyDetailClient() {
                 <button
                   onClick={submitVisit}
                   disabled={visitSubmitting}
-                  style={{ width: "100%", padding: "13px", background: "#2BA8E0", border: "none", borderRadius: "8px", color: "#000000", fontSize: "13px", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", cursor: visitSubmitting ? "not-allowed" : "pointer", opacity: visitSubmitting ? 0.65 : 1, fontFamily: "'DM Sans', sans-serif" }}
+                  style={{ width: "100%", padding: "13px", background: "#2BA8E0", border: "none", borderRadius: "16px", boxShadow: "0 10px 30px rgba(30,167,255,.35)", color: "#000000", fontSize: "13px", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", cursor: visitSubmitting ? "not-allowed" : "pointer", opacity: visitSubmitting ? 0.65 : 1, fontFamily: "'DM Sans', sans-serif", transition: "background 0.2s" }}
+                  className="pd-btn-primary"
                 >{visitSubmitting ? "Scheduling…" : "Confirm Visit"}</button>
               </>
             )}

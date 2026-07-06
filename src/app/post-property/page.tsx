@@ -1348,6 +1348,8 @@ export default function PostPropertyPage() {
 
     try {
       const supabase = createClient()
+      const { data: { session } } = await supabase.auth.getSession()
+      const authUserId = session?.user?.id ?? null
 
       // Upload photos to Supabase Storage — track failures and abort if any fail
       const imageUrls: string[] = []
@@ -1424,6 +1426,7 @@ export default function PostPropertyPage() {
         seller_email:       state.sellerEmail,
         seller_phone:       state.sellerPhone,
         seller_whatsapp:    state.sellerWhatsapp || null,
+        user_id:            authUserId,
         is_featured:        false,
         views:              0,
       }])
