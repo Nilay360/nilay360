@@ -328,11 +328,25 @@ function ListingsTab({ listings, loading, onDelete }: {
   loading: boolean;
   onDelete: (id: string) => void;
 }) {
+  const [search, setSearch] = useState("");
+
   if (loading) return <Spinner />;
+
+  const filtered = search.trim() === ""
+    ? listings
+    : listings.filter(l => {
+        const q = search.toLowerCase();
+        return (
+          l.title?.toLowerCase().includes(q) ||
+          l.city?.toLowerCase().includes(q) ||
+          l.locality?.toLowerCase().includes(q) ||
+          l.status?.toLowerCase().includes(q)
+        );
+      });
 
   return (
     <div>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "28px", flexWrap: "wrap", gap: "12px" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "20px", flexWrap: "wrap", gap: "12px" }}>
         <SectionHeading
           title="My Listings"
           subtitle={listings.length ? `${listings.length} listing${listings.length !== 1 ? "s" : ""} submitted` : undefined}
@@ -341,6 +355,30 @@ function ListingsTab({ listings, loading, onDelete }: {
           + List Property
         </a>
       </div>
+
+      {listings.length > 0 && (
+        <div style={{ marginBottom: "20px" }}>
+          <input
+            type="text"
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            placeholder="Search by title, city, or status…"
+            style={{
+              width: "100%", boxSizing: "border-box",
+              padding: "10px 16px",
+              background: "rgba(255,255,255,0.08)",
+              border: "1.5px solid rgba(255,255,255,0.22)",
+              borderRadius: "10px", fontSize: "13px", color: "#E8EAED",
+              fontFamily: "'DM Sans', sans-serif", outline: "none",
+            }}
+          />
+          {search.trim() !== "" && (
+            <p style={{ fontSize: "12px", color: "rgba(255,255,255,0.45)", fontFamily: "'DM Sans', sans-serif", margin: "8px 0 0" }}>
+              Showing {filtered.length} of {listings.length} {listings.length === 1 ? "listing" : "listings"}
+            </p>
+          )}
+        </div>
+      )}
 
       {listings.length === 0 ? (
         <Card>
@@ -352,9 +390,14 @@ function ListingsTab({ listings, loading, onDelete }: {
             ctaHref="/post-property"
           />
         </Card>
+      ) : filtered.length === 0 ? (
+        <Card style={{ padding: "40px 24px", textAlign: "center" }}>
+          <p style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "20px", color: "#E8EAED", margin: "0 0 6px" }}>No listings match</p>
+          <p style={{ fontSize: "13px", color: "rgba(255,255,255,0.45)", fontFamily: "'DM Sans', sans-serif", margin: 0 }}>Try a different title, city, or status.</p>
+        </Card>
       ) : (
         <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
-          {listings.map(l => (
+          {filtered.map(l => (
             <Card key={l.id} style={{ padding: "22px 24px" }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: "16px", flexWrap: "wrap" }}>
                 {/* Left: info */}
