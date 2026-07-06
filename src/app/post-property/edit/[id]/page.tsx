@@ -257,10 +257,10 @@ export default function EditListingPage() {
           seller_name:        form.seller_name        || null,
           seller_phone:       form.seller_phone       || null,
           seller_whatsapp:    form.seller_whatsapp    || null,
+          user_id:            userId,
           updated_at:         new Date().toISOString(),
         })
         .eq('id', id)
-        .eq('user_id', userId)
       setSaving(false)
       if (upErr) {
         console.error('Edit listing — update error code:', upErr.code, '| message:', upErr.message, '| details:', upErr.details)
