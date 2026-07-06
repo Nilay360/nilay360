@@ -9,6 +9,7 @@ import type { NavMenuData } from "@/constants"
 import { createClient } from "@/lib/supabase/client"
 import { useAuth } from "@/context/AuthContext"
 import type { User } from "@supabase/supabase-js"
+import { MyListingsDropdown } from "@/components/layout/MyListingsDropdown"
 
 // ─── Types ─────────────────────────────────────────────────────────────────────
 
@@ -281,15 +282,19 @@ function UserDropdown({ user, profile, onClose, onSignOut, open, wrapperRef, dro
             {gi > 0 && (
               <div style={{ height: 1, background: "rgba(255,255,255,0.05)", margin: "4px 0" }} />
             )}
-            {group.items.map(item => (
-              <DropdownLink
-                key={item.href}
-                href={item.href}
-                icon={<item.icon />}
-                label={item.label}
-                onClick={onClose}
-              />
-            ))}
+            {group.items.map(item =>
+              item.label === "My Listings" ? (
+                <MyListingsDropdown key="my-listings" onNavClose={onClose} />
+              ) : (
+                <DropdownLink
+                  key={item.href}
+                  href={item.href}
+                  icon={<item.icon />}
+                  label={item.label}
+                  onClick={onClose}
+                />
+              )
+            )}
           </React.Fragment>
         ))}
       </div>
@@ -1042,15 +1047,19 @@ export function Navbar() {
                     </Link>
                   </div>
 
+                  {/* My Listings expandable panel */}
+                  <div style={{ marginBottom: 8 }}>
+                    <MyListingsDropdown mobile onNavClose={() => setMenuOpen(false)} />
+                  </div>
+
                   {/* Quick links grid */}
                   <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 12 }}>
                     {[
-                      { href: "/dashboard", label: "Dashboard", icon: "⊞" },
-                      { href: "/dashboard/my-listings", label: "My Listings", icon: "🏠" },
-                      { href: "/post-property", label: "List Property", icon: "+" },
-                      { href: "/dashboard/saved", label: "Saved", icon: "♡" },
-                      { href: "/dashboard/searches", label: "My Searches", icon: "⌕" },
-                      { href: "/calculator", label: "Calculator", icon: "⊟" },
+                      { href: "/dashboard",          label: "Dashboard",    icon: "⊞" },
+                      { href: "/post-property",       label: "List Property",icon: "+" },
+                      { href: "/dashboard/saved",     label: "Saved",        icon: "♡" },
+                      { href: "/dashboard/searches",  label: "My Searches",  icon: "⌕" },
+                      { href: "/calculator",          label: "Calculator",   icon: "⊟" },
                     ].map(item => (
                       <Link key={item.href} href={item.href} onClick={() => setMenuOpen(false)}
                         style={{

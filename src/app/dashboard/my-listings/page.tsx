@@ -36,6 +36,7 @@ export default function MyListingsPage() {
   const [loading, setLoading]   = useState(true);
   const [email, setEmail]       = useState<string | null>(null);
   const [deleting, setDeleting] = useState<string | null>(null);
+  const [search,   setSearch]   = useState<string>("");
 
   useEffect(() => {
     const supabase = createClient();
@@ -89,6 +90,17 @@ export default function MyListingsPage() {
       </div>
     );
   }
+
+  const filtered = search.trim() === ""
+    ? listings
+    : listings.filter(l => {
+        const q = search.toLowerCase()
+        return (
+          l.title?.toLowerCase().includes(q) ||
+          l.city?.toLowerCase().includes(q) ||
+          l.status.toLowerCase().includes(q)
+        )
+      })
 
   return (
     <div style={{ minHeight: "100vh", background: G.ivory, paddingTop: 64 }}>
@@ -148,7 +160,32 @@ export default function MyListingsPage() {
           </div>
         </div>
 
-        {/* Empty state */}
+        {/* Search */}
+        {listings.length > 0 && (
+          <div style={{ marginBottom: 24 }}>
+            <input
+              type="text"
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              placeholder="Search by title, city, or status…"
+              style={{
+                width: "100%", boxSizing: "border-box",
+                padding: "11px 16px",
+                background: "rgba(255,255,255,0.06)",
+                border: "1.5px solid rgba(255,255,255,0.12)",
+                borderRadius: 10, fontSize: 13, color: "#E8EAED",
+                fontFamily: "'DM Sans', sans-serif", outline: "none",
+              }}
+            />
+            {search.trim() !== "" && (
+              <p style={{ fontSize: 12, color: "rgba(255,255,255,0.45)", fontFamily: "'DM Sans', sans-serif", margin: "8px 0 0" }}>
+                Showing {filtered.length} of {listings.length} {listings.length === 1 ? "listing" : "listings"}
+              </p>
+            )}
+          </div>
+        )}
+
+        {/* Empty state — no listings at all */}
         {listings.length === 0 && (
           <div style={{
             textAlign: "center", padding: "80px 0",
@@ -165,9 +202,26 @@ export default function MyListingsPage() {
           </div>
         )}
 
+        {/* Empty state — search returned no matches */}
+        {listings.length > 0 && filtered.length === 0 && (
+          <div style={{
+            textAlign: "center", padding: "60px 24px",
+            background: "rgba(255,255,255,0.05)",
+            backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)",
+            borderRadius: 16, border: "1px solid rgba(255,255,255,0.08)",
+          }}>
+            <p style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: 22, color: "#E8EAED", margin: "0 0 8px" }}>
+              No listings match
+            </p>
+            <p style={{ fontSize: 13, color: "rgba(255,255,255,0.45)", fontFamily: "'DM Sans', sans-serif", margin: 0 }}>
+              Try a different title, city, or status.
+            </p>
+          </div>
+        )}
+
         {/* Listing cards */}
         <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-          {listings.map(listing => {
+          {filtered.map(listing => {
             const thumb = listing.photo_urls?.[0] ?? null;
             const statusColors: Record<string, { text: string; bg: string; label: string }> = {
               active:         { text: "#2BA8E0", bg: "rgba(43,168,224,0.15)",   label: "Active"          },
