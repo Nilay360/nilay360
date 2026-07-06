@@ -2,6 +2,8 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { SavedSearchesList } from "@/components/dashboard/SavedSearchesList";
+import { MyListingsList } from "@/components/dashboard/MyListingsList";
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
@@ -56,13 +58,6 @@ type Inquiry = {
   message: string | null;
   inquiry_type: string | null;
   status: string | null;
-  created_at: string;
-};
-
-type SavedSearch = {
-  id: string;
-  name: string | null;
-  filters: Record<string, unknown>;
   created_at: string;
 };
 
@@ -326,135 +321,11 @@ function OverviewTab({ email, fullName, listings, savedItems, profile }: {
 function ListingsTab({ listings, loading, onDelete }: {
   listings: Listing[];
   loading: boolean;
-  onDelete: (id: string) => void;
+  onDelete: (id: string) => Promise<void>;
 }) {
-  const [search, setSearch] = useState("");
-
   if (loading) return <Spinner />;
 
-  const filtered = search.trim() === ""
-    ? listings
-    : listings.filter(l => {
-        const q = search.toLowerCase();
-        return (
-          l.title?.toLowerCase().includes(q) ||
-          l.city?.toLowerCase().includes(q) ||
-          l.locality?.toLowerCase().includes(q) ||
-          l.status?.toLowerCase().includes(q)
-        );
-      });
-
-  return (
-    <div>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "20px", flexWrap: "wrap", gap: "12px" }}>
-        <SectionHeading
-          title="My Listings"
-          subtitle={listings.length ? `${listings.length} listing${listings.length !== 1 ? "s" : ""} submitted` : undefined}
-        />
-        <a href="/post-property" style={{ padding: "10px 20px", background: "#2BA8E0", borderRadius: "999px", color: "#000", fontSize: "13px", fontWeight: 700, textDecoration: "none", flexShrink: 0, boxShadow: "0 10px 30px rgba(30,167,255,.35)" }}>
-          + List Property
-        </a>
-      </div>
-
-      {listings.length > 0 && (
-        <div style={{ marginBottom: "20px" }}>
-          <input
-            type="text"
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-            placeholder="Search by title, city, or status…"
-            style={{
-              width: "100%", boxSizing: "border-box",
-              padding: "10px 16px",
-              background: "rgba(255,255,255,0.08)",
-              border: "1.5px solid rgba(255,255,255,0.22)",
-              borderRadius: "10px", fontSize: "13px", color: "#E8EAED",
-              fontFamily: "'DM Sans', sans-serif", outline: "none",
-            }}
-          />
-          {search.trim() !== "" && (
-            <p style={{ fontSize: "12px", color: "rgba(255,255,255,0.45)", fontFamily: "'DM Sans', sans-serif", margin: "8px 0 0" }}>
-              Showing {filtered.length} of {listings.length} {listings.length === 1 ? "listing" : "listings"}
-            </p>
-          )}
-        </div>
-      )}
-
-      {listings.length === 0 ? (
-        <Card>
-          <EmptyState
-            icon={<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M9 22V12h6v10"/><path d="M8 6h.01M16 6h.01M8 10h.01M16 10h.01"/></svg>}
-            title="No listings yet"
-            subtitle="Post your first property listing to reach thousands of qualified buyers on Nilay 360."
-            cta="Post a Property"
-            ctaHref="/post-property"
-          />
-        </Card>
-      ) : filtered.length === 0 ? (
-        <Card style={{ padding: "40px 24px", textAlign: "center" }}>
-          <p style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "20px", color: "#E8EAED", margin: "0 0 6px" }}>No listings match</p>
-          <p style={{ fontSize: "13px", color: "rgba(255,255,255,0.45)", fontFamily: "'DM Sans', sans-serif", margin: 0 }}>Try a different title, city, or status.</p>
-        </Card>
-      ) : (
-        <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
-          {filtered.map(l => (
-            <Card key={l.id} style={{ padding: "22px 24px" }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: "16px", flexWrap: "wrap" }}>
-                {/* Left: info */}
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "8px", flexWrap: "wrap" }}>
-                    <StatusBadge status={l.status} />
-                    <span style={{ fontSize: "11px", color: "rgba(255,255,255,0.45)" }}>{formatDate(l.submitted_at)}</span>
-                  </div>
-                  <h3 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "19px", fontWeight: 600, color: "#E8EAED", marginBottom: "6px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                    {l.title ?? `${l.property_category ?? "Property"} in ${l.city ?? "—"}`}
-                  </h3>
-                  <div style={{ display: "flex", gap: "16px", flexWrap: "wrap", fontSize: "13px", color: "#AEB4BC" }}>
-                    {l.property_category && <span style={{ textTransform: "capitalize" }}>{l.property_category}</span>}
-                    <span style={{ textTransform: "capitalize" }}>
-                      {l.listing_type === "sale" ? "For Sale" : l.listing_type === "rent" ? "For Rent" : (l.listing_type ?? "—")}
-                    </span>
-                    {(l.locality || l.city) && (
-                      <span>{[l.locality, l.city].filter(Boolean).join(", ")}</span>
-                    )}
-                  </div>
-                </div>
-
-                {/* Right: price + actions */}
-                <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: "10px", flexShrink: 0 }}>
-                  <div style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "22px", fontWeight: 600, color: "#E8EAED" }}>
-                    {formatPrice(l.price, l.listing_type)}
-                  </div>
-                  <div style={{ display: "flex", gap: "8px", flexWrap: "wrap", justifyContent: "flex-end" }}>
-                    {l.status === "active" && l.slug && (
-                      <a
-                        href={`/property/${l.slug}`}
-                        style={{ padding: "6px 12px", fontSize: "12px", fontWeight: 500, color: "#E8EAED", border: "1px solid rgba(255,255,255,0.2)", borderRadius: "7px", textDecoration: "none" }}
-                      >
-                        View
-                      </a>
-                    )}
-                    <a
-                      href={`/post-property/edit/${l.id}`}
-                      style={{ display: "flex", alignItems: "center", gap: "5px", padding: "6px 12px", fontSize: "12px", fontWeight: 500, color: "#E8EAED", border: "1px solid rgba(255,255,255,0.2)", borderRadius: "7px", textDecoration: "none" }}
-                    >
-                      <IconEdit /> Edit
-                    </a>
-                    <button
-                      onClick={() => onDelete(l.id)}
-                      style={{ display: "flex", alignItems: "center", gap: "5px", padding: "6px 12px", fontSize: "12px", color: "#F87171", background: "rgba(248,113,113,0.12)", border: "1px solid rgba(248,113,113,0.30)", borderRadius: "7px", cursor: "pointer", fontFamily: "'DM Sans', sans-serif" }}
-                    >
-                      <IconTrash /> Delete
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </Card>
-          ))}
-        </div>
-      )}
-    </div>
-  );
+  return <MyListingsList listings={listings} onDelete={onDelete} compact />;
 }
 
 // ── Tab 3: Saved Properties ───────────────────────────────────────────────────
@@ -765,121 +636,8 @@ function ProfileTab({ email, userId, profile, loading, onSave }: {
   );
 }
 
-// ── Saved search helpers ──────────────────────────────────────────────────────
-
-function fmtBudgetShort(v: number): string {
-  if (v >= 10_000_000) return `₹${(v / 10_000_000).toFixed(1)}Cr`;
-  return `₹${(v / 100_000).toFixed(0)}L`;
-}
-
-function buildSearchSummary(f: Record<string, unknown>): string {
-  const parts: string[] = [];
-  if (typeof f.listingType === "string" && f.listingType !== "all")
-    parts.push(f.listingType === "sale" ? "Sale" : "Rent");
-  const types = Array.isArray(f.propTypes) ? (f.propTypes as string[]) : [];
-  if (types.length > 0) parts.push(types.map(t => t.charAt(0).toUpperCase() + t.slice(1)).join("/"));
-  if (typeof f.city === "string" && f.city !== "all") parts.push(f.city);
-  const beds = Array.isArray(f.bhk) ? (f.bhk as number[]) : [];
-  if (beds.length > 0) parts.push(beds.map((b: number) => `${b}${b >= 5 ? "+" : ""} BHK`).join("/"));
-  const mn = typeof f.minPrice === "string" && f.minPrice ? Number(f.minPrice) : null;
-  const mx = typeof f.maxPrice === "string" && f.maxPrice ? Number(f.maxPrice) : null;
-  if (mn != null || mx != null)
-    parts.push(`${mn != null ? fmtBudgetShort(mn) : "Any"} – ${mx != null ? fmtBudgetShort(mx) : "Any"}`);
-  return parts.length > 0 ? parts.join(" · ") : "All Properties";
-}
-
-const SEARCH_BUDGET_PRESETS: Record<string, [number, number]> = {
-  "Under 50L":  [0,          5_000_000],
-  "50L – 1Cr":   [5_000_000,  10_000_000],
-  "1 – 2 Cr":    [10_000_000, 20_000_000],
-  "2 – 5 Cr":    [20_000_000, 50_000_000],
-  "5 Cr+":      [50_000_000, 999_999_999],
-};
-
-function buildSearchUrl(f: Record<string, unknown>, q: string | null): string {
-  const p = new URLSearchParams();
-  if (typeof f.city === "string" && f.city !== "all") p.set("city", f.city);
-  if (typeof f.listingType === "string" && f.listingType !== "all") p.set("listing", f.listingType);
-  const types = Array.isArray(f.propTypes) ? (f.propTypes as string[]) : [];
-  if (types.length === 1) p.set("type", types[0]);
-  const beds = Array.isArray(f.bhk) ? (f.bhk as number[]) : [];
-  if (beds.length === 1) p.set("beds", String(beds[0]));
-  const mn = typeof f.minPrice === "string" && f.minPrice ? Number(f.minPrice) : 0;
-  const mx = typeof f.maxPrice === "string" && f.maxPrice ? Number(f.maxPrice) : 0;
-  for (const [label, [pMn, pMx]] of Object.entries(SEARCH_BUDGET_PRESETS)) {
-    if (pMn === mn && pMx === mx) { p.set("budget", label); break; }
-  }
-  if (q) p.set("q", q);
-  return `/search${p.toString() ? "?" + p.toString() : ""}`;
-}
-
-// ── Tab 4: Saved Searches ─────────────────────────────────────────────────────
-
-function SearchesTab({ loading, searches, onDelete }: {
-  loading: boolean;
-  searches: SavedSearch[];
-  onDelete: (id: string) => void;
-}) {
-  if (loading) return <Spinner />;
-  const count = searches.length;
-  return (
-    <div>
-      <SectionHeading
-        title="Saved Searches"
-        subtitle={count ? `${count} saved search${count !== 1 ? "es" : ""}` : "Save searches from the search page to revisit them here."}
-      />
-
-      {count === 0 ? (
-        <Card>
-          <EmptyState
-            icon={<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>}
-            title="No saved searches yet"
-            subtitle="Use the 'Save Search' button on the search page to save your filters and revisit them here."
-            cta="Go to Search"
-            ctaHref="/search"
-          />
-        </Card>
-      ) : (
-        <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
-          {searches.map(s => {
-            const f = s.filters ?? {};
-            const summary = buildSearchSummary(f);
-            const url = buildSearchUrl(f, s.name);
-            return (
-              <Card key={s.id} style={{ padding: "20px 24px" }}>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: "16px", flexWrap: "wrap" }}>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    {s.name && (
-                      <p style={{ fontSize: "15px", fontWeight: 600, color: "#E8EAED", marginBottom: "5px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                        {s.name}
-                      </p>
-                    )}
-                    <p style={{ fontSize: "13px", color: "#AEB4BC", marginBottom: "8px" }}>{summary}</p>
-                    <span style={{ fontSize: "11px", color: "rgba(255,255,255,0.45)" }}>Saved {formatDate(s.created_at)}</span>
-                  </div>
-                  <div style={{ display: "flex", gap: "8px", flexShrink: 0, flexWrap: "wrap", alignItems: "center" }}>
-                    <a
-                      href={url}
-                      style={{ display: "inline-flex", alignItems: "center", gap: "6px", padding: "7px 14px", fontSize: "12px", fontWeight: 600, color: "#000", background: "#2BA8E0", borderRadius: "999px", textDecoration: "none", letterSpacing: "0.04em", boxShadow: "0 10px 30px rgba(30,167,255,.35)" }}
-                    >
-                      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-                      Run Search
-                    </a>
-                    <button
-                      onClick={() => onDelete(s.id)}
-                      style={{ display: "flex", alignItems: "center", gap: "5px", padding: "7px 12px", fontSize: "12px", color: "#F87171", background: "rgba(248,113,113,0.12)", border: "1px solid rgba(248,113,113,0.30)", borderRadius: "8px", cursor: "pointer", fontFamily: "'DM Sans', sans-serif" }}
-                    >
-                      <IconTrash /> Delete
-                    </button>
-                  </div>
-                </div>
-              </Card>
-            );
-          })}
-        </div>
-      )}
-    </div>
-  );
+function SearchesTab() {
+  return <SavedSearchesList />;
 }
 
 function InquiryTypeBadge({ type }: { type: string | null }) {
@@ -1142,8 +900,6 @@ export default function DashboardClient({ email, userId, fullName, accountType }
   const [profile,          setProfile]          = useState<ProfileData | null>(null);
   const [dataLoading,      setDataLoading]       = useState(true);
   const [hasSavedTable,    setHasSavedTable]    = useState(true);
-  const [hasSearchesTable, setHasSearchesTable] = useState(false);
-  const [savedSearches,    setSavedSearches]    = useState<SavedSearch[]>([]);
 
   useEffect(() => {
     const supabase = createClient();
@@ -1186,17 +942,6 @@ export default function DashboardClient({ email, userId, fullName, accountType }
       if (inqErr) console.error("Dashboard — inquiries query error:", inqErr);
       if (!cancelled) setInquiries((inqData as Inquiry[] | null) ?? []);
 
-      // ── Saved Searches ────────────────────────────────────────
-      const { data: searchData, error: searchErr } = await supabase
-        .from("saved_searches")
-        .select("id, name, filters, alert_email, created_at")
-        .eq("user_id", userId)
-        .order("created_at", { ascending: false });
-      if (!cancelled && !searchErr) {
-        setHasSearchesTable(true);
-        setSavedSearches((searchData as SavedSearch[] | null) ?? []);
-      }
-
       // ── Profile ───────────────────────────────────────────────
       const { data: profData, error: profErr } = await supabase
         .from("profiles")
@@ -1213,9 +958,7 @@ export default function DashboardClient({ email, userId, fullName, accountType }
     return () => { cancelled = true; };
   }, [email, userId]);
 
-  // Delete a listing with confirmation dialog
   const deleteListing = useCallback(async (listingId: string) => {
-    if (!window.confirm("Delete this listing? This cannot be undone.")) return;
     const supabase = createClient();
     const { error } = await supabase.from("property_listings").delete().eq("id", listingId);
     if (error) console.error("Dashboard — delete listing error:", error);
@@ -1229,18 +972,6 @@ export default function DashboardClient({ email, userId, fullName, accountType }
     if (error) console.error("Dashboard — remove save error:", error);
     else setSavedItems(prev => prev.filter(s => s.id !== saveId));
   }, []);
-
-  // Delete a saved search with optimistic removal
-  const deleteSearch = useCallback(async (searchId: string) => {
-    const prev = savedSearches;
-    setSavedSearches(list => list.filter(s => s.id !== searchId));
-    const supabase = createClient();
-    const { error } = await supabase.from("saved_searches").delete().eq("id", searchId);
-    if (error) {
-      console.error("Dashboard — delete search error:", error);
-      setSavedSearches(prev);
-    }
-  }, [savedSearches]);
 
   // Update inquiry status with optimistic UI
   const updateInquiryStatus = useCallback(async (inquiryId: string, newStatus: string): Promise<void> => {
@@ -1293,7 +1024,7 @@ export default function DashboardClient({ email, userId, fullName, accountType }
     overview:     <OverviewTab     email={email} fullName={fullName} listings={listings} savedItems={savedItems} profile={profile} />,
     listings:     <ListingsTab     listings={listings} loading={dataLoading} onDelete={deleteListing} />,
     saved:        <SavedTab        savedItems={savedItems} loading={dataLoading} onRemove={removeSave} />,
-    searches:     <SearchesTab     loading={dataLoading} searches={savedSearches} onDelete={deleteSearch} />,
+    searches:     <SearchesTab />,
     profile:      <ProfileTab      email={email} userId={userId} profile={profile} loading={dataLoading} onSave={updateProfile} />,
     inquiries:    <InquiriesTab    inquiries={inquiries} loading={dataLoading} onStatusChange={updateInquiryStatus} />,
     appointments: <AppointmentsTab />,
