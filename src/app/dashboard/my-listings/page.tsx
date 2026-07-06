@@ -213,7 +213,7 @@ export default function MyListingsPage() {
             {/* Type pills */}
             <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 8, flexWrap: "wrap" }}>
               <span style={{ fontSize: 11, color: "rgba(255,255,255,0.35)", fontFamily: "'DM Sans', sans-serif", marginRight: 2, flexShrink: 0 }}>Type</span>
-              {(["all", "apartment", "villa", "plot", "penthouse", "commercial"] as const).map(v => {
+              {(["all", "apartment", "villa", "plot", "penthouse", "townhouse", "commercial"] as const).map(v => {
                 const on = typeFilter === v;
                 const label = v === "all" ? "All" : v.charAt(0).toUpperCase() + v.slice(1);
                 return (
