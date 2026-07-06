@@ -1026,6 +1026,13 @@ export default function AdminPage() {
         pending_review: "Listing unpublished — returned to review.",
       };
       setToast({ ok: true, msg: msgs[newStatus] ?? "Updated." });
+      if (newStatus === "active") {
+        fetch("/api/check-saved-search-alerts", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ listingId: id }),
+        }).catch(() => {});
+      }
     }
     setInFlight(null);
     setTimeout(() => setToast(null), 3000);

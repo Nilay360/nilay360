@@ -560,9 +560,10 @@ function SearchPageInner() {
   async function saveSearch() {
     if (!saveSearchName.trim() || !userId) return;
     const supabase = createClient();
-    const { error } = await supabase.from("property_searches").insert({
-      user_id:      userId,
-      search_query: saveSearchName.trim(),
+    const { error } = await supabase.from("saved_searches").insert({
+      user_id:     userId,
+      name:        saveSearchName.trim(),
+      alert_email: true,
       filters: {
         city,
         listingType,
