@@ -61,7 +61,7 @@ type Inquiry = {
 
 type SavedSearch = {
   id: string;
-  search_query: string | null;
+  name: string | null;
   filters: Record<string, unknown>;
   created_at: string;
 };
@@ -844,14 +844,14 @@ function SearchesTab({ loading, searches, onDelete }: {
           {searches.map(s => {
             const f = s.filters ?? {};
             const summary = buildSearchSummary(f);
-            const url = buildSearchUrl(f, s.search_query);
+            const url = buildSearchUrl(f, s.name);
             return (
               <Card key={s.id} style={{ padding: "20px 24px" }}>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: "16px", flexWrap: "wrap" }}>
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    {s.search_query && (
+                    {s.name && (
                       <p style={{ fontSize: "15px", fontWeight: 600, color: "#E8EAED", marginBottom: "5px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                        {s.search_query}
+                        {s.name}
                       </p>
                     )}
                     <p style={{ fontSize: "13px", color: "#AEB4BC", marginBottom: "8px" }}>{summary}</p>
@@ -1188,8 +1188,8 @@ export default function DashboardClient({ email, userId, fullName, accountType }
 
       // ── Saved Searches ────────────────────────────────────────
       const { data: searchData, error: searchErr } = await supabase
-        .from("property_searches")
-        .select("*")
+        .from("saved_searches")
+        .select("id, name, filters, alert_email, created_at")
         .eq("user_id", userId)
         .order("created_at", { ascending: false });
       if (!cancelled && !searchErr) {
@@ -1235,7 +1235,7 @@ export default function DashboardClient({ email, userId, fullName, accountType }
     const prev = savedSearches;
     setSavedSearches(list => list.filter(s => s.id !== searchId));
     const supabase = createClient();
-    const { error } = await supabase.from("property_searches").delete().eq("id", searchId);
+    const { error } = await supabase.from("saved_searches").delete().eq("id", searchId);
     if (error) {
       console.error("Dashboard — delete search error:", error);
       setSavedSearches(prev);
