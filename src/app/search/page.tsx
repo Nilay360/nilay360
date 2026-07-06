@@ -578,7 +578,7 @@ function SearchPageInner() {
       },
     });
     if (error) {
-      console.error("Save search error:", error);
+      console.error("Save search error:", JSON.stringify(error, null, 2), (error as {message?:string}).message, (error as {code?:string}).code, (error as {details?:string}).details, (error as {hint?:string}).hint);
     } else {
       setSaveSearchName("");
       setShowSaveModal(false);
