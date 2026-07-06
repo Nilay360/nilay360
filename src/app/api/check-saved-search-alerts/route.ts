@@ -157,12 +157,8 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "listingId required" }, { status: 400 });
   }
 
-  console.log("[alerts] Alert check started for listing:", listingId);
-  console.log("[alerts] SUPABASE_SERVICE_ROLE_KEY set:", !!process.env.SUPABASE_SERVICE_ROLE_KEY);
-  console.log("[alerts] RESEND_API_KEY set:", !!process.env.RESEND_API_KEY);
-
   if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
-    console.error("[alerts] SUPABASE_SERVICE_ROLE_KEY not set — aborting");
+    console.error("check-saved-search-alerts: SUPABASE_SERVICE_ROLE_KEY not set");
     return NextResponse.json({ error: "Server misconfiguration" }, { status: 500 });
   }
 
@@ -175,8 +171,6 @@ export async function POST(req: NextRequest) {
     .eq("id", listingId)
     .single();
 
-  console.log("[alerts] Listing fetch:", listing ? `"${listing.title}" city=${listing.city} type=${listing.listing_type} cat=${listing.property_category}` : "NOT FOUND", listingErr ? `error=${JSON.stringify(listingErr)}` : "");
-
   if (listingErr || !listing) {
     return NextResponse.json({ error: "Listing not found" }, { status: 404 });
   }
@@ -187,8 +181,6 @@ export async function POST(req: NextRequest) {
     .select("id, user_id, name, filters, alert_email")
     .eq("alert_email", true);
 
-  console.log("[alerts] Alert-enabled saved searches found:", searches?.length ?? 0, searchErr ? `error=${JSON.stringify(searchErr)}` : "");
-
   if (searchErr || !searches || searches.length === 0) {
     return NextResponse.json({ sent: 0 });
   }
@@ -198,9 +190,6 @@ export async function POST(req: NextRequest) {
     listingMatchesFilters(listing as Listing, s.filters ?? {})
   );
 
-  console.log("[alerts] Matching saved searches:", matched.length, "of", searches.length);
-  matched.forEach(s => console.log("[alerts]   matched search:", s.id, JSON.stringify(s.filters)));
-
   if (matched.length === 0) {
     return NextResponse.json({ sent: 0 });
   }
@@ -208,25 +197,22 @@ export async function POST(req: NextRequest) {
   let sent = 0;
   for (const search of matched) {
     try {
-      const { data: userData, error: userErr } = await supabase.auth.admin.getUserById(search.user_id);
+      const { data: userData } = await supabase.auth.admin.getUserById(search.user_id);
       const userEmail = userData?.user?.email;
-      console.log("[alerts] Attempting to send email to:", userEmail ?? "(null)", userErr ? `userErr=${JSON.stringify(userErr)}` : "");
       if (!userEmail) continue;
 
-      const resendResult = await resend.emails.send({
+      await resend.emails.send({
         from: "Nilay 360 <contact@nilay360.com>",
         to: userEmail,
         subject: `New listing matches your saved search: ${search.name ?? "Search Alert"}`,
         html: buildAlertEmail(listing as Listing, search.name, userEmail),
       });
-      console.log("[alerts] Resend response:", JSON.stringify(resendResult, null, 2));
       sent++;
     } catch (err) {
       console.error(`[alerts] Email failed for search ${search.id}:`, err);
     }
   }
 
-  console.log("[alerts] Done — sent:", sent, "matched:", matched.length);
   return NextResponse.json({ sent, matched: matched.length });
 }
 
