@@ -7,9 +7,7 @@ import { createClient } from "@/lib/supabase/client"
 interface MiniListing {
   id: string
   title: string | null
-  city: string | null
   status: string
-  photo_urls: string[] | null
 }
 
 const STATUS_MAP: Record<string, { text: string; bg: string; label: string }> = {
@@ -30,91 +28,72 @@ function HouseIcon() {
   )
 }
 
+// Self-contained panel — owns its own search state so filter is always live
 interface PanelProps {
   listings: MiniListing[]
   loading: boolean
-  search: string
-  onSearchChange: (v: string) => void
   onNavClose?: () => void
   onMouseEnter?: () => void
   onMouseLeave?: () => void
 }
 
-function ListingsPanel({ listings, loading, search, onSearchChange, onNavClose, onMouseEnter, onMouseLeave }: PanelProps) {
-  const visible = listings.filter(l => {
-    const q = search.toLowerCase()
-    return !q || l.title?.toLowerCase().includes(q) || l.city?.toLowerCase().includes(q) || l.status.toLowerCase().includes(q)
-  }).slice(0, 5)
+function ListingsPanel({ listings, loading, onNavClose, onMouseEnter, onMouseLeave }: PanelProps) {
+  const [search, setSearch] = useState("")
+
+  const visible = search.trim() === ""
+    ? listings.slice(0, 3)
+    : listings.filter(l =>
+        l.title?.toLowerCase().includes(search.toLowerCase()) ||
+        l.status.toLowerCase().includes(search.toLowerCase())
+      ).slice(0, 3)
 
   return (
     <div
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
-      style={{ borderTop: "1px solid rgba(255,255,255,0.06)", padding: "8px 8px 6px", background: "rgba(255,255,255,0.02)" }}
+      style={{ borderTop: "1px solid rgba(255,255,255,0.08)", padding: "8px 10px 6px", background: "rgba(255,255,255,0.02)" }}
     >
       <input
         type="text"
         value={search}
-        onChange={e => onSearchChange(e.target.value)}
+        onChange={e => setSearch(e.target.value)}
         placeholder="Search listings…"
         style={{
           width: "100%", boxSizing: "border-box",
-          padding: "7px 10px", marginBottom: 6,
-          background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)",
-          borderRadius: 7, fontSize: 12, color: "#E8EAED", outline: "none",
+          padding: "6px 10px", marginBottom: 5,
+          background: "rgba(255,255,255,0.08)",
+          border: "1px solid rgba(255,255,255,0.18)",
+          borderRadius: 6, fontSize: 12,
+          color: "#E8EAED", outline: "none",
           fontFamily: "'DM Sans', sans-serif",
         }}
       />
 
       {loading ? (
-        <p style={{ fontSize: 12, color: "rgba(255,255,255,0.35)", padding: "6px 4px", margin: 0, fontFamily: "'DM Sans', sans-serif" }}>
+        <p style={{ fontSize: 12, color: "rgba(255,255,255,0.35)", padding: "4px 2px", margin: 0, fontFamily: "'DM Sans', sans-serif" }}>
           Loading…
         </p>
       ) : visible.length === 0 ? (
-        <p style={{ fontSize: 12, color: "rgba(255,255,255,0.35)", padding: "6px 4px", margin: 0, fontFamily: "'DM Sans', sans-serif" }}>
-          {search ? "No listings match" : "No listings yet"}
+        <p style={{ fontSize: 12, color: "rgba(255,255,255,0.35)", padding: "4px 2px", margin: 0, fontFamily: "'DM Sans', sans-serif" }}>
+          {search ? "No match" : "No listings yet"}
         </p>
       ) : (
-        <div style={{ display: "flex", flexDirection: "column", gap: 1 }}>
+        <div style={{ display: "flex", flexDirection: "column" }}>
           {visible.map(l => {
             const sc = STATUS_MAP[l.status] ?? { text: "#AEB4BC", bg: "rgba(255,255,255,0.10)", label: l.status }
-            const thumb = l.photo_urls?.[0] ?? null
             return (
               <Link
                 key={l.id}
                 href={`/post-property/edit/${l.id}`}
                 onClick={onNavClose}
-                style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 6px", borderRadius: 6, textDecoration: "none" }}
+                style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, padding: "5px 4px", borderRadius: 5, textDecoration: "none" }}
                 onMouseEnter={e => (e.currentTarget.style.background = "rgba(255,255,255,0.05)")}
                 onMouseLeave={e => (e.currentTarget.style.background = "transparent")}
               >
-                <div style={{
-                  width: 30, height: 30, borderRadius: 5, flexShrink: 0,
-                  background: thumb ? `url(${thumb}) center/cover no-repeat` : "rgba(43,168,224,0.1)",
-                  border: "1px solid rgba(255,255,255,0.07)",
-                  display: "flex", alignItems: "center", justifyContent: "center",
-                }}>
-                  {!thumb && <span style={{ fontSize: 11, color: "rgba(43,168,224,0.6)" }}>⌂</span>}
-                </div>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{
-                    fontSize: 12, fontWeight: 500, color: "#E8EAED",
-                    fontFamily: "'DM Sans', sans-serif",
-                    whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis",
-                  }}>
-                    {l.title ?? "Untitled"}
-                  </div>
-                  {l.city && (
-                    <div style={{ fontSize: 11, color: "rgba(255,255,255,0.4)", fontFamily: "'DM Sans', sans-serif" }}>
-                      {l.city}
-                    </div>
-                  )}
-                </div>
-                <span style={{
-                  fontSize: 10, fontWeight: 600, padding: "2px 6px", borderRadius: 4,
-                  flexShrink: 0, color: sc.text, background: sc.bg,
-                  fontFamily: "'DM Sans', sans-serif",
-                }}>
+                <span style={{ fontSize: 12, fontWeight: 500, color: "#E8EAED", fontFamily: "'DM Sans', sans-serif", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", flex: 1, minWidth: 0 }}>
+                  {l.title ?? "Untitled"}
+                </span>
+                <span style={{ fontSize: 10, fontWeight: 600, padding: "2px 6px", borderRadius: 4, flexShrink: 0, color: sc.text, background: sc.bg, fontFamily: "'DM Sans', sans-serif" }}>
                   {sc.label}
                 </span>
               </Link>
@@ -123,17 +102,12 @@ function ListingsPanel({ listings, loading, search, onSearchChange, onNavClose, 
         </div>
       )}
 
-      <div style={{ borderTop: "1px solid rgba(255,255,255,0.06)", marginTop: 6, paddingTop: 4 }}>
+      <div style={{ borderTop: "1px solid rgba(255,255,255,0.06)", marginTop: 5, paddingTop: 4 }}>
         <Link
           href="/dashboard/my-listings"
           onClick={onNavClose}
-          style={{
-            display: "block", textAlign: "center",
-            fontSize: 12, fontWeight: 600, color: "#2BA8E0",
-            fontFamily: "'DM Sans', sans-serif",
-            padding: "5px 0", textDecoration: "none",
-          }}
-          onMouseEnter={e => (e.currentTarget.style.opacity = "0.75")}
+          style={{ display: "block", textAlign: "center", fontSize: 11, fontWeight: 600, color: "#2BA8E0", fontFamily: "'DM Sans', sans-serif", padding: "4px 0", textDecoration: "none" }}
+          onMouseEnter={e => (e.currentTarget.style.opacity = "0.7")}
           onMouseLeave={e => (e.currentTarget.style.opacity = "1")}
         >
           View All in Dashboard →
@@ -153,7 +127,6 @@ interface Props {
 export function MyListingsDropdown({ onNavClose, mobile = false }: Props) {
   const [open, setOpen]         = useState(false)
   const [listings, setListings] = useState<MiniListing[]>([])
-  const [search, setSearch]     = useState("")
   const [loading, setLoading]   = useState(false)
   const [fetched, setFetched]   = useState(false)
   const leaveTimer              = useRef<number | null>(null)
@@ -171,75 +144,90 @@ export function MyListingsDropdown({ onNavClose, mobile = false }: Props) {
       : userEmail ? `seller_email.eq.${userEmail}` : `user_id.eq.${userId}`
     const { data: rows } = await supabase
       .from("property_listings")
-      .select("id, title, city, status, photo_urls")
+      .select("id, title, status")
       .or(filter)
       .order("submitted_at", { ascending: false })
       .limit(20)
-    setListings(rows ?? [])
+    setListings((rows ?? []) as MiniListing[])
     setFetched(true)
     setLoading(false)
   }
 
-  const openPanel    = () => { if (leaveTimer.current) clearTimeout(leaveTimer.current); setOpen(true);  fetchOnce() }
-  const cancelClose  = () => { if (leaveTimer.current) clearTimeout(leaveTimer.current) }
+  const openPanel     = () => { if (leaveTimer.current) clearTimeout(leaveTimer.current); setOpen(true); fetchOnce() }
+  const cancelClose   = () => { if (leaveTimer.current) clearTimeout(leaveTimer.current) }
   const scheduleClose = () => { leaveTimer.current = window.setTimeout(() => setOpen(false), 180) }
 
   useEffect(() => () => { if (leaveTimer.current) clearTimeout(leaveTimer.current) }, [])
 
-  // ── Mobile: tap to expand ──────────────────────────────────────────────────
+  // ── Mobile: link navigates, chevron expands panel ──────────────────────────
   if (mobile) {
     return (
       <div>
-        <button
-          onClick={() => { const next = !open; setOpen(next); if (next) fetchOnce() }}
-          style={{
-            width: "100%", display: "flex", alignItems: "center", gap: 8,
-            padding: "11px 12px", borderRadius: 10,
-            background: open ? "rgba(43,168,224,0.08)" : "rgba(255,255,255,0.04)",
-            border: open ? "1px solid rgba(43,168,224,0.25)" : "1px solid rgba(255,255,255,0.07)",
-            color: open ? "#2BA8E0" : "rgba(255,255,255,0.75)",
-            fontSize: 13, fontWeight: 500, cursor: "pointer",
-            fontFamily: "'DM Sans', sans-serif", textAlign: "left" as const,
-          }}
-        >
-          <span style={{ fontSize: 15, color: "#2BA8E0" }}>🏠</span>
-          My Listings
-          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"
-            style={{ marginLeft: "auto", transform: open ? "rotate(180deg)" : "none", transition: "transform 0.2s", flexShrink: 0 }}>
-            <path d="M6 9l6 6 6-6" />
-          </svg>
-        </button>
+        <div style={{ display: "flex", alignItems: "center", borderRadius: 10, overflow: "hidden", border: open ? "1px solid rgba(43,168,224,0.25)" : "1px solid rgba(255,255,255,0.07)" }}>
+          <Link
+            href="/dashboard/my-listings"
+            onClick={onNavClose}
+            style={{
+              flex: 1, display: "flex", alignItems: "center", gap: 8,
+              padding: "11px 12px",
+              background: open ? "rgba(43,168,224,0.06)" : "rgba(255,255,255,0.04)",
+              color: open ? "#2BA8E0" : "rgba(255,255,255,0.75)",
+              fontSize: 13, fontWeight: 500, textDecoration: "none",
+              fontFamily: "'DM Sans', sans-serif",
+            }}
+          >
+            <span style={{ fontSize: 15, color: "#2BA8E0" }}>🏠</span>
+            My Listings
+          </Link>
+          <button
+            onClick={() => { const next = !open; setOpen(next); if (next) fetchOnce() }}
+            aria-label="Expand My Listings preview"
+            style={{
+              padding: "11px 14px",
+              background: open ? "rgba(43,168,224,0.08)" : "rgba(255,255,255,0.04)",
+              border: "none", borderLeft: "1px solid rgba(255,255,255,0.06)",
+              cursor: "pointer", color: open ? "#2BA8E0" : "rgba(255,255,255,0.45)",
+            }}
+          >
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"
+              style={{ display: "block", transform: open ? "rotate(180deg)" : "none", transition: "transform 0.2s" }}>
+              <path d="M6 9l6 6 6-6" />
+            </svg>
+          </button>
+        </div>
         {open && (
-          <div style={{
-            marginTop: 4, background: "rgba(255,255,255,0.02)",
-            borderRadius: 10, border: "1px solid rgba(255,255,255,0.07)", overflow: "hidden",
-          }}>
-            <ListingsPanel
-              listings={listings} loading={loading}
-              search={search} onSearchChange={setSearch}
-              onNavClose={onNavClose}
-            />
+          <div style={{ marginTop: 4, background: "rgba(255,255,255,0.02)", borderRadius: 10, border: "1px solid rgba(255,255,255,0.07)", overflow: "hidden" }}>
+            <ListingsPanel listings={listings} loading={loading} onNavClose={onNavClose} />
           </div>
         )}
       </div>
     )
   }
 
-  // ── Desktop: hover to expand inline within the user dropdown ──────────────
+  // ── Desktop: label navigates, hover expands panel inline ───────────────────
   return (
     <div onMouseEnter={openPanel} onMouseLeave={scheduleClose}>
+      {/* Trigger row — label is a real link, chevron is visual only */}
       <div style={{
         display: "flex", alignItems: "center", gap: 10, padding: "9px 16px",
-        color: open ? "#FFFFFF" : "rgba(255,255,255,0.65)",
         background: open ? "rgba(43,168,224,0.07)" : "transparent",
-        cursor: "pointer", transition: "background 0.12s, color 0.12s",
+        transition: "background 0.12s",
       }}>
         <span style={{ color: open ? "#2BA8E0" : "rgba(43,168,224,0.55)", transition: "color 0.12s", flexShrink: 0 }}>
           <HouseIcon />
         </span>
-        <span style={{ flex: 1, fontSize: 13, fontWeight: 450, fontFamily: "'DM Sans', sans-serif" }}>
+        <Link
+          href="/dashboard/my-listings"
+          onClick={onNavClose}
+          style={{
+            flex: 1, fontSize: 13, fontWeight: 450,
+            color: open ? "#FFFFFF" : "rgba(255,255,255,0.65)",
+            fontFamily: "'DM Sans', sans-serif",
+            textDecoration: "none", transition: "color 0.12s",
+          }}
+        >
           My Listings
-        </span>
+        </Link>
         <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"
           style={{ color: "rgba(255,255,255,0.35)", transform: open ? "rotate(180deg)" : "none", transition: "transform 0.2s", flexShrink: 0 }}>
           <path d="M6 9l6 6 6-6" />
@@ -248,7 +236,6 @@ export function MyListingsDropdown({ onNavClose, mobile = false }: Props) {
       {open && (
         <ListingsPanel
           listings={listings} loading={loading}
-          search={search} onSearchChange={setSearch}
           onNavClose={onNavClose}
           onMouseEnter={cancelClose}
           onMouseLeave={scheduleClose}

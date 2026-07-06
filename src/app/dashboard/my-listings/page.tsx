@@ -107,6 +107,7 @@ export default function MyListingsPage() {
       <style>{`
 .ml-card { transition: transform 0.4s cubic-bezier(0.16,1,0.3,1), box-shadow 0.4s cubic-bezier(0.16,1,0.3,1); will-change: transform; }
 .ml-card:hover { transform: translateY(-8px); box-shadow: 0 20px 60px rgba(0,0,0,.45), 0 0 0 1px rgba(43,168,224,0.22); }
+.ml-search::placeholder { color: rgba(174,180,188,0.55); }
 @media (max-width: 768px) {
   .ml-header { flex-direction: column !important; align-items: flex-start !important; gap: 12px !important; padding: 16px !important; }
   .ml-card { flex-direction: column !important; }
@@ -168,11 +169,12 @@ export default function MyListingsPage() {
               value={search}
               onChange={e => setSearch(e.target.value)}
               placeholder="Search by title, city, or status…"
+              className="ml-search"
               style={{
                 width: "100%", boxSizing: "border-box",
                 padding: "11px 16px",
-                background: "rgba(255,255,255,0.06)",
-                border: "1.5px solid rgba(255,255,255,0.12)",
+                background: "rgba(255,255,255,0.08)",
+                border: "1.5px solid rgba(255,255,255,0.22)",
                 borderRadius: 10, fontSize: 13, color: "#E8EAED",
                 fontFamily: "'DM Sans', sans-serif", outline: "none",
               }}
