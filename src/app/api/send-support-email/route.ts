@@ -94,8 +94,7 @@ export async function POST(req: NextRequest) {
   try {
     await resend.emails.send({
       from: "Nilay 360 <contact@nilay360.com>",
-      // TEMP: switch back to contact@nilay360.com once that inbox is set up and monitored
-      to: "vanith.kandre@nilay360.com",
+      to: "contact@nilay360.com",
       replyTo: email,
       subject: `[Support] ${subject} — from ${name}`,
       html,
