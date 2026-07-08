@@ -7,7 +7,8 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Phone and OTP required' }, { status: 400 })
     }
 
-    if (process.env.MSG91_TEST_MODE === 'true' && otp === '123456') {
+    // Test mode: only active when explicitly set AND not in production
+    if (process.env.MSG91_TEST_MODE === 'true' && process.env.NODE_ENV !== 'production' && otp === '123456') {
       return NextResponse.json({ success: true, verified: true, testMode: true })
     }
 
@@ -21,8 +22,8 @@ export async function POST(req: NextRequest) {
 
     const data = await response.json()
 
-    if (data.type === 'error') {
-      return NextResponse.json({ error: data.message || 'Invalid OTP' }, { status: 400 })
+    if (!response.ok || data.type === 'error') {
+      return NextResponse.json({ error: 'Invalid or expired OTP. Please try again.' }, { status: 400 })
     }
 
     return NextResponse.json({ success: true, verified: true })

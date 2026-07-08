@@ -7,7 +7,8 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Invalid phone number' }, { status: 400 })
     }
 
-    if (process.env.MSG91_TEST_MODE === 'true') {
+    // Test mode: only active when explicitly set AND not in production
+    if (process.env.MSG91_TEST_MODE === 'true' && process.env.NODE_ENV !== 'production') {
       return NextResponse.json({ success: true, requestId: 'test-mode', testMode: true })
     }
 
@@ -21,14 +22,18 @@ export async function POST(req: NextRequest) {
         template_id: process.env.MSG91_TEMPLATE_ID,
         mobile: `91${phone}`,
         authkey: process.env.MSG91_AUTH_KEY,
+        sender: process.env.MSG91_SENDER_ID || 'NILAYS',
       }),
     })
 
     const data = await response.json()
 
-    if (data.type === 'error') {
+    if (!response.ok || data.type === 'error') {
       console.error('MSG91 send-otp error:', data)
-      return NextResponse.json({ error: data.message || 'Failed to send OTP' }, { status: 500 })
+      return NextResponse.json(
+        { error: 'Failed to send OTP. Please try again.' },
+        { status: 500 }
+      )
     }
 
     return NextResponse.json({ success: true, requestId: data.request_id })
