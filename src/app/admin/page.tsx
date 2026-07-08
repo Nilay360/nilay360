@@ -263,7 +263,7 @@ function ListingCard({
           {/* Actions */}
           <div style={{ display: "flex", gap: "8px", alignItems: "center", flexWrap: "wrap" }}>
             {listing.slug && (
-              
+              <a
                 href={`/property/${listing.slug}`}
                 target="_blank"
                 rel="noopener noreferrer"
