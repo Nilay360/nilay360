@@ -263,7 +263,7 @@ function ListingCard({
           {/* Actions */}
           <div style={{ display: "flex", gap: "8px", alignItems: "center", flexWrap: "wrap" }}>
             {listing.slug && (
-              <a
+              
                 href={`/property/${listing.slug}`}
                 target="_blank"
                 rel="noopener noreferrer"
@@ -544,8 +544,6 @@ const ROLE_OPTIONS = [
   "content_manager", "support", "finance_manager", "sales_manager", "admin",
 ];
 
-// Full user_role enum (001_nivila_schema.sql) — includes super_admin, which is
-// intentionally absent from the role-change dropdown above but valid as a filter.
 const ROLE_FILTER_OPTIONS = [
   "buyer", "seller", "agent", "agency", "moderator",
   "content_manager", "support", "finance_manager", "sales_manager", "admin", "super_admin",
@@ -873,7 +871,10 @@ export default function AdminPage() {
   const { user, profile, loading: authLoading } = useAuth();
 
   const isAdmin = profile?.role === "admin" || profile?.role === "super_admin";
-  const authChecking = authLoading || !isAdmin;
+  // Keep the verifying screen up until auth resolves AND we've confirmed admin,
+  // so non-admins never flash the panel before the redirect kicks in.
+  // Also covers the profilePending window (user set, profile still in flight).
+  const authChecking = authLoading || (!!user && profile === null) || !isAdmin;
 
   const [active,       setActive]       = useState<AdminSection>("overview");
   const [sidebarOpen,  setSidebarOpen]  = useState(false);
@@ -898,10 +899,36 @@ export default function AdminPage() {
 
   const loaded = useRef(new Set<AdminSection>());
 
+  // ── Auth guard ────────────────────────────────────────────────────────────────
+  // Session + profile (incl. role) come from AuthContext — no duplicate query.
+  // Once auth has resolved, redirect anyone who isn't an admin.
+  //
+  // profilePending: after MSG91 sign-in the router navigates without a reload,
+  // so AuthContext already has authLoading=false from the previous page. The
+  // onAuthStateChange handler sets user synchronously but defers the profile
+  // fetch via setTimeout(0). Without this guard we'd redirect before the
+  // profile arrives and conclude the admin is a non-admin.
+  //
+  // profileTimedOut: if the profile fetch fails or stalls for >5 s, release the
+  // hold so the redirect fires rather than hanging indefinitely.
+  const profilePending = !!user && profile === null;
+  const [profileTimedOut, setProfileTimedOut] = useState(false);
+
+  useEffect(() => {
+    if (!profilePending) {
+      setProfileTimedOut(false);
+      return;
+    }
+    const id = setTimeout(() => setProfileTimedOut(true), 5000);
+    return () => clearTimeout(id);
+  }, [profilePending]);
+
+
   useEffect(() => {
     if (authLoading) return;
+    if (profilePending && !profileTimedOut) return;
     if (!user || !isAdmin) router.replace("/");
-  }, [authLoading, user, isAdmin, router]);
+  }, [authLoading, profilePending, profileTimedOut, user, isAdmin, router]);
 
   useEffect(() => {
     if (!isAdmin) return;
@@ -1201,7 +1228,7 @@ export default function AdminPage() {
 
             {/* Footer links */}
             <div style={{ padding: "12px 10px 18px", borderTop: "1px solid rgba(255,255,255,0.07)", display: "flex", flexDirection: "column", gap: "4px" }}>
-              <a
+              
                 href="/dashboard"
                 style={{ display: "flex", alignItems: "center", gap: "10px", padding: "9px 14px", borderRadius: "8px", fontSize: "12px", color: "rgba(255,255,255,0.4)", textDecoration: "none", fontFamily: "'DM Sans', sans-serif" }}
               >

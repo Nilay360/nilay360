@@ -77,15 +77,16 @@ export async function POST(req: NextRequest) {
 `;
 
   try {
-    await resend.emails.send({
+    const result = await resend.emails.send({
       from: "Nilay 360 <contact@nilay360.com>",
       to: "contact@nilay360.com",
       subject: `📞 Callback Request — ${name} (+91 ${phone})`,
       html,
     });
+    console.log("[request-callback] Resend response:", JSON.stringify(result, null, 2));
     return NextResponse.json({ success: true });
   } catch (err) {
-    console.error("Resend error:", err);
+    console.error("[request-callback] Resend error:", JSON.stringify(err, null, 2));
     return NextResponse.json({ error: "Email send failed" }, { status: 500 });
   }
 }

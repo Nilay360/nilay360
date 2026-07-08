@@ -210,18 +210,22 @@ function AuthModalInner({
   const cleanPhone = (raw: string) => raw.replace(/\D/g, "").slice(0, 10);
 
   async function sendOtp(phone10: string): Promise<boolean> {
-    const supabase = createClient();
-    const { error: otpErr } = await supabase.auth.signInWithOtp({ phone: "+91" + phone10 });
-    if (otpErr) {
-      const msg = otpErr.message.toLowerCase();
-      if (msg.includes("network") || msg.includes("fetch")) {
-        setError("Network error. Please check your connection and try again.");
-      } else {
-        setError(otpErr.message);
+    try {
+      const res = await fetch("/api/send-otp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ phone: phone10 }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        setError(data.error || "Failed to send OTP. Please try again.");
+        return false;
       }
+      return true;
+    } catch {
+      setError("Network error. Please check your connection and try again.");
       return false;
     }
-    return true;
   }
 
   // ── SIGN IN: step 1 → send OTP ──
@@ -243,15 +247,31 @@ function AuthModalInner({
     if (token.length !== 6) { setError("Please enter the full 6-digit code."); return; }
     setLoading(true);
     try {
-      const supabase = createClient();
-      const { error: verifyErr } = await supabase.auth.verifyOtp({
-        phone: "+91" + siPhone, token, type: "sms",
+      // Verify OTP with MSG91 and receive a session token from the server
+      const res = await fetch("/api/verify-otp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ phone: siPhone, otp: token }),
       });
-      if (verifyErr) {
-        setError("Invalid or expired code. Please try again.");
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        setError(data.error || "Invalid or expired code. Please try again.");
         setLoading(false);
         return;
       }
+
+      // Exchange the server-issued token_hash for a real Supabase session
+      const supabase = createClient();
+      const { error: sessionErr } = await supabase.auth.verifyOtp({
+        token_hash: data.token_hash,
+        type: data.type,
+      });
+      if (sessionErr) {
+        setError("Something went wrong completing sign-in. Please try again.");
+        setLoading(false);
+        return;
+      }
+
       await refreshAuth();
       setLoading(false);
       setSiStep(3);
@@ -274,20 +294,9 @@ function AuthModalInner({
       return;
     }
     setLoading(true);
-    const supabase = createClient();
-    // Send OTP and stash name/email in user metadata so they survive signup.
-    const { error: otpErr } = await supabase.auth.signInWithOtp({
-      phone: "+91" + reForm.phone,
-      options: { data: { full_name: reForm.full_name, email: reForm.email, account_type: accountType } },
-    });
+    const ok = await sendOtp(reForm.phone);
     setLoading(false);
-    if (otpErr) {
-      const msg = otpErr.message.toLowerCase();
-      setError(msg.includes("network") || msg.includes("fetch")
-        ? "Network error. Please check your connection and try again."
-        : otpErr.message);
-      return;
-    }
+    if (!ok) return;
     setReOtp(["", "", "", "", "", ""]);
     setReStep(3);
     startCountdown();
@@ -301,35 +310,41 @@ function AuthModalInner({
     if (token.length !== 6) { setError("Please enter the full 6-digit code."); return; }
     setLoading(true);
     try {
+      // Verify OTP with MSG91; server creates user + profile and returns session token
+      const res = await fetch("/api/verify-otp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          phone:        reForm.phone,
+          otp:          token,
+          email:        reForm.email,
+          full_name:    reForm.full_name,
+          account_type: accountType,
+          city:         reForm.city,
+          whatsapp:     whatsappOptIn,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        setError(data.error || "Invalid or expired code. Please try again.");
+        setLoading(false);
+        return;
+      }
+
+      // Exchange the server-issued token_hash for a real Supabase session
       const supabase = createClient();
-      const { data, error: verifyErr } = await supabase.auth.verifyOtp({
-        phone: "+91" + reForm.phone, token, type: "sms",
+      const { error: sessionErr } = await supabase.auth.verifyOtp({
+        token_hash: data.token_hash,
+        type: data.type,
       });
-      if (verifyErr || !data.user) {
-        setError("Invalid or expired code. Please try again.");
+      if (sessionErr) {
+        setError("Something went wrong completing sign-in. Please try again.");
         setLoading(false);
         return;
       }
 
-      const isAgent = accountType === "agent";
-      const { error: upsertErr } = await supabase.from("profiles").upsert({
-        id:          data.user.id,
-        full_name:   reForm.full_name,
-        phone:       "+91" + reForm.phone,
-        city:        reForm.city,
-        role:        isAgent ? "agent" : "buyer",
-        is_verified: !isAgent, // agents stay unverified until admin approval
-        whatsapp:    whatsappOptIn ? "+91" + reForm.phone : null,
-      });
-      if (upsertErr) {
-        console.error("Profile upsert error:", upsertErr);
-        setError("We verified your number but couldn't save your profile. Please try again.");
-        setLoading(false);
-        return;
-      }
-
-      // Notify admin for agent applications (non-blocking — don't fail signup on email error).
-      if (isAgent) {
+      // Notify admin for agent applications (non-blocking)
+      if (accountType === "agent") {
         try {
           await fetch("/api/notify-admin-agent", {
             method: "POST",
@@ -349,11 +364,11 @@ function AuthModalInner({
       }
 
       await refreshAuth();
-      setAgentPending(isAgent);
+      setAgentPending(accountType === "agent");
       setLoading(false);
       setReStep(3);
       setReSuccess(true);
-      window.setTimeout(() => { onClose(); }, isAgent ? 2600 : 1600);
+      window.setTimeout(() => { onClose(); }, accountType === "agent" ? 2600 : 1600);
     } catch {
       setError("Something went wrong. Please try again.");
       setLoading(false);
