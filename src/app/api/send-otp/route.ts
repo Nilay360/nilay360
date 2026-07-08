@@ -12,17 +12,23 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ success: true, requestId: 'test-mode', testMode: true })
     }
 
+    const payload = {
+      template_id: process.env.MSG91_TEMPLATE_ID,
+      mobile: `91${phone}`,
+      sender: process.env.MSG91_SENDER_ID || 'NILAYS',
+      otp_length: 6,
+    }
+
+    // DIAGNOSTIC — remove after OTP-length instability is resolved
+    console.log(`[send-otp DIAG ${new Date().toISOString()}] payload=${JSON.stringify(payload)}`)
+
     const response = await fetch('https://control.msg91.com/api/v5/otp', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'authkey': process.env.MSG91_AUTH_KEY!,
       },
-      body: JSON.stringify({
-        template_id: process.env.MSG91_TEMPLATE_ID,
-        mobile: `91${phone}`,
-        sender: process.env.MSG91_SENDER_ID || 'NILAYS',
-      }),
+      body: JSON.stringify(payload),
     })
 
     const data = await response.json()

@@ -875,7 +875,8 @@ export default function AdminPage() {
   const isAdmin = profile?.role === "admin" || profile?.role === "super_admin";
   // Keep the verifying screen up until auth resolves AND we've confirmed admin,
   // so non-admins never flash the panel before the redirect kicks in.
-  const authChecking = authLoading || !isAdmin;
+  // Also covers the profilePending window (user set, profile still in flight).
+  const authChecking = authLoading || (!!user && profile === null) || !isAdmin;
 
   const [active,       setActive]       = useState<AdminSection>("overview");
   const [sidebarOpen,  setSidebarOpen]  = useState(false);
@@ -905,10 +906,32 @@ export default function AdminPage() {
   // ── Auth guard ────────────────────────────────────────────────────────────────
   // Session + profile (incl. role) come from AuthContext — no duplicate query.
   // Once auth has resolved, redirect anyone who isn't an admin.
+  //
+  // profilePending: after MSG91 sign-in the router navigates without a reload,
+  // so AuthContext already has authLoading=false from the previous page. The
+  // onAuthStateChange handler sets user synchronously but defers the profile
+  // fetch via setTimeout(0). Without this guard we'd redirect before the
+  // profile arrives and conclude the admin is a non-admin.
+  //
+  // profileTimedOut: if the profile fetch fails or stalls for >5 s, release the
+  // hold so the redirect fires rather than hanging indefinitely.
+  const profilePending = !!user && profile === null;
+  const [profileTimedOut, setProfileTimedOut] = useState(false);
+
+  useEffect(() => {
+    if (!profilePending) {
+      setProfileTimedOut(false);
+      return;
+    }
+    const id = setTimeout(() => setProfileTimedOut(true), 5000);
+    return () => clearTimeout(id);
+  }, [profilePending]);
+
   useEffect(() => {
     if (authLoading) return;
+    if (profilePending && !profileTimedOut) return;
     if (!user || !isAdmin) router.replace("/");
-  }, [authLoading, user, isAdmin, router]);
+  }, [authLoading, profilePending, profileTimedOut, user, isAdmin, router]);
 
   // ── Stats load on auth ────────────────────────────────────────────────────────
   useEffect(() => {
