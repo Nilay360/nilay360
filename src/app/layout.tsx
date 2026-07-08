@@ -50,7 +50,7 @@ export const metadata: Metadata = {
     canonical: "https://nilay360.com",
   },
   icons: {
-    icon: "/icons/favicon.ico",
+    icon: "/favicon.ico",
     apple: "/icons/apple-touch-icon.png",
   },
 }
