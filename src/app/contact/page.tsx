@@ -461,7 +461,7 @@ export default function ContactPage() {
                 Frequently Asked<br /><em style={{ fontStyle: "italic", color: "#2BA8E0" }}>Questions</em>
               </h2>
               <p style={{ fontSize: "15px", color: "#6B7C72", marginTop: "14px", lineHeight: 1.7 }}>
-                Can't find what you're looking for? <a href="mailto:hello@nilay360.com" style={{ color: "#2BA8E0", textDecoration: "none", fontWeight: 600 }}>Email us directly</a>.
+                Can't find what you're looking for? <a href="mailto:contact@nilay360.com" style={{ color: "#2BA8E0", textDecoration: "none", fontWeight: 600 }}>Email us directly</a>.
               </p>
             </div>
             <div style={{ background: "#fff", borderRadius: "18px", padding: "8px 36px", border: "1px solid rgba(13,43,31,0.07)", boxShadow: "0 2px 16px rgba(13,43,31,0.04)" }}>

@@ -156,7 +156,7 @@ const CURRENT_YEAR = 2026;
 // ── Skeleton ──────────────────────────────────────────────────
 function Skeleton() {
   return (
-    <div style={{ background: "#161A1F", border: "1px solid rgba(255,255,255,0.07)", borderRadius: "14px", overflow: "hidden" }}>
+    <div className="premium-card" style={{ border: "1px solid rgba(255,255,255,0.08)", borderRadius: "16px", overflow: "hidden" }}>
       <div style={{ height: "200px", background: "rgba(255,255,255,0.06)", animation: "pulse 1.6s ease-in-out infinite" }} />
       <div style={{ padding: "18px" }}>
         {[75, 55, 40].map((w, i) => (
@@ -172,7 +172,7 @@ function Chip({ label, onRemove }: { label: string; onRemove: () => void }) {
   return (
     <span style={{ display: "inline-flex", alignItems: "center", gap: "6px", padding: "5px 12px", borderRadius: "100px", background: "rgba(43,168,224,0.12)", border: "1px solid rgba(43,168,224,0.3)", fontSize: "12px", fontWeight: 500, color: "#E8EAED", whiteSpace: "nowrap" }}>
       {label}
-      <span onClick={onRemove} style={{ cursor: "pointer", fontSize: "13px", lineHeight: 1, color: "#1577B8", fontWeight: 700 }}>×</span>
+      <span onClick={onRemove} style={{ cursor: "pointer", fontSize: "13px", lineHeight: 1, color: "#3DBEF5", fontWeight: 700 }}>×</span>
     </span>
   );
 }
@@ -181,10 +181,10 @@ function Chip({ label, onRemove }: { label: string; onRemove: () => void }) {
 function FilterCheck({ label, checked, onChange }: { label: string; checked: boolean; onChange: () => void }) {
   return (
     <label style={{ display: "flex", alignItems: "center", gap: "10px", cursor: "pointer", marginBottom: "10px" }}>
-      <div onClick={onChange} style={{ width: "16px", height: "16px", borderRadius: "4px", flexShrink: 0, border: checked ? "none" : "1.5px solid rgba(245,242,236,0.25)", background: checked ? "#2BA8E0" : "transparent", display: "flex", alignItems: "center", justifyContent: "center", transition: "all 0.15s" }}>
+      <div onClick={onChange} style={{ width: "16px", height: "16px", borderRadius: "4px", flexShrink: 0, border: checked ? "none" : "1.5px solid rgba(255,255,255,0.25)", background: checked ? "#2BA8E0" : "transparent", display: "flex", alignItems: "center", justifyContent: "center", transition: "all 0.15s" }}>
         {checked && <svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l2.5 2.5L9 1" stroke="#FFFFFF" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" /></svg>}
       </div>
-      <span onClick={onChange} style={{ fontSize: "13px", color: checked ? "#FFFFFF" : "rgba(245,242,236,0.55)", transition: "color 0.15s" }}>{label}</span>
+      <span onClick={onChange} style={{ fontSize: "13px", color: checked ? "#FFFFFF" : "#AEB4BC", transition: "color 0.15s" }}>{label}</span>
     </label>
   );
 }
@@ -193,8 +193,8 @@ function FilterCheck({ label, checked, onChange }: { label: string; checked: boo
 function ToggleSwitch({ label, checked, onChange }: { label: string; checked: boolean; onChange: () => void }) {
   return (
     <div onClick={onChange} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", cursor: "pointer", marginBottom: "14px" }}>
-      <span style={{ fontSize: "13px", color: checked ? "#FFFFFF" : "rgba(245,242,236,0.55)", transition: "color 0.15s" }}>{label}</span>
-      <div style={{ width: "36px", height: "20px", borderRadius: "10px", background: checked ? "#2BA8E0" : "rgba(245,242,236,0.15)", transition: "background 0.2s", position: "relative", flexShrink: 0 }}>
+      <span style={{ fontSize: "13px", color: checked ? "#FFFFFF" : "#AEB4BC", transition: "color 0.15s" }}>{label}</span>
+      <div style={{ width: "36px", height: "20px", borderRadius: "10px", background: checked ? "#2BA8E0" : "rgba(255,255,255,0.15)", transition: "background 0.2s", position: "relative", flexShrink: 0 }}>
         <div style={{ position: "absolute", top: "3px", left: checked ? "19px" : "3px", width: "14px", height: "14px", borderRadius: "50%", background: "#fff", transition: "left 0.2s", boxShadow: "0 1px 3px rgba(0,0,0,0.3)" }} />
       </div>
     </div>
@@ -206,12 +206,12 @@ function PropertyCard({ p, comparing, onCompare, onSave, saved }: { p: Property;
   const [imgErr, setImgErr] = useState(false);
   const img = !imgErr && p.images?.length > 0 ? p.images[0] : `https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800&q=80`;
   return (
-    <div style={{ background: "#161A1F", border: comparing ? "2px solid #2BA8E0" : "1px solid rgba(255,255,255,0.07)", borderRadius: "14px", overflow: "hidden", transition: "transform 0.18s, box-shadow 0.18s, border-color 0.15s", cursor: "pointer", position: "relative" }}
-      onMouseEnter={e => { const d = e.currentTarget as HTMLDivElement; if (!comparing) { d.style.transform = "translateY(-3px)"; d.style.boxShadow = "0 12px 40px rgba(43,168,224,0.1)"; } }}
-      onMouseLeave={e => { const d = e.currentTarget as HTMLDivElement; if (!comparing) { d.style.transform = "translateY(0)"; d.style.boxShadow = "none"; } }}
+    <div className="premium-card" style={{ border: comparing ? "2px solid #2BA8E0" : "1px solid rgba(255,255,255,0.08)", borderRadius: "16px", overflow: "hidden", cursor: "pointer", position: "relative" }}
+      onMouseEnter={e => { const d = e.currentTarget as HTMLDivElement; if (!comparing) { d.style.transform = "translateY(-8px)"; d.style.boxShadow = "0 20px 60px rgba(0,0,0,.45), 0 0 0 1px rgba(43,168,224,0.22)"; } }}
+      onMouseLeave={e => { const d = e.currentTarget as HTMLDivElement; if (!comparing) { d.style.transform = "translateY(0)"; d.style.boxShadow = ""; } }}
     >
       {/* Compare checkbox */}
-      <div onClick={e => { e.stopPropagation(); onCompare(); }} style={{ position: "absolute", top: "12px", left: "12px", zIndex: 3, width: "22px", height: "22px", borderRadius: "5px", background: comparing ? "#2BA8E0" : "rgba(255,255,255,0.85)", border: comparing ? "none" : "1.5px solid rgba(13,43,31,0.2)", backdropFilter: "blur(4px)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", transition: "all 0.15s" }}>
+      <div onClick={e => { e.stopPropagation(); onCompare(); }} style={{ position: "absolute", top: "12px", left: "12px", zIndex: 3, width: "22px", height: "22px", borderRadius: "5px", background: comparing ? "#2BA8E0" : "rgba(255,255,255,0.85)", border: comparing ? "none" : "1.5px solid rgba(0,0,0,0.2)", backdropFilter: "blur(4px)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", transition: "all 0.15s" }}>
         {comparing && <svg width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5l3 3 7-7" stroke="#000000" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>}
       </div>
 
@@ -222,10 +222,10 @@ function PropertyCard({ p, comparing, onCompare, onSave, saved }: { p: Property;
             onMouseLeave={e => (e.currentTarget as HTMLImageElement).style.transform = "scale(1)"}
           />
           <div style={{ position: "absolute", top: "12px", right: "12px", display: "flex", gap: "6px" }}>
-            <span style={{ padding: "3px 9px", borderRadius: "100px", fontSize: "10px", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", background: p.listing_type === "rent" ? "rgba(45,106,79,0.9)" : "rgba(201,168,76,0.9)", color: p.listing_type === "rent" ? "#0B0D10" : "#000000", backdropFilter: "blur(6px)" }}>
+            <span style={{ padding: "3px 9px", borderRadius: "100px", fontSize: "10px", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", background: p.listing_type === "rent" ? "rgba(61,190,245,0.9)" : "rgba(43,168,224,0.9)", color: "#000000", backdropFilter: "blur(6px)" }}>
               {p.listing_type === "rent" ? "Rent" : "Sale"}
             </span>
-            {p.is_featured && <span style={{ padding: "3px 9px", borderRadius: "100px", fontSize: "10px", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", background: "rgba(13,43,31,0.82)", color: "#2BA8E0", border: "1px solid rgba(201,168,76,0.35)", backdropFilter: "blur(6px)" }}>Premium</span>}
+            {p.is_featured && <span style={{ padding: "3px 9px", borderRadius: "100px", fontSize: "10px", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", background: "rgba(11,13,16,0.82)", color: "#3DBEF5", border: "1px solid rgba(43,168,224,0.35)", backdropFilter: "blur(6px)" }}>Premium</span>}
           </div>
           <button onClick={e => { e.preventDefault(); e.stopPropagation(); onSave(); }} style={{ position: "absolute", bottom: "12px", right: "12px", width: "32px", height: "32px", borderRadius: "50%", background: "rgba(255,255,255,0.88)", border: "none", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", backdropFilter: "blur(4px)" }}>
             <svg width="14" height="14" viewBox="0 0 24 24" fill={saved ? "#2BA8E0" : "none"} stroke={saved ? "#2BA8E0" : "#6B7280"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" /></svg>
@@ -260,15 +260,15 @@ function PropertyCard({ p, comparing, onCompare, onSave, saved }: { p: Property;
 function ListRow({ p, comparing, onCompare, onSave, saved }: { p: Property; comparing: boolean; onCompare: () => void; onSave: () => void; saved: boolean }) {
   const img = p.images?.[0] || `https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800&q=80`;
   return (
-    <div className="search-list-card" style={{ background: "#161A1F", border: comparing ? "2px solid #2BA8E0" : "1px solid rgba(255,255,255,0.07)", borderRadius: "12px", overflow: "hidden", display: "flex", transition: "box-shadow 0.18s, border-color 0.15s" }}
-      onMouseEnter={e => { if (!comparing) (e.currentTarget as HTMLDivElement).style.boxShadow = "0 4px 20px rgba(43,168,224,0.08)"; }}
-      onMouseLeave={e => { if (!comparing) (e.currentTarget as HTMLDivElement).style.boxShadow = "none"; }}
+    <div className="search-list-card premium-card" style={{ border: comparing ? "2px solid #2BA8E0" : "1px solid rgba(255,255,255,0.08)", borderRadius: "16px", overflow: "hidden", display: "flex" }}
+      onMouseEnter={e => { if (!comparing) (e.currentTarget as HTMLDivElement).style.boxShadow = "0 20px 60px rgba(0,0,0,.45), 0 0 0 1px rgba(43,168,224,0.22)"; }}
+      onMouseLeave={e => { if (!comparing) (e.currentTarget as HTMLDivElement).style.boxShadow = ""; }}
     >
       <div style={{ width: "260px", flexShrink: 0, position: "relative" }}>
         <a href={`/property/${p.slug}`} style={{ display: "block", height: "100%" }}>
           <img src={img} alt={p.title} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block", minHeight: "160px" }} />
         </a>
-        <div onClick={e => { e.stopPropagation(); onCompare(); }} style={{ position: "absolute", top: "10px", left: "10px", width: "22px", height: "22px", borderRadius: "5px", background: comparing ? "#2BA8E0" : "rgba(255,255,255,0.85)", border: comparing ? "none" : "1.5px solid rgba(13,43,31,0.2)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
+        <div onClick={e => { e.stopPropagation(); onCompare(); }} style={{ position: "absolute", top: "10px", left: "10px", width: "22px", height: "22px", borderRadius: "5px", background: comparing ? "#2BA8E0" : "rgba(255,255,255,0.85)", border: comparing ? "none" : "1.5px solid rgba(0,0,0,0.2)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
           {comparing && <svg width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5l3 3 7-7" stroke="#FFFFFF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>}
         </div>
       </div>
@@ -292,8 +292,8 @@ function ListRow({ p, comparing, onCompare, onSave, saved }: { p: Property; comp
             </div>
           ))}
           <div style={{ marginLeft: "auto", display: "flex", gap: "8px", alignItems: "center" }}>
-            {p.is_featured && <span style={{ padding: "3px 10px", borderRadius: "100px", fontSize: "10px", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "#2BA8E0", border: "1px solid rgba(201,168,76,0.3)" }}>Premium</span>}
-            <span style={{ padding: "3px 10px", borderRadius: "100px", fontSize: "10px", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", background: p.listing_type === "rent" ? "rgba(45,106,79,0.08)" : "rgba(201,168,76,0.08)", color: "rgba(255,255,255,0.7)", border: "1px solid rgba(43,168,224,0.2)" }}>
+            {p.is_featured && <span style={{ padding: "3px 10px", borderRadius: "100px", fontSize: "10px", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "#2BA8E0", border: "1px solid rgba(43,168,224,0.3)" }}>Premium</span>}
+            <span style={{ padding: "3px 10px", borderRadius: "100px", fontSize: "10px", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", background: "rgba(43,168,224,0.08)", color: "rgba(255,255,255,0.7)", border: "1px solid rgba(43,168,224,0.2)" }}>
               {p.listing_type === "rent" ? "Rent" : "Sale"}
             </span>
             <button onClick={e => { e.preventDefault(); e.stopPropagation(); onSave(); }} style={{ width: "30px", height: "30px", borderRadius: "50%", background: "rgba(255,255,255,0.08)", border: "none", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
@@ -308,7 +308,7 @@ function ListRow({ p, comparing, onCompare, onSave, saved }: { p: Property; comp
 
 // ── Sidebar section label ─────────────────────────────────────
 function SbLabel({ children }: { children: React.ReactNode }) {
-  return <div style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", color: "rgba(245,242,236,0.35)", marginBottom: "12px" }}>{children}</div>;
+  return <div style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", color: "rgba(255,255,255,0.45)", marginBottom: "12px" }}>{children}</div>;
 }
 
 // ── Main page ─────────────────────────────────────────────────
@@ -560,9 +560,10 @@ function SearchPageInner() {
   async function saveSearch() {
     if (!saveSearchName.trim() || !userId) return;
     const supabase = createClient();
-    const { error } = await supabase.from("property_searches").insert({
-      user_id:      userId,
-      search_query: saveSearchName.trim(),
+    const { error } = await supabase.from("saved_searches").insert({
+      user_id:     userId,
+      name:        saveSearchName.trim(),
+      alert_email: true,
       filters: {
         city,
         listingType,
@@ -577,7 +578,7 @@ function SearchPageInner() {
       },
     });
     if (error) {
-      console.error("Save search error:", error);
+      console.error("Save search error:", JSON.stringify(error, null, 2), (error as {message?:string}).message, (error as {code?:string}).code, (error as {details?:string}).details, (error as {hint?:string}).hint);
     } else {
       setSaveSearchName("");
       setShowSaveModal(false);
@@ -613,9 +614,9 @@ function SearchPageInner() {
     [...bhk].length > 0 ? `${[...bhk].join("/")} BHK` : null,
   ].filter(Boolean).join(" · ") || "All Properties";
 
-  const selStyle = { padding: "10px 36px 10px 14px", background: "rgba(245,242,236,0.06)", border: "1px solid rgba(245,242,236,0.14)", borderRadius: "8px", color: "#FFFFFF", fontSize: "13px", fontFamily: "'DM Sans', sans-serif", cursor: "pointer", outline: "none" } as React.CSSProperties;
+  const selStyle = { padding: "10px 36px 10px 14px", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.14)", borderRadius: "8px", color: "#FFFFFF", fontSize: "13px", fontFamily: "'DM Sans', sans-serif", cursor: "pointer", outline: "none" } as React.CSSProperties;
   const chevron = (
-    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="rgba(245,242,236,0.4)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ position: "absolute", right: "12px", top: "50%", transform: "translateY(-50%)", pointerEvents: "none" }}><polyline points="6 9 12 15 18 9" /></svg>
+    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.4)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ position: "absolute", right: "12px", top: "50%", transform: "translateY(-50%)", pointerEvents: "none" }}><polyline points="6 9 12 15 18 9" /></svg>
   );
 
   return (
@@ -629,12 +630,21 @@ function SearchPageInner() {
         @keyframes pulse { 0%,100%{opacity:1}50%{opacity:0.4} }
         @keyframes slideUp { from{transform:translateY(100%);opacity:0} to{transform:translateY(0);opacity:1} }
         ::-webkit-scrollbar { width: 4px; }
-        ::-webkit-scrollbar-thumb { background: rgba(201,168,76,0.25); border-radius: 2px; }
+        ::-webkit-scrollbar-thumb { background: rgba(43,168,224,0.25); border-radius: 2px; }
+
+        .premium-card {
+          background: rgba(255,255,255,0.04);
+          backdrop-filter: blur(20px);
+          -webkit-backdrop-filter: blur(20px);
+          border-radius: 16px;
+          box-shadow: 0 4px 24px rgba(0,0,0,0.18);
+          transition: transform 0.4s cubic-bezier(0.16,1,0.3,1), box-shadow 0.4s cubic-bezier(0.16,1,0.3,1), border-color 0.15s;
+        }
 
         .mobile-filter-toggle { display: none; }
 
         @media (max-width: 768px) {
-          .mobile-filter-toggle { display: flex !important; align-items: center; gap: 8px; background: #1a1a2e; color: #2BA8E0; border: 1px solid #2BA8E0; padding: 10px 20px; border-radius: 8px; font-size: 14px; cursor: pointer; margin: 12px 16px; width: calc(100% - 32px); justify-content: center; font-family: 'DM Sans', sans-serif; }
+          .mobile-filter-toggle { display: flex !important; align-items: center; gap: 8px; background: rgba(255,255,255,0.06); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); color: #2BA8E0; border: 1px solid #2BA8E0; padding: 10px 20px; border-radius: 8px; font-size: 14px; cursor: pointer; margin: 12px 16px; width: calc(100% - 32px); justify-content: center; font-family: 'DM Sans', sans-serif; }
           .search-layout { flex-direction: column !important; padding: 0 !important; }
           .search-sidebar { width: 100% !important; position: fixed !important; top: 0 !important; left: 0 !important; height: 100vh !important; z-index: 999 !important; overflow-y: auto !important; transform: translateX(-100%) !important; transition: transform 0.3s ease !important; background: #0B0D10 !important; padding: 24px 16px !important; }
           .search-sidebar.open { transform: translateX(0) !important; }
@@ -656,7 +666,7 @@ function SearchPageInner() {
       <div style={{ minHeight: "100vh", background: "#000000" }}>
 
         {/* ── NAV ── */}
-        <nav style={{ position: "fixed", top: 0, left: 0, right: 0, zIndex: 100, height: "68px", display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 48px", background: "rgba(5,8,12,0.82)", backdropFilter: "blur(20px) saturate(180%)", borderBottom: "0.5px solid rgba(201,168,76,0.18)" }}>
+        <nav style={{ position: "fixed", top: 0, left: 0, right: 0, zIndex: 100, height: "68px", display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 48px", background: "rgba(5,8,12,0.82)", backdropFilter: "blur(20px) saturate(180%)", borderBottom: "0.5px solid rgba(43,168,224,0.18)" }}>
           <a href="/" style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "19px", fontWeight: 600, color: "#fff", letterSpacing: "0.16em", display: "flex", alignItems: "center", gap: "6px", textDecoration: "none" }}>
             Nilay 360 <span style={{ color: "#2BA8E0", fontSize: "22px", lineHeight: 1 }}>·</span>
           </a>
@@ -672,14 +682,14 @@ function SearchPageInner() {
         </nav>
 
         {/* ── SEARCH SUMMARY BAND ── */}
-        <div className="search-summary" style={{ marginTop: "68px", background: "#000000", padding: "14px 48px", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "12px" }}>
+        <div className="search-summary" style={{ marginTop: "68px", background: "rgba(255,255,255,0.02)", borderBottom: "1px solid rgba(255,255,255,0.06)", padding: "14px 48px", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "12px" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
             {loading ? (
-              <div style={{ height: "14px", width: "200px", borderRadius: "4px", background: "rgba(245,242,236,0.1)", animation: "pulse 1.6s ease-in-out infinite" }} />
+              <div style={{ height: "14px", width: "200px", borderRadius: "4px", background: "rgba(255,255,255,0.1)", animation: "pulse 1.6s ease-in-out infinite" }} />
             ) : (
               <>
                 <span style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "20px", fontWeight: 600, color: "#2BA8E0" }}>{filtered.length}</span>
-                <span style={{ fontSize: "13px", color: "rgba(245,242,236,0.6)" }}>properties found for</span>
+                <span style={{ fontSize: "13px", color: "rgba(255,255,255,0.6)" }}>properties found for</span>
                 <span style={{ fontSize: "13px", fontWeight: 600, color: "#E8EAED" }}>{criteriaLabel}</span>
               </>
             )}
@@ -687,11 +697,11 @@ function SearchPageInner() {
           <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
             {/* View mode toggle */}
             {(["grid", "list", "map"] as const).map(mode => (
-              <button key={mode} onClick={() => setViewMode(mode)} style={{ padding: "7px 14px", borderRadius: "7px", fontSize: "12px", fontWeight: 600, letterSpacing: "0.04em", textTransform: "capitalize", background: viewMode === mode ? "#2BA8E0" : "rgba(245,242,236,0.07)", border: viewMode === mode ? "none" : "1px solid rgba(245,242,236,0.12)", color: viewMode === mode ? "#000000" : "rgba(245,242,236,0.55)", cursor: "pointer", fontFamily: "'DM Sans', sans-serif", transition: "all 0.15s" }}>
+              <button key={mode} onClick={() => setViewMode(mode)} style={{ padding: "7px 14px", borderRadius: "7px", fontSize: "12px", fontWeight: 600, letterSpacing: "0.04em", textTransform: "capitalize", background: viewMode === mode ? "#2BA8E0" : "rgba(255,255,255,0.07)", border: viewMode === mode ? "none" : "1px solid rgba(255,255,255,0.12)", color: viewMode === mode ? "#000000" : "rgba(255,255,255,0.55)", cursor: "pointer", fontFamily: "'DM Sans', sans-serif", transition: "all 0.15s" }}>
                 {mode === "grid" ? "⊞ Grid" : mode === "list" ? "≡ List" : "⊕ Map"}
               </button>
             ))}
-            <button onClick={() => { if (!userId) { router.push("/login"); return; } setShowSaveModal(true); }} style={{ padding: "7px 16px", borderRadius: "7px", fontSize: "12px", fontWeight: 600, letterSpacing: "0.04em", background: "transparent", border: "1px solid rgba(201,168,76,0.35)", color: "#2BA8E0", cursor: "pointer", fontFamily: "'DM Sans', sans-serif", display: "flex", alignItems: "center", gap: "6px" }}>
+            <button onClick={() => { if (!userId) { router.push("/login"); return; } setShowSaveModal(true); }} style={{ padding: "7px 16px", borderRadius: "7px", fontSize: "12px", fontWeight: 600, letterSpacing: "0.04em", background: "transparent", border: "1px solid rgba(43,168,224,0.35)", color: "#2BA8E0", cursor: "pointer", fontFamily: "'DM Sans', sans-serif", display: "flex", alignItems: "center", gap: "6px" }}>
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" /></svg>
               Save Search
             </button>
@@ -699,7 +709,7 @@ function SearchPageInner() {
         </div>
 
         {/* ── SEARCH BAR ROW ── */}
-        <div className="search-bar-row" style={{ background: "#0B0D10", borderBottom: "1px solid rgba(255,255,255,0.07)", padding: "16px 48px" }}>
+        <div className="search-bar-row" style={{ background: "rgba(255,255,255,0.04)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", borderBottom: "1px solid rgba(255,255,255,0.08)", padding: "16px 48px" }}>
           <div style={{ display: "flex", gap: "10px", alignItems: "center", maxWidth: "1400px", margin: "0 auto", flexWrap: "wrap" }}>
             {/* City */}
             <div style={{ position: "relative", flex: "1 1 160px" }}>
@@ -748,15 +758,15 @@ function SearchPageInner() {
           <button className="mobile-filter-toggle" onClick={() => setFiltersOpen(prev => !prev)}>
             ☰ Filters
           </button>
-          <aside className={filtersOpen ? "search-sidebar open" : "search-sidebar"} style={{ width: "272px", flexShrink: 0, position: "sticky", top: "72px", background: "#000000", borderRadius: "14px", overflow: "hidden", maxHeight: "calc(100vh - 108px)", overflowY: "auto" }}>
-            <div style={{ padding: "18px 18px 14px", borderBottom: "1px solid rgba(245,242,236,0.07)", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-              <span style={{ fontSize: "12px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "rgba(245,242,236,0.45)" }}>Filters</span>
+          <aside className={filtersOpen ? "search-sidebar open" : "search-sidebar"} style={{ width: "272px", flexShrink: 0, position: "sticky", top: "72px", background: "rgba(255,255,255,0.04)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", border: "1px solid rgba(255,255,255,0.08)", boxShadow: "0 4px 24px rgba(0,0,0,0.18)", borderRadius: "24px", overflow: "hidden", maxHeight: "calc(100vh - 108px)", overflowY: "auto" }}>
+            <div style={{ padding: "18px 18px 14px", borderBottom: "1px solid rgba(255,255,255,0.07)", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+              <span style={{ fontSize: "12px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "rgba(255,255,255,0.45)" }}>Filters</span>
               {hasFilters && <button onClick={clearFilters} style={{ fontSize: "11px", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "#2BA8E0", background: "transparent", border: "none", cursor: "pointer", fontFamily: "'DM Sans', sans-serif" }}>Clear All</button>}
             </div>
 
             {/* Active chips */}
             {chips.length > 0 && (
-              <div style={{ padding: "12px 16px", borderBottom: "1px solid rgba(245,242,236,0.07)", display: "flex", flexWrap: "wrap", gap: "6px" }}>
+              <div style={{ padding: "12px 16px", borderBottom: "1px solid rgba(255,255,255,0.07)", display: "flex", flexWrap: "wrap", gap: "6px" }}>
                 {chips.map((c, i) => <Chip key={i} label={c.label} onRemove={c.remove} />)}
               </div>
             )}
@@ -768,7 +778,7 @@ function SearchPageInner() {
                 <SbLabel>Type</SbLabel>
                 <div style={{ display: "flex", gap: "6px" }}>
                   {(["all", "sale", "rent"] as const).map(t => (
-                    <button key={t} onClick={() => { setListingType(t); setPage(1); }} style={{ flex: 1, padding: "8px 4px", borderRadius: "8px", fontSize: "12px", fontWeight: 600, background: listingType === t ? "#2BA8E0" : "rgba(245,242,236,0.05)", border: listingType === t ? "none" : "1px solid rgba(245,242,236,0.1)", color: listingType === t ? "#000000" : "rgba(245,242,236,0.55)", cursor: "pointer", fontFamily: "'DM Sans', sans-serif", transition: "all 0.15s" }}>
+                    <button key={t} onClick={() => { setListingType(t); setPage(1); }} style={{ flex: 1, padding: "8px 4px", borderRadius: "8px", fontSize: "12px", fontWeight: 600, background: listingType === t ? "#2BA8E0" : "rgba(255,255,255,0.05)", border: listingType === t ? "none" : "1px solid rgba(255,255,255,0.1)", color: listingType === t ? "#000000" : "rgba(255,255,255,0.55)", cursor: "pointer", fontFamily: "'DM Sans', sans-serif", transition: "all 0.15s" }}>
                       {t === "all" ? "All" : t === "sale" ? "Buy" : "Rent"}
                     </button>
                   ))}
@@ -779,11 +789,11 @@ function SearchPageInner() {
               <div style={{ marginBottom: "22px" }}>
                 <SbLabel>State</SbLabel>
                 <div style={{ position: "relative" }}>
-                  <select value={stateFilter} onChange={e => { handleStateChange(e.target.value); setPage(1); }} style={{ width: "100%", padding: "10px 32px 10px 12px", background: "rgba(245,242,236,0.05)", border: "1px solid rgba(245,242,236,0.12)", borderRadius: "8px", color: stateFilter === "all" ? "rgba(245,242,236,0.4)" : "#FFFFFF", fontSize: "13px", fontFamily: "'DM Sans', sans-serif", cursor: "pointer", outline: "none" }}>
+                  <select value={stateFilter} onChange={e => { handleStateChange(e.target.value); setPage(1); }} style={{ width: "100%", padding: "10px 32px 10px 12px", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: "8px", color: stateFilter === "all" ? "rgba(255,255,255,0.4)" : "#FFFFFF", fontSize: "13px", fontFamily: "'DM Sans', sans-serif", cursor: "pointer", outline: "none" }}>
                     <option value="all" style={{ background: "#000000" }}>All States</option>
                     {Object.keys(STATE_CITY_MAP).sort().map(s => <option key={s} value={s} style={{ background: "#000000" }}>{s}</option>)}
                   </select>
-                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="rgba(245,242,236,0.35)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ position: "absolute", right: "10px", top: "50%", transform: "translateY(-50%)", pointerEvents: "none" }}><polyline points="6 9 12 15 18 9" /></svg>
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.35)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ position: "absolute", right: "10px", top: "50%", transform: "translateY(-50%)", pointerEvents: "none" }}><polyline points="6 9 12 15 18 9" /></svg>
                 </div>
               </div>
 
@@ -791,11 +801,11 @@ function SearchPageInner() {
               <div style={{ marginBottom: "22px" }}>
                 <SbLabel>City</SbLabel>
                 <div style={{ position: "relative" }}>
-                  <select value={city} onChange={e => { handleCityChange(e.target.value); setPage(1); }} style={{ width: "100%", padding: "10px 32px 10px 12px", background: "rgba(245,242,236,0.05)", border: "1px solid rgba(245,242,236,0.12)", borderRadius: "8px", color: city === "all" ? "rgba(245,242,236,0.4)" : "#FFFFFF", fontSize: "13px", fontFamily: "'DM Sans', sans-serif", cursor: "pointer", outline: "none" }}>
+                  <select value={city} onChange={e => { handleCityChange(e.target.value); setPage(1); }} style={{ width: "100%", padding: "10px 32px 10px 12px", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: "8px", color: city === "all" ? "rgba(255,255,255,0.4)" : "#FFFFFF", fontSize: "13px", fontFamily: "'DM Sans', sans-serif", cursor: "pointer", outline: "none" }}>
                     <option value="all" style={{ background: "#000000" }}>All Cities</option>
                     {(stateFilter !== "all" ? (STATE_CITY_MAP[stateFilter] || []) : Object.keys(CITY_STATE_MAP).sort()).map(c => <option key={c} value={c} style={{ background: "#000000" }}>{c}</option>)}
                   </select>
-                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="rgba(245,242,236,0.35)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ position: "absolute", right: "10px", top: "50%", transform: "translateY(-50%)", pointerEvents: "none" }}><polyline points="6 9 12 15 18 9" /></svg>
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.35)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ position: "absolute", right: "10px", top: "50%", transform: "translateY(-50%)", pointerEvents: "none" }}><polyline points="6 9 12 15 18 9" /></svg>
                 </div>
               </div>
 
@@ -808,7 +818,7 @@ function SearchPageInner() {
                   onChange={e => handlePincodeChange(e.target.value)}
                   placeholder="Enter pincode..."
                   maxLength={6}
-                  style={{ width: "100%", padding: "10px 12px", background: "rgba(245,242,236,0.05)", border: "1px solid rgba(245,242,236,0.12)", borderRadius: "8px", color: "#FFFFFF", fontSize: "13px", fontFamily: "'DM Sans', sans-serif", outline: "none" }}
+                  style={{ width: "100%", padding: "10px 12px", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: "8px", color: "#FFFFFF", fontSize: "13px", fontFamily: "'DM Sans', sans-serif", outline: "none" }}
                 />
                 {pincodeInput.length >= 3 && PINCODE_MAP[pincodeInput.slice(0, 3)] && (
                   <div style={{ fontSize: "11px", color: "#2BA8E0", marginTop: "6px" }}>
@@ -830,12 +840,12 @@ function SearchPageInner() {
                 <SbLabel>Price Range (₹)</SbLabel>
                 <div style={{ display: "flex", gap: "8px", marginBottom: "8px" }}>
                   {[{ ph: "Min", val: minPrice, set: setMinPrice }, { ph: "Max", val: maxPrice, set: setMaxPrice }].map(({ ph, val, set }) => (
-                    <input key={ph} type="number" placeholder={ph} value={val} onChange={e => { set(e.target.value); setPage(1); }} style={{ flex: 1, padding: "9px 10px", background: "rgba(245,242,236,0.05)", border: "1px solid rgba(245,242,236,0.12)", borderRadius: "8px", color: "#FFFFFF", fontSize: "12px", fontFamily: "'DM Sans', sans-serif", outline: "none" }} />
+                    <input key={ph} type="number" placeholder={ph} value={val} onChange={e => { set(e.target.value); setPage(1); }} style={{ flex: 1, padding: "9px 10px", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: "8px", color: "#FFFFFF", fontSize: "12px", fontFamily: "'DM Sans', sans-serif", outline: "none" }} />
                   ))}
                 </div>
                 <div style={{ display: "flex", gap: "5px", flexWrap: "wrap" }}>
                   {Object.entries(BUDGET_PRESETS).map(([label, [mn, mx]]) => (
-                    <button key={label} onClick={() => { setMinPrice(mn ? String(mn) : ""); setMaxPrice(mx < 999999999 ? String(mx) : ""); setPage(1); }} style={{ padding: "3px 9px", borderRadius: "100px", fontSize: "10px", fontWeight: 600, background: "rgba(201,168,76,0.08)", border: "1px solid rgba(201,168,76,0.2)", color: "#2BA8E0", cursor: "pointer", fontFamily: "'DM Sans', sans-serif" }}>{label}</button>
+                    <button key={label} onClick={() => { setMinPrice(mn ? String(mn) : ""); setMaxPrice(mx < 999999999 ? String(mx) : ""); setPage(1); }} style={{ padding: "3px 9px", borderRadius: "100px", fontSize: "10px", fontWeight: 600, background: "rgba(43,168,224,0.08)", border: "1px solid rgba(43,168,224,0.2)", color: "#2BA8E0", cursor: "pointer", fontFamily: "'DM Sans', sans-serif" }}>{label}</button>
                   ))}
                 </div>
               </div>
@@ -845,7 +855,7 @@ function SearchPageInner() {
                 <SbLabel>Bedrooms</SbLabel>
                 <div style={{ display: "flex", gap: "6px", flexWrap: "wrap" }}>
                   {[1, 2, 3, 4, 5].map(n => (
-                    <button key={n} onClick={() => { setBhk(s => toggleSet(s, n)); setPage(1); }} style={{ width: "40px", height: "36px", borderRadius: "8px", fontSize: "13px", fontWeight: 600, background: bhk.has(n) ? "#2BA8E0" : "rgba(245,242,236,0.05)", border: bhk.has(n) ? "none" : "1px solid rgba(245,242,236,0.1)", color: bhk.has(n) ? "#000000" : "rgba(245,242,236,0.55)", cursor: "pointer", fontFamily: "'DM Sans', sans-serif", transition: "all 0.15s" }}>{n === 5 ? "5+" : n}</button>
+                    <button key={n} onClick={() => { setBhk(s => toggleSet(s, n)); setPage(1); }} style={{ width: "40px", height: "36px", borderRadius: "8px", fontSize: "13px", fontWeight: 600, background: bhk.has(n) ? "#2BA8E0" : "rgba(255,255,255,0.05)", border: bhk.has(n) ? "none" : "1px solid rgba(255,255,255,0.1)", color: bhk.has(n) ? "#000000" : "rgba(255,255,255,0.55)", cursor: "pointer", fontFamily: "'DM Sans', sans-serif", transition: "all 0.15s" }}>{n === 5 ? "5+" : n}</button>
                   ))}
                 </div>
               </div>
@@ -854,11 +864,11 @@ function SearchPageInner() {
               <div style={{ marginBottom: "22px" }}>
                 <SbLabel>Possession Status</SbLabel>
                 <div style={{ position: "relative" }}>
-                  <select value={possession} onChange={e => { setPossession(e.target.value); setPage(1); }} style={{ width: "100%", padding: "10px 32px 10px 12px", background: "rgba(245,242,236,0.05)", border: "1px solid rgba(245,242,236,0.12)", borderRadius: "8px", color: possession === "all" ? "rgba(245,242,236,0.4)" : "#FFFFFF", fontSize: "13px", fontFamily: "'DM Sans', sans-serif", cursor: "pointer", outline: "none" }}>
+                  <select value={possession} onChange={e => { setPossession(e.target.value); setPage(1); }} style={{ width: "100%", padding: "10px 32px 10px 12px", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: "8px", color: possession === "all" ? "rgba(255,255,255,0.4)" : "#FFFFFF", fontSize: "13px", fontFamily: "'DM Sans', sans-serif", cursor: "pointer", outline: "none" }}>
                     <option value="all" style={{ background: "#000000" }}>Any Status</option>
                     {POSSESSION_OPTIONS.map(o => <option key={o} value={o} style={{ background: "#000000" }}>{o}</option>)}
                   </select>
-                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="rgba(245,242,236,0.35)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ position: "absolute", right: "10px", top: "50%", transform: "translateY(-50%)", pointerEvents: "none" }}><polyline points="6 9 12 15 18 9" /></svg>
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.35)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ position: "absolute", right: "10px", top: "50%", transform: "translateY(-50%)", pointerEvents: "none" }}><polyline points="6 9 12 15 18 9" /></svg>
                 </div>
               </div>
 
@@ -866,11 +876,11 @@ function SearchPageInner() {
               <div style={{ marginBottom: "22px" }}>
                 <SbLabel>Property Age</SbLabel>
                 <div style={{ position: "relative" }}>
-                  <select value={propertyAge} onChange={e => { setPropertyAge(e.target.value); setPage(1); }} style={{ width: "100%", padding: "10px 32px 10px 12px", background: "rgba(245,242,236,0.05)", border: "1px solid rgba(245,242,236,0.12)", borderRadius: "8px", color: propertyAge === "all" ? "rgba(245,242,236,0.4)" : "#FFFFFF", fontSize: "13px", fontFamily: "'DM Sans', sans-serif", cursor: "pointer", outline: "none" }}>
+                  <select value={propertyAge} onChange={e => { setPropertyAge(e.target.value); setPage(1); }} style={{ width: "100%", padding: "10px 32px 10px 12px", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: "8px", color: propertyAge === "all" ? "rgba(255,255,255,0.4)" : "#FFFFFF", fontSize: "13px", fontFamily: "'DM Sans', sans-serif", cursor: "pointer", outline: "none" }}>
                     <option value="all" style={{ background: "#000000" }}>Any Age</option>
                     {AGE_OPTIONS.map(o => <option key={o.value} value={o.value} style={{ background: "#000000" }}>{o.label}</option>)}
                   </select>
-                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="rgba(245,242,236,0.35)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ position: "absolute", right: "10px", top: "50%", transform: "translateY(-50%)", pointerEvents: "none" }}><polyline points="6 9 12 15 18 9" /></svg>
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.35)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ position: "absolute", right: "10px", top: "50%", transform: "translateY(-50%)", pointerEvents: "none" }}><polyline points="6 9 12 15 18 9" /></svg>
                 </div>
               </div>
 
@@ -879,7 +889,7 @@ function SearchPageInner() {
                 <SbLabel>Floor Number</SbLabel>
                 <div style={{ display: "flex", gap: "8px" }}>
                   {[{ ph: "Min", val: minFloor, set: setMinFloor }, { ph: "Max", val: maxFloor, set: setMaxFloor }].map(({ ph, val, set }) => (
-                    <input key={ph} type="number" placeholder={ph} value={val} onChange={e => { set(e.target.value); setPage(1); }} style={{ flex: 1, padding: "9px 10px", background: "rgba(245,242,236,0.05)", border: "1px solid rgba(245,242,236,0.12)", borderRadius: "8px", color: "#FFFFFF", fontSize: "12px", fontFamily: "'DM Sans', sans-serif", outline: "none" }} />
+                    <input key={ph} type="number" placeholder={ph} value={val} onChange={e => { set(e.target.value); setPage(1); }} style={{ flex: 1, padding: "9px 10px", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: "8px", color: "#FFFFFF", fontSize: "12px", fontFamily: "'DM Sans', sans-serif", outline: "none" }} />
                   ))}
                 </div>
               </div>
@@ -889,7 +899,7 @@ function SearchPageInner() {
                 <SbLabel>Facing</SbLabel>
                 <div style={{ display: "flex", gap: "6px", flexWrap: "wrap" }}>
                   {FACING_OPTIONS.map(f => (
-                    <button key={f} onClick={() => { setFacingFilters(s => toggleSet(s, f)); setPage(1); }} style={{ padding: "6px 11px", borderRadius: "100px", fontSize: "11px", fontWeight: 600, background: facingFilters.has(f) ? "#2BA8E0" : "rgba(245,242,236,0.05)", border: facingFilters.has(f) ? "none" : "1px solid rgba(245,242,236,0.1)", color: facingFilters.has(f) ? "#000000" : "rgba(245,242,236,0.55)", cursor: "pointer", fontFamily: "'DM Sans', sans-serif", transition: "all 0.15s" }}>{f}</button>
+                    <button key={f} onClick={() => { setFacingFilters(s => toggleSet(s, f)); setPage(1); }} style={{ padding: "6px 11px", borderRadius: "100px", fontSize: "11px", fontWeight: 600, background: facingFilters.has(f) ? "#2BA8E0" : "rgba(255,255,255,0.05)", border: facingFilters.has(f) ? "none" : "1px solid rgba(255,255,255,0.1)", color: facingFilters.has(f) ? "#000000" : "rgba(255,255,255,0.55)", cursor: "pointer", fontFamily: "'DM Sans', sans-serif", transition: "all 0.15s" }}>{f}</button>
                   ))}
                 </div>
               </div>
@@ -903,7 +913,7 @@ function SearchPageInner() {
               </div>
 
               {/* Extra toggles */}
-              <div style={{ marginBottom: "22px", paddingTop: "16px", borderTop: "1px solid rgba(245,242,236,0.07)" }}>
+              <div style={{ marginBottom: "22px", paddingTop: "16px", borderTop: "1px solid rgba(255,255,255,0.07)" }}>
                 <SbLabel>Preferences</SbLabel>
                 <ToggleSwitch label="Furnished" checked={furnished === true} onChange={() => { setFurnished(v => v === true ? null : true); setPage(1); }} />
                 <ToggleSwitch label="Unfurnished" checked={furnished === false} onChange={() => { setFurnished(v => v === false ? null : false); setPage(1); }} />
@@ -913,10 +923,10 @@ function SearchPageInner() {
 
               {/* Saved searches */}
               {savedSearches.length > 0 && (
-                <div style={{ paddingTop: "16px", borderTop: "1px solid rgba(245,242,236,0.07)" }}>
+                <div style={{ paddingTop: "16px", borderTop: "1px solid rgba(255,255,255,0.07)" }}>
                   <SbLabel>Saved Searches</SbLabel>
                   {savedSearches.map(s => (
-                    <div key={s} style={{ fontSize: "12px", color: "rgba(245,242,236,0.6)", marginBottom: "8px", display: "flex", alignItems: "center", gap: "6px" }}>
+                    <div key={s} style={{ fontSize: "12px", color: "rgba(255,255,255,0.6)", marginBottom: "8px", display: "flex", alignItems: "center", gap: "6px" }}>
                       <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#2BA8E0" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" /></svg>
                       {s}
                     </div>
@@ -925,7 +935,7 @@ function SearchPageInner() {
               )}
 
               {hasFilters && (
-                <button onClick={clearFilters} style={{ width: "100%", padding: "11px", marginTop: "8px", background: "transparent", border: "1.5px solid rgba(201,168,76,0.35)", borderRadius: "8px", color: "#2BA8E0", fontSize: "11px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", cursor: "pointer", fontFamily: "'DM Sans', sans-serif" }}>Clear All Filters</button>
+                <button onClick={clearFilters} style={{ width: "100%", padding: "11px", marginTop: "8px", background: "transparent", border: "1.5px solid rgba(43,168,224,0.35)", borderRadius: "8px", color: "#2BA8E0", fontSize: "11px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", cursor: "pointer", fontFamily: "'DM Sans', sans-serif" }}>Clear All Filters</button>
               )}
             </div>
           </aside>
@@ -959,7 +969,7 @@ function SearchPageInner() {
                 {/* Grid/list inline toggle */}
                 <div style={{ display: "flex", background: "#161A1F", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "8px", overflow: "hidden" }}>
                   {(["grid", "list"] as const).map(m => (
-                    <button key={m} onClick={() => setViewMode(m)} style={{ width: "36px", height: "36px", display: "flex", alignItems: "center", justifyContent: "center", background: viewMode === m ? "rgba(201,168,76,0.12)" : "transparent", border: "none", cursor: "pointer", borderRight: m === "grid" ? "1px solid rgba(13,43,31,0.08)" : "none" }}>
+                    <button key={m} onClick={() => setViewMode(m)} style={{ width: "36px", height: "36px", display: "flex", alignItems: "center", justifyContent: "center", background: viewMode === m ? "rgba(43,168,224,0.12)" : "transparent", border: "none", cursor: "pointer", borderRight: m === "grid" ? "1px solid rgba(255,255,255,0.08)" : "none" }}>
                       {m === "grid" ? (
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={viewMode === "grid" ? "#2BA8E0" : "#9CA3AF"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7" /><rect x="14" y="3" width="7" height="7" /><rect x="3" y="14" width="7" height="7" /><rect x="14" y="14" width="7" height="7" /></svg>
                       ) : (
@@ -975,11 +985,11 @@ function SearchPageInner() {
             {viewMode === "map" ? (
               /* Map placeholder */
               <div style={{ background: "#0B0D10", borderRadius: "14px", overflow: "hidden", position: "relative", height: "600px", border: "1px solid rgba(255,255,255,0.07)" }}>
-                <div style={{ position: "absolute", inset: 0, backgroundImage: "linear-gradient(rgba(13,43,31,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(13,43,31,0.04) 1px, transparent 1px)", backgroundSize: "40px 40px" }} />
+                <div style={{ position: "absolute", inset: 0, backgroundImage: "linear-gradient(rgba(43,168,224,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(43,168,224,0.04) 1px, transparent 1px)", backgroundSize: "40px 40px" }} />
                 <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "16px" }}>
                   <div style={{ fontSize: "48px", opacity: 0.3 }}>🗺️</div>
                   <div style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "24px", fontWeight: 400, color: "#E8EAED", opacity: 0.5 }}>Map View</div>
-                  <div style={{ fontSize: "13px", color: "#6B7C72", textAlign: "center", maxWidth: "300px" }}>
+                  <div style={{ fontSize: "13px", color: "#AEB4BC", textAlign: "center", maxWidth: "300px" }}>
                     Interactive map with property pins coming soon. Add a Google Maps API key to enable.
                   </div>
                 </div>
@@ -999,16 +1009,16 @@ function SearchPageInner() {
               </div>
             ) : paginated.length === 0 && !(textQuery.trim() && allProps.length > 0) ? (
               /* Empty state */
-              <div style={{ textAlign: "center", padding: "80px 24px", background: "#161A1F", borderRadius: "14px", border: "1px solid rgba(255,255,255,0.07)" }}>
+              <div style={{ textAlign: "center", padding: "80px 24px", background: "rgba(255,255,255,0.04)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", borderRadius: "24px", border: "1px solid rgba(255,255,255,0.08)", boxShadow: "0 4px 24px rgba(0,0,0,0.18)" }}>
                 <div style={{ fontSize: "52px", marginBottom: "16px", opacity: 0.25 }}>⌂</div>
                 <h3 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "28px", fontWeight: 400, color: "#E8EAED", marginBottom: "10px" }}>No Properties Found</h3>
-                <p style={{ fontSize: "14px", color: "rgba(255,255,255,0.45)", marginBottom: "8px" }}>Try adjusting your filters for more results.</p>
+                <p style={{ fontSize: "14px", color: "#AEB4BC", marginBottom: "8px" }}>Try adjusting your filters for more results.</p>
                 <div style={{ display: "flex", gap: "10px", justifyContent: "center", flexWrap: "wrap", marginTop: "20px" }}>
                   {["Try any city", "Remove BHK filter", "Expand price range", "Clear all filters"].map(s => (
-                    <span key={s} onClick={clearFilters} style={{ padding: "8px 16px", background: "rgba(255,255,255,0.07)", borderRadius: "100px", fontSize: "12px", color: "rgba(255,255,255,0.7)", cursor: "pointer", border: "1px solid rgba(255,255,255,0.07)" }}>{s}</span>
+                    <span key={s} onClick={clearFilters} style={{ padding: "8px 16px", background: "rgba(255,255,255,0.06)", borderRadius: "999px", fontSize: "12px", color: "#AEB4BC", cursor: "pointer", border: "1px solid rgba(255,255,255,0.10)" }}>{s}</span>
                   ))}
                 </div>
-                <button onClick={clearFilters} style={{ marginTop: "24px", padding: "12px 28px", background: "#2BA8E0", border: "none", borderRadius: "8px", color: "#000000", fontSize: "13px", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", cursor: "pointer", fontFamily: "'DM Sans', sans-serif" }}>Clear All Filters</button>
+                <button onClick={clearFilters} style={{ marginTop: "24px", padding: "12px 28px", background: "#2BA8E0", border: "none", borderRadius: "999px", boxShadow: "0 10px 30px rgba(30,167,255,.35)", color: "#000000", fontSize: "13px", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", cursor: "pointer", fontFamily: "'DM Sans', sans-serif" }}>Clear All Filters</button>
               </div>
             ) : (() => {
               const fallback = paginated.length === 0 && textQuery.trim() && allProps.length > 0;
@@ -1033,15 +1043,15 @@ function SearchPageInner() {
             {/* Pagination */}
             {!loading && totalPages > 1 && (
               <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: "6px", marginTop: "40px" }}>
-                <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1} style={{ padding: "9px 18px", borderRadius: "8px", fontSize: "13px", fontWeight: 500, background: page === 1 ? "rgba(255,255,255,0.04)" : "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.1)", color: page === 1 ? "rgba(255,255,255,0.3)" : "#E8EAED", cursor: page === 1 ? "default" : "pointer", fontFamily: "'DM Sans', sans-serif" }}>← Prev</button>
+                <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1} style={{ padding: "9px 18px", borderRadius: "999px", fontSize: "13px", fontWeight: 500, background: page === 1 ? "rgba(255,255,255,0.04)" : "rgba(255,255,255,0.06)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", border: "1px solid rgba(255,255,255,0.10)", color: page === 1 ? "rgba(255,255,255,0.3)" : "#AEB4BC", cursor: page === 1 ? "default" : "pointer", fontFamily: "'DM Sans', sans-serif" }}>← Prev</button>
                 {Array.from({ length: Math.min(totalPages, 7) }, (_, i) => {
                   const p = totalPages <= 7 ? i + 1 : (page <= 4 ? i + 1 : page - 3 + i);
                   if (p < 1 || p > totalPages) return null;
                   return (
-                    <button key={p} onClick={() => setPage(p)} style={{ width: "38px", height: "38px", borderRadius: "8px", fontSize: "13px", fontWeight: page === p ? 700 : 400, background: page === p ? "#2BA8E0" : "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.1)", color: page === p ? "#000000" : "rgba(255,255,255,0.7)", cursor: "pointer", fontFamily: "'DM Sans', sans-serif", transition: "all 0.15s" }}>{p}</button>
+                    <button key={p} onClick={() => setPage(p)} style={{ width: "38px", height: "38px", borderRadius: "999px", fontSize: "13px", fontWeight: page === p ? 700 : 400, background: page === p ? "#2BA8E0" : "rgba(255,255,255,0.06)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", border: page === p ? "1px solid #2BA8E0" : "1px solid rgba(255,255,255,0.10)", boxShadow: page === p ? "0 10px 30px rgba(30,167,255,.35)" : "none", color: page === p ? "#000000" : "#AEB4BC", cursor: "pointer", fontFamily: "'DM Sans', sans-serif", transition: "all 0.15s" }}>{p}</button>
                   );
                 })}
-                <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page === totalPages} style={{ padding: "9px 18px", borderRadius: "8px", fontSize: "13px", fontWeight: 500, background: page === totalPages ? "rgba(255,255,255,0.04)" : "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.1)", color: page === totalPages ? "rgba(255,255,255,0.3)" : "#E8EAED", cursor: page === totalPages ? "default" : "pointer", fontFamily: "'DM Sans', sans-serif" }}>Next →</button>
+                <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page === totalPages} style={{ padding: "9px 18px", borderRadius: "999px", fontSize: "13px", fontWeight: 500, background: page === totalPages ? "rgba(255,255,255,0.04)" : "rgba(255,255,255,0.06)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", border: "1px solid rgba(255,255,255,0.10)", color: page === totalPages ? "rgba(255,255,255,0.3)" : "#AEB4BC", cursor: page === totalPages ? "default" : "pointer", fontFamily: "'DM Sans', sans-serif" }}>Next →</button>
               </div>
             )}
           </div>
@@ -1049,23 +1059,23 @@ function SearchPageInner() {
 
         {/* ── COMPARE BAR ── */}
         {compareIds.size >= 2 && (
-          <div style={{ position: "fixed", bottom: 0, left: 0, right: 0, zIndex: 200, background: "#000000", borderTop: "1px solid rgba(201,168,76,0.3)", padding: "16px 48px", display: "flex", alignItems: "center", justifyContent: "space-between", animation: "slideUp 0.25s ease-out", boxShadow: "0 -8px 40px rgba(0,0,0,0.3)" }}>
+          <div style={{ position: "fixed", bottom: 0, left: 0, right: 0, zIndex: 200, background: "#000000", borderTop: "1px solid rgba(43,168,224,0.3)", padding: "16px 48px", display: "flex", alignItems: "center", justifyContent: "space-between", animation: "slideUp 0.25s ease-out", boxShadow: "0 -8px 40px rgba(0,0,0,0.3)" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
-            <span style={{ fontSize: "13px", color: "rgba(245,242,236,0.6)" }}>Comparing</span>
+            <span style={{ fontSize: "13px", color: "rgba(255,255,255,0.6)" }}>Comparing</span>
             <div style={{ display: "flex", gap: "10px" }}>
               {[...compareIds].map(id => {
                 const p = allProps.find(x => x.id === id);
                 return p ? (
-                  <div key={id} style={{ display: "flex", alignItems: "center", gap: "8px", padding: "6px 12px", background: "rgba(245,242,236,0.06)", borderRadius: "8px", border: "1px solid rgba(245,242,236,0.12)" }}>
+                  <div key={id} style={{ display: "flex", alignItems: "center", gap: "8px", padding: "6px 12px", background: "rgba(255,255,255,0.06)", borderRadius: "8px", border: "1px solid rgba(255,255,255,0.12)" }}>
                     <span style={{ fontSize: "12px", color: "#E8EAED", maxWidth: "150px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{p.title}</span>
-                    <span onClick={() => setCompareIds(s => { const n = new Set(s); n.delete(id); return n; })} style={{ color: "rgba(245,242,236,0.4)", cursor: "pointer", fontSize: "14px", fontWeight: 700, lineHeight: 1 }}>×</span>
+                    <span onClick={() => setCompareIds(s => { const n = new Set(s); n.delete(id); return n; })} style={{ color: "rgba(255,255,255,0.4)", cursor: "pointer", fontSize: "14px", fontWeight: 700, lineHeight: 1 }}>×</span>
                   </div>
                 ) : null;
               })}
             </div>
           </div>
           <div style={{ display: "flex", gap: "10px" }}>
-            <button onClick={() => setCompareIds(new Set())} style={{ padding: "9px 18px", background: "transparent", border: "1px solid rgba(245,242,236,0.2)", borderRadius: "8px", color: "rgba(245,242,236,0.6)", fontSize: "12px", fontWeight: 500, cursor: "pointer", fontFamily: "'DM Sans', sans-serif" }}>Clear</button>
+            <button onClick={() => setCompareIds(new Set())} style={{ padding: "9px 18px", background: "transparent", border: "1px solid rgba(255,255,255,0.2)", borderRadius: "8px", color: "rgba(255,255,255,0.6)", fontSize: "12px", fontWeight: 500, cursor: "pointer", fontFamily: "'DM Sans', sans-serif" }}>Clear</button>
             <button style={{ padding: "9px 24px", background: "#2BA8E0", border: "none", borderRadius: "8px", color: "#000000", fontSize: "13px", fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", cursor: "pointer", fontFamily: "'DM Sans', sans-serif" }}>Compare {compareIds.size} Properties →</button>
           </div>
         </div>
@@ -1074,9 +1084,9 @@ function SearchPageInner() {
         {/* ── SAVE SEARCH MODAL ── */}
         {showSaveModal && (
           <div style={{ position: "fixed", inset: 0, zIndex: 300, background: "rgba(0,0,0,0.5)", backdropFilter: "blur(6px)", display: "flex", alignItems: "center", justifyContent: "center" }} onClick={() => setShowSaveModal(false)}>
-            <div className="search-save-modal" style={{ background: "#161A1F", borderRadius: "16px", padding: "36px", width: "420px", boxShadow: "0 24px 80px rgba(0,0,0,0.6)", border: "1px solid rgba(255,255,255,0.07)" }} onClick={e => e.stopPropagation()}>
+            <div className="search-save-modal" style={{ background: "rgba(255,255,255,0.06)", backdropFilter: "blur(30px)", WebkitBackdropFilter: "blur(30px)", borderRadius: "24px", padding: "36px", width: "420px", boxShadow: "0 24px 80px rgba(0,0,0,0.6)", border: "1px solid rgba(255,255,255,0.10)" }} onClick={e => e.stopPropagation()}>
               <h3 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "26px", fontWeight: 500, color: "#E8EAED", marginBottom: "8px" }}>Save This Search</h3>
-              <p style={{ fontSize: "13px", color: "rgba(255,255,255,0.45)", marginBottom: "24px" }}>Get notified when new properties match your criteria.</p>
+              <p style={{ fontSize: "13px", color: "#AEB4BC", marginBottom: "24px" }}>Get notified when new properties match your criteria.</p>
               <input
                 placeholder="Search name (e.g. 3BHK in Jubilee Hills)"
                 value={saveSearchName}
@@ -1092,7 +1102,7 @@ function SearchPageInner() {
         )}
 
         {searchSavedToast && (
-          <div style={{ position: "fixed", top: "88px", right: "24px", zIndex: 500, padding: "12px 20px", borderRadius: "10px", background: "#161A1F", color: "#FFFFFF", fontSize: "13px", fontWeight: 600, boxShadow: "0 4px 20px rgba(0,0,0,0.2)", display: "flex", alignItems: "center", gap: "8px", fontFamily: "'DM Sans', sans-serif" }}>
+          <div style={{ position: "fixed", top: "88px", right: "24px", zIndex: 500, padding: "12px 20px", borderRadius: "16px", background: "rgba(255,255,255,0.06)", backdropFilter: "blur(30px)", WebkitBackdropFilter: "blur(30px)", border: "1px solid rgba(255,255,255,0.10)", color: "#FFFFFF", fontSize: "13px", fontWeight: 600, boxShadow: "0 4px 24px rgba(0,0,0,0.18)", display: "flex", alignItems: "center", gap: "8px", fontFamily: "'DM Sans', sans-serif" }}>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#2BA8E0" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
             Search saved to your dashboard
           </div>

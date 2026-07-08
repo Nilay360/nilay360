@@ -1232,7 +1232,7 @@ export default function HomePage() {
             {/* Brand */}
             <div>
               <a href="/" style={{display:"inline-block", marginBottom:12}}>
-                <img src="/nilay_final.jpg" alt="Nilay 360" style={{ height: 32, width: 'auto', objectFit: 'contain' }} />
+                <img src="/nilay_logo_final.png" alt="Nilay 360" style={{ height: 32, width: 'auto', objectFit: 'contain' }} />
               </a>
               <p style={{fontSize:13, lineHeight:1.75, maxWidth:240, marginBottom:20}}>India's premium real estate platform connecting discerning buyers with exceptional properties.</p>
               <div style={{display:"flex", gap:10}}>

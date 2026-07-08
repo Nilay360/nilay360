@@ -4,49 +4,30 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import type { Session } from "@supabase/supabase-js";
+import { MyListingsList } from "@/components/dashboard/MyListingsList";
+import type { Listing } from "@/components/dashboard/MyListingsList";
 
-interface Listing {
-  id: string;
-  title: string | null;
-  city: string | null;
-  property_category: string | null;
-  listing_type: string | null;
-  price: number | null;
-  status: string;
-  submitted_at: string;
-  slug: string | null;
-  images: string[] | null;
-}
-
-const G = { dark: "#000000", gold: "#2BA8E0", ivory: "#000000", mid: "#0B0D10" };
-
-function fmtPrice(n: number) {
-  if (n >= 1e7) return `₹${(n / 1e7).toFixed(2)} Cr`;
-  if (n >= 1e5) return `₹${(n / 1e5).toFixed(2)} L`;
-  return `₹${n.toLocaleString("en-IN")}`;
-}
-
-function fmtDate(iso: string | null | undefined) {
-  if (!iso) return "—";
-  return new Date(iso).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
-}
+const G = { ivory: "#000000", gold: "#2BA8E0" };
 
 export default function MyListingsPage() {
   const [listings, setListings] = useState<Listing[]>([]);
-  const [loading, setLoading]   = useState(true);
-  const [email, setEmail]       = useState<string | null>(null);
-  const [deleting, setDeleting] = useState<string | null>(null);
+  const [loading,  setLoading]  = useState(true);
+  const [email,    setEmail]    = useState<string | null>(null);
 
   useEffect(() => {
     const supabase = createClient();
     supabase.auth.getSession().then(({ data }: { data: { session: Session | null } }) => {
       const userEmail = data.session?.user?.email ?? null;
+      const userId    = data.session?.user?.id    ?? null;
       setEmail(userEmail);
-      if (!userEmail) { setLoading(false); return; }
+      if (!userEmail && !userId) { setLoading(false); return; }
+      const filter = userId && userEmail
+        ? `seller_email.eq.${userEmail},user_id.eq.${userId}`
+        : userEmail ? `seller_email.eq.${userEmail}` : `user_id.eq.${userId}`;
       supabase
         .from("property_listings")
-        .select("id, title, city, property_category, listing_type, price, status, submitted_at, slug, images")
-        .eq("seller_email", userEmail)
+        .select("id, title, city, property_category, listing_type, price, status, submitted_at, slug, photo_urls")
+        .or(filter)
         .order("submitted_at", { ascending: false })
         .then(({ data: rows }: { data: Listing[] | null }) => {
           setListings(rows ?? []);
@@ -55,24 +36,17 @@ export default function MyListingsPage() {
     });
   }, []);
 
-  const handleDelete = async (id: string, title: string | null | undefined) => {
-    const label = title ?? "this listing";
-    if (!window.confirm(`Delete "${label}"? This cannot be undone.`)) return;
-    setDeleting(id);
+  const handleDelete = async (id: string) => {
     const supabase = createClient();
     const { error } = await supabase.from("property_listings").delete().eq("id", id);
-    if (!error) {
-      setListings(prev => prev.filter(l => l.id !== id));
-    } else {
-      alert("Failed to delete. Please try again.");
-    }
-    setDeleting(null);
+    if (!error) setListings(prev => prev.filter(l => l.id !== id));
+    else alert("Failed to delete. Please try again.");
   };
 
   if (loading) {
     return (
       <div style={{ minHeight: "100vh", background: G.ivory, display: "flex", alignItems: "center", justifyContent: "center" }}>
-        <span style={{ color: G.dark, fontFamily: "'DM Sans', sans-serif", fontSize: 14, opacity: 0.5 }}>Loading…</span>
+        <span style={{ color: "#AEB4BC", fontFamily: "'DM Sans', sans-serif", fontSize: 14 }}>Loading…</span>
       </div>
     );
   }
@@ -80,7 +54,7 @@ export default function MyListingsPage() {
   if (!email) {
     return (
       <div style={{ minHeight: "100vh", background: G.ivory, paddingTop: 64, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 16 }}>
-        <p style={{ color: G.dark, fontFamily: "'DM Sans', sans-serif", fontSize: 16 }}>Please sign in to view your listings.</p>
+        <p style={{ color: "#E8EAED", fontFamily: "'DM Sans', sans-serif", fontSize: 16 }}>Please sign in to view your listings.</p>
         <Link href="/login" style={{ color: G.gold, fontWeight: 600, fontFamily: "'DM Sans', sans-serif", textDecoration: "none" }}>Sign In →</Link>
       </div>
     );
@@ -88,32 +62,19 @@ export default function MyListingsPage() {
 
   return (
     <div style={{ minHeight: "100vh", background: G.ivory, paddingTop: 64 }}>
-      <style>{`
-@media (max-width: 768px) {
-  .ml-header { flex-direction: column !important; align-items: flex-start !important; gap: 12px !important; padding: 16px !important; }
-  .ml-card { flex-direction: column !important; }
-  .ml-thumb { width: 100% !important; height: 180px !important; flex-shrink: unset !important; }
-  .ml-body { padding: 12px 16px !important; }
-  .ml-actions { flex-direction: row !important; flex-wrap: wrap !important; padding: 12px 16px !important; gap: 8px !important; border-top: 1px solid rgba(255,255,255,0.06) !important; }
-  .ml-actions a, .ml-actions button { flex: 1 1 calc(50% - 4px) !important; justify-content: center !important; }
-}
-@media (max-width: 480px) {
-  .ml-actions a, .ml-actions button { flex: 1 1 100% !important; }
-}
-`}</style>
       <div style={{ maxWidth: 1000, margin: "0 auto", padding: "40px 40px" }}>
 
         {/* Header */}
-        <div className="ml-header" style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 36, flexWrap: "wrap", gap: 16 }}>
+        <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 36, flexWrap: "wrap", gap: 16 }}>
           <div>
             <h1 style={{
               fontFamily: "'Cormorant Garamond', Georgia, serif",
-              fontSize: 34, fontWeight: 600, color: G.dark,
+              fontSize: 34, fontWeight: 600, color: "#E8EAED",
               margin: 0, lineHeight: 1.15,
             }}>
               My Listings
             </h1>
-            <p style={{ color: "rgba(13,43,31,0.5)", fontFamily: "'DM Sans', sans-serif", fontSize: 14, margin: "6px 0 0" }}>
+            <p style={{ color: "#AEB4BC", fontFamily: "'DM Sans', sans-serif", fontSize: 14, margin: "6px 0 0" }}>
               {listings.length} {listings.length === 1 ? "property" : "properties"} · {email}
             </p>
           </div>
@@ -121,168 +82,24 @@ export default function MyListingsPage() {
             <Link href="/dashboard" style={{ textDecoration: "none" }}>
               <button style={{
                 padding: "9px 16px", fontSize: 13, fontWeight: 500,
-                color: G.dark, background: "transparent",
-                border: "1px solid rgba(13,43,31,0.2)", borderRadius: 8,
+                color: "#E8EAED", background: "rgba(255,255,255,0.05)",
+                border: "1px solid rgba(255,255,255,0.15)", borderRadius: 8,
                 cursor: "pointer", fontFamily: "'DM Sans', sans-serif",
-              }}>
-                ← Dashboard
-              </button>
+              }}>← Dashboard</button>
             </Link>
             <Link href="/post-property" style={{ textDecoration: "none" }}>
               <button style={{
                 padding: "9px 18px", fontSize: 13, fontWeight: 600,
-                color: "#0a0a0a", background: G.gold,
-                border: "none", borderRadius: 8,
+                color: "#000000", background: G.gold,
+                border: "none", borderRadius: 999,
+                boxShadow: "0 10px 30px rgba(30,167,255,.35)",
                 cursor: "pointer", fontFamily: "'DM Sans', sans-serif",
-              }}>
-                + New Listing
-              </button>
+              }}>+ New Listing</button>
             </Link>
           </div>
         </div>
 
-        {/* Empty state */}
-        {listings.length === 0 && (
-          <div style={{
-            textAlign: "center", padding: "80px 0",
-            color: "rgba(13,43,31,0.38)", fontFamily: "'DM Sans', sans-serif",
-          }}>
-            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.25" style={{ opacity: 0.35, marginBottom: 16 }}>
-              <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
-              <polyline points="9 22 9 12 15 12 15 22"/>
-            </svg>
-            <p style={{ fontSize: 16, margin: "0 0 12px" }}>No listings yet.</p>
-            <Link href="/post-property" style={{ color: G.gold, fontWeight: 600, fontFamily: "'DM Sans', sans-serif", textDecoration: "none" }}>
-              List your first property →
-            </Link>
-          </div>
-        )}
-
-        {/* Listing cards */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-          {listings.map(listing => {
-            const thumb = listing.images?.[0] ?? null;
-            const statusColors: Record<string, { text: string; bg: string; label: string }> = {
-              active:         { text: "#065F46", bg: "rgba(16,185,129,0.1)",   label: "Active"          },
-              pending_review: { text: "#92400E", bg: "rgba(245,158,11,0.1)",   label: "Pending Review"  },
-              pending:        { text: "#92400E", bg: "rgba(245,158,11,0.1)",   label: "Pending"         },
-              rejected:       { text: "#B91C1C", bg: "rgba(239,68,68,0.1)",    label: "Rejected"        },
-              inactive:       { text: "#6b7280", bg: "rgba(107,114,128,0.08)", label: "Inactive"        },
-              sold:           { text: "#7c3aed", bg: "rgba(124,58,237,0.08)",  label: "Sold"            },
-            };
-            const sc = statusColors[listing.status] ?? { text: "#6b7280", bg: "rgba(107,114,128,0.08)", label: listing.status };
-
-            return (
-              <div
-                key={listing.id}
-                className="ml-card"
-                style={{
-                  background: "#ffffff",
-                  borderRadius: 12,
-                  border: "1px solid rgba(13,43,31,0.09)",
-                  boxShadow: "0 2px 12px rgba(13,43,31,0.05)",
-                  overflow: "hidden",
-                  display: "flex",
-                }}
-              >
-                {/* Thumbnail */}
-                <div className="ml-thumb" style={{
-                  width: 152, minHeight: 110, flexShrink: 0,
-                  background: thumb
-                    ? `url(${thumb}) center/cover no-repeat`
-                    : `linear-gradient(135deg, ${G.mid} 0%, ${G.dark} 100%)`,
-                  display: "flex", alignItems: "center", justifyContent: "center",
-                }}>
-                  {!thumb && (
-                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="rgba(201,168,76,0.35)" strokeWidth="1.5">
-                      <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
-                      <polyline points="9 22 9 12 15 12 15 22"/>
-                    </svg>
-                  )}
-                </div>
-
-                {/* Body */}
-                <div className="ml-body" style={{ flex: 1, padding: "16px 20px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16, flexWrap: "wrap" }}>
-                  <div style={{ flex: 1, minWidth: 200 }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 5 }}>
-                      <span style={{
-                        fontSize: 11, fontWeight: 600, textTransform: "uppercase",
-                        letterSpacing: "0.07em", color: sc.text, background: sc.bg,
-                        borderRadius: 4, padding: "2px 8px",
-                        fontFamily: "'DM Sans', sans-serif",
-                      }}>
-                        {sc.label}
-                      </span>
-                      <span style={{ fontSize: 12, color: "rgba(13,43,31,0.4)", fontFamily: "'DM Sans', sans-serif" }}>
-                        {[listing.property_category, listing.listing_type].filter(Boolean).join(" · ")}
-                      </span>
-                    </div>
-                    <h3 style={{
-                      fontFamily: "'Cormorant Garamond', Georgia, serif",
-                      fontSize: 19, fontWeight: 600, color: G.dark,
-                      margin: "0 0 4px", lineHeight: 1.2,
-                    }}>
-                      {listing.title ?? "Untitled"}
-                    </h3>
-                    <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
-                      <span style={{ fontSize: 13, color: "rgba(13,43,31,0.55)", fontFamily: "'DM Sans', sans-serif" }}>
-                        {listing.city ?? "—"}
-                      </span>
-                      <span style={{ fontSize: 13, fontWeight: 600, color: G.dark, fontFamily: "'DM Sans', sans-serif" }}>
-                        {listing.price != null ? fmtPrice(listing.price) : "Price on request"}
-                      </span>
-                    </div>
-                    <div style={{ fontSize: 11.5, color: "rgba(13,43,31,0.35)", fontFamily: "'DM Sans', sans-serif", marginTop: 4 }}>
-                      Listed {fmtDate(listing.submitted_at)}
-                    </div>
-                  </div>
-
-                  {/* Actions */}
-                  <div className="ml-actions" style={{ display: "flex", gap: 8, flexShrink: 0 }}>
-                    {listing.status === "active" && listing.slug && (
-                      <Link href={`/properties/${listing.slug}`} style={{ textDecoration: "none" }}>
-                        <button style={{
-                          padding: "7px 14px", fontSize: 13, fontWeight: 500,
-                          color: G.dark, background: "transparent",
-                          border: "1px solid rgba(13,43,31,0.18)",
-                          borderRadius: 7, cursor: "pointer",
-                          fontFamily: "'DM Sans', sans-serif",
-                        }}>
-                          View
-                        </button>
-                      </Link>
-                    )}
-                    <Link href={`/post-property/edit/${listing.id}`} style={{ textDecoration: "none" }}>
-                      <button style={{
-                        padding: "7px 14px", fontSize: 13, fontWeight: 500,
-                        color: "#ffffff", background: G.dark,
-                        border: "none", borderRadius: 7, cursor: "pointer",
-                        fontFamily: "'DM Sans', sans-serif",
-                      }}>
-                        Edit
-                      </button>
-                    </Link>
-                    <button
-                      onClick={() => handleDelete(listing.id, listing.title ?? "this listing")}
-                      disabled={deleting === listing.id}
-                      style={{
-                        padding: "7px 14px", fontSize: 13, fontWeight: 500,
-                        color: deleting === listing.id ? "#aaa" : "#e05555",
-                        background: "transparent",
-                        border: `1px solid ${deleting === listing.id ? "rgba(170,170,170,0.3)" : "rgba(224,85,85,0.25)"}`,
-                        borderRadius: 7, cursor: deleting === listing.id ? "not-allowed" : "pointer",
-                        fontFamily: "'DM Sans', sans-serif",
-                        transition: "border-color 0.15s, color 0.15s",
-                      }}
-                    >
-                      {deleting === listing.id ? "…" : "Delete"}
-                    </button>
-                  </div>
-                </div>
-              </div>
-            );
-          })}
-        </div>
+        <MyListingsList listings={listings} onDelete={handleDelete} />
 
       </div>
     </div>

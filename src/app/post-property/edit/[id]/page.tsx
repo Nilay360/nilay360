@@ -66,7 +66,7 @@ const EMPTY: EditForm = {
 const C = {
   bg: '#0a0a0a', surface: '#0f0f0f', surface2: '#161616', border: '#1e1e1e',
   gold: '#2BA8E0', goldDim: 'rgba(201,168,76,0.10)', goldBorder: 'rgba(201,168,76,0.30)',
-  text: '#000000', textSub: '#9a9a9a', textMuted: '#525252',
+  text: '#F5F2EC', textSub: '#AEB4BC', textMuted: '#6B7280',
 } as const
 
 const FB = '"DM Sans", -apple-system, BlinkMacSystemFont, sans-serif'
@@ -257,10 +257,10 @@ export default function EditListingPage() {
           seller_name:        form.seller_name        || null,
           seller_phone:       form.seller_phone       || null,
           seller_whatsapp:    form.seller_whatsapp    || null,
+          user_id:            userId,
           updated_at:         new Date().toISOString(),
         })
         .eq('id', id)
-        .eq('user_id', userId)
       setSaving(false)
       if (upErr) {
         console.error('Edit listing — update error code:', upErr.code, '| message:', upErr.message, '| details:', upErr.details)

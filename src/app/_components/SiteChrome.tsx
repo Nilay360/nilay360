@@ -15,7 +15,7 @@ export function Navbar() {
   return (
     <nav className="sc-nav" style={{ position:"fixed", top:0, left:0, right:0, zIndex:200, height:60, display:"flex", alignItems:"center", justifyContent:"space-between", padding:"0 40px", background:"rgba(0,0,0,0.96)", backdropFilter:"blur(20px)", borderBottom:"0.5px solid rgba(43,168,224,0.15)" }}>
       <a href="/" style={{ display:"flex", alignItems:"center" }}>
-        <img src="/nilay_final.jpg" alt="Nilay 360" style={{ height: 36, width: 'auto', objectFit: 'contain' }} />
+        <img src="/nilay_logo_final.png" alt="Nilay 360" style={{ height: 36, width: 'auto', objectFit: 'contain' }} />
       </a>
       <div style={{ display:"flex", alignItems:"center", gap:4 }} className="nv-center">
         {NAV.map(([l,h]) => (
@@ -46,7 +46,7 @@ export function Footer() {
         <div className="sc-footer-grid" style={{ display:"grid", gridTemplateColumns:"2fr 1fr 1fr 1fr 1fr", gap:40, marginBottom:48 }}>
           <div>
             <a href="/" style={{ display:"inline-block", marginBottom:12 }}>
-              <img src="/nilay_final.jpg" alt="Nilay 360" style={{ height: 32, width: 'auto', objectFit: 'contain' }} />
+              <img src="/nilay_logo_final.png" alt="Nilay 360" style={{ height: 32, width: 'auto', objectFit: 'contain' }} />
             </a>
             <p style={{ fontSize:13, lineHeight:1.75, maxWidth:240 }}>India&apos;s premium real estate platform connecting discerning buyers with exceptional properties.</p>
           </div>
