@@ -88,9 +88,9 @@ function OtpBoxes({
 
   const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
     e.preventDefault();
-    const digits = e.clipboardData.getData("text").replace(/\D/g, "").slice(0, 6).split("");
+    const digits = e.clipboardData.getData("text").replace(/\D/g, "").slice(0, 4).split("");
     if (!digits.length) return;
-    const next = ["", "", "", "", "", ""];
+    const next = ["", "", "", ""];
     digits.forEach((d, i) => { next[i] = d; });
     onChange(next);
     refs.current[Math.min(digits.length, 5)]?.focus();
@@ -139,7 +139,7 @@ function AuthModalInner({
   // sign-in flow
   const [siStep, setSiStep]   = useState<1 | 2 | 3>(1);
   const [siPhone, setSiPhone] = useState("");
-  const [siOtp, setSiOtp]     = useState<string[]>(["", "", "", "", "", ""]);
+  const [siOtp, setSiOtp]     = useState<string[]>(["", "", "", ""]);
 
   // register flow
   const [reStep, setReStep]   = useState<1 | 2 | 3>(1);
@@ -148,7 +148,7 @@ function AuthModalInner({
     full_name: "", phone: "", email: "", city: CITIES[0], rera: "", agency: "",
   });
   const [whatsappOptIn, setWhatsappOptIn] = useState(true);
-  const [reOtp, setReOtp] = useState<string[]>(["", "", "", "", "", ""]);
+  const [reOtp, setReOtp] = useState<string[]>(["", "", "", ""]);
   const [agentPending, setAgentPending] = useState(false);
   const [reSuccess, setReSuccess] = useState(false);
 
@@ -236,7 +236,7 @@ function AuthModalInner({
     setLoading(true);
     const ok = await sendOtp(siPhone);
     setLoading(false);
-    if (ok) { setSiOtp(["", "", "", "", "", ""]); setSiStep(2); startCountdown(); }
+    if (ok) { setSiOtp(["", "", "", ""]); setSiStep(2); startCountdown(); }
   }
 
   // ── SIGN IN: step 2 → verify ──
@@ -244,7 +244,7 @@ function AuthModalInner({
     e.preventDefault();
     setError(null);
     const token = siOtp.join("");
-    if (token.length !== 6) { setError("Please enter the full 6-digit code."); return; }
+    if (token.length !== 4) { setError("Please enter the full 4-digit code."); return; }
     setLoading(true);
     try {
       // Verify OTP with MSG91 and receive a session token from the server
@@ -297,7 +297,7 @@ function AuthModalInner({
     const ok = await sendOtp(reForm.phone);
     setLoading(false);
     if (!ok) return;
-    setReOtp(["", "", "", "", "", ""]);
+    setReOtp(["", "", "", ""]);
     setReStep(3);
     startCountdown();
   }
@@ -307,7 +307,7 @@ function AuthModalInner({
     e.preventDefault();
     setError(null);
     const token = reOtp.join("");
-    if (token.length !== 6) { setError("Please enter the full 6-digit code."); return; }
+    if (token.length !== 4) { setError("Please enter the full 4-digit code."); return; }
     setLoading(true);
     try {
       // Verify OTP with MSG91; server creates user + profile and returns session token
@@ -464,7 +464,7 @@ function AuthModalInner({
               <form onSubmit={handleSiVerify} className="am-step">
                 <BackArrow onClick={() => { setSiStep(1); setError(null); }} />
                 <h2 className="am-title">Verify your number</h2>
-                <p className="am-sub">Enter the 6-digit code sent to {phoneMasked(siPhone)}.</p>
+                <p className="am-sub">Enter the 4-digit code sent to {phoneMasked(siPhone)}.</p>
 
                 <OtpBoxes value={siOtp} onChange={setSiOtp} disabled={loading} />
 
@@ -593,7 +593,7 @@ function AuthModalInner({
               <form onSubmit={handleReVerify} className="am-step">
                 <BackArrow onClick={() => { setReStep(2); setError(null); }} />
                 <h2 className="am-title">Verify your number</h2>
-                <p className="am-sub">Enter the 6-digit code sent to {phoneMasked(reForm.phone)}.</p>
+                <p className="am-sub">Enter the 4-digit code sent to {phoneMasked(reForm.phone)}.</p>
 
                 <OtpBoxes value={reOtp} onChange={setReOtp} disabled={loading} />
 
