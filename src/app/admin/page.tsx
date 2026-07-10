@@ -3,10 +3,11 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { useAuth } from "@/context/AuthContext";
+import { CITIES } from "@/constants";
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
-type AdminSection = "overview" | "pending" | "approved" | "rejected" | "users" | "inquiries";
+type AdminSection = "overview" | "pending" | "approved" | "rejected" | "users" | "inquiries" | "agents";
 
 type Stats = {
   pending: number;
@@ -71,6 +72,27 @@ type RecentActivity = {
   city: string | null;
 };
 
+type AgentApplication = {
+  id: string;
+  user_id: string;
+  license_number: string | null;
+  agency_name: string | null;
+  bio: string | null;
+  years_experience: number | null;
+  status: string;
+  created_at: string;
+  profiles: { full_name: string | null; phone: string | null; email: string | null } | null;
+  agent_service_cities: { city: string }[] | null;
+};
+
+type ProfileSearchRow = {
+  id: string;
+  full_name: string | null;
+  phone: string | null;
+  email: string | null;
+  role: string | null;
+};
+
 // ── Helpers ────────────────────────────────────────────────────────────────────
 
 function fmtPrice(v: number | null, listingType: string | null): string {
@@ -114,6 +136,7 @@ function IconApprove() { return <svg width="12" height="12" viewBox="0 0 24 24" 
 function IconReject()  { return <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>; }
 function IconOut()     { return <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>; }
 function IconBuilding(){ return <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M9 22V12h6v10"/><path d="M8 6h.01M16 6h.01M8 10h.01M16 10h.01"/></svg>; }
+function IconBriefcase(){ return <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>; }
 
 // ── Shared UI ──────────────────────────────────────────────────────────────────
 
@@ -853,6 +876,337 @@ function InquiriesSection({ inquiries, loading }: { inquiries: InquiryRow[]; loa
   );
 }
 
+// ── Section: Agent Applications ─────────────────────────────────────────────────
+
+const AGENT_STATUS_FILTERS = ["pending", "approved", "rejected"] as const;
+type AgentStatusFilter = typeof AGENT_STATUS_FILTERS[number];
+
+function AgentCard({
+  app, inFlight, actions,
+}: {
+  app: AgentApplication;
+  inFlight: boolean;
+  actions: React.ReactNode;
+}) {
+  const cities = (app.agent_service_cities ?? []).map(c => c.city);
+  return (
+    <div style={{ background: "rgba(255,255,255,0.05)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", borderRadius: "14px", border: "1px solid rgba(255,255,255,0.08)", boxShadow: "0 4px 24px rgba(0,0,0,0.18)", padding: "18px 22px", opacity: inFlight ? 0.55 : 1, transition: "opacity 0.2s" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: "12px", flexWrap: "wrap", marginBottom: "10px" }}>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px", flexWrap: "wrap" }}>
+            <StatusBadge status={app.status === "approved" ? "active" : app.status === "pending" ? "pending_review" : "rejected"} />
+            <span style={{ fontSize: "11px", color: "rgba(255,255,255,0.45)" }}>{fmtDate(app.created_at)}</span>
+          </div>
+          <h3 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "19px", fontWeight: 600, color: "#E8EAED", lineHeight: 1.25, marginBottom: "4px" }}>
+            {app.profiles?.full_name ?? "Unnamed applicant"}
+          </h3>
+          <div style={{ display: "flex", gap: "14px", fontSize: "12px", color: "#AEB4BC", flexWrap: "wrap" }}>
+            {app.profiles?.phone && <a href={`tel:${app.profiles.phone}`} style={{ color: "#AEB4BC", textDecoration: "none" }}>{app.profiles.phone}</a>}
+            {app.profiles?.email && <a href={`mailto:${app.profiles.email}`} style={{ color: "#AEB4BC", textDecoration: "none" }}>{app.profiles.email}</a>}
+            {app.agency_name && <span>{app.agency_name}</span>}
+            {app.years_experience != null && <span>{app.years_experience} yrs experience</span>}
+          </div>
+        </div>
+      </div>
+
+      {app.license_number && (
+        <div style={{ fontSize: "12px", color: "#AEB4BC", marginBottom: "8px" }}>
+          License: <span style={{ color: "#E8EAED" }}>{app.license_number}</span>
+        </div>
+      )}
+
+      {cities.length > 0 && (
+        <div style={{ display: "flex", gap: "6px", flexWrap: "wrap", marginBottom: "8px" }}>
+          {cities.map(c => (
+            <span key={c} style={{ padding: "3px 10px", borderRadius: "100px", fontSize: "10px", fontWeight: 600, background: "rgba(43,168,224,0.1)", color: "#2BA8E0", border: "1px solid rgba(43,168,224,0.25)" }}>{c}</span>
+          ))}
+        </div>
+      )}
+
+      {app.bio && (
+        <div style={{ background: "rgba(255,255,255,0.04)", borderRadius: "8px", padding: "10px 14px", fontSize: "12px", color: "#AEB4BC", lineHeight: 1.6, borderLeft: "3px solid rgba(43,168,224,0.4)", marginBottom: "8px" }}>
+          {app.bio}
+        </div>
+      )}
+
+      <div style={{ display: "flex", gap: "8px", alignItems: "center", flexWrap: "wrap" }}>
+        {actions}
+      </div>
+    </div>
+  );
+}
+
+function CityMultiSelect({ selected, onChange }: { selected: string[]; onChange: (cities: string[]) => void }) {
+  const toggle = (city: string) => {
+    onChange(selected.includes(city) ? selected.filter(c => c !== city) : [...selected, city]);
+  };
+  return (
+    <div style={{ display: "flex", gap: "6px", flexWrap: "wrap" }}>
+      {CITIES.map(city => {
+        const on = selected.includes(city);
+        return (
+          <button
+            type="button"
+            key={city}
+            onClick={() => toggle(city)}
+            style={{ padding: "6px 14px", borderRadius: "100px", fontSize: "12px", fontWeight: on ? 700 : 500, background: on ? "#2BA8E0" : "rgba(255,255,255,0.06)", color: on ? "#000000" : "#AEB4BC", border: on ? "1.5px solid #2BA8E0" : "1.5px solid rgba(255,255,255,0.12)", cursor: "pointer", fontFamily: "'DM Sans', sans-serif" }}
+          >
+            {city}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+const inputStyle: React.CSSProperties = {
+  width: "100%", padding: "10px 14px", background: "rgba(255,255,255,0.06)",
+  border: "1.5px solid rgba(255,255,255,0.12)", borderRadius: "9px", fontSize: "13px",
+  color: "#E8EAED", fontFamily: "'DM Sans', sans-serif", outlineColor: "#2BA8E0",
+};
+
+const labelStyle: React.CSSProperties = {
+  display: "block", fontSize: "11px", fontWeight: 700, letterSpacing: "0.06em",
+  textTransform: "uppercase" as const, color: "#AEB4BC", marginBottom: "6px",
+};
+
+function AddAgentModal({ onClose, onSubmit }: {
+  onClose: () => void;
+  onSubmit: (data: {
+    userId: string; licenseNumber: string; agencyName: string; bio: string;
+    yearsExperience: string; cities: string[];
+  }) => Promise<{ ok: boolean; error?: string }>;
+}) {
+  const [search, setSearch] = useState("");
+  const [results, setResults] = useState<ProfileSearchRow[]>([]);
+  const [searching, setSearching] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<ProfileSearchRow | null>(null);
+  const [licenseNumber, setLicenseNumber] = useState("");
+  const [agencyName, setAgencyName] = useState("");
+  const [bio, setBio] = useState("");
+  const [yearsExperience, setYearsExperience] = useState("");
+  const [cities, setCities] = useState<string[]>([]);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const q = search.trim();
+    if (q.length < 2) { setResults([]); return; }
+    setSearching(true);
+    const supabase = createClient();
+    const id = setTimeout(() => {
+      supabase
+        .from("profiles")
+        .select("id, full_name, phone, email, role")
+        .or(`full_name.ilike.%${q}%,phone.ilike.%${q}%,email.ilike.%${q}%`)
+        .limit(8)
+        .then((res: { data: unknown }) => {
+          setResults((res.data as ProfileSearchRow[] | null) ?? []);
+          setSearching(false);
+        });
+    }, 300);
+    return () => clearTimeout(id);
+  }, [search]);
+
+  const handleSubmit = async () => {
+    if (!selectedUser) { setError("Select a user first."); return; }
+    setSubmitting(true);
+    setError(null);
+    const res = await onSubmit({ userId: selectedUser.id, licenseNumber, agencyName, bio, yearsExperience, cities });
+    setSubmitting(false);
+    if (!res.ok) setError(res.error ?? "Failed to add agent.");
+    else onClose();
+  };
+
+  return (
+    <div
+      onClick={onClose}
+      role="dialog"
+      aria-modal="true"
+      aria-label="Add agent manually"
+      style={{ position: "fixed", inset: 0, zIndex: 500, background: "rgba(0,0,0,0.6)", backdropFilter: "blur(4px)", display: "flex", alignItems: "center", justifyContent: "center", padding: "20px" }}
+    >
+      <div
+        onClick={e => e.stopPropagation()}
+        style={{ background: "#0B0D10", borderRadius: "18px", border: "1px solid rgba(255,255,255,0.1)", boxShadow: "0 12px 48px rgba(0,0,0,0.5)", width: "100%", maxWidth: "520px", maxHeight: "88vh", overflowY: "auto", padding: "26px 28px", animation: "fadeSlide 0.18s ease-out", fontFamily: "'DM Sans', sans-serif" }}
+      >
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
+          <h3 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "24px", fontWeight: 600, color: "#E8EAED" }}>Add Agent Manually</h3>
+          <button onClick={onClose} aria-label="Close" style={{ width: "30px", height: "30px", borderRadius: "8px", background: "rgba(255,255,255,0.06)", border: "none", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: "#E8EAED" }}>
+            <IconX />
+          </button>
+        </div>
+
+        {!selectedUser ? (
+          <div>
+            <label style={labelStyle}>Search user by name, phone, or email</label>
+            <input
+              type="text"
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              placeholder="Start typing…"
+              style={inputStyle}
+              autoFocus
+            />
+            {searching && <div style={{ marginTop: "10px" }}><Spinner size={20} pad={10} /></div>}
+            {!searching && results.length > 0 && (
+              <div style={{ marginTop: "10px", display: "flex", flexDirection: "column", gap: "6px" }}>
+                {results.map(r => (
+                  <button
+                    key={r.id}
+                    onClick={() => setSelectedUser(r)}
+                    style={{ textAlign: "left", padding: "10px 14px", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "9px", cursor: "pointer", color: "#E8EAED", fontFamily: "'DM Sans', sans-serif" }}
+                  >
+                    <div style={{ fontWeight: 600, fontSize: "13px" }}>{r.full_name ?? "—"}</div>
+                    <div style={{ fontSize: "11px", color: "#AEB4BC" }}>{[r.phone, r.email].filter(Boolean).join(" · ")} {r.role && `· ${r.role}`}</div>
+                  </button>
+                ))}
+              </div>
+            )}
+            {!searching && search.trim().length >= 2 && results.length === 0 && (
+              <div style={{ marginTop: "10px", fontSize: "12px", color: "#AEB4BC" }}>No matching users.</div>
+            )}
+          </div>
+        ) : (
+          <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "10px 14px", background: "rgba(43,168,224,0.08)", border: "1px solid rgba(43,168,224,0.2)", borderRadius: "9px" }}>
+              <div>
+                <div style={{ fontWeight: 600, fontSize: "13px", color: "#E8EAED" }}>{selectedUser.full_name ?? "—"}</div>
+                <div style={{ fontSize: "11px", color: "#AEB4BC" }}>{[selectedUser.phone, selectedUser.email].filter(Boolean).join(" · ")}</div>
+              </div>
+              <button onClick={() => setSelectedUser(null)} style={{ fontSize: "11px", color: "#2BA8E0", background: "none", border: "none", cursor: "pointer", fontFamily: "'DM Sans', sans-serif" }}>Change</button>
+            </div>
+
+            <div>
+              <label style={labelStyle}>License Number</label>
+              <input type="text" value={licenseNumber} onChange={e => setLicenseNumber(e.target.value)} style={inputStyle} />
+            </div>
+            <div>
+              <label style={labelStyle}>Agency Name</label>
+              <input type="text" value={agencyName} onChange={e => setAgencyName(e.target.value)} style={inputStyle} />
+            </div>
+            <div>
+              <label style={labelStyle}>Years of Experience</label>
+              <input type="number" min="0" value={yearsExperience} onChange={e => setYearsExperience(e.target.value)} style={inputStyle} />
+            </div>
+            <div>
+              <label style={labelStyle}>Bio</label>
+              <textarea value={bio} onChange={e => setBio(e.target.value)} rows={3} style={{ ...inputStyle, resize: "vertical" as const }} />
+            </div>
+            <div>
+              <label style={labelStyle}>Service Cities</label>
+              <CityMultiSelect selected={cities} onChange={setCities} />
+            </div>
+
+            {error && <div style={{ fontSize: "12px", color: "#F87171" }}>{error}</div>}
+
+            <button
+              onClick={() => void handleSubmit()}
+              disabled={submitting}
+              style={{ padding: "12px", borderRadius: "9px", background: "#2BA8E0", color: "#000000", border: "none", fontWeight: 700, fontSize: "13px", letterSpacing: "0.04em", cursor: submitting ? "not-allowed" : "pointer", opacity: submitting ? 0.6 : 1, fontFamily: "'DM Sans', sans-serif" }}
+            >
+              {submitting ? "Adding…" : "Add Agent"}
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function AgentsSection({
+  applications, loading, inFlight, onApprove, onReject, onAddAgent,
+}: {
+  applications: AgentApplication[];
+  loading: boolean;
+  inFlight: string | null;
+  onApprove: (id: string, userId: string) => void;
+  onReject: (id: string) => void;
+  onAddAgent: (data: {
+    userId: string; licenseNumber: string; agencyName: string; bio: string;
+    yearsExperience: string; cities: string[];
+  }) => Promise<{ ok: boolean; error?: string }>;
+}) {
+  const [filter, setFilter] = useState<AgentStatusFilter>("pending");
+  const [showAddModal, setShowAddModal] = useState(false);
+
+  const filtered = applications.filter(a => a.status === filter);
+
+  if (loading) return <Spinner />;
+
+  return (
+    <div>
+      <SectionHeading title="Agent Applications" subtitle="Review public applications or add agents directly." count={filtered.length} />
+
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "12px", flexWrap: "wrap", marginBottom: "18px" }}>
+        <div style={{ display: "flex", gap: "6px", flexWrap: "wrap" }}>
+          {AGENT_STATUS_FILTERS.map(f => {
+            const on = filter === f;
+            return (
+              <button
+                key={f}
+                onClick={() => setFilter(f)}
+                style={{ padding: "6px 14px", borderRadius: "100px", fontSize: "11px", fontWeight: on ? 700 : 500, background: on ? "#2BA8E0" : "rgba(255,255,255,0.06)", color: on ? "#000000" : "#AEB4BC", border: on ? "1.5px solid #2BA8E0" : "1.5px solid rgba(255,255,255,0.12)", cursor: "pointer", fontFamily: "'DM Sans', sans-serif", textTransform: "capitalize" as const }}
+              >
+                {f} ({applications.filter(a => a.status === f).length})
+              </button>
+            );
+          })}
+        </div>
+        <button
+          onClick={() => setShowAddModal(true)}
+          style={{ display: "flex", alignItems: "center", gap: "6px", padding: "9px 18px", borderRadius: "8px", fontSize: "12px", fontWeight: 700, letterSpacing: "0.04em", background: "rgba(43,168,224,0.1)", color: "#2BA8E0", border: "1.5px solid rgba(43,168,224,0.3)", cursor: "pointer", fontFamily: "'DM Sans', sans-serif" }}
+        >
+          + Add Agent Manually
+        </button>
+      </div>
+
+      {filtered.length === 0 ? (
+        <div style={{ padding: "60px 24px", textAlign: "center", background: "rgba(255,255,255,0.05)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", borderRadius: "18px", border: "1px solid rgba(255,255,255,0.08)" }}>
+          <p style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "20px", color: "#E8EAED" }}>No {filter} applications</p>
+        </div>
+      ) : (
+        <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
+          {filtered.map(app => (
+            <AgentCard
+              key={app.id}
+              app={app}
+              inFlight={inFlight === app.id}
+              actions={
+                filter === "pending" ? (
+                  <>
+                    <button
+                      onClick={() => onApprove(app.id, app.user_id)}
+                      disabled={inFlight === app.id}
+                      style={{ display: "flex", alignItems: "center", gap: "6px", padding: "7px 16px", borderRadius: "7px", fontSize: "11px", fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase" as const, background: "#2BA8E0", color: "#000000", border: "none", cursor: inFlight === app.id ? "not-allowed" : "pointer", fontFamily: "'DM Sans', sans-serif", opacity: inFlight === app.id ? 0.6 : 1 }}
+                    >
+                      <IconApprove /> Approve
+                    </button>
+                    <button
+                      onClick={() => onReject(app.id)}
+                      disabled={inFlight === app.id}
+                      style={{ display: "flex", alignItems: "center", gap: "6px", padding: "7px 16px", borderRadius: "7px", fontSize: "11px", fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase" as const, background: "rgba(248,113,113,0.1)", color: "#F87171", border: "1.5px solid rgba(248,113,113,0.3)", cursor: inFlight === app.id ? "not-allowed" : "pointer", fontFamily: "'DM Sans', sans-serif", opacity: inFlight === app.id ? 0.6 : 1 }}
+                    >
+                      <IconReject /> Reject
+                    </button>
+                  </>
+                ) : null
+              }
+            />
+          ))}
+        </div>
+      )}
+
+      {showAddModal && (
+        <AddAgentModal
+          onClose={() => setShowAddModal(false)}
+          onSubmit={onAddAgent}
+        />
+      )}
+    </div>
+  );
+}
+
 // ── Sidebar nav ────────────────────────────────────────────────────────────────
 
 const NAV: { id: AdminSection; label: string; icon: React.ReactNode }[] = [
@@ -860,6 +1214,7 @@ const NAV: { id: AdminSection; label: string; icon: React.ReactNode }[] = [
   { id: "pending",    label: "Pending Review",     icon: <IconClock /> },
   { id: "approved",   label: "Approved Listings",  icon: <IconCheck /> },
   { id: "rejected",   label: "Rejected Listings",  icon: <IconX /> },
+  { id: "agents",     label: "Agent Applications", icon: <IconBriefcase /> },
   { id: "users",      label: "All Users",          icon: <IconUsers /> },
   { id: "inquiries",  label: "All Inquiries",      icon: <IconMsg /> },
 ];
@@ -888,12 +1243,14 @@ export default function AdminPage() {
   const [rejectedListings, setRejectedListings] = useState<AdminListing[]>([]);
   const [users,            setUsers]            = useState<UserRow[]>([]);
   const [inquiries,        setInquiries]        = useState<InquiryRow[]>([]);
+  const [agentApps,        setAgentApps]        = useState<AgentApplication[]>([]);
 
   const [pendingLoading,  setPendingLoading]  = useState(false);
   const [approvedLoading, setApprovedLoading] = useState(false);
   const [rejectedLoading, setRejectedLoading] = useState(false);
   const [usersLoading,    setUsersLoading]    = useState(false);
   const [inquiriesLoading, setInquiriesLoading] = useState(false);
+  const [agentAppsLoading, setAgentAppsLoading] = useState(false);
 
   const [inFlight, setInFlight] = useState<string | null>(null);
 
@@ -1017,6 +1374,16 @@ export default function AdminPage() {
           setInquiries((res.data as InquiryRow[] | null) ?? []);
           setInquiriesLoading(false);
         });
+    } else if (active === "agents") {
+      setAgentAppsLoading(true);
+      supabase
+        .from("agent_profiles")
+        .select("id, user_id, license_number, agency_name, bio, years_experience, status, created_at, profiles(full_name, phone, email), agent_service_cities(city)")
+        .order("created_at", { ascending: false })
+        .then((res: { data: unknown }) => {
+          setAgentApps((res.data as AgentApplication[] | null) ?? []);
+          setAgentAppsLoading(false);
+        });
     }
   }, [active, isAdmin]);
 
@@ -1080,6 +1447,84 @@ export default function AdminPage() {
     }
   }, [users]);
 
+  const handleAgentApprove = useCallback(async (id: string, userId: string) => {
+    setInFlight(id);
+    const supabase = createClient();
+    const { error: statusErr } = await supabase.from("agent_profiles").update({ status: "approved" }).eq("id", id);
+    const { error: roleErr } = statusErr ? { error: null } : await supabase.from("profiles").update({ role: "agent" }).eq("id", userId);
+
+    if (statusErr || roleErr) {
+      console.error("Admin — agent approve error:", statusErr ?? roleErr);
+      setToast({ ok: false, msg: "Approval failed — please try again." });
+    } else {
+      setAgentApps(prev => prev.map(a => a.id === id ? { ...a, status: "approved" } : a));
+      setToast({ ok: true, msg: "Agent approved." });
+    }
+    setInFlight(null);
+    setTimeout(() => setToast(null), 3000);
+  }, []);
+
+  const handleAgentReject = useCallback(async (id: string) => {
+    setInFlight(id);
+    const supabase = createClient();
+    const { error } = await supabase.from("agent_profiles").update({ status: "rejected" }).eq("id", id);
+
+    if (error) {
+      console.error("Admin — agent reject error:", error);
+      setToast({ ok: false, msg: "Rejection failed — please try again." });
+    } else {
+      setAgentApps(prev => prev.map(a => a.id === id ? { ...a, status: "rejected" } : a));
+      setToast({ ok: true, msg: "Agent application rejected." });
+    }
+    setInFlight(null);
+    setTimeout(() => setToast(null), 3000);
+  }, []);
+
+  const handleAddAgent = useCallback(async (data: {
+    userId: string; licenseNumber: string; agencyName: string; bio: string;
+    yearsExperience: string; cities: string[];
+  }): Promise<{ ok: boolean; error?: string }> => {
+    const supabase = createClient();
+    const { data: inserted, error: insertErr } = await supabase
+      .from("agent_profiles")
+      .insert({
+        user_id: data.userId,
+        license_number: data.licenseNumber || null,
+        agency_name: data.agencyName || null,
+        bio: data.bio || null,
+        years_experience: data.yearsExperience ? parseInt(data.yearsExperience, 10) : null,
+        status: "approved",
+      })
+      .select("id, user_id, license_number, agency_name, bio, years_experience, status, created_at, profiles(full_name, phone, email)")
+      .single();
+
+    if (insertErr || !inserted) {
+      console.error("Admin — add agent error:", insertErr);
+      const msg = insertErr?.code === "23505"
+        ? "This user is already an agent or has an existing application."
+        : "Failed to add agent — please try again.";
+      return { ok: false, error: msg };
+    }
+
+    if (data.cities.length > 0) {
+      const { error: citiesErr } = await supabase
+        .from("agent_service_cities")
+        .insert(data.cities.map(city => ({ agent_id: inserted.id, city })));
+      if (citiesErr) console.error("Admin — add agent cities error:", citiesErr);
+    }
+
+    const { error: roleErr } = await supabase.from("profiles").update({ role: "agent" }).eq("id", data.userId);
+    if (roleErr) console.error("Admin — add agent role update error:", roleErr);
+
+    setAgentApps(prev => [
+      { ...inserted, agent_service_cities: data.cities.map(city => ({ city })) } as AgentApplication,
+      ...prev,
+    ]);
+    setToast({ ok: true, msg: "Agent added." });
+    setTimeout(() => setToast(null), 3000);
+    return { ok: true };
+  }, []);
+
   if (authChecking) {
     return (
       <>
@@ -1124,6 +1569,17 @@ export default function AdminPage() {
         loading={rejectedLoading}
         inFlight={inFlight}
         onReApprove={id => void handleListingStatus(id, "active", "rejected")}
+      />
+    );
+  } else if (active === "agents") {
+    content = (
+      <AgentsSection
+        applications={agentApps}
+        loading={agentAppsLoading}
+        inFlight={inFlight}
+        onApprove={(id, userId) => void handleAgentApprove(id, userId)}
+        onReject={id => void handleAgentReject(id)}
+        onAddAgent={handleAddAgent}
       />
     );
   } else if (active === "users") {
