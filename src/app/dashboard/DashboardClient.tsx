@@ -2,14 +2,17 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { useAuth } from "@/context/AuthContext";
 import { SavedSearchesList } from "@/components/dashboard/SavedSearchesList";
 import { MyListingsList } from "@/components/dashboard/MyListingsList";
+import { CITIES } from "@/constants";
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
 type Tab =
   | "overview"
   | "listings"
+  | "assigned"
   | "saved"
   | "searches"
   | "profile"
@@ -35,6 +38,16 @@ type Listing = {
   price: number | null;
   status: string;
   submitted_at: string;
+  photo_urls?: string[] | null;
+};
+
+type AgentProfileData = {
+  id:               string;
+  license_number:   string | null;
+  agency_name:      string | null;
+  bio:              string | null;
+  years_experience: number | null;
+  cities:           string[];
 };
 
 type SaveRow = {
@@ -126,8 +139,13 @@ function IconTrash()    { return <svg width="14" height="14" viewBox="0 0 24 24"
 function IconEdit()     { return <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>; }
 function IconPin()      { return <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#2BA8E0" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>; }
 function IconAlert()    { return <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FBBF24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>; }
+function IconBriefcase(){ return <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>; }
 
 // ── Sidebar nav ────────────────────────────────────────────────────────────────
+// Buyer/seller nav is unchanged. Agents get a distinct, shorter nav — per
+// directive, buyer-only items (Saved Properties, Recent Searches, My Listings,
+// My Inquiries, Appointments) are hidden since an agent doesn't own listings or
+// browse as a buyer in this phase. Flagged as a judgment call, not a fixed rule.
 
 const NAV: { id: Tab; label: string; icon: React.ReactNode }[] = [
   { id: "overview",     label: "Overview",        icon: <IconHome /> },
@@ -139,6 +157,36 @@ const NAV: { id: Tab; label: string; icon: React.ReactNode }[] = [
   { id: "appointments", label: "Appointments",     icon: <IconCal /> },
   { id: "settings",     label: "Settings",         icon: <IconGear /> },
 ];
+
+const NAV_AGENT: { id: Tab; label: string; icon: React.ReactNode }[] = [
+  { id: "overview",  label: "Overview",           icon: <IconHome /> },
+  { id: "assigned",  label: "Assigned Listings",   icon: <IconBriefcase /> },
+  { id: "profile",   label: "Profile",             icon: <IconUser /> },
+  { id: "settings",  label: "Settings",            icon: <IconGear /> },
+];
+
+function CityMultiSelect({ selected, onChange }: { selected: string[]; onChange: (cities: string[]) => void }) {
+  const toggle = (city: string) => {
+    onChange(selected.includes(city) ? selected.filter(c => c !== city) : [...selected, city]);
+  };
+  return (
+    <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
+      {CITIES.map(city => {
+        const on = selected.includes(city);
+        return (
+          <button
+            type="button"
+            key={city}
+            onClick={() => toggle(city)}
+            style={{ padding: "7px 15px", borderRadius: "100px", fontSize: "12px", fontWeight: on ? 700 : 500, background: on ? "#2BA8E0" : "rgba(255,255,255,0.06)", color: on ? "#000000" : "#AEB4BC", border: on ? "1.5px solid #2BA8E0" : "1.5px solid rgba(255,255,255,0.12)", cursor: "pointer", fontFamily: "'DM Sans', sans-serif" }}
+          >
+            {city}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
 
 // ── Shared UI ──────────────────────────────────────────────────────────────────
 
@@ -316,6 +364,51 @@ function OverviewTab({ email, fullName, listings, savedItems, profile }: {
   );
 }
 
+// ── Tab 1b: Agent Overview ────────────────────────────────────────────────────
+
+function AgentOverviewTab({ fullName, email, assignedListings }: {
+  fullName?: string;
+  email: string;
+  assignedListings: Listing[];
+}) {
+  const name        = fullName || email.split("@")[0];
+  const activeCount = assignedListings.filter(l => l.status === "active").length;
+
+  return (
+    <div>
+      <div style={{ marginBottom: "32px" }}>
+        <h1 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "38px", fontWeight: 400, color: "#E8EAED", lineHeight: 1.2, marginBottom: "6px" }}>
+          Welcome back, <em style={{ fontStyle: "italic", color: "#2BA8E0" }}>{name}</em>
+        </h1>
+        <p style={{ fontSize: "14px", color: "#AEB4BC" }}>Here&apos;s an overview of your assigned listings.</p>
+      </div>
+
+      <div style={{ display: "flex", gap: "14px", flexWrap: "wrap", marginBottom: "28px" }}>
+        <StatCard label="Assigned Listings" value={assignedListings.length} accent icon={<IconBriefcase />} />
+        <StatCard label="Active"            value={activeCount}                    icon={<IconBuilding />} />
+      </div>
+
+      <Card style={{ padding: "28px" }}>
+        <h3 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "20px", fontWeight: 600, color: "#E8EAED", marginBottom: "18px" }}>Quick Actions</h3>
+        <div style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>
+          <button
+            onClick={() => { const el = document.querySelector("[data-tab='assigned']") as HTMLButtonElement | null; el?.click(); }}
+            style={{ padding: "12px 24px", borderRadius: "999px", fontSize: "13px", fontWeight: 600, letterSpacing: "0.05em", background: "#2BA8E0", color: "#E8EAED", border: "none", cursor: "pointer", boxShadow: "0 10px 30px rgba(30,167,255,.35)", fontFamily: "'DM Sans', sans-serif" }}
+          >
+            View Assigned Listings
+          </button>
+          <button
+            onClick={() => { const el = document.querySelector("[data-tab='profile']") as HTMLButtonElement | null; el?.click(); }}
+            style={{ padding: "12px 24px", borderRadius: "999px", fontSize: "13px", fontWeight: 600, letterSpacing: "0.05em", background: "rgba(255,255,255,0.05)", border: "1.5px solid rgba(255,255,255,0.15)", color: "#E8EAED", cursor: "pointer", fontFamily: "'DM Sans', sans-serif" }}
+          >
+            Edit Profile
+          </button>
+        </div>
+      </Card>
+    </div>
+  );
+}
+
 // ── Tab 2: My Listings ────────────────────────────────────────────────────────
 
 function ListingsTab({ listings, loading, onDelete }: {
@@ -326,6 +419,113 @@ function ListingsTab({ listings, loading, onDelete }: {
   if (loading) return <Spinner />;
 
   return <MyListingsList listings={listings} onDelete={onDelete} compact />;
+}
+
+// ── Tab: Assigned Listings (agent, read-only) ────────────────────────────────
+
+function AssignedListingsTab({ listings, loading }: { listings: Listing[]; loading: boolean }) {
+  if (loading) return <Spinner />;
+
+  return (
+    <div>
+      <SectionHeading title="Assigned Listings" subtitle="Properties assigned to you by the Nilay 360 team." />
+      <MyListingsList listings={listings} compact readOnly />
+    </div>
+  );
+}
+
+// ── Tab: Agent Profile ────────────────────────────────────────────────────────
+
+function AgentProfileTab({ email, agentProfile, loading, onSave }: {
+  email: string;
+  agentProfile: AgentProfileData | null;
+  loading: boolean;
+  onSave: (updates: Omit<AgentProfileData, "id">) => Promise<boolean>;
+}) {
+  const [licenseNumber,   setLicenseNumber]   = useState("");
+  const [agencyName,      setAgencyName]      = useState("");
+  const [bio,              setBio]            = useState("");
+  const [yearsExperience, setYearsExperience] = useState("");
+  const [cities,           setCities]         = useState<string[]>([]);
+  const [saving, setSaving] = useState(false);
+  const [toast,  setToast]  = useState<{ ok: boolean; msg: string } | null>(null);
+
+  useEffect(() => {
+    if (!agentProfile) return;
+    setLicenseNumber(agentProfile.license_number ?? "");
+    setAgencyName(agentProfile.agency_name ?? "");
+    setBio(agentProfile.bio ?? "");
+    setYearsExperience(agentProfile.years_experience != null ? String(agentProfile.years_experience) : "");
+    setCities(agentProfile.cities);
+  }, [agentProfile]);
+
+  const handleSave = async () => {
+    setSaving(true);
+    setToast(null);
+    const ok = await onSave({
+      license_number:   licenseNumber.trim() || null,
+      agency_name:      agencyName.trim()    || null,
+      bio:              bio.trim()           || null,
+      years_experience: yearsExperience ? parseInt(yearsExperience, 10) : null,
+      cities,
+    });
+    setSaving(false);
+    setToast(ok ? { ok: true, msg: "Profile saved successfully" } : { ok: false, msg: "Save failed. Please try again." });
+    if (ok) setTimeout(() => setToast(null), 3000);
+  };
+
+  if (loading) return <Spinner />;
+
+  return (
+    <div>
+      {toast && (
+        <div style={{ position: "fixed", top: 88, right: 24, zIndex: 500, padding: "12px 20px", borderRadius: 16, background: "rgba(18,21,25,0.92)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", border: `1px solid ${toast.ok ? "rgba(43,168,224,0.30)" : "rgba(248,113,113,0.30)"}`, color: toast.ok ? "#E8EAED" : "#F87171", fontSize: 13, fontWeight: 600, boxShadow: "0 4px 24px rgba(0,0,0,0.18)", fontFamily: "'DM Sans', sans-serif", display: "flex", alignItems: "center", gap: 8 }}>
+          {toast.ok ? "✓" : "✗"} {toast.msg}
+        </div>
+      )}
+
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 28, flexWrap: "wrap", gap: 12 }}>
+        <SectionHeading title="Agent Profile" subtitle="This information is visible to admins and, once public profiles ship, to buyers." />
+        <button
+          onClick={() => void handleSave()}
+          disabled={saving}
+          style={{ padding: "11px 28px", background: "#2BA8E0", borderRadius: 999, color: "#000", fontSize: 13, fontWeight: 700, border: "none", cursor: saving ? "not-allowed" : "pointer", fontFamily: "'DM Sans', sans-serif", opacity: saving ? 0.7 : 1, flexShrink: 0, boxShadow: "0 10px 30px rgba(30,167,255,.35)" }}
+        >
+          {saving ? "Saving…" : "Save Changes"}
+        </button>
+      </div>
+
+      <Card style={{ padding: "28px 32px", marginBottom: 20 }}>
+        <h3 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: 20, fontWeight: 600, color: "#E8EAED", marginBottom: 22, paddingBottom: 16, borderBottom: "1px solid rgba(255,255,255,0.07)" }}>Agent Details</h3>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "0 28px" }}>
+          <FormField label="License Number"  value={licenseNumber}   onChange={setLicenseNumber} placeholder="RERA / license number" />
+          <FormField label="Agency Name"     value={agencyName}      onChange={setAgencyName}    placeholder="Your agency (if any)" />
+          <FormField label="Years of Experience" type="number" value={yearsExperience} onChange={setYearsExperience} />
+          <div style={{ marginBottom: "18px" }}>
+            <label style={{ display: "block", fontSize: "11px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" as const, color: "#AEB4BC", marginBottom: "7px" }}>Bio</label>
+            <textarea
+              value={bio}
+              onChange={e => setBio(e.target.value)}
+              rows={3}
+              style={{ width: "100%", padding: "11px 14px", background: "rgba(255,255,255,0.05)", border: "1.5px solid rgba(255,255,255,0.12)", borderRadius: 8, fontSize: 14, color: "#FFFFFF", fontFamily: "'DM Sans', sans-serif", outline: "none", resize: "vertical", boxSizing: "border-box", minHeight: 80 }}
+            />
+          </div>
+        </div>
+      </Card>
+
+      <Card style={{ padding: "28px 32px", marginBottom: 20 }}>
+        <h3 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: 20, fontWeight: 600, color: "#E8EAED", marginBottom: 22, paddingBottom: 16, borderBottom: "1px solid rgba(255,255,255,0.07)" }}>Service Cities</h3>
+        <CityMultiSelect selected={cities} onChange={setCities} />
+      </Card>
+
+      <Card style={{ padding: "28px 32px" }}>
+        <h3 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: 20, fontWeight: 600, color: "#E8EAED", marginBottom: 22, paddingBottom: 16, borderBottom: "1px solid rgba(255,255,255,0.07)" }}>Account Details</h3>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "0 28px" }}>
+          {pField("Email Address", email, () => {}, { readOnly: true })}
+        </div>
+      </Card>
+    </div>
+  );
 }
 
 // ── Tab 3: Saved Properties ───────────────────────────────────────────────────
@@ -890,10 +1090,13 @@ function SettingsTab({ email, fullName }: { email: string; fullName?: string }) 
 
 export default function DashboardClient({ email, userId, fullName, accountType }: Props) {
   const router = useRouter();
+  const { profile: authProfile, loading: authLoading } = useAuth();
+  const isAgent = authProfile?.role === "agent";
+
   const [active,      setActive]      = useState<Tab>("overview");
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  // Data
+  // Data (buyer/seller)
   const [listings,         setListings]         = useState<Listing[]>([]);
   const [savedItems,       setSavedItems]       = useState<SavedItem[]>([]);
   const [inquiries,        setInquiries]        = useState<Inquiry[]>([]);
@@ -901,11 +1104,50 @@ export default function DashboardClient({ email, userId, fullName, accountType }
   const [dataLoading,      setDataLoading]       = useState(true);
   const [hasSavedTable,    setHasSavedTable]    = useState(true);
 
+  // Data (agent)
+  const [agentProfile,     setAgentProfile]     = useState<AgentProfileData | null>(null);
+  const [assignedListings, setAssignedListings] = useState<Listing[]>([]);
+
+  // Wait on role resolution before fetching — avoids firing the wrong branch's
+  // queries on first render (profile.role isn't known until AuthContext resolves).
   useEffect(() => {
+    if (authLoading) return;
     const supabase = createClient();
     let cancelled = false;
 
-    const load = async () => {
+    const loadAgent = async () => {
+      const { data: apRow, error: apErr } = await supabase
+        .from("agent_profiles")
+        .select("id, license_number, agency_name, bio, years_experience, agent_service_cities(city)")
+        .eq("user_id", userId)
+        .maybeSingle();
+      if (apErr) console.error("Dashboard — agent_profiles query error:", apErr);
+      if (cancelled) return;
+
+      if (apRow) {
+        const cities = ((apRow.agent_service_cities as { city: string }[] | null) ?? []).map(c => c.city);
+        setAgentProfile({
+          id: apRow.id,
+          license_number: apRow.license_number,
+          agency_name: apRow.agency_name,
+          bio: apRow.bio,
+          years_experience: apRow.years_experience,
+          cities,
+        });
+
+        const { data: listData, error: listErr } = await supabase
+          .from("property_listings")
+          .select("id, slug, title, property_category, listing_type, city, locality, price, status, submitted_at, photo_urls")
+          .eq("assigned_agent_id", apRow.id)
+          .order("submitted_at", { ascending: false });
+        if (listErr) console.error("Dashboard — assigned listings query error:", listErr);
+        if (!cancelled) setAssignedListings((listData as Listing[] | null) ?? []);
+      }
+
+      if (!cancelled) setDataLoading(false);
+    };
+
+    const loadBuyerSeller = async () => {
       // ── My Listings ──────────────────────────────────────────
       const listingsFilter = `seller_email.eq.${email},user_id.eq.${userId}`;
       const { data: listData, error: listErr } = await supabase
@@ -954,9 +1196,9 @@ export default function DashboardClient({ email, userId, fullName, accountType }
       if (!cancelled) setDataLoading(false);
     };
 
-    load();
+    if (isAgent) void loadAgent(); else void loadBuyerSeller();
     return () => { cancelled = true; };
-  }, [email, userId]);
+  }, [email, userId, isAgent, authLoading]);
 
   const deleteListing = useCallback(async (listingId: string) => {
     const supabase = createClient();
@@ -1011,21 +1253,71 @@ export default function DashboardClient({ email, userId, fullName, accountType }
     return !error;
   }, [userId]);
 
+  // Upsert agent_profiles + replace agent_service_cities, update local state
+  const updateAgentProfile = useCallback(async (updates: Omit<AgentProfileData, "id">): Promise<boolean> => {
+    if (!agentProfile) return false;
+    const supabase = createClient();
+    const { error: apErr } = await supabase
+      .from("agent_profiles")
+      .update({
+        license_number:   updates.license_number,
+        agency_name:      updates.agency_name,
+        bio:               updates.bio,
+        years_experience: updates.years_experience,
+        updated_at:        new Date().toISOString(),
+      })
+      .eq("id", agentProfile.id);
+    if (apErr) {
+      console.error("Dashboard — agent_profiles update error:", apErr);
+      return false;
+    }
+
+    // Replace service cities wholesale — simplest correct approach for a small set.
+    const { error: delErr } = await supabase.from("agent_service_cities").delete().eq("agent_id", agentProfile.id);
+    if (delErr) console.error("Dashboard — agent_service_cities delete error:", delErr);
+    if (updates.cities.length > 0) {
+      const { error: insErr } = await supabase
+        .from("agent_service_cities")
+        .insert(updates.cities.map(city => ({ agent_id: agentProfile.id, city })));
+      if (insErr) console.error("Dashboard — agent_service_cities insert error:", insErr);
+    }
+
+    setAgentProfile({ ...agentProfile, ...updates });
+    return true;
+  }, [agentProfile]);
+
   async function handleSignOut() {
     const supabase = createClient();
     await supabase.auth.signOut();
     router.push("/login");
   }
 
+  // Block the shell until role is known — prevents a buyer-nav flash before
+  // flipping to the agent nav (all hooks above have already run, so this
+  // early return is safe).
+  if (authLoading) {
+    return (
+      <div style={{ minHeight: "100dvh", background: "#000000", display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <Spinner />
+      </div>
+    );
+  }
+
   const name = fullName || email.split("@")[0];
-  const type = accountType || "Individual";
+  const type = isAgent ? "Agent" : (accountType || "Individual");
+  const nav = isAgent ? NAV_AGENT : NAV;
 
   const content: Record<Tab, React.ReactNode> = {
-    overview:     <OverviewTab     email={email} fullName={fullName} listings={listings} savedItems={savedItems} profile={profile} />,
+    overview:     isAgent
+      ? <AgentOverviewTab fullName={fullName} email={email} assignedListings={assignedListings} />
+      : <OverviewTab      email={email} fullName={fullName} listings={listings} savedItems={savedItems} profile={profile} />,
     listings:     <ListingsTab     listings={listings} loading={dataLoading} onDelete={deleteListing} />,
+    assigned:     <AssignedListingsTab listings={assignedListings} loading={dataLoading} />,
     saved:        <SavedTab        savedItems={savedItems} loading={dataLoading} onRemove={removeSave} />,
     searches:     <SearchesTab />,
-    profile:      <ProfileTab      email={email} userId={userId} profile={profile} loading={dataLoading} onSave={updateProfile} />,
+    profile:      isAgent
+      ? <AgentProfileTab email={email} agentProfile={agentProfile} loading={dataLoading} onSave={updateAgentProfile} />
+      : <ProfileTab      email={email} userId={userId} profile={profile} loading={dataLoading} onSave={updateProfile} />,
     inquiries:    <InquiriesTab    inquiries={inquiries} loading={dataLoading} onStatusChange={updateInquiryStatus} />,
     appointments: <AppointmentsTab />,
     settings:     <SettingsTab     email={email} fullName={fullName} />,
@@ -1090,7 +1382,7 @@ export default function DashboardClient({ email, userId, fullName, accountType }
 
             {/* Nav */}
             <nav style={{ flex: 1, padding: "12px 10px" }}>
-              {NAV.map(item => (
+              {nav.map(item => (
                 <button
                   key={item.id}
                   data-tab={item.id}
