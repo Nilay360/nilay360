@@ -1,0 +1,190 @@
+"use client";
+import { useState } from "react";
+import { useAuth } from "@/context/AuthContext";
+import { createClient } from "@/lib/supabase/client";
+import { CITIES } from "@/constants";
+
+const inputStyle: React.CSSProperties = {
+  width: "100%", padding: "12px 16px", background: "rgba(255,255,255,0.06)",
+  border: "1.5px solid rgba(255,255,255,0.12)", borderRadius: "9px", fontSize: "14px",
+  color: "#E8EAED", fontFamily: "'DM Sans', sans-serif", outlineColor: "#2BA8E0",
+};
+
+const labelStyle: React.CSSProperties = {
+  display: "block", fontSize: "12px", fontWeight: 700, letterSpacing: "0.06em",
+  textTransform: "uppercase" as const, color: "#AEB4BC", marginBottom: "8px",
+};
+
+function CityMultiSelect({ selected, onChange }: { selected: string[]; onChange: (cities: string[]) => void }) {
+  const toggle = (city: string) => {
+    onChange(selected.includes(city) ? selected.filter(c => c !== city) : [...selected, city]);
+  };
+  return (
+    <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
+      {CITIES.map(city => {
+        const on = selected.includes(city);
+        return (
+          <button
+            type="button"
+            key={city}
+            onClick={() => toggle(city)}
+            style={{ padding: "8px 16px", borderRadius: "100px", fontSize: "13px", fontWeight: on ? 700 : 500, background: on ? "#2BA8E0" : "rgba(255,255,255,0.06)", color: on ? "#000000" : "#AEB4BC", border: on ? "1.5px solid #2BA8E0" : "1.5px solid rgba(255,255,255,0.12)", cursor: "pointer", fontFamily: "'DM Sans', sans-serif" }}
+          >
+            {city}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+export default function BecomeAnAgentPage() {
+  const { user, loading: authLoading, openAuthModal } = useAuth();
+
+  const [licenseNumber, setLicenseNumber] = useState("");
+  const [agencyName, setAgencyName] = useState("");
+  const [bio, setBio] = useState("");
+  const [yearsExperience, setYearsExperience] = useState("");
+  const [cities, setCities] = useState<string[]>([]);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [submitted, setSubmitted] = useState(false);
+
+  const handleSubmit = async () => {
+    if (!user) return;
+    setSubmitting(true);
+    setError(null);
+
+    const supabase = createClient();
+    const { data: inserted, error: insertErr } = await supabase
+      .from("agent_profiles")
+      .insert({
+        user_id: user.id,
+        license_number: licenseNumber || null,
+        agency_name: agencyName || null,
+        bio: bio || null,
+        years_experience: yearsExperience ? parseInt(yearsExperience, 10) : null,
+        status: "pending",
+      })
+      .select("id")
+      .single();
+
+    if (insertErr || !inserted) {
+      setSubmitting(false);
+      setError(
+        insertErr?.code === "23505"
+          ? "You already have an agent application on file."
+          : "Something went wrong — please try again."
+      );
+      return;
+    }
+
+    if (cities.length > 0) {
+      await supabase
+        .from("agent_service_cities")
+        .insert(cities.map(city => ({ agent_id: inserted.id, city })));
+    }
+
+    setSubmitting(false);
+    setSubmitted(true);
+  };
+
+  const wrap: React.CSSProperties = {
+    minHeight: "100dvh", background: "#000000", paddingTop: "64px",
+    display: "flex", flexDirection: "column", alignItems: "center",
+    fontFamily: "'DM Sans', system-ui, sans-serif",
+  };
+
+  if (authLoading) {
+    return (
+      <div style={{ ...wrap, justifyContent: "center" }}>
+        <div style={{ color: "#2BA8E0" }}>Loading…</div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return (
+      <div style={{ ...wrap, justifyContent: "center", padding: "24px" }}>
+        <div style={{ textAlign: "center", maxWidth: "440px" }}>
+          <h1 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "32px", fontWeight: 600, color: "#E8EAED", marginBottom: "12px" }}>
+            Become an Agent
+          </h1>
+          <p style={{ fontSize: "14px", color: "#AEB4BC", marginBottom: "24px", lineHeight: 1.6 }}>
+            Sign in to apply as a Nilay 360 agent.
+          </p>
+          <button
+            onClick={() => openAuthModal("signin")}
+            style={{ padding: "12px 28px", borderRadius: "9px", background: "#2BA8E0", color: "#000000", border: "none", fontWeight: 700, fontSize: "13px", letterSpacing: "0.04em", cursor: "pointer", fontFamily: "'DM Sans', sans-serif" }}
+          >
+            Sign In
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (submitted) {
+    return (
+      <div style={{ ...wrap, justifyContent: "center", padding: "24px" }}>
+        <div style={{ textAlign: "center", maxWidth: "440px" }}>
+          <div style={{ width: "52px", height: "52px", borderRadius: "50%", background: "rgba(52,211,153,0.08)", border: "1.5px solid rgba(52,211,153,0.2)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 20px", color: "#34D399" }}>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <h1 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "28px", fontWeight: 600, color: "#E8EAED", marginBottom: "10px" }}>
+            Application Received
+          </h1>
+          <p style={{ fontSize: "14px", color: "#AEB4BC", lineHeight: 1.6 }}>
+            We&apos;ll review your application and get back to you.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div style={{ ...wrap, alignItems: "center", padding: "48px 24px 80px" }}>
+      <div style={{ width: "100%", maxWidth: "560px" }}>
+        <h1 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "34px", fontWeight: 600, color: "#E8EAED", marginBottom: "8px" }}>
+          Become an Agent
+        </h1>
+        <p style={{ fontSize: "14px", color: "#AEB4BC", marginBottom: "32px", lineHeight: 1.6 }}>
+          Tell us about your experience — our team reviews every application.
+        </p>
+
+        <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+          <div>
+            <label style={labelStyle}>License Number</label>
+            <input type="text" value={licenseNumber} onChange={e => setLicenseNumber(e.target.value)} style={inputStyle} placeholder="RERA / license number" />
+          </div>
+          <div>
+            <label style={labelStyle}>Agency Name</label>
+            <input type="text" value={agencyName} onChange={e => setAgencyName(e.target.value)} style={inputStyle} placeholder="Your agency (if any)" />
+          </div>
+          <div>
+            <label style={labelStyle}>Years of Experience</label>
+            <input type="number" min="0" value={yearsExperience} onChange={e => setYearsExperience(e.target.value)} style={inputStyle} />
+          </div>
+          <div>
+            <label style={labelStyle}>Bio</label>
+            <textarea value={bio} onChange={e => setBio(e.target.value)} rows={4} style={{ ...inputStyle, resize: "vertical" as const }} placeholder="Tell us about yourself and your work." />
+          </div>
+          <div>
+            <label style={labelStyle}>Service Cities</label>
+            <CityMultiSelect selected={cities} onChange={setCities} />
+          </div>
+
+          {error && <div style={{ fontSize: "13px", color: "#F87171" }}>{error}</div>}
+
+          <button
+            onClick={() => void handleSubmit()}
+            disabled={submitting}
+            style={{ padding: "14px", borderRadius: "9px", background: "#2BA8E0", color: "#000000", border: "none", fontWeight: 700, fontSize: "14px", letterSpacing: "0.04em", cursor: submitting ? "not-allowed" : "pointer", opacity: submitting ? 0.6 : 1, fontFamily: "'DM Sans', sans-serif" }}
+          >
+            {submitting ? "Submitting…" : "Submit Application"}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
