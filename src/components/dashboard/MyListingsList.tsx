@@ -19,8 +19,10 @@ export interface Listing {
 
 interface Props {
   listings: Listing[];
-  onDelete: (id: string) => Promise<void>;
+  onDelete?: (id: string) => Promise<void>;
   compact?: boolean;
+  /** Hides Edit/Delete — for viewers who don't own the listing (e.g. an assigned agent). */
+  readOnly?: boolean;
 }
 
 const COMMERCIAL = ["office", "retail", "warehouse"];
@@ -60,7 +62,7 @@ function Pill({ active, label, onClick }: { active: boolean; label: string; onCl
   );
 }
 
-export function MyListingsList({ listings, onDelete, compact = false }: Props) {
+export function MyListingsList({ listings, onDelete, compact = false, readOnly = false }: Props) {
   const [search,       setSearch]       = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [typeFilter,   setTypeFilter]   = useState("all");
@@ -88,6 +90,7 @@ export function MyListingsList({ listings, onDelete, compact = false }: Props) {
   });
 
   const handleDeleteClick = async (id: string, title: string | null | undefined) => {
+    if (!onDelete) return;
     if (!window.confirm(`Delete "${title ?? "this listing"}"? This cannot be undone.`)) return;
     setDeletingId(id);
     await onDelete(id);
@@ -101,10 +104,14 @@ export function MyListingsList({ listings, onDelete, compact = false }: Props) {
           <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
           <polyline points="9 22 9 12 15 12 15 22"/>
         </svg>
-        <p style={{ fontSize: compact ? 14 : 16, margin: "0 0 12px" }}>No listings yet.</p>
-        <Link href="/post-property" style={{ color: "#2BA8E0", fontWeight: 600, fontFamily: "'DM Sans', sans-serif", textDecoration: "none" }}>
-          List your first property →
-        </Link>
+        <p style={{ fontSize: compact ? 14 : 16, margin: "0 0 12px" }}>
+          {readOnly ? "No listings assigned yet." : "No listings yet."}
+        </p>
+        {!readOnly && (
+          <Link href="/post-property" style={{ color: "#2BA8E0", fontWeight: 600, fontFamily: "'DM Sans', sans-serif", textDecoration: "none" }}>
+            List your first property →
+          </Link>
+        )}
       </div>
     );
   }
@@ -282,31 +289,35 @@ export function MyListingsList({ listings, onDelete, compact = false }: Props) {
                           }}>View</button>
                         </Link>
                       )}
-                      <Link href={`/post-property/edit/${l.id}`} style={{ textDecoration: "none" }}>
-                        <button style={{
-                          padding: compact ? "5px 10px" : "7px 14px",
-                          fontSize: compact ? 12 : 13, fontWeight: 600,
-                          color: "#000000", background: "#2BA8E0",
-                          boxShadow: "0 8px 24px rgba(43,168,224,0.3)",
-                          border: "none", borderRadius: 7, cursor: "pointer",
-                          fontFamily: "'DM Sans', sans-serif",
-                        }}>Edit</button>
-                      </Link>
-                      <button
-                        onClick={() => handleDeleteClick(l.id, l.title)}
-                        disabled={isDeleting}
-                        style={{
-                          padding: compact ? "5px 10px" : "7px 14px",
-                          fontSize: compact ? 12 : 13, fontWeight: 500,
-                          color: isDeleting ? "rgba(255,255,255,0.35)" : "#F87171",
-                          background: "rgba(248,113,113,0.10)",
-                          border: `1px solid ${isDeleting ? "rgba(255,255,255,0.15)" : "rgba(248,113,113,0.30)"}`,
-                          borderRadius: 7, cursor: isDeleting ? "not-allowed" : "pointer",
-                          fontFamily: "'DM Sans', sans-serif", transition: "border-color 0.15s, color 0.15s",
-                        }}
-                      >
-                        {isDeleting ? "…" : "Delete"}
-                      </button>
+                      {!readOnly && (
+                        <>
+                          <Link href={`/post-property/edit/${l.id}`} style={{ textDecoration: "none" }}>
+                            <button style={{
+                              padding: compact ? "5px 10px" : "7px 14px",
+                              fontSize: compact ? 12 : 13, fontWeight: 600,
+                              color: "#000000", background: "#2BA8E0",
+                              boxShadow: "0 8px 24px rgba(43,168,224,0.3)",
+                              border: "none", borderRadius: 7, cursor: "pointer",
+                              fontFamily: "'DM Sans', sans-serif",
+                            }}>Edit</button>
+                          </Link>
+                          <button
+                            onClick={() => handleDeleteClick(l.id, l.title)}
+                            disabled={isDeleting}
+                            style={{
+                              padding: compact ? "5px 10px" : "7px 14px",
+                              fontSize: compact ? 12 : 13, fontWeight: 500,
+                              color: isDeleting ? "rgba(255,255,255,0.35)" : "#F87171",
+                              background: "rgba(248,113,113,0.10)",
+                              border: `1px solid ${isDeleting ? "rgba(255,255,255,0.15)" : "rgba(248,113,113,0.30)"}`,
+                              borderRadius: 7, cursor: isDeleting ? "not-allowed" : "pointer",
+                              fontFamily: "'DM Sans', sans-serif", transition: "border-color 0.15s, color 0.15s",
+                            }}
+                          >
+                            {isDeleting ? "…" : "Delete"}
+                          </button>
+                        </>
+                      )}
                     </div>
 
                   </div>
