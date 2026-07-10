@@ -32,7 +32,10 @@ type AdminListing = {
   seller_phone: string | null;
   submitted_at: string;
   status: string;
+  assigned_agent_id?: string | null;
 };
+
+type ApprovedAgentOption = { id: string; name: string };
 
 type UserRow = {
   id: string;
@@ -210,10 +213,13 @@ function ListingCard({
   listing,
   actions,
   inFlight,
+  assignControl,
 }: {
   listing: AdminListing;
   actions: React.ReactNode;
   inFlight: boolean;
+  /** Optional slot for an "Assign Agent" control — only Pending/Approved sections supply this. */
+  assignControl?: React.ReactNode;
 }) {
   const thumb = Array.isArray(listing.photo_urls) ? listing.photo_urls[0] ?? null : null;
   const label = listing.listing_type === "sale" ? "For Sale" : listing.listing_type === "rent" ? "For Rent" : (listing.listing_type ?? "");
@@ -283,6 +289,10 @@ function ListingCard({
             )}
           </div>
 
+          {assignControl && (
+            <div style={{ display: "flex", alignItems: "center" }}>{assignControl}</div>
+          )}
+
           {/* Actions */}
           <div style={{ display: "flex", gap: "8px", alignItems: "center", flexWrap: "wrap" }}>
             {listing.slug && (
@@ -298,6 +308,42 @@ function ListingCard({
             {actions}
           </div>
         </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Assign Agent control (Pending/Approved only) ────────────────────────────────
+
+function AssignAgentControl({
+  currentAgentId, agents, onAssign, disabled,
+}: {
+  currentAgentId: string | null | undefined;
+  agents: ApprovedAgentOption[];
+  onAssign: (agentId: string | null) => void;
+  disabled: boolean;
+}) {
+  const currentName = agents.find(a => a.id === currentAgentId)?.name;
+  return (
+    <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap", padding: "8px 12px", background: "rgba(255,255,255,0.03)", borderRadius: "8px", border: "1px solid rgba(255,255,255,0.06)" }}>
+      <span style={{ fontSize: "11px", color: "rgba(255,255,255,0.45)" }}>
+        {currentAgentId
+          ? <>Assigned to: <strong style={{ color: "#E8EAED", fontWeight: 600 }}>{currentName ?? "Unknown agent"}</strong></>
+          : "Not assigned to an agent"}
+      </span>
+      <div style={{ position: "relative", flexShrink: 0 }}>
+        <select
+          value={currentAgentId ?? ""}
+          disabled={disabled}
+          onChange={e => onAssign(e.target.value || null)}
+          style={{ padding: "6px 28px 6px 10px", background: "rgba(255,255,255,0.06)", border: "1.5px solid rgba(255,255,255,0.12)", borderRadius: "7px", fontSize: "12px", color: "#E8EAED", fontFamily: "'DM Sans', sans-serif", outline: "none", appearance: "none", cursor: disabled ? "not-allowed" : "pointer" }}
+        >
+          <option value="" style={{ background: "#0B0D10", color: "#E8EAED" }}>Unassigned</option>
+          {agents.map(a => (
+            <option key={a.id} value={a.id} style={{ background: "#0B0D10", color: "#E8EAED" }}>{a.name}</option>
+          ))}
+        </select>
+        <span style={{ position: "absolute", right: 8, top: "50%", transform: "translateY(-50%)", pointerEvents: "none", color: "rgba(255,255,255,0.45)", fontSize: 9 }}>▼</span>
       </div>
     </div>
   );
@@ -421,13 +467,15 @@ function OverviewSection({ stats, loading }: { stats: Stats; loading: boolean })
 // ── Section: Pending Review ────────────────────────────────────────────────────
 
 function PendingSection({
-  listings, loading, inFlight, onApprove, onReject,
+  listings, loading, inFlight, onApprove, onReject, agents, onAssignAgent,
 }: {
   listings: AdminListing[];
   loading: boolean;
   inFlight: string | null;
   onApprove: (id: string) => void;
   onReject: (id: string) => void;
+  agents: ApprovedAgentOption[];
+  onAssignAgent: (id: string, agentId: string | null) => void;
 }) {
   if (loading) return <Spinner />;
   return (
@@ -448,6 +496,14 @@ function PendingSection({
               key={l.id}
               listing={l}
               inFlight={inFlight === l.id}
+              assignControl={
+                <AssignAgentControl
+                  currentAgentId={l.assigned_agent_id}
+                  agents={agents}
+                  disabled={inFlight === l.id}
+                  onAssign={agentId => onAssignAgent(l.id, agentId)}
+                />
+              }
               actions={
                 <>
                   <button
@@ -477,12 +533,14 @@ function PendingSection({
 // ── Section: Approved Listings ─────────────────────────────────────────────────
 
 function ApprovedSection({
-  listings, loading, inFlight, onUnpublish,
+  listings, loading, inFlight, onUnpublish, agents, onAssignAgent,
 }: {
   listings: AdminListing[];
   loading: boolean;
   inFlight: string | null;
   onUnpublish: (id: string) => void;
+  agents: ApprovedAgentOption[];
+  onAssignAgent: (id: string, agentId: string | null) => void;
 }) {
   if (loading) return <Spinner />;
   return (
@@ -499,6 +557,14 @@ function ApprovedSection({
               key={l.id}
               listing={l}
               inFlight={inFlight === l.id}
+              assignControl={
+                <AssignAgentControl
+                  currentAgentId={l.assigned_agent_id}
+                  agents={agents}
+                  disabled={inFlight === l.id}
+                  onAssign={agentId => onAssignAgent(l.id, agentId)}
+                />
+              }
               actions={
                 <button
                   onClick={() => {
@@ -1244,6 +1310,7 @@ export default function AdminPage() {
   const [users,            setUsers]            = useState<UserRow[]>([]);
   const [inquiries,        setInquiries]        = useState<InquiryRow[]>([]);
   const [agentApps,        setAgentApps]        = useState<AgentApplication[]>([]);
+  const [approvedAgents,   setApprovedAgents]   = useState<ApprovedAgentOption[]>([]);
 
   const [pendingLoading,  setPendingLoading]  = useState(false);
   const [approvedLoading, setApprovedLoading] = useState(false);
@@ -1316,6 +1383,21 @@ export default function AdminPage() {
     void loadStats();
   }, [isAdmin]);
 
+  // Approved agents — loaded once, passed down to Pending/Approved sections
+  // for the "Assign Agent" control, rather than re-fetched per card.
+  useEffect(() => {
+    if (!isAdmin) return;
+    const supabase = createClient();
+    supabase
+      .from("agent_profiles")
+      .select("id, profiles(full_name)")
+      .eq("status", "approved")
+      .then((res: { data: unknown }) => {
+        const rows = (res.data as { id: string; profiles: { full_name: string | null } | null }[] | null) ?? [];
+        setApprovedAgents(rows.map(r => ({ id: r.id, name: r.profiles?.full_name ?? "Unnamed agent" })));
+      });
+  }, [isAdmin]);
+
   useEffect(() => {
     if (!isAdmin || loaded.current.has(active)) return;
     loaded.current.add(active);
@@ -1325,7 +1407,7 @@ export default function AdminPage() {
       setPendingLoading(true);
       supabase
         .from("property_listings")
-        .select("id, slug, title, property_category, listing_type, city, locality, price, photo_urls, seller_name, seller_email, seller_phone, submitted_at, status")
+        .select("id, slug, title, property_category, listing_type, city, locality, price, photo_urls, seller_name, seller_email, seller_phone, submitted_at, status, assigned_agent_id")
         .eq("status", "pending_review")
         .order("submitted_at", { ascending: true })
         .then((res: { data: unknown }) => {
@@ -1336,7 +1418,7 @@ export default function AdminPage() {
       setApprovedLoading(true);
       supabase
         .from("property_listings")
-        .select("id, slug, title, property_category, listing_type, city, locality, price, photo_urls, seller_name, seller_email, seller_phone, submitted_at, status")
+        .select("id, slug, title, property_category, listing_type, city, locality, price, photo_urls, seller_name, seller_email, seller_phone, submitted_at, status, assigned_agent_id")
         .eq("status", "active")
         .order("submitted_at", { ascending: false })
         .then((res: { data: unknown }) => {
@@ -1430,6 +1512,28 @@ export default function AdminPage() {
     }
     setInFlight(null);
     setTimeout(() => setToast(null), 3000);
+  }, []);
+
+  const handleAssignAgent = useCallback(async (
+    id: string,
+    agentId: string | null,
+    fromSection: "pending" | "approved",
+  ) => {
+    setInFlight(id);
+    const supabase = createClient();
+    const { error } = await supabase.from("property_listings").update({ assigned_agent_id: agentId }).eq("id", id);
+
+    if (error) {
+      console.error("Admin — assign agent error:", error);
+      setToast({ ok: false, msg: "Assignment failed — please try again." });
+    } else {
+      const updater = (prev: AdminListing[]) => prev.map(l => l.id === id ? { ...l, assigned_agent_id: agentId } : l);
+      if (fromSection === "pending") setPendingListings(updater);
+      else setApprovedListings(updater);
+      setToast({ ok: true, msg: agentId ? "Agent assigned." : "Agent unassigned." });
+    }
+    setInFlight(null);
+    setTimeout(() => setToast(null), 2500);
   }, []);
 
   const handleUserRole = useCallback(async (userId: string, newRole: string) => {
@@ -1551,6 +1655,8 @@ export default function AdminPage() {
         inFlight={inFlight}
         onApprove={id => void handleListingStatus(id, "active", "pending")}
         onReject={id => void handleListingStatus(id, "rejected", "pending")}
+        agents={approvedAgents}
+        onAssignAgent={(id, agentId) => void handleAssignAgent(id, agentId, "pending")}
       />
     );
   } else if (active === "approved") {
@@ -1560,6 +1666,8 @@ export default function AdminPage() {
         loading={approvedLoading}
         inFlight={inFlight}
         onUnpublish={id => void handleListingStatus(id, "pending_review", "approved")}
+        agents={approvedAgents}
+        onAssignAgent={(id, agentId) => void handleAssignAgent(id, agentId, "approved")}
       />
     );
   } else if (active === "rejected") {
