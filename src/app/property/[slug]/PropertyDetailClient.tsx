@@ -6,6 +6,7 @@ import Reveal from "@/components/ui/Reveal";
 import { useRecentlyViewed } from "@/hooks/useRecentlyViewed";
 import { useAuth } from "@/context/AuthContext";
 import { useSavedProperties } from "@/hooks/useSavedProperties";
+import ReportButton from "@/components/shared/ReportButton";
 
 // ── Types ────────────────────────────────────────────────────
 type Property = {
@@ -774,6 +775,7 @@ export default function PropertyDetailClient() {
                   <svg width="13" height="13" viewBox="0 0 24 24" fill={savedIds.has(property.id) ? "#2BA8E0" : "none"} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" /></svg>
                   {savedIds.has(property.id) ? "Saved" : "Save"}
                 </button>
+                <ReportButton entityType="listing" entityId={property.id} variant="dark" />
               </div>
 
               {/* Image counter */}

@@ -7,7 +7,7 @@ import { CITIES } from "@/constants";
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
-type AdminSection = "overview" | "pending" | "approved" | "rejected" | "users" | "inquiries" | "agents" | "audit";
+type AdminSection = "overview" | "pending" | "approved" | "rejected" | "users" | "inquiries" | "agents" | "reports" | "audit";
 
 type Stats = {
   pending: number;
@@ -15,6 +15,7 @@ type Stats = {
   rejected: number;
   users: number;
   inquiries: number;
+  reportsOpen: number;
 };
 
 type AdminListing = {
@@ -108,6 +109,23 @@ type AuditLogRow = {
   profiles: { full_name: string | null; email: string | null } | null;
 };
 
+type ReportRow = {
+  id: string;
+  reporter_id: string;
+  entity_type: "listing" | "profile";
+  entity_id: string;
+  reason: string;
+  details: string | null;
+  status: "open" | "resolved" | "dismissed";
+  created_at: string;
+  resolved_at: string | null;
+  resolved_by: string | null;
+  profiles: { full_name: string | null; email: string | null } | null;
+};
+
+type ReportListingPreview = { id: string; slug: string | null; title: string | null; status: string | null };
+type ReportProfilePreview = { id: string; full_name: string | null; email: string | null; is_active: boolean | null };
+
 // ── Helpers ────────────────────────────────────────────────────────────────────
 
 function fmtPrice(v: number | null, listingType: string | null): string {
@@ -159,6 +177,7 @@ function IconOut()     { return <svg width="15" height="15" viewBox="0 0 24 24" 
 function IconBuilding(){ return <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M9 22V12h6v10"/><path d="M8 6h.01M16 6h.01M8 10h.01M16 10h.01"/></svg>; }
 function IconBriefcase(){ return <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>; }
 function IconAudit()  { return <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="15" y2="17"/></svg>; }
+function IconFlag()   { return <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>; }
 function IconChevron(){ return <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"/></svg>; }
 
 // ── Shared UI ──────────────────────────────────────────────────────────────────
@@ -1453,6 +1472,181 @@ function AgentsSection({
   );
 }
 
+// ── Section: Reports ─────────────────────────────────────────────────────────────
+
+const REPORT_STATUS_FILTERS = ["open", "resolved", "dismissed"] as const;
+type ReportStatusFilter = typeof REPORT_STATUS_FILTERS[number];
+
+function ReportCard({
+  report, listingPreview, profilePreview, busy, onDismiss, onResolve, onRejectListing, onDeactivateUser,
+}: {
+  report: ReportRow;
+  listingPreview: ReportListingPreview | undefined;
+  profilePreview: ReportProfilePreview | undefined;
+  busy: boolean;
+  onDismiss: () => void;
+  onResolve: () => void;
+  onRejectListing: () => void;
+  onDeactivateUser: () => void;
+}) {
+  const isOpen = report.status === "open";
+  return (
+    <div style={{ background: "rgba(255,255,255,0.05)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", borderRadius: "14px", border: "1px solid rgba(255,255,255,0.08)", boxShadow: "0 4px 24px rgba(0,0,0,0.18)", padding: "18px 22px", opacity: busy ? 0.55 : 1, transition: "opacity 0.2s" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: "12px", flexWrap: "wrap", marginBottom: "10px" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
+          <span style={{ display: "inline-block", padding: "2px 8px", borderRadius: "100px", fontSize: "9px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" as const, background: report.status === "open" ? "rgba(245,158,11,0.15)" : report.status === "resolved" ? "rgba(52,211,153,0.15)" : "rgba(255,255,255,0.08)", color: report.status === "open" ? "#F59E0B" : report.status === "resolved" ? "#34D399" : "#AEB4BC", border: `1px solid ${report.status === "open" ? "rgba(245,158,11,0.3)" : report.status === "resolved" ? "rgba(52,211,153,0.3)" : "rgba(255,255,255,0.12)"}` }}>
+            {report.status}
+          </span>
+          <span style={{ display: "inline-block", padding: "2px 8px", borderRadius: "100px", fontSize: "9px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" as const, background: "rgba(43,168,224,0.12)", color: "#2BA8E0", border: "1px solid rgba(43,168,224,0.25)" }}>
+            {report.entity_type}
+          </span>
+          <span style={{ fontSize: "12px", fontWeight: 600, color: "#E8EAED" }}>{report.reason}</span>
+        </div>
+        <span style={{ fontSize: "11px", color: "rgba(255,255,255,0.45)", flexShrink: 0 }}>{fmtDateTime(report.created_at)}</span>
+      </div>
+
+      {/* Reported entity preview */}
+      <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "8px", fontSize: "12px", color: "#AEB4BC" }}>
+        {report.entity_type === "listing" ? (
+          listingPreview?.slug ? (
+            <a href={`/property/${listingPreview.slug}`} target="_blank" rel="noopener noreferrer" style={{ color: "#E8EAED", fontWeight: 500, textDecoration: "none" }}>
+              {listingPreview.title ?? "View listing"} <IconArrow />
+            </a>
+          ) : (
+            <span>{listingPreview?.title ?? "Listing unavailable (may have been deleted)"}</span>
+          )
+        ) : (
+          <span style={{ color: "#E8EAED", fontWeight: 500 }}>
+            {profilePreview?.full_name ?? profilePreview?.email ?? "Profile unavailable"}
+            {profilePreview?.is_active === false && <span style={{ color: "#F87171", fontWeight: 700 }}> · Inactive</span>}
+          </span>
+        )}
+      </div>
+
+      {/* Reporter */}
+      <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.45)", marginBottom: report.details ? "8px" : "12px" }}>
+        Reported by <span style={{ color: "#AEB4BC", fontWeight: 600 }}>{report.profiles?.full_name ?? report.profiles?.email ?? "Unknown user"}</span>
+      </div>
+
+      {report.details && (
+        <div style={{ background: "rgba(255,255,255,0.04)", borderRadius: "8px", padding: "10px 14px", fontSize: "12px", color: "#AEB4BC", lineHeight: 1.6, borderLeft: "3px solid rgba(43,168,224,0.4)", marginBottom: "12px" }}>
+          {report.details}
+        </div>
+      )}
+
+      {!isOpen && report.resolved_at && (
+        <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.4)", marginBottom: "10px" }}>
+          {report.status === "resolved" ? "Resolved" : "Dismissed"} {fmtDateTime(report.resolved_at)}
+        </div>
+      )}
+
+      {isOpen && (
+        <div style={{ display: "flex", gap: "8px", alignItems: "center", flexWrap: "wrap" }}>
+          <button
+            onClick={onResolve}
+            disabled={busy}
+            style={{ display: "flex", alignItems: "center", gap: "6px", padding: "7px 14px", borderRadius: "7px", fontSize: "11px", fontWeight: 700, background: "#2BA8E0", color: "#000000", border: "none", cursor: busy ? "not-allowed" : "pointer", fontFamily: "'DM Sans', sans-serif", opacity: busy ? 0.6 : 1 }}
+          >
+            <IconApprove /> Resolve
+          </button>
+          <button
+            onClick={onDismiss}
+            disabled={busy}
+            style={{ display: "flex", alignItems: "center", gap: "6px", padding: "7px 14px", borderRadius: "7px", fontSize: "11px", fontWeight: 600, background: "rgba(255,255,255,0.06)", color: "#AEB4BC", border: "1.5px solid rgba(255,255,255,0.12)", cursor: busy ? "not-allowed" : "pointer", fontFamily: "'DM Sans', sans-serif", opacity: busy ? 0.6 : 1 }}
+          >
+            Dismiss
+          </button>
+          {report.entity_type === "listing" && listingPreview && listingPreview.status !== "rejected" && (
+            <button
+              onClick={() => {
+                if (window.confirm("Reject this listing and resolve the report?")) onRejectListing();
+              }}
+              disabled={busy}
+              style={{ display: "flex", alignItems: "center", gap: "6px", padding: "7px 14px", borderRadius: "7px", fontSize: "11px", fontWeight: 600, background: "rgba(248,113,113,0.1)", color: "#F87171", border: "1.5px solid rgba(248,113,113,0.3)", cursor: busy ? "not-allowed" : "pointer", fontFamily: "'DM Sans', sans-serif", opacity: busy ? 0.6 : 1 }}
+            >
+              <IconReject /> Reject Listing
+            </button>
+          )}
+          {report.entity_type === "profile" && profilePreview && profilePreview.is_active !== false && (
+            <button
+              onClick={() => {
+                if (window.confirm("Deactivate this user's account and resolve the report?")) onDeactivateUser();
+              }}
+              disabled={busy}
+              style={{ display: "flex", alignItems: "center", gap: "6px", padding: "7px 14px", borderRadius: "7px", fontSize: "11px", fontWeight: 600, background: "rgba(248,113,113,0.1)", color: "#F87171", border: "1.5px solid rgba(248,113,113,0.3)", cursor: busy ? "not-allowed" : "pointer", fontFamily: "'DM Sans', sans-serif", opacity: busy ? 0.6 : 1 }}
+            >
+              Deactivate User
+            </button>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function ReportsSection({
+  reports, loading, inFlight, listingPreviews, profilePreviews,
+  onDismiss, onResolve, onRejectListing, onDeactivateUser,
+}: {
+  reports: ReportRow[];
+  loading: boolean;
+  inFlight: string | null;
+  listingPreviews: Record<string, ReportListingPreview>;
+  profilePreviews: Record<string, ReportProfilePreview>;
+  onDismiss: (id: string) => void;
+  onResolve: (id: string) => void;
+  onRejectListing: (report: ReportRow) => void;
+  onDeactivateUser: (report: ReportRow) => void;
+}) {
+  const [filter, setFilter] = useState<ReportStatusFilter>("open");
+  const filtered = reports.filter(r => r.status === filter);
+
+  if (loading) return <Spinner />;
+
+  return (
+    <div>
+      <SectionHeading title="Reports" subtitle="User-submitted reports on listings and profiles." count={filtered.length} />
+
+      <div style={{ display: "flex", gap: "6px", flexWrap: "wrap", marginBottom: "18px" }}>
+        {REPORT_STATUS_FILTERS.map(f => {
+          const on = filter === f;
+          return (
+            <button
+              key={f}
+              onClick={() => setFilter(f)}
+              style={{ padding: "6px 14px", borderRadius: "100px", fontSize: "11px", fontWeight: on ? 700 : 500, background: on ? "#2BA8E0" : "rgba(255,255,255,0.06)", color: on ? "#000000" : "#AEB4BC", border: on ? "1.5px solid #2BA8E0" : "1.5px solid rgba(255,255,255,0.12)", cursor: "pointer", fontFamily: "'DM Sans', sans-serif", textTransform: "capitalize" as const }}
+            >
+              {f} ({reports.filter(r => r.status === f).length})
+            </button>
+          );
+        })}
+      </div>
+
+      {filtered.length === 0 ? (
+        <div style={{ padding: "60px 24px", textAlign: "center", background: "rgba(255,255,255,0.05)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", borderRadius: "18px", border: "1px solid rgba(255,255,255,0.08)" }}>
+          <p style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "20px", color: "#E8EAED" }}>No {filter} reports</p>
+        </div>
+      ) : (
+        <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
+          {filtered.map(r => (
+            <ReportCard
+              key={r.id}
+              report={r}
+              listingPreview={listingPreviews[r.entity_id]}
+              profilePreview={profilePreviews[r.entity_id]}
+              busy={inFlight === r.id || inFlight === r.entity_id}
+              onDismiss={() => onDismiss(r.id)}
+              onResolve={() => onResolve(r.id)}
+              onRejectListing={() => onRejectListing(r)}
+              onDeactivateUser={() => onDeactivateUser(r)}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ── Section: Audit Log ──────────────────────────────────────────────────────────
 
 const AUDIT_ENTITY_TYPES = ["property_listing", "profile", "agent_profile"] as const;
@@ -1567,6 +1761,7 @@ const NAV: { id: AdminSection; label: string; icon: React.ReactNode }[] = [
   { id: "agents",     label: "Agent Applications", icon: <IconBriefcase /> },
   { id: "users",      label: "All Users",          icon: <IconUsers /> },
   { id: "inquiries",  label: "All Inquiries",      icon: <IconMsg /> },
+  { id: "reports",    label: "Reports",            icon: <IconFlag /> },
   { id: "audit",      label: "Audit Log",          icon: <IconAudit /> },
 ];
 
@@ -1586,7 +1781,7 @@ export default function AdminPage() {
   const [sidebarOpen,  setSidebarOpen]  = useState(false);
   const [toast,        setToast]        = useState<{ ok: boolean; msg: string } | null>(null);
 
-  const [stats,        setStats]        = useState<Stats>({ pending: 0, active: 0, rejected: 0, users: 0, inquiries: 0 });
+  const [stats,        setStats]        = useState<Stats>({ pending: 0, active: 0, rejected: 0, users: 0, inquiries: 0, reportsOpen: 0 });
   const [statsLoading, setStatsLoading] = useState(true);
 
   const [pendingListings,  setPendingListings]  = useState<AdminListing[]>([]);
@@ -1597,6 +1792,9 @@ export default function AdminPage() {
   const [agentApps,        setAgentApps]        = useState<AgentApplication[]>([]);
   const [approvedAgents,   setApprovedAgents]   = useState<ApprovedAgentOption[]>([]);
   const [auditLog,         setAuditLog]         = useState<AuditLogRow[]>([]);
+  const [reports,          setReports]          = useState<ReportRow[]>([]);
+  const [reportListingPreviews, setReportListingPreviews] = useState<Record<string, ReportListingPreview>>({});
+  const [reportProfilePreviews, setReportProfilePreviews] = useState<Record<string, ReportProfilePreview>>({});
 
   const [pendingLoading,  setPendingLoading]  = useState(false);
   const [approvedLoading, setApprovedLoading] = useState(false);
@@ -1605,6 +1803,7 @@ export default function AdminPage() {
   const [inquiriesLoading, setInquiriesLoading] = useState(false);
   const [agentAppsLoading, setAgentAppsLoading] = useState(false);
   const [auditLoading,     setAuditLoading]     = useState(false);
+  const [reportsLoading,   setReportsLoading]   = useState(false);
 
   const [inFlight, setInFlight] = useState<string | null>(null);
 
@@ -1651,12 +1850,14 @@ export default function AdminPage() {
         { count: rejected },
         { count: users },
         { count: inquiries },
+        { count: reportsOpen },
       ] = await Promise.all([
         supabase.from("property_listings").select("*", { count: "exact", head: true }).eq("status", "pending_review"),
         supabase.from("property_listings").select("*", { count: "exact", head: true }).eq("status", "active"),
         supabase.from("property_listings").select("*", { count: "exact", head: true }).eq("status", "rejected"),
         supabase.from("profiles").select("*", { count: "exact", head: true }),
         supabase.from("inquiries").select("*", { count: "exact", head: true }),
+        supabase.from("reports").select("*", { count: "exact", head: true }).eq("status", "open"),
       ]);
       setStats({
         pending:   pending   ?? 0,
@@ -1664,6 +1865,7 @@ export default function AdminPage() {
         rejected:  rejected  ?? 0,
         users:     users     ?? 0,
         inquiries: inquiries ?? 0,
+        reportsOpen: reportsOpen ?? 0,
       });
       setStatsLoading(false);
     }
@@ -1764,6 +1966,34 @@ export default function AdminPage() {
           setAuditLog((res.data as AuditLogRow[] | null) ?? []);
           setAuditLoading(false);
         });
+    } else if (active === "reports") {
+      setReportsLoading(true);
+      (async () => {
+        const { data } = await supabase
+          .from("reports")
+          .select("id, reporter_id, entity_type, entity_id, reason, details, status, created_at, resolved_at, resolved_by, profiles!reporter_id(full_name, email)")
+          .order("created_at", { ascending: false })
+          .limit(300);
+        const rows = (data as ReportRow[] | null) ?? [];
+        setReports(rows);
+
+        const listingIds = Array.from(new Set(rows.filter(r => r.entity_type === "listing").map(r => r.entity_id)));
+        const profileIds = Array.from(new Set(rows.filter(r => r.entity_type === "profile").map(r => r.entity_id)));
+
+        if (listingIds.length > 0) {
+          const { data: listings } = await supabase.from("property_listings").select("id, slug, title, status").in("id", listingIds);
+          const map: Record<string, ReportListingPreview> = {};
+          for (const l of (listings as ReportListingPreview[] | null) ?? []) map[l.id] = l;
+          setReportListingPreviews(map);
+        }
+        if (profileIds.length > 0) {
+          const { data: profs } = await supabase.from("profiles").select("id, full_name, email, is_active").in("id", profileIds);
+          const map: Record<string, ReportProfilePreview> = {};
+          for (const p of (profs as ReportProfilePreview[] | null) ?? []) map[p.id] = p;
+          setReportProfilePreviews(map);
+        }
+        setReportsLoading(false);
+      })();
     }
   }, [active, isAdmin]);
 
@@ -1942,6 +2172,45 @@ export default function AdminPage() {
     setTimeout(() => setToast(null), 2500);
   }, [inquiries, logAdminAction]);
 
+  const handleReportResolve = useCallback(async (id: string, newStatus: "resolved" | "dismissed") => {
+    const report = reports.find(r => r.id === id);
+    if (!report || !user) return;
+    setInFlight(id);
+    const supabase = createClient();
+    const resolvedAt = new Date().toISOString();
+    const { error } = await supabase
+      .from("reports")
+      .update({ status: newStatus, resolved_at: resolvedAt, resolved_by: user.id })
+      .eq("id", id);
+
+    if (error) {
+      console.error("Admin — report resolve error:", error);
+      setToast({ ok: false, msg: "Update failed — please try again." });
+    } else {
+      void logAdminAction(
+        newStatus === "resolved" ? "resolve_report" : "dismiss_report",
+        "report", id, { status: report.status }, { status: newStatus },
+      );
+      setReports(prev => prev.map(r => r.id === id ? { ...r, status: newStatus, resolved_at: resolvedAt, resolved_by: user.id } : r));
+      setStats(s => report.status === "open" ? { ...s, reportsOpen: Math.max(0, s.reportsOpen - 1) } : s);
+      setToast({ ok: true, msg: newStatus === "resolved" ? "Report resolved." : "Report dismissed." });
+    }
+    setInFlight(null);
+    setTimeout(() => setToast(null), 2500);
+  }, [reports, user, logAdminAction]);
+
+  const handleReportRejectListing = useCallback(async (report: ReportRow) => {
+    const preview = reportListingPreviews[report.entity_id];
+    const fromSection = preview?.status === "active" ? "approved" : preview?.status === "rejected" ? "rejected" : "pending";
+    await handleListingStatus(report.entity_id, "rejected", fromSection);
+    await handleReportResolve(report.id, "resolved");
+  }, [reportListingPreviews, handleListingStatus, handleReportResolve]);
+
+  const handleReportDeactivateUser = useCallback(async (report: ReportRow) => {
+    await handleUserUpdate(report.entity_id, { is_active: false });
+    await handleReportResolve(report.id, "resolved");
+  }, [handleUserUpdate, handleReportResolve]);
+
   const handleAgentApprove = useCallback(async (id: string, userId: string) => {
     setInFlight(id);
     const oldStatus = agentApps.find(a => a.id === id)?.status ?? null;
@@ -2112,6 +2381,20 @@ export default function AdminPage() {
         onMarkSpam={id => void handleInquirySpam(id)}
       />
     );
+  } else if (active === "reports") {
+    content = (
+      <ReportsSection
+        reports={reports}
+        loading={reportsLoading}
+        inFlight={inFlight}
+        listingPreviews={reportListingPreviews}
+        profilePreviews={reportProfilePreviews}
+        onDismiss={id => void handleReportResolve(id, "dismissed")}
+        onResolve={id => void handleReportResolve(id, "resolved")}
+        onRejectListing={report => void handleReportRejectListing(report)}
+        onDeactivateUser={report => void handleReportDeactivateUser(report)}
+      />
+    );
   } else {
     content = <AuditLogSection entries={auditLog} loading={auditLoading} />;
   }
@@ -2182,9 +2465,10 @@ export default function AdminPage() {
             <nav style={{ flex: 1, padding: "12px 10px" }}>
               {NAV.map(item => {
                 const badge =
-                  item.id === "pending"  ? stats.pending  :
-                  item.id === "approved" ? stats.active   :
-                  item.id === "rejected" ? stats.rejected : 0;
+                  item.id === "pending"  ? stats.pending     :
+                  item.id === "approved" ? stats.active      :
+                  item.id === "rejected" ? stats.rejected    :
+                  item.id === "reports"  ? stats.reportsOpen : 0;
                 return (
                   <button
                     key={item.id}
