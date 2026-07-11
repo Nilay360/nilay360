@@ -6,7 +6,11 @@ import ReportButton from "@/components/shared/ReportButton";
 
 // ── Static agent data (same as directory page) ────────────────
 type Agent = {
-  id: string; slug: string; full_name: string; title: string;
+  /** agent_profiles.id — used for listings lookups (assigned_agent_id) and demo ids. */
+  id: string;
+  /** profiles.id (the real user account) — this is what a "profile" report/moderation action must target, NOT agent_profiles.id. Falls back to `id` for demo/fallback agents. */
+  userId: string;
+  slug: string; full_name: string; title: string;
   agency: string; city: string; cities_served: string[];
   specialisation: string; specialisations: string[];
   languages: string[]; experience_years: number;
@@ -22,7 +26,7 @@ type Property = { id: string; slug: string; title: string; price: number; type: 
 
 const AGENTS: Record<string, Agent> = {
   "arjun-mehta": {
-    id: "a1", slug: "arjun-mehta", full_name: "Arjun Mehta", title: "Senior Property Consultant", agency: "Nilay 360 Premium Realty",
+    id: "a1", userId: "a1", slug: "arjun-mehta", full_name: "Arjun Mehta", title: "Senior Property Consultant", agency: "Nilay 360 Premium Realty",
     city: "Hyderabad", cities_served: ["Hyderabad", "Secunderabad", "Warangal"],
     specialisation: "Luxury Apartments", specialisations: ["Luxury Apartments", "Penthouse Sales", "NRI Investments", "Builder Tie-ups"],
     languages: ["English", "Hindi", "Telugu"], experience_years: 12,
@@ -32,7 +36,7 @@ const AGENTS: Record<string, Agent> = {
     phone: "+919876543210", email: "arjun.mehta@nilay360.com", whatsapp: "+919876543210",
   },
   "priya-raghavan": {
-    id: "a2", slug: "priya-raghavan", full_name: "Priya Raghavan", title: "Principal Advisor", agency: "Nilay 360 Premium Realty",
+    id: "a2", userId: "a2", slug: "priya-raghavan", full_name: "Priya Raghavan", title: "Principal Advisor", agency: "Nilay 360 Premium Realty",
     city: "Mumbai", cities_served: ["Mumbai", "Navi Mumbai", "Thane"],
     specialisation: "Sea-View Residences", specialisations: ["Sea-View Residences", "Bandra & Worli", "NRI Clients", "Luxury Rentals"],
     languages: ["English", "Hindi", "Tamil"], experience_years: 9,
@@ -42,7 +46,7 @@ const AGENTS: Record<string, Agent> = {
     phone: "+919876543211", email: "priya.raghavan@nilay360.com", whatsapp: "+919876543211",
   },
   "rohit-desai": {
-    id: "a3", slug: "rohit-desai", full_name: "Rohit Desai", title: "Investment Specialist", agency: "Nilay 360 Premium Realty",
+    id: "a3", userId: "a3", slug: "rohit-desai", full_name: "Rohit Desai", title: "Investment Specialist", agency: "Nilay 360 Premium Realty",
     city: "Bengaluru", cities_served: ["Bengaluru", "Mysuru", "Hosur"],
     specialisation: "IT Corridor Homes", specialisations: ["IT Corridor Homes", "Investment Portfolios", "Pre-Launch Projects", "Tech Professionals"],
     languages: ["English", "Hindi", "Kannada"], experience_years: 8,
@@ -63,6 +67,7 @@ function colorForName(name: string): string {
 
 type AgentProfileRow = {
   id: string;
+  user_id: string;
   agency_name: string | null;
   bio: string | null;
   years_experience: number | null;
@@ -76,7 +81,7 @@ function mapAgentProfileRow(row: AgentProfileRow, slug: string): Agent {
   const cities = (row.agent_service_cities ?? []).map(c => c.city);
   const phone = row.profiles?.phone ?? "";
   return {
-    id: row.id, slug, full_name: fullName, title: "Property Consultant",
+    id: row.id, userId: row.user_id, slug, full_name: fullName, title: "Property Consultant",
     agency: row.agency_name || "Nilay 360 Premium Realty",
     city: cities[0] ?? "India", cities_served: cities.length > 0 ? cities : ["Pan India"],
     specialisation: "Residential Properties", specialisations: ["Residential Properties"],
@@ -92,7 +97,7 @@ function mapAgentProfileRow(row: AgentProfileRow, slug: string): Agent {
 function buildFallback(slug: string): Agent {
   const name = slug.replace(/-/g, " ").replace(/\b\w/g, l => l.toUpperCase());
   return {
-    id: slug, slug, full_name: name, title: "Property Consultant", agency: "Nilay 360 Premium Realty",
+    id: slug, userId: slug, slug, full_name: name, title: "Property Consultant", agency: "Nilay 360 Premium Realty",
     city: "India", cities_served: ["Pan India"],
     specialisation: "Residential Properties", specialisations: ["Residential Properties", "Investment Advisory"],
     languages: ["English", "Hindi"], experience_years: 5,
@@ -265,7 +270,7 @@ export default function AgentProfilePage() {
         const supabase = createClient();
         const { data: row } = await supabase
           .from("agent_profiles")
-          .select("id, agency_name, bio, years_experience, license_number, profiles(full_name, phone, email), agent_service_cities(city)")
+          .select("id, user_id, agency_name, bio, years_experience, license_number, profiles(full_name, phone, email), agent_service_cities(city)")
           .eq("slug", slug)
           .eq("status", "approved")
           .maybeSingle();
@@ -609,7 +614,7 @@ export default function AgentProfilePage() {
               Share Profile
             </button>
 
-            <ReportButton entityType="profile" entityId={agent.id} variant="light" />
+            <ReportButton entityType="profile" entityId={agent.userId} variant="light" />
           </div>
         </div>
 

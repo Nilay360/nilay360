@@ -2103,13 +2103,32 @@ export default function AdminPage() {
   }, [users, logAdminAction]);
 
   const handleUserUpdate = useCallback(async (userId: string, changes: Partial<UserRow>) => {
-    const prevUser = users.find(u => u.id === userId);
-    if (!prevUser) return;
+    const supabase = createClient();
     const keys = Object.keys(changes) as (keyof UserRow)[];
-    const before = Object.fromEntries(keys.map(k => [k, prevUser[k]])) as Partial<UserRow>;
+
+    // Callers outside the Users tab (e.g. the Reports "Deactivate User"
+    // shortcut) may target a user who was never loaded into local `users`
+    // state — fetch the current row rather than silently no-op-ing.
+    let before: Partial<UserRow>;
+    const localUser = users.find(u => u.id === userId);
+    if (localUser) {
+      before = Object.fromEntries(keys.map(k => [k, localUser[k]])) as Partial<UserRow>;
+    } else {
+      const { data: row, error: fetchErr } = await supabase
+        .from("profiles")
+        .select(keys.join(", "))
+        .eq("id", userId)
+        .single();
+      if (fetchErr || !row) {
+        console.error("Admin — user update: could not load current row:", fetchErr);
+        setToast({ ok: false, msg: "Update failed — user not found." });
+        setTimeout(() => setToast(null), 2500);
+        return;
+      }
+      before = row as Partial<UserRow>;
+    }
 
     setUsers(list => list.map(u => u.id === userId ? { ...u, ...changes } : u));
-    const supabase = createClient();
     const { error } = await supabase.from("profiles").update(changes).eq("id", userId);
 
     if (error) {
