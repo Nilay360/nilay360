@@ -667,12 +667,54 @@ const USER_SORT_LABELS: Record<UserSort, string> = {
   name_za: "Name — Z to A",
 };
 
-function UserDetailModal({ user, onClose }: { user: UserRow; onClose: () => void }) {
+type UserEditableFields = Pick<UserRow, "full_name" | "city" | "phone" | "email" | "is_verified">;
+
+const userModalInputStyle: React.CSSProperties = {
+  width: "100%", padding: "8px 12px", background: "#F8F6F1",
+  border: "1.5px solid rgba(13,43,31,0.12)", borderRadius: "7px", fontSize: "13px",
+  color: "#000000", fontFamily: "'DM Sans', sans-serif", outlineColor: "#2BA8E0",
+};
+
+function UserDetailModal({ user, onClose, onSave }: {
+  user: UserRow;
+  onClose: () => void;
+  onSave: (userId: string, changes: Partial<UserRow>) => Promise<void>;
+}) {
+  const [editing,        setEditing]        = useState(false);
+  const [draft,          setDraft]          = useState<UserEditableFields>({
+    full_name: user.full_name, city: user.city, phone: user.phone, email: user.email, is_verified: user.is_verified,
+  });
+  const [saving,         setSaving]         = useState(false);
+  const [togglingActive, setTogglingActive] = useState(false);
+
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [onClose]);
+
+  const startEditing = () => {
+    setDraft({ full_name: user.full_name, city: user.city, phone: user.phone, email: user.email, is_verified: user.is_verified });
+    setEditing(true);
+  };
+
+  const handleSave = async () => {
+    const changes: Partial<UserRow> = {};
+    (Object.keys(draft) as (keyof UserEditableFields)[]).forEach(key => {
+      if (draft[key] !== user[key]) (changes as Record<string, unknown>)[key] = draft[key];
+    });
+    if (Object.keys(changes).length === 0) { setEditing(false); return; }
+    setSaving(true);
+    await onSave(user.id, changes);
+    setSaving(false);
+    setEditing(false);
+  };
+
+  const handleToggleActive = async () => {
+    setTogglingActive(true);
+    await onSave(user.id, { is_active: !(user.is_active ?? true) });
+    setTogglingActive(false);
+  };
 
   const field = (label: string, value: React.ReactNode) => (
     <div>
@@ -680,6 +722,20 @@ function UserDetailModal({ user, onClose }: { user: UserRow; onClose: () => void
       <div style={{ fontSize: "13px", color: "#374151" }}>{value ?? "—"}</div>
     </div>
   );
+
+  const editField = (label: string, key: keyof Omit<UserEditableFields, "is_verified">) => (
+    <div>
+      <div style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" as const, color: "#9CA3AF", marginBottom: "3px" }}>{label}</div>
+      <input
+        type="text"
+        value={draft[key] ?? ""}
+        onChange={e => setDraft(d => ({ ...d, [key]: e.target.value || null }))}
+        style={userModalInputStyle}
+      />
+    </div>
+  );
+
+  const isActive = user.is_active !== false;
 
   return (
     <div
@@ -708,7 +764,7 @@ function UserDetailModal({ user, onClose }: { user: UserRow; onClose: () => void
                 <span style={{ display: "inline-block", padding: "2px 8px", borderRadius: "100px", fontSize: "9px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" as const, background: user.is_verified ? "rgba(45,106,79,0.1)" : "rgba(107,114,128,0.1)", color: user.is_verified ? "#065F46" : "#374151", border: `1px solid ${user.is_verified ? "rgba(45,106,79,0.3)" : "rgba(107,114,128,0.2)"}` }}>
                   {user.is_verified ? "Verified" : "Unverified"}
                 </span>
-                {user.is_active === false && (
+                {!isActive && (
                   <span style={{ display: "inline-block", padding: "2px 8px", borderRadius: "100px", fontSize: "9px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" as const, background: "rgba(239,68,68,0.1)", color: "#B91C1C", border: "1px solid rgba(239,68,68,0.3)" }}>
                     Inactive
                   </span>
@@ -721,27 +777,90 @@ function UserDetailModal({ user, onClose }: { user: UserRow; onClose: () => void
               </div>
             </div>
           </div>
-          <button
-            onClick={onClose}
-            aria-label="Close user details"
-            style={{ width: "30px", height: "30px", borderRadius: "8px", background: "#F8F6F1", border: "1px solid rgba(13,43,31,0.1)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: "#374151", flexShrink: 0 }}
-          >
-            <IconX />
-          </button>
+          <div style={{ display: "flex", alignItems: "center", gap: "8px", flexShrink: 0 }}>
+            {!editing && (
+              <button
+                onClick={startEditing}
+                style={{ padding: "7px 14px", borderRadius: "8px", background: "rgba(43,168,224,0.1)", color: "#0B6E96", border: "1.5px solid rgba(43,168,224,0.3)", fontSize: "11px", fontWeight: 700, cursor: "pointer", fontFamily: "'DM Sans', sans-serif" }}
+              >
+                Edit
+              </button>
+            )}
+            <button
+              onClick={onClose}
+              aria-label="Close user details"
+              style={{ width: "30px", height: "30px", borderRadius: "8px", background: "#F8F6F1", border: "1px solid rgba(13,43,31,0.1)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: "#374151", flexShrink: 0 }}
+            >
+              <IconX />
+            </button>
+          </div>
         </div>
+
+        {/* Deactivate/Reactivate — prominent, not buried in the edit form */}
+        <button
+          onClick={() => void handleToggleActive()}
+          disabled={togglingActive}
+          style={{
+            width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: "8px",
+            padding: "10px", borderRadius: "9px", marginBottom: "18px", fontSize: "12px", fontWeight: 700,
+            letterSpacing: "0.04em", fontFamily: "'DM Sans', sans-serif", cursor: togglingActive ? "not-allowed" : "pointer",
+            opacity: togglingActive ? 0.6 : 1,
+            background: isActive ? "rgba(239,68,68,0.08)" : "rgba(52,211,153,0.1)",
+            color: isActive ? "#B91C1C" : "#065F46",
+            border: `1.5px solid ${isActive ? "rgba(239,68,68,0.3)" : "rgba(52,211,153,0.35)"}`,
+          }}
+        >
+          {togglingActive ? "Updating…" : isActive ? "Deactivate Account" : "Reactivate Account"}
+        </button>
 
         {/* Fields */}
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px 20px", paddingTop: "18px", borderTop: "1px solid rgba(13,43,31,0.07)" }}>
-          {field("Email", user.email ? <a href={`mailto:${user.email}`} style={{ color: "#374151" }}>{user.email}</a> : null)}
-          {field("Phone", user.phone)}
-          {field("WhatsApp", user.whatsapp)}
-          {field("City", user.city)}
-          {field("Nationality", user.nationality)}
-          {field("Joined", fmtDate(user.created_at))}
-          {field("Role", user.role ?? "buyer")}
-        </div>
+        {editing ? (
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px 20px", paddingTop: "18px", borderTop: "1px solid rgba(13,43,31,0.07)" }}>
+            {editField("Full Name", "full_name")}
+            {editField("Email", "email")}
+            {editField("Phone", "phone")}
+            {editField("City", "city")}
+            <label style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "12px", color: "#374151", cursor: "pointer" }}>
+              <input
+                type="checkbox"
+                checked={draft.is_verified ?? false}
+                onChange={e => setDraft(d => ({ ...d, is_verified: e.target.checked }))}
+              />
+              Verified
+            </label>
+          </div>
+        ) : (
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px 20px", paddingTop: "18px", borderTop: "1px solid rgba(13,43,31,0.07)" }}>
+            {field("Email", user.email ? <a href={`mailto:${user.email}`} style={{ color: "#374151" }}>{user.email}</a> : null)}
+            {field("Phone", user.phone)}
+            {field("WhatsApp", user.whatsapp)}
+            {field("City", user.city)}
+            {field("Nationality", user.nationality)}
+            {field("Joined", fmtDate(user.created_at))}
+            {field("Role", user.role ?? "buyer")}
+          </div>
+        )}
 
-        {user.bio && (
+        {editing && (
+          <div style={{ display: "flex", gap: "10px", marginTop: "20px" }}>
+            <button
+              onClick={() => void handleSave()}
+              disabled={saving}
+              style={{ flex: 1, padding: "10px", borderRadius: "9px", background: "#2BA8E0", color: "#000000", border: "none", fontWeight: 700, fontSize: "12px", cursor: saving ? "not-allowed" : "pointer", opacity: saving ? 0.6 : 1, fontFamily: "'DM Sans', sans-serif" }}
+            >
+              {saving ? "Saving…" : "Save Changes"}
+            </button>
+            <button
+              onClick={() => setEditing(false)}
+              disabled={saving}
+              style={{ flex: 1, padding: "10px", borderRadius: "9px", background: "#F8F6F1", color: "#374151", border: "1px solid rgba(13,43,31,0.1)", fontWeight: 600, fontSize: "12px", cursor: "pointer", fontFamily: "'DM Sans', sans-serif" }}
+            >
+              Cancel
+            </button>
+          </div>
+        )}
+
+        {!editing && user.bio && (
           <div style={{ marginTop: "18px" }}>
             <div style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" as const, color: "#9CA3AF", marginBottom: "5px" }}>Bio</div>
             <div style={{ background: "#F8F6F1", borderRadius: "8px", padding: "10px 14px", fontSize: "12px", color: "#374151", lineHeight: 1.6 }}>{user.bio}</div>
@@ -754,16 +873,18 @@ function UserDetailModal({ user, onClose }: { user: UserRow; onClose: () => void
 }
 
 function UsersSection({
-  users, loading, onRoleChange,
+  users, loading, onRoleChange, onUpdateUser,
 }: {
   users: UserRow[];
   loading: boolean;
   onRoleChange: (userId: string, newRole: string) => void;
+  onUpdateUser: (userId: string, changes: Partial<UserRow>) => Promise<void>;
 }) {
   const [search,     setSearch]     = useState("");
   const [roleFilter, setRoleFilter] = useState<string>("all");
   const [sort,       setSort]       = useState<UserSort>("newest");
-  const [selected,   setSelected]   = useState<UserRow | null>(null);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const selected = users.find(u => u.id === selectedId) ?? null;
 
   const filtered = React.useMemo(() => {
     const q = search.trim().toLowerCase();
@@ -853,10 +974,10 @@ function UsersSection({
           {filtered.map(u => (
             <div
               key={u.id}
-              onClick={() => setSelected(u)}
+              onClick={() => setSelectedId(u.id)}
               role="button"
               tabIndex={0}
-              onKeyDown={e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setSelected(u); } }}
+              onKeyDown={e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setSelectedId(u.id); } }}
               style={{ background: "rgba(255,255,255,0.05)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", borderRadius: "12px", border: "1px solid rgba(255,255,255,0.08)", padding: "16px 20px", display: "flex", alignItems: "center", gap: "16px", flexWrap: "wrap", cursor: "pointer" }}
             >
               {/* Avatar */}
@@ -893,14 +1014,28 @@ function UsersSection({
         </div>
       )}
 
-      {selected && <UserDetailModal user={selected} onClose={() => setSelected(null)} />}
+      {selected && (
+        <UserDetailModal
+          user={selected}
+          onClose={() => setSelectedId(null)}
+          onSave={onUpdateUser}
+        />
+      )}
     </div>
   );
 }
 
 // ── Section: All Inquiries ─────────────────────────────────────────────────────
 
-function InquiriesSection({ inquiries, loading }: { inquiries: InquiryRow[]; loading: boolean }) {
+function InquiriesSection({
+  inquiries, loading, inFlight, onDelete, onMarkSpam,
+}: {
+  inquiries: InquiryRow[];
+  loading: boolean;
+  inFlight: string | null;
+  onDelete: (id: string) => void;
+  onMarkSpam: (id: string) => void;
+}) {
   if (loading) return <Spinner />;
   return (
     <div>
@@ -911,51 +1046,76 @@ function InquiriesSection({ inquiries, loading }: { inquiries: InquiryRow[]; loa
         </div>
       ) : (
         <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-          {inquiries.map(inq => (
-            <div key={inq.id} style={{ background: "rgba(255,255,255,0.05)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", borderRadius: "12px", border: "1px solid rgba(255,255,255,0.08)", padding: "18px 22px" }}>
-              {/* Header */}
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: "12px", flexWrap: "wrap", marginBottom: "10px" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
-                  <span style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "18px", fontWeight: 600, color: "#E8EAED" }}>
-                    {inq.inquirer_name ?? "Anonymous"}
-                  </span>
-                  {inq.inquiry_type && (
-                    <span style={{ display: "inline-block", padding: "2px 8px", borderRadius: "100px", fontSize: "9px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" as const, background: inq.inquiry_type === "viewing" ? "rgba(52,211,153,0.1)" : "rgba(43,168,224,0.12)", color: inq.inquiry_type === "viewing" ? "#34D399" : "#2BA8E0", border: `1px solid ${inq.inquiry_type === "viewing" ? "rgba(52,211,153,0.25)" : "rgba(43,168,224,0.3)"}` }}>
-                      {inq.inquiry_type}
+          {inquiries.map(inq => {
+            const isSpam = inq.status === "spam";
+            const busy = inFlight === inq.id;
+            return (
+              <div key={inq.id} style={{ background: "rgba(255,255,255,0.05)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", borderRadius: "12px", border: "1px solid rgba(255,255,255,0.08)", padding: "18px 22px", opacity: busy ? 0.55 : 1, transition: "opacity 0.2s" }}>
+                {/* Header */}
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: "12px", flexWrap: "wrap", marginBottom: "10px" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
+                    <span style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "18px", fontWeight: 600, color: "#E8EAED" }}>
+                      {inq.inquirer_name ?? "Anonymous"}
                     </span>
+                    {inq.inquiry_type && (
+                      <span style={{ display: "inline-block", padding: "2px 8px", borderRadius: "100px", fontSize: "9px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" as const, background: inq.inquiry_type === "viewing" ? "rgba(52,211,153,0.1)" : "rgba(43,168,224,0.12)", color: inq.inquiry_type === "viewing" ? "#34D399" : "#2BA8E0", border: `1px solid ${inq.inquiry_type === "viewing" ? "rgba(52,211,153,0.25)" : "rgba(43,168,224,0.3)"}` }}>
+                        {inq.inquiry_type}
+                      </span>
+                    )}
+                    {inq.status && (
+                      <span style={{ display: "inline-block", padding: "2px 8px", borderRadius: "100px", fontSize: "9px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" as const, background: isSpam ? "rgba(248,113,113,0.12)" : "rgba(255,255,255,0.07)", color: isSpam ? "#F87171" : "#AEB4BC", border: `1px solid ${isSpam ? "rgba(248,113,113,0.3)" : "rgba(255,255,255,0.1)"}` }}>
+                        {inq.status}
+                      </span>
+                    )}
+                  </div>
+                  <span style={{ fontSize: "11px", color: "rgba(255,255,255,0.45)", flexShrink: 0 }}>{fmtDate(inq.created_at)}</span>
+                </div>
+                {/* Property */}
+                {inq.property_title && (
+                  <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "8px", fontSize: "12px", color: "#AEB4BC" }}>
+                    <IconBuilding />
+                    {inq.property_slug
+                      ? <a href={`/property/${inq.property_slug}`} style={{ color: "#E8EAED", fontWeight: 500, textDecoration: "none" }}>{inq.property_title}</a>
+                      : <span style={{ color: "#E8EAED", fontWeight: 500 }}>{inq.property_title}</span>
+                    }
+                    {inq.seller_email && <span style={{ color: "rgba(255,255,255,0.45)" }}>→ {inq.seller_email}</span>}
+                  </div>
+                )}
+                {/* Contact */}
+                <div style={{ display: "flex", gap: "16px", flexWrap: "wrap", marginBottom: inq.message ? "10px" : 0, fontSize: "12px" }}>
+                  {inq.inquirer_phone && <a href={`tel:${inq.inquirer_phone}`} style={{ color: "#AEB4BC", textDecoration: "none" }}>{inq.inquirer_phone}</a>}
+                  {inq.inquirer_email && <a href={`mailto:${inq.inquirer_email}`} style={{ color: "#AEB4BC", textDecoration: "none" }}>{inq.inquirer_email}</a>}
+                </div>
+                {/* Message */}
+                {inq.message && (
+                  <div style={{ background: "rgba(255,255,255,0.04)", borderRadius: "8px", padding: "10px 14px", fontSize: "12px", color: "#AEB4BC", lineHeight: 1.6, borderLeft: "3px solid rgba(43,168,224,0.4)", marginBottom: "12px" }}>
+                    {inq.message}
+                  </div>
+                )}
+                {/* Actions */}
+                <div style={{ display: "flex", gap: "8px", alignItems: "center", flexWrap: "wrap" }}>
+                  {!isSpam && (
+                    <button
+                      onClick={() => onMarkSpam(inq.id)}
+                      disabled={busy}
+                      style={{ display: "flex", alignItems: "center", gap: "6px", padding: "7px 14px", borderRadius: "7px", fontSize: "11px", fontWeight: 600, background: "rgba(245,158,11,0.1)", color: "#F59E0B", border: "1.5px solid rgba(245,158,11,0.3)", cursor: busy ? "not-allowed" : "pointer", fontFamily: "'DM Sans', sans-serif", opacity: busy ? 0.6 : 1 }}
+                    >
+                      Mark as Spam
+                    </button>
                   )}
-                  {inq.status && (
-                    <span style={{ display: "inline-block", padding: "2px 8px", borderRadius: "100px", fontSize: "9px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" as const, background: "rgba(255,255,255,0.07)", color: "#AEB4BC", border: "1px solid rgba(255,255,255,0.1)" }}>
-                      {inq.status}
-                    </span>
-                  )}
+                  <button
+                    onClick={() => {
+                      if (window.confirm("Permanently delete this inquiry? This cannot be undone.")) onDelete(inq.id);
+                    }}
+                    disabled={busy}
+                    style={{ display: "flex", alignItems: "center", gap: "6px", padding: "7px 14px", borderRadius: "7px", fontSize: "11px", fontWeight: 600, background: "rgba(248,113,113,0.1)", color: "#F87171", border: "1.5px solid rgba(248,113,113,0.3)", cursor: busy ? "not-allowed" : "pointer", fontFamily: "'DM Sans', sans-serif", opacity: busy ? 0.6 : 1 }}
+                  >
+                    <IconReject /> Delete
+                  </button>
                 </div>
-                <span style={{ fontSize: "11px", color: "rgba(255,255,255,0.45)", flexShrink: 0 }}>{fmtDate(inq.created_at)}</span>
               </div>
-              {/* Property */}
-              {inq.property_title && (
-                <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "8px", fontSize: "12px", color: "#AEB4BC" }}>
-                  <IconBuilding />
-                  {inq.property_slug
-                    ? <a href={`/property/${inq.property_slug}`} style={{ color: "#E8EAED", fontWeight: 500, textDecoration: "none" }}>{inq.property_title}</a>
-                    : <span style={{ color: "#E8EAED", fontWeight: 500 }}>{inq.property_title}</span>
-                  }
-                  {inq.seller_email && <span style={{ color: "rgba(255,255,255,0.45)" }}>→ {inq.seller_email}</span>}
-                </div>
-              )}
-              {/* Contact */}
-              <div style={{ display: "flex", gap: "16px", flexWrap: "wrap", marginBottom: inq.message ? "10px" : 0, fontSize: "12px" }}>
-                {inq.inquirer_phone && <a href={`tel:${inq.inquirer_phone}`} style={{ color: "#AEB4BC", textDecoration: "none" }}>{inq.inquirer_phone}</a>}
-                {inq.inquirer_email && <a href={`mailto:${inq.inquirer_email}`} style={{ color: "#AEB4BC", textDecoration: "none" }}>{inq.inquirer_email}</a>}
-              </div>
-              {/* Message */}
-              {inq.message && (
-                <div style={{ background: "rgba(255,255,255,0.04)", borderRadius: "8px", padding: "10px 14px", fontSize: "12px", color: "#AEB4BC", lineHeight: 1.6, borderLeft: "3px solid rgba(43,168,224,0.4)" }}>
-                  {inq.message}
-                </div>
-              )}
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>
@@ -1712,6 +1872,76 @@ export default function AdminPage() {
     }
   }, [users, logAdminAction]);
 
+  const handleUserUpdate = useCallback(async (userId: string, changes: Partial<UserRow>) => {
+    const prevUser = users.find(u => u.id === userId);
+    if (!prevUser) return;
+    const keys = Object.keys(changes) as (keyof UserRow)[];
+    const before = Object.fromEntries(keys.map(k => [k, prevUser[k]])) as Partial<UserRow>;
+
+    setUsers(list => list.map(u => u.id === userId ? { ...u, ...changes } : u));
+    const supabase = createClient();
+    const { error } = await supabase.from("profiles").update(changes).eq("id", userId);
+
+    if (error) {
+      console.error("Admin — user update error:", error);
+      setUsers(list => list.map(u => u.id === userId ? { ...u, ...before } : u));
+      setToast({ ok: false, msg: "Update failed — please try again." });
+    } else {
+      void logAdminAction(
+        "update_user_profile", "profile", userId,
+        before as Record<string, unknown>, changes as Record<string, unknown>,
+      );
+      setToast({ ok: true, msg: "User updated." });
+      setTimeout(() => setToast(null), 2500);
+    }
+  }, [users, logAdminAction]);
+
+  const handleInquiryDelete = useCallback(async (id: string) => {
+    const target = inquiries.find(i => i.id === id) ?? null;
+    setInFlight(id);
+    const supabase = createClient();
+    const { error } = await supabase.from("inquiries").delete().eq("id", id);
+
+    if (error) {
+      console.error("Admin — inquiry delete error:", error);
+      setToast({ ok: false, msg: "Delete failed — please try again." });
+    } else {
+      void logAdminAction("delete_inquiry", "inquiry", id, target ? {
+        property_title: target.property_title,
+        seller_email: target.seller_email,
+        inquirer_name: target.inquirer_name,
+        inquirer_email: target.inquirer_email,
+        inquirer_phone: target.inquirer_phone,
+        message: target.message,
+        inquiry_type: target.inquiry_type,
+        status: target.status,
+      } : null, null);
+      setInquiries(prev => prev.filter(i => i.id !== id));
+      setStats(s => ({ ...s, inquiries: Math.max(0, s.inquiries - 1) }));
+      setToast({ ok: true, msg: "Inquiry deleted." });
+    }
+    setInFlight(null);
+    setTimeout(() => setToast(null), 2500);
+  }, [inquiries, logAdminAction]);
+
+  const handleInquirySpam = useCallback(async (id: string) => {
+    const oldStatus = inquiries.find(i => i.id === id)?.status ?? null;
+    setInFlight(id);
+    const supabase = createClient();
+    const { error } = await supabase.from("inquiries").update({ status: "spam" }).eq("id", id);
+
+    if (error) {
+      console.error("Admin — inquiry spam error:", error);
+      setToast({ ok: false, msg: "Update failed — please try again." });
+    } else {
+      void logAdminAction("mark_inquiry_spam", "inquiry", id, { status: oldStatus }, { status: "spam" });
+      setInquiries(prev => prev.map(i => i.id === id ? { ...i, status: "spam" } : i));
+      setToast({ ok: true, msg: "Marked as spam." });
+    }
+    setInFlight(null);
+    setTimeout(() => setToast(null), 2500);
+  }, [inquiries, logAdminAction]);
+
   const handleAgentApprove = useCallback(async (id: string, userId: string) => {
     setInFlight(id);
     const oldStatus = agentApps.find(a => a.id === id)?.status ?? null;
@@ -1869,10 +2099,19 @@ export default function AdminPage() {
         users={users}
         loading={usersLoading}
         onRoleChange={(uid, role) => void handleUserRole(uid, role)}
+        onUpdateUser={handleUserUpdate}
       />
     );
   } else if (active === "inquiries") {
-    content = <InquiriesSection inquiries={inquiries} loading={inquiriesLoading} />;
+    content = (
+      <InquiriesSection
+        inquiries={inquiries}
+        loading={inquiriesLoading}
+        inFlight={inFlight}
+        onDelete={id => void handleInquiryDelete(id)}
+        onMarkSpam={id => void handleInquirySpam(id)}
+      />
+    );
   } else {
     content = <AuditLogSection entries={auditLog} loading={auditLoading} />;
   }
