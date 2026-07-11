@@ -53,6 +53,42 @@ const AGENTS: Record<string, Agent> = {
   },
 };
 
+// ── Real agent_profiles row → Agent (used once a slug matches a live, approved agent) ──
+const AVATAR_COLORS = ["#000000", "#1E3A5F", "#3B1F5F", "#4A2A0F", "#0F3D2E"];
+function colorForName(name: string): string {
+  let hash = 0;
+  for (let i = 0; i < name.length; i++) hash = (hash * 31 + name.charCodeAt(i)) | 0;
+  return AVATAR_COLORS[Math.abs(hash) % AVATAR_COLORS.length];
+}
+
+type AgentProfileRow = {
+  id: string;
+  agency_name: string | null;
+  bio: string | null;
+  years_experience: number | null;
+  license_number: string | null;
+  profiles: { full_name: string | null; phone: string | null; email: string | null } | null;
+  agent_service_cities: { city: string }[] | null;
+};
+
+function mapAgentProfileRow(row: AgentProfileRow, slug: string): Agent {
+  const fullName = row.profiles?.full_name?.trim() || "Nilay 360 Agent";
+  const cities = (row.agent_service_cities ?? []).map(c => c.city);
+  const phone = row.profiles?.phone ?? "";
+  return {
+    id: row.id, slug, full_name: fullName, title: "Property Consultant",
+    agency: row.agency_name || "Nilay 360 Premium Realty",
+    city: cities[0] ?? "India", cities_served: cities.length > 0 ? cities : ["Pan India"],
+    specialisation: "Residential Properties", specialisations: ["Residential Properties"],
+    languages: ["English"], experience_years: row.years_experience ?? 0,
+    rating: 0, reviews_count: 0, properties_sold: 0, properties_listed: 0,
+    rera_number: row.license_number || "—", verified: true, featured: false,
+    avatar_color: colorForName(fullName),
+    bio: row.bio || `${fullName} is a verified real estate professional at Nilay 360, helping buyers and sellers navigate the market with transparent, client-first advisory.`,
+    phone, email: row.profiles?.email ?? "", whatsapp: phone,
+  };
+}
+
 function buildFallback(slug: string): Agent {
   const name = slug.replace(/-/g, " ").replace(/\b\w/g, l => l.toUpperCase());
   return {
@@ -210,30 +246,97 @@ function ContactForm({ agent }: { agent: Agent }) {
 export default function AgentProfilePage() {
   const params = useParams();
   const slug   = (params?.slug as string) ?? "";
-  const agent  = AGENTS[slug] ?? buildFallback(slug);
 
+  const [agent,       setAgent]       = useState<Agent | null>(null);
+  const [agentLoading, setAgentLoading] = useState(true);
+  const [isRealAgent, setIsRealAgent] = useState(false);
   const [properties, setProperties] = useState<Property[]>(PLACEHOLDER_PROPERTIES);
   const [reviews,    setReviews]    = useState<Review[]>(PLACEHOLDER_REVIEWS);
   const [activeTab,  setActiveTab]  = useState<"listings" | "reviews">("listings");
 
+  // Resolve the slug against real agent_profiles first (status = approved);
+  // only fall back to demo/hardcoded data when no live match exists.
   useEffect(() => {
+    let cancelled = false;
+    async function loadAgent() {
+      if (!slug) return;
+      setAgentLoading(true);
+      try {
+        const supabase = createClient();
+        const { data: row } = await supabase
+          .from("agent_profiles")
+          .select("id, agency_name, bio, years_experience, license_number, profiles(full_name, phone, email), agent_service_cities(city)")
+          .eq("slug", slug)
+          .eq("status", "approved")
+          .maybeSingle();
+        if (cancelled) return;
+        if (row) {
+          setAgent(mapAgentProfileRow(row as unknown as AgentProfileRow, slug));
+          setIsRealAgent(true);
+          // Real agents start with no demo listings/reviews — avoids fabricated
+          // testimonials appearing under a real person's name before the fetch below resolves.
+          setProperties([]);
+          setReviews([]);
+        } else {
+          setAgent(AGENTS[slug] ?? buildFallback(slug));
+          setIsRealAgent(false);
+        }
+      } catch (_) {
+        if (!cancelled) { setAgent(AGENTS[slug] ?? buildFallback(slug)); setIsRealAgent(false); }
+      } finally {
+        if (!cancelled) setAgentLoading(false);
+      }
+    }
+    void loadAgent();
+    return () => { cancelled = true; };
+  }, [slug]);
+
+  useEffect(() => {
+    if (!agent) return;
     async function load() {
       try {
         const supabase = createClient();
-        const [{ data: props }, { data: revs }] = await Promise.all([
-          supabase.from("properties").select("*").eq("agent_id", agent.id).eq("status", "active").limit(6),
-          supabase.from("agent_reviews").select("*").eq("agent_id", agent.id).order("created_at", { ascending: false }).limit(12),
-        ]);
-        if (props && props.length > 0) setProperties(props);
-        if (revs  && revs.length  > 0) setReviews(revs.map((r: any) => ({ name: r.reviewer_name, rating: r.rating, date: r.created_at?.slice(0,7) ?? "", text: r.text, property: r.property_title ?? "" })));
+        if (isRealAgent) {
+          const { data: listings } = await supabase
+            .from("property_listings")
+            .select("id, slug, title, price, property_category, city, bedrooms, built_up_area, photo_urls, listing_type")
+            .eq("assigned_agent_id", agent!.id)
+            .eq("status", "active")
+            .limit(6);
+          const mapped: Property[] = (listings ?? []).map((r: any) => ({
+            id: r.id, slug: r.slug ?? r.id, title: r.title ?? "Untitled Property",
+            price: r.price ?? 0, type: r.property_category ?? "Property", city: r.city ?? "",
+            bedrooms: r.bedrooms ?? 0, area: r.built_up_area ?? 0,
+            image: Array.isArray(r.photo_urls) && r.photo_urls[0] ? r.photo_urls[0] : "https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=600&q=80",
+            listing_type: r.listing_type ?? "sale",
+          }));
+          setProperties(mapped);
+          // No real review system wired yet — leave empty rather than show fabricated reviews for a real agent.
+          setReviews([]);
+        } else {
+          const [{ data: props }, { data: revs }] = await Promise.all([
+            supabase.from("properties").select("*").eq("agent_id", agent!.id).eq("status", "active").limit(6),
+            supabase.from("agent_reviews").select("*").eq("agent_id", agent!.id).order("created_at", { ascending: false }).limit(12),
+          ]);
+          if (props && props.length > 0) setProperties(props);
+          if (revs  && revs.length  > 0) setReviews(revs.map((r: any) => ({ name: r.reviewer_name, rating: r.rating, date: r.created_at?.slice(0,7) ?? "", text: r.text, property: r.property_title ?? "" })));
+        }
       } catch (_) {}
     }
-    load();
-  }, [agent.id]);
+    void load();
+  }, [agent, isRealAgent]);
 
   const ratingBreakdown = [5,4,3,2,1].map(star => ({
     star, pct: star === 5 ? 72 : star === 4 ? 18 : star === 3 ? 6 : star === 2 ? 3 : 1
   }));
+
+  if (agentLoading || !agent) {
+    return (
+      <div style={{ minHeight: "100vh", background: "#000000", display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <span style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "20px", color: "rgba(245,242,236,0.5)" }}>Loading agent…</span>
+      </div>
+    );
+  }
 
   return (
     <>
