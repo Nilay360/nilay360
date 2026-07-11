@@ -7,7 +7,7 @@ import { CITIES } from "@/constants";
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
-type AdminSection = "overview" | "pending" | "approved" | "rejected" | "users" | "inquiries" | "agents";
+type AdminSection = "overview" | "pending" | "approved" | "rejected" | "users" | "inquiries" | "agents" | "audit";
 
 type Stats = {
   pending: number;
@@ -96,6 +96,18 @@ type ProfileSearchRow = {
   role: string | null;
 };
 
+type AuditLogRow = {
+  id: string;
+  actor_id: string;
+  action: string;
+  entity_type: string;
+  entity_id: string | null;
+  before_data: Record<string, unknown> | null;
+  after_data: Record<string, unknown> | null;
+  created_at: string;
+  profiles: { full_name: string | null; email: string | null } | null;
+};
+
 // ── Helpers ────────────────────────────────────────────────────────────────────
 
 function fmtPrice(v: number | null, listingType: string | null): string {
@@ -112,6 +124,12 @@ function fmtPrice(v: number | null, listingType: string | null): string {
 function fmtDate(iso: string): string {
   return new Date(iso).toLocaleDateString("en-IN", {
     day: "numeric", month: "short", year: "numeric",
+  });
+}
+
+function fmtDateTime(iso: string): string {
+  return new Date(iso).toLocaleString("en-IN", {
+    day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit",
   });
 }
 
@@ -140,6 +158,8 @@ function IconReject()  { return <svg width="12" height="12" viewBox="0 0 24 24" 
 function IconOut()     { return <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>; }
 function IconBuilding(){ return <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M9 22V12h6v10"/><path d="M8 6h.01M16 6h.01M8 10h.01M16 10h.01"/></svg>; }
 function IconBriefcase(){ return <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>; }
+function IconAudit()  { return <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="15" y2="17"/></svg>; }
+function IconChevron(){ return <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"/></svg>; }
 
 // ── Shared UI ──────────────────────────────────────────────────────────────────
 
@@ -1273,6 +1293,110 @@ function AgentsSection({
   );
 }
 
+// ── Section: Audit Log ──────────────────────────────────────────────────────────
+
+const AUDIT_ENTITY_TYPES = ["property_listing", "profile", "agent_profile"] as const;
+
+function DiffBlock({ label, data }: { label: string; data: Record<string, unknown> | null }) {
+  return (
+    <div style={{ flex: "1 1 200px", minWidth: 0 }}>
+      <div style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: "rgba(255,255,255,0.45)", marginBottom: "6px" }}>{label}</div>
+      <pre style={{ margin: 0, fontSize: "11px", lineHeight: 1.6, color: "#AEB4BC", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: "8px", padding: "10px 12px", overflowX: "auto", fontFamily: "'DM Sans', sans-serif" }}>
+        {data ? JSON.stringify(data, null, 2) : "—"}
+      </pre>
+    </div>
+  );
+}
+
+function AuditLogRow_({ entry }: { entry: AuditLogRow }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div style={{ background: "rgba(255,255,255,0.05)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", borderRadius: "12px", border: "1px solid rgba(255,255,255,0.08)", overflow: "hidden" }}>
+      <button
+        onClick={() => setOpen(v => !v)}
+        style={{ width: "100%", display: "flex", alignItems: "center", gap: "14px", padding: "14px 18px", background: "transparent", border: "none", cursor: "pointer", textAlign: "left" as const, fontFamily: "'DM Sans', sans-serif", flexWrap: "wrap" }}
+      >
+        <span style={{ fontSize: "11px", color: "rgba(255,255,255,0.45)", flexShrink: 0 }}>{fmtDateTime(entry.created_at)}</span>
+        <span style={{ fontSize: "13px", fontWeight: 600, color: "#E8EAED", flexShrink: 0 }}>{entry.profiles?.full_name ?? entry.profiles?.email ?? "Unknown admin"}</span>
+        <span style={{ padding: "2px 9px", borderRadius: "100px", fontSize: "10px", fontWeight: 700, letterSpacing: "0.04em", background: "rgba(43,168,224,0.12)", color: "#2BA8E0", border: "1px solid rgba(43,168,224,0.25)", flexShrink: 0 }}>
+          {entry.action}
+        </span>
+        <span style={{ fontSize: "11px", color: "rgba(255,255,255,0.45)", flexShrink: 0 }}>{entry.entity_type}</span>
+        <span style={{ marginLeft: "auto", color: "rgba(255,255,255,0.45)", display: "flex", alignItems: "center", transform: open ? "rotate(180deg)" : "none", transition: "transform 0.15s" }}>
+          <IconChevron />
+        </span>
+      </button>
+      {open && (
+        <div style={{ display: "flex", gap: "16px", flexWrap: "wrap", padding: "0 18px 16px" }}>
+          <DiffBlock label="Before" data={entry.before_data} />
+          <DiffBlock label="After" data={entry.after_data} />
+        </div>
+      )}
+    </div>
+  );
+}
+
+function AuditLogSection({ entries, loading }: { entries: AuditLogRow[]; loading: boolean }) {
+  const [entityFilter, setEntityFilter] = useState<string>("all");
+  const [actorFilter,  setActorFilter]  = useState<string>("all");
+
+  const actors = React.useMemo(() => {
+    const map = new Map<string, string>();
+    for (const e of entries) map.set(e.actor_id, e.profiles?.full_name ?? e.profiles?.email ?? "Unknown admin");
+    return Array.from(map.entries());
+  }, [entries]);
+
+  const filtered = entries.filter(e =>
+    (entityFilter === "all" || e.entity_type === entityFilter) &&
+    (actorFilter === "all" || e.actor_id === actorFilter)
+  );
+
+  if (loading) return <Spinner />;
+
+  return (
+    <div>
+      <SectionHeading title="Audit Log" subtitle="Every admin write action, in reverse-chronological order." count={filtered.length} />
+
+      <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", marginBottom: "18px" }}>
+        <div style={{ position: "relative", flexShrink: 0 }}>
+          <select
+            value={entityFilter}
+            onChange={e => setEntityFilter(e.target.value)}
+            aria-label="Filter by entity type"
+            style={{ padding: "9px 28px 9px 12px", background: "rgba(255,255,255,0.06)", border: "1.5px solid rgba(255,255,255,0.12)", borderRadius: "9px", fontSize: "12px", color: "#E8EAED", fontFamily: "'DM Sans', sans-serif", outline: "none", appearance: "none", cursor: "pointer" }}
+          >
+            <option value="all">All entity types</option>
+            {AUDIT_ENTITY_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
+          </select>
+          <span style={{ position: "absolute", right: 8, top: "50%", transform: "translateY(-50%)", pointerEvents: "none", color: "rgba(255,255,255,0.45)", fontSize: 9 }}>▼</span>
+        </div>
+        <div style={{ position: "relative", flexShrink: 0 }}>
+          <select
+            value={actorFilter}
+            onChange={e => setActorFilter(e.target.value)}
+            aria-label="Filter by actor"
+            style={{ padding: "9px 28px 9px 12px", background: "rgba(255,255,255,0.06)", border: "1.5px solid rgba(255,255,255,0.12)", borderRadius: "9px", fontSize: "12px", color: "#E8EAED", fontFamily: "'DM Sans', sans-serif", outline: "none", appearance: "none", cursor: "pointer" }}
+          >
+            <option value="all">All actors</option>
+            {actors.map(([id, name]) => <option key={id} value={id}>{name}</option>)}
+          </select>
+          <span style={{ position: "absolute", right: 8, top: "50%", transform: "translateY(-50%)", pointerEvents: "none", color: "rgba(255,255,255,0.45)", fontSize: 9 }}>▼</span>
+        </div>
+      </div>
+
+      {filtered.length === 0 ? (
+        <div style={{ padding: "60px 24px", textAlign: "center", background: "rgba(255,255,255,0.05)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", borderRadius: "18px", border: "1px solid rgba(255,255,255,0.08)" }}>
+          <p style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "20px", color: "#E8EAED" }}>No matching audit entries</p>
+        </div>
+      ) : (
+        <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+          {filtered.map(e => <AuditLogRow_ key={e.id} entry={e} />)}
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ── Sidebar nav ────────────────────────────────────────────────────────────────
 
 const NAV: { id: AdminSection; label: string; icon: React.ReactNode }[] = [
@@ -1283,6 +1407,7 @@ const NAV: { id: AdminSection; label: string; icon: React.ReactNode }[] = [
   { id: "agents",     label: "Agent Applications", icon: <IconBriefcase /> },
   { id: "users",      label: "All Users",          icon: <IconUsers /> },
   { id: "inquiries",  label: "All Inquiries",      icon: <IconMsg /> },
+  { id: "audit",      label: "Audit Log",          icon: <IconAudit /> },
 ];
 
 // ── Main page ──────────────────────────────────────────────────────────────────
@@ -1311,6 +1436,7 @@ export default function AdminPage() {
   const [inquiries,        setInquiries]        = useState<InquiryRow[]>([]);
   const [agentApps,        setAgentApps]        = useState<AgentApplication[]>([]);
   const [approvedAgents,   setApprovedAgents]   = useState<ApprovedAgentOption[]>([]);
+  const [auditLog,         setAuditLog]         = useState<AuditLogRow[]>([]);
 
   const [pendingLoading,  setPendingLoading]  = useState(false);
   const [approvedLoading, setApprovedLoading] = useState(false);
@@ -1318,6 +1444,7 @@ export default function AdminPage() {
   const [usersLoading,    setUsersLoading]    = useState(false);
   const [inquiriesLoading, setInquiriesLoading] = useState(false);
   const [agentAppsLoading, setAgentAppsLoading] = useState(false);
+  const [auditLoading,     setAuditLoading]     = useState(false);
 
   const [inFlight, setInFlight] = useState<string | null>(null);
 
@@ -1466,8 +1593,37 @@ export default function AdminPage() {
           setAgentApps((res.data as AgentApplication[] | null) ?? []);
           setAgentAppsLoading(false);
         });
+    } else if (active === "audit") {
+      setAuditLoading(true);
+      supabase
+        .from("admin_audit_log")
+        .select("id, actor_id, action, entity_type, entity_id, before_data, after_data, created_at, profiles(full_name, email)")
+        .order("created_at", { ascending: false })
+        .limit(300)
+        .then((res: { data: unknown }) => {
+          setAuditLog((res.data as AuditLogRow[] | null) ?? []);
+          setAuditLoading(false);
+        });
     }
   }, [active, isAdmin]);
+
+  const logAdminAction = useCallback(async (
+    action: string,
+    entityType: string,
+    entityId: string | null,
+    before: Record<string, unknown> | null,
+    after: Record<string, unknown> | null,
+  ) => {
+    const supabase = createClient();
+    const { error } = await supabase.rpc("log_admin_action", {
+      p_action: action,
+      p_entity_type: entityType,
+      p_entity_id: entityId,
+      p_before: before,
+      p_after: after,
+    });
+    if (error) console.error("Admin — audit log write failed:", error);
+  }, []);
 
   const handleListingStatus = useCallback(async (
     id: string,
@@ -1475,6 +1631,7 @@ export default function AdminPage() {
     fromSection: "pending" | "approved" | "rejected",
   ) => {
     setInFlight(id);
+    const oldStatus = fromSection === "pending" ? "pending_review" : fromSection === "approved" ? "active" : "rejected";
     const supabase = createClient();
     const { error } = await supabase.from("property_listings").update({ status: newStatus }).eq("id", id);
 
@@ -1482,6 +1639,7 @@ export default function AdminPage() {
       console.error("Admin — listing status error:", error);
       setToast({ ok: false, msg: "Update failed — please try again." });
     } else {
+      void logAdminAction("update_listing_status", "property_listing", id, { status: oldStatus }, { status: newStatus });
       if (fromSection === "pending") {
         setPendingListings(prev => prev.filter(l => l.id !== id));
         setStats(s => ({ ...s, pending: Math.max(0, s.pending - 1), ...(newStatus === "active" ? { active: s.active + 1 } : { rejected: s.rejected + 1 }) }));
@@ -1512,7 +1670,7 @@ export default function AdminPage() {
     }
     setInFlight(null);
     setTimeout(() => setToast(null), 3000);
-  }, []);
+  }, [logAdminAction]);
 
   const handleAssignAgent = useCallback(async (
     id: string,
@@ -1520,6 +1678,7 @@ export default function AdminPage() {
     fromSection: "pending" | "approved",
   ) => {
     setInFlight(id);
+    const oldAgentId = (fromSection === "pending" ? pendingListings : approvedListings).find(l => l.id === id)?.assigned_agent_id ?? null;
     const supabase = createClient();
     const { error } = await supabase.from("property_listings").update({ assigned_agent_id: agentId }).eq("id", id);
 
@@ -1527,6 +1686,7 @@ export default function AdminPage() {
       console.error("Admin — assign agent error:", error);
       setToast({ ok: false, msg: "Assignment failed — please try again." });
     } else {
+      void logAdminAction("assign_agent", "property_listing", id, { assigned_agent_id: oldAgentId }, { assigned_agent_id: agentId });
       const updater = (prev: AdminListing[]) => prev.map(l => l.id === id ? { ...l, assigned_agent_id: agentId } : l);
       if (fromSection === "pending") setPendingListings(updater);
       else setApprovedListings(updater);
@@ -1534,7 +1694,7 @@ export default function AdminPage() {
     }
     setInFlight(null);
     setTimeout(() => setToast(null), 2500);
-  }, []);
+  }, [pendingListings, approvedListings, logAdminAction]);
 
   const handleUserRole = useCallback(async (userId: string, newRole: string) => {
     const prev = users.find(u => u.id === userId)?.role ?? null;
@@ -1546,13 +1706,15 @@ export default function AdminPage() {
       setUsers(list => list.map(u => u.id === userId ? { ...u, role: prev } : u));
       setToast({ ok: false, msg: "Role update failed." });
     } else {
+      void logAdminAction("update_user_role", "profile", userId, { role: prev }, { role: newRole });
       setToast({ ok: true, msg: `Role updated to ${newRole}.` });
       setTimeout(() => setToast(null), 2500);
     }
-  }, [users]);
+  }, [users, logAdminAction]);
 
   const handleAgentApprove = useCallback(async (id: string, userId: string) => {
     setInFlight(id);
+    const oldStatus = agentApps.find(a => a.id === id)?.status ?? null;
     const supabase = createClient();
     const { error: statusErr } = await supabase.from("agent_profiles").update({ status: "approved" }).eq("id", id);
     const { error: roleErr } = statusErr ? { error: null } : await supabase.from("profiles").update({ role: "agent" }).eq("id", userId);
@@ -1561,15 +1723,17 @@ export default function AdminPage() {
       console.error("Admin — agent approve error:", statusErr ?? roleErr);
       setToast({ ok: false, msg: "Approval failed — please try again." });
     } else {
+      void logAdminAction("approve_agent_application", "agent_profile", id, { status: oldStatus }, { status: "approved" });
       setAgentApps(prev => prev.map(a => a.id === id ? { ...a, status: "approved" } : a));
       setToast({ ok: true, msg: "Agent approved." });
     }
     setInFlight(null);
     setTimeout(() => setToast(null), 3000);
-  }, []);
+  }, [agentApps, logAdminAction]);
 
   const handleAgentReject = useCallback(async (id: string) => {
     setInFlight(id);
+    const oldStatus = agentApps.find(a => a.id === id)?.status ?? null;
     const supabase = createClient();
     const { error } = await supabase.from("agent_profiles").update({ status: "rejected" }).eq("id", id);
 
@@ -1577,12 +1741,13 @@ export default function AdminPage() {
       console.error("Admin — agent reject error:", error);
       setToast({ ok: false, msg: "Rejection failed — please try again." });
     } else {
+      void logAdminAction("reject_agent_application", "agent_profile", id, { status: oldStatus }, { status: "rejected" });
       setAgentApps(prev => prev.map(a => a.id === id ? { ...a, status: "rejected" } : a));
       setToast({ ok: true, msg: "Agent application rejected." });
     }
     setInFlight(null);
     setTimeout(() => setToast(null), 3000);
-  }, []);
+  }, [agentApps, logAdminAction]);
 
   const handleAddAgent = useCallback(async (data: {
     userId: string; licenseNumber: string; agencyName: string; bio: string;
@@ -1620,6 +1785,14 @@ export default function AdminPage() {
     const { error: roleErr } = await supabase.from("profiles").update({ role: "agent" }).eq("id", data.userId);
     if (roleErr) console.error("Admin — add agent role update error:", roleErr);
 
+    void logAdminAction("add_agent", "agent_profile", inserted.id, null, {
+      user_id: data.userId,
+      license_number: data.licenseNumber || null,
+      agency_name: data.agencyName || null,
+      status: "approved",
+      cities: data.cities,
+    });
+
     setAgentApps(prev => [
       { ...inserted, agent_service_cities: data.cities.map(city => ({ city })) } as AgentApplication,
       ...prev,
@@ -1627,7 +1800,7 @@ export default function AdminPage() {
     setToast({ ok: true, msg: "Agent added." });
     setTimeout(() => setToast(null), 3000);
     return { ok: true };
-  }, []);
+  }, [logAdminAction]);
 
   if (authChecking) {
     return (
@@ -1698,8 +1871,10 @@ export default function AdminPage() {
         onRoleChange={(uid, role) => void handleUserRole(uid, role)}
       />
     );
-  } else {
+  } else if (active === "inquiries") {
     content = <InquiriesSection inquiries={inquiries} loading={inquiriesLoading} />;
+  } else {
+    content = <AuditLogSection entries={auditLog} loading={auditLoading} />;
   }
 
   return (
