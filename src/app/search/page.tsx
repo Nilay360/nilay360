@@ -3,6 +3,7 @@ import { useState, useEffect, useMemo, useCallback, useRef, Suspense } from "rea
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { AMENITIES } from "@/constants";
+import { optimizedImageUrl } from "@/lib/image-url";
 
 // ── Types ─────────────────────────────────────────────────────
 type Property = {
@@ -217,7 +218,7 @@ function PropertyCard({ p, comparing, onCompare, onSave, saved }: { p: Property;
 
       <a href={`/property/${p.slug}`} style={{ textDecoration: "none", display: "block" }}>
         <div style={{ position: "relative", height: "200px", overflow: "hidden", background: "#0B0D10" }}>
-          <img src={img} alt={p.title} onError={() => setImgErr(true)} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block", transition: "transform 0.35s" }}
+          <img src={optimizedImageUrl(img, 600)} alt={p.title} loading="lazy" onError={() => setImgErr(true)} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block", transition: "transform 0.35s" }}
             onMouseEnter={e => (e.currentTarget as HTMLImageElement).style.transform = "scale(1.04)"}
             onMouseLeave={e => (e.currentTarget as HTMLImageElement).style.transform = "scale(1)"}
           />
@@ -266,7 +267,7 @@ function ListRow({ p, comparing, onCompare, onSave, saved }: { p: Property; comp
     >
       <div style={{ width: "260px", flexShrink: 0, position: "relative" }}>
         <a href={`/property/${p.slug}`} style={{ display: "block", height: "100%" }}>
-          <img src={img} alt={p.title} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block", minHeight: "160px" }} />
+          <img src={optimizedImageUrl(img, 600)} alt={p.title} loading="lazy" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block", minHeight: "160px" }} />
         </a>
         <div onClick={e => { e.stopPropagation(); onCompare(); }} style={{ position: "absolute", top: "10px", left: "10px", width: "22px", height: "22px", borderRadius: "5px", background: comparing ? "#2BA8E0" : "rgba(255,255,255,0.85)", border: comparing ? "none" : "1.5px solid rgba(0,0,0,0.2)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
           {comparing && <svg width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5l3 3 7-7" stroke="#FFFFFF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>}

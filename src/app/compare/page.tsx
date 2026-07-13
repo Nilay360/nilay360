@@ -2,6 +2,7 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useCompare, type CompareItem } from "@/context/CompareContext";
+import { optimizedImageUrl } from "@/lib/image-url";
 
 // ── Types ─────────────────────────────────────────────────────
 type Property = {
@@ -140,7 +141,7 @@ function SelectorSlot({
     return (
       <div style={{ flex: 1, minWidth: 0, border: "2px solid #2BA8E0", borderRadius: "16px", overflow: "hidden", background: "#fff", boxShadow: "0 4px 20px rgba(201,168,76,0.15)" }}>
         <div style={{ position: "relative", height: "180px", overflow: "hidden" }}>
-          <img src={img} alt={property.title} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+          <img src={optimizedImageUrl(img, 500)} alt={property.title} loading="lazy" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
           <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(5,8,12,0.7) 0%, transparent 50%)" }} />
           <button onClick={onRemove} style={{ position: "absolute", top: "10px", right: "10px", width: "28px", height: "28px", borderRadius: "50%", background: "rgba(220,38,38,0.85)", border: "none", color: "#fff", fontSize: "14px", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, backdropFilter: "blur(4px)" }}>×</button>
           <span style={{ position: "absolute", bottom: "10px", left: "10px", padding: "3px 10px", borderRadius: "100px", fontSize: "9px", fontWeight: 800, letterSpacing: "0.1em", textTransform: "uppercase", background: "#2BA8E0", color: "#000000" }}>{property.listing_type === "sale" ? "For Sale" : "For Rent"}</span>
@@ -180,7 +181,7 @@ function SelectorSlot({
                 style={{ width: "100%", display: "flex", alignItems: "center", gap: "12px", padding: "12px 16px", background: "transparent", border: "none", borderBottom: "1px solid rgba(13,43,31,0.05)", cursor: "pointer", fontFamily: "'DM Sans', sans-serif", textAlign: "left" }}
                 onMouseEnter={e => (e.currentTarget as HTMLButtonElement).style.background = "#F8F6F1"}
                 onMouseLeave={e => (e.currentTarget as HTMLButtonElement).style.background = "transparent"}>
-                <img src={p.featured_image || `https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=100&q=80`} alt="" style={{ width: "40px", height: "40px", borderRadius: "8px", objectFit: "cover", flexShrink: 0 }} />
+                <img src={optimizedImageUrl(p.featured_image, 100) || `https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=100&q=80`} alt="" loading="lazy" style={{ width: "40px", height: "40px", borderRadius: "8px", objectFit: "cover", flexShrink: 0 }} />
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <p style={{ fontSize: "13px", fontWeight: 600, color: "#000000", marginBottom: "2px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{p.title}</p>
                   <p style={{ fontSize: "11px", color: "#9CA3AF" }}>{p.city} · {fmtINR(p.price, true)}</p>
@@ -263,7 +264,7 @@ function MiniCard({ p }: { p: Property }) {
     <a href={`/property/${p.slug}`} style={{ textDecoration: "none", display: "block", background: "#fff", borderRadius: "14px", overflow: "hidden", border: "1px solid rgba(13,43,31,0.07)", boxShadow: hover ? "0 16px 48px rgba(13,43,31,0.12)" : "0 1px 5px rgba(13,43,31,0.04)", transform: hover ? "translateY(-4px)" : "none", transition: "all 0.2s" }}
       onMouseEnter={() => setHover(true)} onMouseLeave={() => setHover(false)}>
       <div style={{ height: "180px", overflow: "hidden" }}>
-        <img src={img} alt={p.title} style={{ width: "100%", height: "100%", objectFit: "cover", transform: hover ? "scale(1.05)" : "scale(1)", transition: "transform 0.3s" }} />
+        <img src={optimizedImageUrl(img, 500)} alt={p.title} loading="lazy" style={{ width: "100%", height: "100%", objectFit: "cover", transform: hover ? "scale(1.05)" : "scale(1)", transition: "transform 0.3s" }} />
       </div>
       <div style={{ padding: "16px 18px" }}>
         <p style={{ fontSize: "9px", fontWeight: 700, letterSpacing: "0.12em", color: "#2BA8E0", textTransform: "uppercase", marginBottom: "5px" }}>{p.property_type} · {p.city}</p>

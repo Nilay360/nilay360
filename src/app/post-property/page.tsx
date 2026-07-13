@@ -1351,24 +1351,23 @@ export default function PostPropertyPage() {
       const { data: { session } } = await supabase.auth.getSession()
       const authUserId = session?.user?.id ?? null
 
-      // Upload photos to Supabase Storage — track failures and abort if any fail
+      // Upload photos to Cloudinary via /api/upload-image — track failures and abort if any fail
       const imageUrls: string[] = []
       const failed: string[] = []
       for (let i = 0; i < state.photos.length; i++) {
         const photo = state.photos[i]
         setUploadProgress({ current: i + 1, total: state.photos.length })
-        const ext = photo.file.name.split('.').pop() ?? 'jpg'
-        const path = `listings/${Date.now()}-${uid()}.${ext}`
-        const { data: up, error: upErr } = await supabase.storage
-          .from('property-images')
-          .upload(path, photo.file, { contentType: photo.file.type, upsert: false })
-        if (upErr || !up) {
-          console.error('Photo upload failed:', photo.file.name, upErr)
+        try {
+          const body = new FormData()
+          body.append('file', photo.file)
+          const res = await fetch('/api/upload-image', { method: 'POST', body })
+          const json = await res.json()
+          if (!res.ok || !json?.secure_url) throw new Error(json?.error ?? 'Upload failed')
+          imageUrls.push(json.secure_url as string)
+        } catch (err) {
+          console.error('Photo upload failed:', photo.file.name, err)
           failed.push(photo.file.name)
-          continue
         }
-        const { data: { publicUrl } } = supabase.storage.from('property-images').getPublicUrl(path)
-        imageUrls.push(publicUrl)
       }
 
       if (failed.length > 0) {

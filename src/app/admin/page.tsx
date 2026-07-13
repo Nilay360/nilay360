@@ -4,10 +4,11 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { useAuth } from "@/context/AuthContext";
 import { CITIES } from "@/constants";
+import { optimizedImageUrl } from "@/lib/image-url";
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
-type AdminSection = "overview" | "pending" | "approved" | "rejected" | "users" | "inquiries" | "agents";
+type AdminSection = "overview" | "pending" | "approved" | "rejected" | "users" | "inquiries" | "agents" | "reports" | "audit";
 
 type Stats = {
   pending: number;
@@ -15,6 +16,7 @@ type Stats = {
   rejected: number;
   users: number;
   inquiries: number;
+  reportsOpen: number;
 };
 
 type AdminListing = {
@@ -96,6 +98,35 @@ type ProfileSearchRow = {
   role: string | null;
 };
 
+type AuditLogRow = {
+  id: string;
+  actor_id: string;
+  action: string;
+  entity_type: string;
+  entity_id: string | null;
+  before_data: Record<string, unknown> | null;
+  after_data: Record<string, unknown> | null;
+  created_at: string;
+  profiles: { full_name: string | null; email: string | null } | null;
+};
+
+type ReportRow = {
+  id: string;
+  reporter_id: string;
+  entity_type: "listing" | "profile";
+  entity_id: string;
+  reason: string;
+  details: string | null;
+  status: "open" | "resolved" | "dismissed";
+  created_at: string;
+  resolved_at: string | null;
+  resolved_by: string | null;
+  profiles: { full_name: string | null; email: string | null } | null;
+};
+
+type ReportListingPreview = { id: string; slug: string | null; title: string | null; status: string | null };
+type ReportProfilePreview = { id: string; full_name: string | null; email: string | null; is_active: boolean | null };
+
 // ── Helpers ────────────────────────────────────────────────────────────────────
 
 function fmtPrice(v: number | null, listingType: string | null): string {
@@ -112,6 +143,12 @@ function fmtPrice(v: number | null, listingType: string | null): string {
 function fmtDate(iso: string): string {
   return new Date(iso).toLocaleDateString("en-IN", {
     day: "numeric", month: "short", year: "numeric",
+  });
+}
+
+function fmtDateTime(iso: string): string {
+  return new Date(iso).toLocaleString("en-IN", {
+    day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit",
   });
 }
 
@@ -140,6 +177,9 @@ function IconReject()  { return <svg width="12" height="12" viewBox="0 0 24 24" 
 function IconOut()     { return <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>; }
 function IconBuilding(){ return <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M9 22V12h6v10"/><path d="M8 6h.01M16 6h.01M8 10h.01M16 10h.01"/></svg>; }
 function IconBriefcase(){ return <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>; }
+function IconAudit()  { return <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="15" y2="17"/></svg>; }
+function IconFlag()   { return <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>; }
+function IconChevron(){ return <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"/></svg>; }
 
 // ── Shared UI ──────────────────────────────────────────────────────────────────
 
@@ -231,7 +271,7 @@ function ListingCard({
         {/* Thumbnail */}
         <div style={{ width: "150px", flexShrink: 0, position: "relative", background: "#0B0D10", overflow: "hidden", minHeight: "140px" }}>
           {thumb ? (
-            <img src={thumb} alt={listing.title ?? "Property"} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+            <img src={optimizedImageUrl(thumb, 300)} alt={listing.title ?? "Property"} loading="lazy" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
           ) : (
             <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", color: "#2BA8E0", opacity: 0.3, minHeight: "140px" }}>
               <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
@@ -647,12 +687,54 @@ const USER_SORT_LABELS: Record<UserSort, string> = {
   name_za: "Name — Z to A",
 };
 
-function UserDetailModal({ user, onClose }: { user: UserRow; onClose: () => void }) {
+type UserEditableFields = Pick<UserRow, "full_name" | "city" | "phone" | "email" | "is_verified">;
+
+const userModalInputStyle: React.CSSProperties = {
+  width: "100%", padding: "8px 12px", background: "#F8F6F1",
+  border: "1.5px solid rgba(13,43,31,0.12)", borderRadius: "7px", fontSize: "13px",
+  color: "#000000", fontFamily: "'DM Sans', sans-serif", outlineColor: "#2BA8E0",
+};
+
+function UserDetailModal({ user, onClose, onSave }: {
+  user: UserRow;
+  onClose: () => void;
+  onSave: (userId: string, changes: Partial<UserRow>) => Promise<void>;
+}) {
+  const [editing,        setEditing]        = useState(false);
+  const [draft,          setDraft]          = useState<UserEditableFields>({
+    full_name: user.full_name, city: user.city, phone: user.phone, email: user.email, is_verified: user.is_verified,
+  });
+  const [saving,         setSaving]         = useState(false);
+  const [togglingActive, setTogglingActive] = useState(false);
+
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [onClose]);
+
+  const startEditing = () => {
+    setDraft({ full_name: user.full_name, city: user.city, phone: user.phone, email: user.email, is_verified: user.is_verified });
+    setEditing(true);
+  };
+
+  const handleSave = async () => {
+    const changes: Partial<UserRow> = {};
+    (Object.keys(draft) as (keyof UserEditableFields)[]).forEach(key => {
+      if (draft[key] !== user[key]) (changes as Record<string, unknown>)[key] = draft[key];
+    });
+    if (Object.keys(changes).length === 0) { setEditing(false); return; }
+    setSaving(true);
+    await onSave(user.id, changes);
+    setSaving(false);
+    setEditing(false);
+  };
+
+  const handleToggleActive = async () => {
+    setTogglingActive(true);
+    await onSave(user.id, { is_active: !(user.is_active ?? true) });
+    setTogglingActive(false);
+  };
 
   const field = (label: string, value: React.ReactNode) => (
     <div>
@@ -660,6 +742,20 @@ function UserDetailModal({ user, onClose }: { user: UserRow; onClose: () => void
       <div style={{ fontSize: "13px", color: "#374151" }}>{value ?? "—"}</div>
     </div>
   );
+
+  const editField = (label: string, key: keyof Omit<UserEditableFields, "is_verified">) => (
+    <div>
+      <div style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" as const, color: "#9CA3AF", marginBottom: "3px" }}>{label}</div>
+      <input
+        type="text"
+        value={draft[key] ?? ""}
+        onChange={e => setDraft(d => ({ ...d, [key]: e.target.value || null }))}
+        style={userModalInputStyle}
+      />
+    </div>
+  );
+
+  const isActive = user.is_active !== false;
 
   return (
     <div
@@ -688,7 +784,7 @@ function UserDetailModal({ user, onClose }: { user: UserRow; onClose: () => void
                 <span style={{ display: "inline-block", padding: "2px 8px", borderRadius: "100px", fontSize: "9px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" as const, background: user.is_verified ? "rgba(45,106,79,0.1)" : "rgba(107,114,128,0.1)", color: user.is_verified ? "#065F46" : "#374151", border: `1px solid ${user.is_verified ? "rgba(45,106,79,0.3)" : "rgba(107,114,128,0.2)"}` }}>
                   {user.is_verified ? "Verified" : "Unverified"}
                 </span>
-                {user.is_active === false && (
+                {!isActive && (
                   <span style={{ display: "inline-block", padding: "2px 8px", borderRadius: "100px", fontSize: "9px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" as const, background: "rgba(239,68,68,0.1)", color: "#B91C1C", border: "1px solid rgba(239,68,68,0.3)" }}>
                     Inactive
                   </span>
@@ -701,27 +797,90 @@ function UserDetailModal({ user, onClose }: { user: UserRow; onClose: () => void
               </div>
             </div>
           </div>
-          <button
-            onClick={onClose}
-            aria-label="Close user details"
-            style={{ width: "30px", height: "30px", borderRadius: "8px", background: "#F8F6F1", border: "1px solid rgba(13,43,31,0.1)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: "#374151", flexShrink: 0 }}
-          >
-            <IconX />
-          </button>
+          <div style={{ display: "flex", alignItems: "center", gap: "8px", flexShrink: 0 }}>
+            {!editing && (
+              <button
+                onClick={startEditing}
+                style={{ padding: "7px 14px", borderRadius: "8px", background: "rgba(43,168,224,0.1)", color: "#0B6E96", border: "1.5px solid rgba(43,168,224,0.3)", fontSize: "11px", fontWeight: 700, cursor: "pointer", fontFamily: "'DM Sans', sans-serif" }}
+              >
+                Edit
+              </button>
+            )}
+            <button
+              onClick={onClose}
+              aria-label="Close user details"
+              style={{ width: "30px", height: "30px", borderRadius: "8px", background: "#F8F6F1", border: "1px solid rgba(13,43,31,0.1)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: "#374151", flexShrink: 0 }}
+            >
+              <IconX />
+            </button>
+          </div>
         </div>
+
+        {/* Deactivate/Reactivate — prominent, not buried in the edit form */}
+        <button
+          onClick={() => void handleToggleActive()}
+          disabled={togglingActive}
+          style={{
+            width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: "8px",
+            padding: "10px", borderRadius: "9px", marginBottom: "18px", fontSize: "12px", fontWeight: 700,
+            letterSpacing: "0.04em", fontFamily: "'DM Sans', sans-serif", cursor: togglingActive ? "not-allowed" : "pointer",
+            opacity: togglingActive ? 0.6 : 1,
+            background: isActive ? "rgba(239,68,68,0.08)" : "rgba(52,211,153,0.1)",
+            color: isActive ? "#B91C1C" : "#065F46",
+            border: `1.5px solid ${isActive ? "rgba(239,68,68,0.3)" : "rgba(52,211,153,0.35)"}`,
+          }}
+        >
+          {togglingActive ? "Updating…" : isActive ? "Deactivate Account" : "Reactivate Account"}
+        </button>
 
         {/* Fields */}
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px 20px", paddingTop: "18px", borderTop: "1px solid rgba(13,43,31,0.07)" }}>
-          {field("Email", user.email ? <a href={`mailto:${user.email}`} style={{ color: "#374151" }}>{user.email}</a> : null)}
-          {field("Phone", user.phone)}
-          {field("WhatsApp", user.whatsapp)}
-          {field("City", user.city)}
-          {field("Nationality", user.nationality)}
-          {field("Joined", fmtDate(user.created_at))}
-          {field("Role", user.role ?? "buyer")}
-        </div>
+        {editing ? (
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px 20px", paddingTop: "18px", borderTop: "1px solid rgba(13,43,31,0.07)" }}>
+            {editField("Full Name", "full_name")}
+            {editField("Email", "email")}
+            {editField("Phone", "phone")}
+            {editField("City", "city")}
+            <label style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "12px", color: "#374151", cursor: "pointer" }}>
+              <input
+                type="checkbox"
+                checked={draft.is_verified ?? false}
+                onChange={e => setDraft(d => ({ ...d, is_verified: e.target.checked }))}
+              />
+              Verified
+            </label>
+          </div>
+        ) : (
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px 20px", paddingTop: "18px", borderTop: "1px solid rgba(13,43,31,0.07)" }}>
+            {field("Email", user.email ? <a href={`mailto:${user.email}`} style={{ color: "#374151" }}>{user.email}</a> : null)}
+            {field("Phone", user.phone)}
+            {field("WhatsApp", user.whatsapp)}
+            {field("City", user.city)}
+            {field("Nationality", user.nationality)}
+            {field("Joined", fmtDate(user.created_at))}
+            {field("Role", user.role ?? "buyer")}
+          </div>
+        )}
 
-        {user.bio && (
+        {editing && (
+          <div style={{ display: "flex", gap: "10px", marginTop: "20px" }}>
+            <button
+              onClick={() => void handleSave()}
+              disabled={saving}
+              style={{ flex: 1, padding: "10px", borderRadius: "9px", background: "#2BA8E0", color: "#000000", border: "none", fontWeight: 700, fontSize: "12px", cursor: saving ? "not-allowed" : "pointer", opacity: saving ? 0.6 : 1, fontFamily: "'DM Sans', sans-serif" }}
+            >
+              {saving ? "Saving…" : "Save Changes"}
+            </button>
+            <button
+              onClick={() => setEditing(false)}
+              disabled={saving}
+              style={{ flex: 1, padding: "10px", borderRadius: "9px", background: "#F8F6F1", color: "#374151", border: "1px solid rgba(13,43,31,0.1)", fontWeight: 600, fontSize: "12px", cursor: "pointer", fontFamily: "'DM Sans', sans-serif" }}
+            >
+              Cancel
+            </button>
+          </div>
+        )}
+
+        {!editing && user.bio && (
           <div style={{ marginTop: "18px" }}>
             <div style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" as const, color: "#9CA3AF", marginBottom: "5px" }}>Bio</div>
             <div style={{ background: "#F8F6F1", borderRadius: "8px", padding: "10px 14px", fontSize: "12px", color: "#374151", lineHeight: 1.6 }}>{user.bio}</div>
@@ -734,16 +893,18 @@ function UserDetailModal({ user, onClose }: { user: UserRow; onClose: () => void
 }
 
 function UsersSection({
-  users, loading, onRoleChange,
+  users, loading, onRoleChange, onUpdateUser,
 }: {
   users: UserRow[];
   loading: boolean;
   onRoleChange: (userId: string, newRole: string) => void;
+  onUpdateUser: (userId: string, changes: Partial<UserRow>) => Promise<void>;
 }) {
   const [search,     setSearch]     = useState("");
   const [roleFilter, setRoleFilter] = useState<string>("all");
   const [sort,       setSort]       = useState<UserSort>("newest");
-  const [selected,   setSelected]   = useState<UserRow | null>(null);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const selected = users.find(u => u.id === selectedId) ?? null;
 
   const filtered = React.useMemo(() => {
     const q = search.trim().toLowerCase();
@@ -833,10 +994,10 @@ function UsersSection({
           {filtered.map(u => (
             <div
               key={u.id}
-              onClick={() => setSelected(u)}
+              onClick={() => setSelectedId(u.id)}
               role="button"
               tabIndex={0}
-              onKeyDown={e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setSelected(u); } }}
+              onKeyDown={e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setSelectedId(u.id); } }}
               style={{ background: "rgba(255,255,255,0.05)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", borderRadius: "12px", border: "1px solid rgba(255,255,255,0.08)", padding: "16px 20px", display: "flex", alignItems: "center", gap: "16px", flexWrap: "wrap", cursor: "pointer" }}
             >
               {/* Avatar */}
@@ -873,14 +1034,28 @@ function UsersSection({
         </div>
       )}
 
-      {selected && <UserDetailModal user={selected} onClose={() => setSelected(null)} />}
+      {selected && (
+        <UserDetailModal
+          user={selected}
+          onClose={() => setSelectedId(null)}
+          onSave={onUpdateUser}
+        />
+      )}
     </div>
   );
 }
 
 // ── Section: All Inquiries ─────────────────────────────────────────────────────
 
-function InquiriesSection({ inquiries, loading }: { inquiries: InquiryRow[]; loading: boolean }) {
+function InquiriesSection({
+  inquiries, loading, inFlight, onDelete, onMarkSpam,
+}: {
+  inquiries: InquiryRow[];
+  loading: boolean;
+  inFlight: string | null;
+  onDelete: (id: string) => void;
+  onMarkSpam: (id: string) => void;
+}) {
   if (loading) return <Spinner />;
   return (
     <div>
@@ -891,51 +1066,76 @@ function InquiriesSection({ inquiries, loading }: { inquiries: InquiryRow[]; loa
         </div>
       ) : (
         <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-          {inquiries.map(inq => (
-            <div key={inq.id} style={{ background: "rgba(255,255,255,0.05)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", borderRadius: "12px", border: "1px solid rgba(255,255,255,0.08)", padding: "18px 22px" }}>
-              {/* Header */}
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: "12px", flexWrap: "wrap", marginBottom: "10px" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
-                  <span style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "18px", fontWeight: 600, color: "#E8EAED" }}>
-                    {inq.inquirer_name ?? "Anonymous"}
-                  </span>
-                  {inq.inquiry_type && (
-                    <span style={{ display: "inline-block", padding: "2px 8px", borderRadius: "100px", fontSize: "9px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" as const, background: inq.inquiry_type === "viewing" ? "rgba(52,211,153,0.1)" : "rgba(43,168,224,0.12)", color: inq.inquiry_type === "viewing" ? "#34D399" : "#2BA8E0", border: `1px solid ${inq.inquiry_type === "viewing" ? "rgba(52,211,153,0.25)" : "rgba(43,168,224,0.3)"}` }}>
-                      {inq.inquiry_type}
+          {inquiries.map(inq => {
+            const isSpam = inq.status === "spam";
+            const busy = inFlight === inq.id;
+            return (
+              <div key={inq.id} style={{ background: "rgba(255,255,255,0.05)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", borderRadius: "12px", border: "1px solid rgba(255,255,255,0.08)", padding: "18px 22px", opacity: busy ? 0.55 : 1, transition: "opacity 0.2s" }}>
+                {/* Header */}
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: "12px", flexWrap: "wrap", marginBottom: "10px" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
+                    <span style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "18px", fontWeight: 600, color: "#E8EAED" }}>
+                      {inq.inquirer_name ?? "Anonymous"}
                     </span>
+                    {inq.inquiry_type && (
+                      <span style={{ display: "inline-block", padding: "2px 8px", borderRadius: "100px", fontSize: "9px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" as const, background: inq.inquiry_type === "viewing" ? "rgba(52,211,153,0.1)" : "rgba(43,168,224,0.12)", color: inq.inquiry_type === "viewing" ? "#34D399" : "#2BA8E0", border: `1px solid ${inq.inquiry_type === "viewing" ? "rgba(52,211,153,0.25)" : "rgba(43,168,224,0.3)"}` }}>
+                        {inq.inquiry_type}
+                      </span>
+                    )}
+                    {inq.status && (
+                      <span style={{ display: "inline-block", padding: "2px 8px", borderRadius: "100px", fontSize: "9px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" as const, background: isSpam ? "rgba(248,113,113,0.12)" : "rgba(255,255,255,0.07)", color: isSpam ? "#F87171" : "#AEB4BC", border: `1px solid ${isSpam ? "rgba(248,113,113,0.3)" : "rgba(255,255,255,0.1)"}` }}>
+                        {inq.status}
+                      </span>
+                    )}
+                  </div>
+                  <span style={{ fontSize: "11px", color: "rgba(255,255,255,0.45)", flexShrink: 0 }}>{fmtDate(inq.created_at)}</span>
+                </div>
+                {/* Property */}
+                {inq.property_title && (
+                  <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "8px", fontSize: "12px", color: "#AEB4BC" }}>
+                    <IconBuilding />
+                    {inq.property_slug
+                      ? <a href={`/property/${inq.property_slug}`} style={{ color: "#E8EAED", fontWeight: 500, textDecoration: "none" }}>{inq.property_title}</a>
+                      : <span style={{ color: "#E8EAED", fontWeight: 500 }}>{inq.property_title}</span>
+                    }
+                    {inq.seller_email && <span style={{ color: "rgba(255,255,255,0.45)" }}>→ {inq.seller_email}</span>}
+                  </div>
+                )}
+                {/* Contact */}
+                <div style={{ display: "flex", gap: "16px", flexWrap: "wrap", marginBottom: inq.message ? "10px" : 0, fontSize: "12px" }}>
+                  {inq.inquirer_phone && <a href={`tel:${inq.inquirer_phone}`} style={{ color: "#AEB4BC", textDecoration: "none" }}>{inq.inquirer_phone}</a>}
+                  {inq.inquirer_email && <a href={`mailto:${inq.inquirer_email}`} style={{ color: "#AEB4BC", textDecoration: "none" }}>{inq.inquirer_email}</a>}
+                </div>
+                {/* Message */}
+                {inq.message && (
+                  <div style={{ background: "rgba(255,255,255,0.04)", borderRadius: "8px", padding: "10px 14px", fontSize: "12px", color: "#AEB4BC", lineHeight: 1.6, borderLeft: "3px solid rgba(43,168,224,0.4)", marginBottom: "12px" }}>
+                    {inq.message}
+                  </div>
+                )}
+                {/* Actions */}
+                <div style={{ display: "flex", gap: "8px", alignItems: "center", flexWrap: "wrap" }}>
+                  {!isSpam && (
+                    <button
+                      onClick={() => onMarkSpam(inq.id)}
+                      disabled={busy}
+                      style={{ display: "flex", alignItems: "center", gap: "6px", padding: "7px 14px", borderRadius: "7px", fontSize: "11px", fontWeight: 600, background: "rgba(245,158,11,0.1)", color: "#F59E0B", border: "1.5px solid rgba(245,158,11,0.3)", cursor: busy ? "not-allowed" : "pointer", fontFamily: "'DM Sans', sans-serif", opacity: busy ? 0.6 : 1 }}
+                    >
+                      Mark as Spam
+                    </button>
                   )}
-                  {inq.status && (
-                    <span style={{ display: "inline-block", padding: "2px 8px", borderRadius: "100px", fontSize: "9px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" as const, background: "rgba(255,255,255,0.07)", color: "#AEB4BC", border: "1px solid rgba(255,255,255,0.1)" }}>
-                      {inq.status}
-                    </span>
-                  )}
+                  <button
+                    onClick={() => {
+                      if (window.confirm("Permanently delete this inquiry? This cannot be undone.")) onDelete(inq.id);
+                    }}
+                    disabled={busy}
+                    style={{ display: "flex", alignItems: "center", gap: "6px", padding: "7px 14px", borderRadius: "7px", fontSize: "11px", fontWeight: 600, background: "rgba(248,113,113,0.1)", color: "#F87171", border: "1.5px solid rgba(248,113,113,0.3)", cursor: busy ? "not-allowed" : "pointer", fontFamily: "'DM Sans', sans-serif", opacity: busy ? 0.6 : 1 }}
+                  >
+                    <IconReject /> Delete
+                  </button>
                 </div>
-                <span style={{ fontSize: "11px", color: "rgba(255,255,255,0.45)", flexShrink: 0 }}>{fmtDate(inq.created_at)}</span>
               </div>
-              {/* Property */}
-              {inq.property_title && (
-                <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "8px", fontSize: "12px", color: "#AEB4BC" }}>
-                  <IconBuilding />
-                  {inq.property_slug
-                    ? <a href={`/property/${inq.property_slug}`} style={{ color: "#E8EAED", fontWeight: 500, textDecoration: "none" }}>{inq.property_title}</a>
-                    : <span style={{ color: "#E8EAED", fontWeight: 500 }}>{inq.property_title}</span>
-                  }
-                  {inq.seller_email && <span style={{ color: "rgba(255,255,255,0.45)" }}>→ {inq.seller_email}</span>}
-                </div>
-              )}
-              {/* Contact */}
-              <div style={{ display: "flex", gap: "16px", flexWrap: "wrap", marginBottom: inq.message ? "10px" : 0, fontSize: "12px" }}>
-                {inq.inquirer_phone && <a href={`tel:${inq.inquirer_phone}`} style={{ color: "#AEB4BC", textDecoration: "none" }}>{inq.inquirer_phone}</a>}
-                {inq.inquirer_email && <a href={`mailto:${inq.inquirer_email}`} style={{ color: "#AEB4BC", textDecoration: "none" }}>{inq.inquirer_email}</a>}
-              </div>
-              {/* Message */}
-              {inq.message && (
-                <div style={{ background: "rgba(255,255,255,0.04)", borderRadius: "8px", padding: "10px 14px", fontSize: "12px", color: "#AEB4BC", lineHeight: 1.6, borderLeft: "3px solid rgba(43,168,224,0.4)" }}>
-                  {inq.message}
-                </div>
-              )}
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>
@@ -1273,6 +1473,285 @@ function AgentsSection({
   );
 }
 
+// ── Section: Reports ─────────────────────────────────────────────────────────────
+
+const REPORT_STATUS_FILTERS = ["open", "resolved", "dismissed"] as const;
+type ReportStatusFilter = typeof REPORT_STATUS_FILTERS[number];
+
+function ReportCard({
+  report, listingPreview, profilePreview, busy, onDismiss, onResolve, onRejectListing, onDeactivateUser,
+}: {
+  report: ReportRow;
+  listingPreview: ReportListingPreview | undefined;
+  profilePreview: ReportProfilePreview | undefined;
+  busy: boolean;
+  onDismiss: () => void;
+  onResolve: () => void;
+  onRejectListing: () => void;
+  onDeactivateUser: () => void;
+}) {
+  const isOpen = report.status === "open";
+  return (
+    <div style={{ background: "rgba(255,255,255,0.05)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", borderRadius: "14px", border: "1px solid rgba(255,255,255,0.08)", boxShadow: "0 4px 24px rgba(0,0,0,0.18)", padding: "18px 22px", opacity: busy ? 0.55 : 1, transition: "opacity 0.2s" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: "12px", flexWrap: "wrap", marginBottom: "10px" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
+          <span style={{ display: "inline-block", padding: "2px 8px", borderRadius: "100px", fontSize: "9px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" as const, background: report.status === "open" ? "rgba(245,158,11,0.15)" : report.status === "resolved" ? "rgba(52,211,153,0.15)" : "rgba(255,255,255,0.08)", color: report.status === "open" ? "#F59E0B" : report.status === "resolved" ? "#34D399" : "#AEB4BC", border: `1px solid ${report.status === "open" ? "rgba(245,158,11,0.3)" : report.status === "resolved" ? "rgba(52,211,153,0.3)" : "rgba(255,255,255,0.12)"}` }}>
+            {report.status}
+          </span>
+          <span style={{ display: "inline-block", padding: "2px 8px", borderRadius: "100px", fontSize: "9px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" as const, background: "rgba(43,168,224,0.12)", color: "#2BA8E0", border: "1px solid rgba(43,168,224,0.25)" }}>
+            {report.entity_type}
+          </span>
+          <span style={{ fontSize: "12px", fontWeight: 600, color: "#E8EAED" }}>{report.reason}</span>
+        </div>
+        <span style={{ fontSize: "11px", color: "rgba(255,255,255,0.45)", flexShrink: 0 }}>{fmtDateTime(report.created_at)}</span>
+      </div>
+
+      {/* Reported entity preview */}
+      <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "8px", fontSize: "12px", color: "#AEB4BC" }}>
+        {report.entity_type === "listing" ? (
+          listingPreview?.slug ? (
+            <a href={`/property/${listingPreview.slug}`} target="_blank" rel="noopener noreferrer" style={{ color: "#E8EAED", fontWeight: 500, textDecoration: "none" }}>
+              {listingPreview.title ?? "View listing"} <IconArrow />
+            </a>
+          ) : (
+            <span>{listingPreview?.title ?? "Listing unavailable (may have been deleted)"}</span>
+          )
+        ) : (
+          <span style={{ color: "#E8EAED", fontWeight: 500 }}>
+            {profilePreview?.full_name ?? profilePreview?.email ?? "Profile unavailable"}
+            {profilePreview?.is_active === false && <span style={{ color: "#F87171", fontWeight: 700 }}> · Inactive</span>}
+          </span>
+        )}
+      </div>
+
+      {/* Reporter */}
+      <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.45)", marginBottom: report.details ? "8px" : "12px" }}>
+        Reported by <span style={{ color: "#AEB4BC", fontWeight: 600 }}>{report.profiles?.full_name ?? report.profiles?.email ?? "Unknown user"}</span>
+      </div>
+
+      {report.details && (
+        <div style={{ background: "rgba(255,255,255,0.04)", borderRadius: "8px", padding: "10px 14px", fontSize: "12px", color: "#AEB4BC", lineHeight: 1.6, borderLeft: "3px solid rgba(43,168,224,0.4)", marginBottom: "12px" }}>
+          {report.details}
+        </div>
+      )}
+
+      {!isOpen && report.resolved_at && (
+        <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.4)", marginBottom: "10px" }}>
+          {report.status === "resolved" ? "Resolved" : "Dismissed"} {fmtDateTime(report.resolved_at)}
+        </div>
+      )}
+
+      {isOpen && (
+        <div style={{ display: "flex", gap: "8px", alignItems: "center", flexWrap: "wrap" }}>
+          <button
+            onClick={onResolve}
+            disabled={busy}
+            style={{ display: "flex", alignItems: "center", gap: "6px", padding: "7px 14px", borderRadius: "7px", fontSize: "11px", fontWeight: 700, background: "#2BA8E0", color: "#000000", border: "none", cursor: busy ? "not-allowed" : "pointer", fontFamily: "'DM Sans', sans-serif", opacity: busy ? 0.6 : 1 }}
+          >
+            <IconApprove /> Resolve
+          </button>
+          <button
+            onClick={onDismiss}
+            disabled={busy}
+            style={{ display: "flex", alignItems: "center", gap: "6px", padding: "7px 14px", borderRadius: "7px", fontSize: "11px", fontWeight: 600, background: "rgba(255,255,255,0.06)", color: "#AEB4BC", border: "1.5px solid rgba(255,255,255,0.12)", cursor: busy ? "not-allowed" : "pointer", fontFamily: "'DM Sans', sans-serif", opacity: busy ? 0.6 : 1 }}
+          >
+            Dismiss
+          </button>
+          {report.entity_type === "listing" && listingPreview && listingPreview.status !== "rejected" && (
+            <button
+              onClick={() => {
+                if (window.confirm("Reject this listing and resolve the report?")) onRejectListing();
+              }}
+              disabled={busy}
+              style={{ display: "flex", alignItems: "center", gap: "6px", padding: "7px 14px", borderRadius: "7px", fontSize: "11px", fontWeight: 600, background: "rgba(248,113,113,0.1)", color: "#F87171", border: "1.5px solid rgba(248,113,113,0.3)", cursor: busy ? "not-allowed" : "pointer", fontFamily: "'DM Sans', sans-serif", opacity: busy ? 0.6 : 1 }}
+            >
+              <IconReject /> Reject Listing
+            </button>
+          )}
+          {report.entity_type === "profile" && profilePreview && profilePreview.is_active !== false && (
+            <button
+              onClick={() => {
+                if (window.confirm("Deactivate this user's account and resolve the report?")) onDeactivateUser();
+              }}
+              disabled={busy}
+              style={{ display: "flex", alignItems: "center", gap: "6px", padding: "7px 14px", borderRadius: "7px", fontSize: "11px", fontWeight: 600, background: "rgba(248,113,113,0.1)", color: "#F87171", border: "1.5px solid rgba(248,113,113,0.3)", cursor: busy ? "not-allowed" : "pointer", fontFamily: "'DM Sans', sans-serif", opacity: busy ? 0.6 : 1 }}
+            >
+              Deactivate User
+            </button>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function ReportsSection({
+  reports, loading, inFlight, listingPreviews, profilePreviews,
+  onDismiss, onResolve, onRejectListing, onDeactivateUser,
+}: {
+  reports: ReportRow[];
+  loading: boolean;
+  inFlight: string | null;
+  listingPreviews: Record<string, ReportListingPreview>;
+  profilePreviews: Record<string, ReportProfilePreview>;
+  onDismiss: (id: string) => void;
+  onResolve: (id: string) => void;
+  onRejectListing: (report: ReportRow) => void;
+  onDeactivateUser: (report: ReportRow) => void;
+}) {
+  const [filter, setFilter] = useState<ReportStatusFilter>("open");
+  const filtered = reports.filter(r => r.status === filter);
+
+  if (loading) return <Spinner />;
+
+  return (
+    <div>
+      <SectionHeading title="Reports" subtitle="User-submitted reports on listings and profiles." count={filtered.length} />
+
+      <div style={{ display: "flex", gap: "6px", flexWrap: "wrap", marginBottom: "18px" }}>
+        {REPORT_STATUS_FILTERS.map(f => {
+          const on = filter === f;
+          return (
+            <button
+              key={f}
+              onClick={() => setFilter(f)}
+              style={{ padding: "6px 14px", borderRadius: "100px", fontSize: "11px", fontWeight: on ? 700 : 500, background: on ? "#2BA8E0" : "rgba(255,255,255,0.06)", color: on ? "#000000" : "#AEB4BC", border: on ? "1.5px solid #2BA8E0" : "1.5px solid rgba(255,255,255,0.12)", cursor: "pointer", fontFamily: "'DM Sans', sans-serif", textTransform: "capitalize" as const }}
+            >
+              {f} ({reports.filter(r => r.status === f).length})
+            </button>
+          );
+        })}
+      </div>
+
+      {filtered.length === 0 ? (
+        <div style={{ padding: "60px 24px", textAlign: "center", background: "rgba(255,255,255,0.05)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", borderRadius: "18px", border: "1px solid rgba(255,255,255,0.08)" }}>
+          <p style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "20px", color: "#E8EAED" }}>No {filter} reports</p>
+        </div>
+      ) : (
+        <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
+          {filtered.map(r => (
+            <ReportCard
+              key={r.id}
+              report={r}
+              listingPreview={listingPreviews[r.entity_id]}
+              profilePreview={profilePreviews[r.entity_id]}
+              busy={inFlight === r.id || inFlight === r.entity_id}
+              onDismiss={() => onDismiss(r.id)}
+              onResolve={() => onResolve(r.id)}
+              onRejectListing={() => onRejectListing(r)}
+              onDeactivateUser={() => onDeactivateUser(r)}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── Section: Audit Log ──────────────────────────────────────────────────────────
+
+const AUDIT_ENTITY_TYPES = ["property_listing", "profile", "agent_profile"] as const;
+
+function DiffBlock({ label, data }: { label: string; data: Record<string, unknown> | null }) {
+  return (
+    <div style={{ flex: "1 1 200px", minWidth: 0 }}>
+      <div style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: "rgba(255,255,255,0.45)", marginBottom: "6px" }}>{label}</div>
+      <pre style={{ margin: 0, fontSize: "11px", lineHeight: 1.6, color: "#AEB4BC", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: "8px", padding: "10px 12px", overflowX: "auto", fontFamily: "'DM Sans', sans-serif" }}>
+        {data ? JSON.stringify(data, null, 2) : "—"}
+      </pre>
+    </div>
+  );
+}
+
+function AuditLogRow_({ entry }: { entry: AuditLogRow }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div style={{ background: "rgba(255,255,255,0.05)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", borderRadius: "12px", border: "1px solid rgba(255,255,255,0.08)", overflow: "hidden" }}>
+      <button
+        onClick={() => setOpen(v => !v)}
+        style={{ width: "100%", display: "flex", alignItems: "center", gap: "14px", padding: "14px 18px", background: "transparent", border: "none", cursor: "pointer", textAlign: "left" as const, fontFamily: "'DM Sans', sans-serif", flexWrap: "wrap" }}
+      >
+        <span style={{ fontSize: "11px", color: "rgba(255,255,255,0.45)", flexShrink: 0 }}>{fmtDateTime(entry.created_at)}</span>
+        <span style={{ fontSize: "13px", fontWeight: 600, color: "#E8EAED", flexShrink: 0 }}>{entry.profiles?.full_name ?? entry.profiles?.email ?? "Unknown admin"}</span>
+        <span style={{ padding: "2px 9px", borderRadius: "100px", fontSize: "10px", fontWeight: 700, letterSpacing: "0.04em", background: "rgba(43,168,224,0.12)", color: "#2BA8E0", border: "1px solid rgba(43,168,224,0.25)", flexShrink: 0 }}>
+          {entry.action}
+        </span>
+        <span style={{ fontSize: "11px", color: "rgba(255,255,255,0.45)", flexShrink: 0 }}>{entry.entity_type}</span>
+        <span style={{ marginLeft: "auto", color: "rgba(255,255,255,0.45)", display: "flex", alignItems: "center", transform: open ? "rotate(180deg)" : "none", transition: "transform 0.15s" }}>
+          <IconChevron />
+        </span>
+      </button>
+      {open && (
+        <div style={{ display: "flex", gap: "16px", flexWrap: "wrap", padding: "0 18px 16px" }}>
+          <DiffBlock label="Before" data={entry.before_data} />
+          <DiffBlock label="After" data={entry.after_data} />
+        </div>
+      )}
+    </div>
+  );
+}
+
+function AuditLogSection({ entries, loading }: { entries: AuditLogRow[]; loading: boolean }) {
+  const [entityFilter, setEntityFilter] = useState<string>("all");
+  const [actorFilter,  setActorFilter]  = useState<string>("all");
+
+  const actors = React.useMemo(() => {
+    const map = new Map<string, string>();
+    for (const e of entries) map.set(e.actor_id, e.profiles?.full_name ?? e.profiles?.email ?? "Unknown admin");
+    return Array.from(map.entries());
+  }, [entries]);
+
+  const filtered = entries.filter(e =>
+    (entityFilter === "all" || e.entity_type === entityFilter) &&
+    (actorFilter === "all" || e.actor_id === actorFilter)
+  );
+
+  if (loading) return <Spinner />;
+
+  return (
+    <div>
+      <SectionHeading title="Audit Log" subtitle="Every admin write action, in reverse-chronological order." count={filtered.length} />
+
+      <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", marginBottom: "18px" }}>
+        <div style={{ position: "relative", flexShrink: 0 }}>
+          <select
+            value={entityFilter}
+            onChange={e => setEntityFilter(e.target.value)}
+            aria-label="Filter by entity type"
+            style={{ padding: "9px 28px 9px 12px", background: "rgba(255,255,255,0.06)", border: "1.5px solid rgba(255,255,255,0.12)", borderRadius: "9px", fontSize: "12px", color: "#E8EAED", fontFamily: "'DM Sans', sans-serif", outline: "none", appearance: "none", cursor: "pointer" }}
+          >
+            <option value="all">All entity types</option>
+            {AUDIT_ENTITY_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
+          </select>
+          <span style={{ position: "absolute", right: 8, top: "50%", transform: "translateY(-50%)", pointerEvents: "none", color: "rgba(255,255,255,0.45)", fontSize: 9 }}>▼</span>
+        </div>
+        <div style={{ position: "relative", flexShrink: 0 }}>
+          <select
+            value={actorFilter}
+            onChange={e => setActorFilter(e.target.value)}
+            aria-label="Filter by actor"
+            style={{ padding: "9px 28px 9px 12px", background: "rgba(255,255,255,0.06)", border: "1.5px solid rgba(255,255,255,0.12)", borderRadius: "9px", fontSize: "12px", color: "#E8EAED", fontFamily: "'DM Sans', sans-serif", outline: "none", appearance: "none", cursor: "pointer" }}
+          >
+            <option value="all">All actors</option>
+            {actors.map(([id, name]) => <option key={id} value={id}>{name}</option>)}
+          </select>
+          <span style={{ position: "absolute", right: 8, top: "50%", transform: "translateY(-50%)", pointerEvents: "none", color: "rgba(255,255,255,0.45)", fontSize: 9 }}>▼</span>
+        </div>
+      </div>
+
+      {filtered.length === 0 ? (
+        <div style={{ padding: "60px 24px", textAlign: "center", background: "rgba(255,255,255,0.05)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", borderRadius: "18px", border: "1px solid rgba(255,255,255,0.08)" }}>
+          <p style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "20px", color: "#E8EAED" }}>No matching audit entries</p>
+        </div>
+      ) : (
+        <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+          {filtered.map(e => <AuditLogRow_ key={e.id} entry={e} />)}
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ── Sidebar nav ────────────────────────────────────────────────────────────────
 
 const NAV: { id: AdminSection; label: string; icon: React.ReactNode }[] = [
@@ -1283,6 +1762,8 @@ const NAV: { id: AdminSection; label: string; icon: React.ReactNode }[] = [
   { id: "agents",     label: "Agent Applications", icon: <IconBriefcase /> },
   { id: "users",      label: "All Users",          icon: <IconUsers /> },
   { id: "inquiries",  label: "All Inquiries",      icon: <IconMsg /> },
+  { id: "reports",    label: "Reports",            icon: <IconFlag /> },
+  { id: "audit",      label: "Audit Log",          icon: <IconAudit /> },
 ];
 
 // ── Main page ──────────────────────────────────────────────────────────────────
@@ -1301,7 +1782,7 @@ export default function AdminPage() {
   const [sidebarOpen,  setSidebarOpen]  = useState(false);
   const [toast,        setToast]        = useState<{ ok: boolean; msg: string } | null>(null);
 
-  const [stats,        setStats]        = useState<Stats>({ pending: 0, active: 0, rejected: 0, users: 0, inquiries: 0 });
+  const [stats,        setStats]        = useState<Stats>({ pending: 0, active: 0, rejected: 0, users: 0, inquiries: 0, reportsOpen: 0 });
   const [statsLoading, setStatsLoading] = useState(true);
 
   const [pendingListings,  setPendingListings]  = useState<AdminListing[]>([]);
@@ -1311,6 +1792,10 @@ export default function AdminPage() {
   const [inquiries,        setInquiries]        = useState<InquiryRow[]>([]);
   const [agentApps,        setAgentApps]        = useState<AgentApplication[]>([]);
   const [approvedAgents,   setApprovedAgents]   = useState<ApprovedAgentOption[]>([]);
+  const [auditLog,         setAuditLog]         = useState<AuditLogRow[]>([]);
+  const [reports,          setReports]          = useState<ReportRow[]>([]);
+  const [reportListingPreviews, setReportListingPreviews] = useState<Record<string, ReportListingPreview>>({});
+  const [reportProfilePreviews, setReportProfilePreviews] = useState<Record<string, ReportProfilePreview>>({});
 
   const [pendingLoading,  setPendingLoading]  = useState(false);
   const [approvedLoading, setApprovedLoading] = useState(false);
@@ -1318,6 +1803,8 @@ export default function AdminPage() {
   const [usersLoading,    setUsersLoading]    = useState(false);
   const [inquiriesLoading, setInquiriesLoading] = useState(false);
   const [agentAppsLoading, setAgentAppsLoading] = useState(false);
+  const [auditLoading,     setAuditLoading]     = useState(false);
+  const [reportsLoading,   setReportsLoading]   = useState(false);
 
   const [inFlight, setInFlight] = useState<string | null>(null);
 
@@ -1364,12 +1851,14 @@ export default function AdminPage() {
         { count: rejected },
         { count: users },
         { count: inquiries },
+        { count: reportsOpen },
       ] = await Promise.all([
         supabase.from("property_listings").select("*", { count: "exact", head: true }).eq("status", "pending_review"),
         supabase.from("property_listings").select("*", { count: "exact", head: true }).eq("status", "active"),
         supabase.from("property_listings").select("*", { count: "exact", head: true }).eq("status", "rejected"),
         supabase.from("profiles").select("*", { count: "exact", head: true }),
         supabase.from("inquiries").select("*", { count: "exact", head: true }),
+        supabase.from("reports").select("*", { count: "exact", head: true }).eq("status", "open"),
       ]);
       setStats({
         pending:   pending   ?? 0,
@@ -1377,6 +1866,7 @@ export default function AdminPage() {
         rejected:  rejected  ?? 0,
         users:     users     ?? 0,
         inquiries: inquiries ?? 0,
+        reportsOpen: reportsOpen ?? 0,
       });
       setStatsLoading(false);
     }
@@ -1466,8 +1956,65 @@ export default function AdminPage() {
           setAgentApps((res.data as AgentApplication[] | null) ?? []);
           setAgentAppsLoading(false);
         });
+    } else if (active === "audit") {
+      setAuditLoading(true);
+      supabase
+        .from("admin_audit_log")
+        .select("id, actor_id, action, entity_type, entity_id, before_data, after_data, created_at, profiles(full_name, email)")
+        .order("created_at", { ascending: false })
+        .limit(300)
+        .then((res: { data: unknown }) => {
+          setAuditLog((res.data as AuditLogRow[] | null) ?? []);
+          setAuditLoading(false);
+        });
+    } else if (active === "reports") {
+      setReportsLoading(true);
+      (async () => {
+        const { data } = await supabase
+          .from("reports")
+          .select("id, reporter_id, entity_type, entity_id, reason, details, status, created_at, resolved_at, resolved_by, profiles!reporter_id(full_name, email)")
+          .order("created_at", { ascending: false })
+          .limit(300);
+        const rows = (data as ReportRow[] | null) ?? [];
+        setReports(rows);
+
+        const listingIds = Array.from(new Set(rows.filter(r => r.entity_type === "listing").map(r => r.entity_id)));
+        const profileIds = Array.from(new Set(rows.filter(r => r.entity_type === "profile").map(r => r.entity_id)));
+
+        if (listingIds.length > 0) {
+          const { data: listings } = await supabase.from("property_listings").select("id, slug, title, status").in("id", listingIds);
+          const map: Record<string, ReportListingPreview> = {};
+          for (const l of (listings as ReportListingPreview[] | null) ?? []) map[l.id] = l;
+          setReportListingPreviews(map);
+        }
+        if (profileIds.length > 0) {
+          const { data: profs } = await supabase.from("profiles").select("id, full_name, email, is_active").in("id", profileIds);
+          const map: Record<string, ReportProfilePreview> = {};
+          for (const p of (profs as ReportProfilePreview[] | null) ?? []) map[p.id] = p;
+          setReportProfilePreviews(map);
+        }
+        setReportsLoading(false);
+      })();
     }
   }, [active, isAdmin]);
+
+  const logAdminAction = useCallback(async (
+    action: string,
+    entityType: string,
+    entityId: string | null,
+    before: Record<string, unknown> | null,
+    after: Record<string, unknown> | null,
+  ) => {
+    const supabase = createClient();
+    const { error } = await supabase.rpc("log_admin_action", {
+      p_action: action,
+      p_entity_type: entityType,
+      p_entity_id: entityId,
+      p_before: before,
+      p_after: after,
+    });
+    if (error) console.error("Admin — audit log write failed:", error);
+  }, []);
 
   const handleListingStatus = useCallback(async (
     id: string,
@@ -1475,6 +2022,7 @@ export default function AdminPage() {
     fromSection: "pending" | "approved" | "rejected",
   ) => {
     setInFlight(id);
+    const oldStatus = fromSection === "pending" ? "pending_review" : fromSection === "approved" ? "active" : "rejected";
     const supabase = createClient();
     const { error } = await supabase.from("property_listings").update({ status: newStatus }).eq("id", id);
 
@@ -1482,6 +2030,7 @@ export default function AdminPage() {
       console.error("Admin — listing status error:", error);
       setToast({ ok: false, msg: "Update failed — please try again." });
     } else {
+      void logAdminAction("update_listing_status", "property_listing", id, { status: oldStatus }, { status: newStatus });
       if (fromSection === "pending") {
         setPendingListings(prev => prev.filter(l => l.id !== id));
         setStats(s => ({ ...s, pending: Math.max(0, s.pending - 1), ...(newStatus === "active" ? { active: s.active + 1 } : { rejected: s.rejected + 1 }) }));
@@ -1512,7 +2061,7 @@ export default function AdminPage() {
     }
     setInFlight(null);
     setTimeout(() => setToast(null), 3000);
-  }, []);
+  }, [logAdminAction]);
 
   const handleAssignAgent = useCallback(async (
     id: string,
@@ -1520,6 +2069,7 @@ export default function AdminPage() {
     fromSection: "pending" | "approved",
   ) => {
     setInFlight(id);
+    const oldAgentId = (fromSection === "pending" ? pendingListings : approvedListings).find(l => l.id === id)?.assigned_agent_id ?? null;
     const supabase = createClient();
     const { error } = await supabase.from("property_listings").update({ assigned_agent_id: agentId }).eq("id", id);
 
@@ -1527,6 +2077,7 @@ export default function AdminPage() {
       console.error("Admin — assign agent error:", error);
       setToast({ ok: false, msg: "Assignment failed — please try again." });
     } else {
+      void logAdminAction("assign_agent", "property_listing", id, { assigned_agent_id: oldAgentId }, { assigned_agent_id: agentId });
       const updater = (prev: AdminListing[]) => prev.map(l => l.id === id ? { ...l, assigned_agent_id: agentId } : l);
       if (fromSection === "pending") setPendingListings(updater);
       else setApprovedListings(updater);
@@ -1534,7 +2085,7 @@ export default function AdminPage() {
     }
     setInFlight(null);
     setTimeout(() => setToast(null), 2500);
-  }, []);
+  }, [pendingListings, approvedListings, logAdminAction]);
 
   const handleUserRole = useCallback(async (userId: string, newRole: string) => {
     const prev = users.find(u => u.id === userId)?.role ?? null;
@@ -1546,13 +2097,143 @@ export default function AdminPage() {
       setUsers(list => list.map(u => u.id === userId ? { ...u, role: prev } : u));
       setToast({ ok: false, msg: "Role update failed." });
     } else {
+      void logAdminAction("update_user_role", "profile", userId, { role: prev }, { role: newRole });
       setToast({ ok: true, msg: `Role updated to ${newRole}.` });
       setTimeout(() => setToast(null), 2500);
     }
-  }, [users]);
+  }, [users, logAdminAction]);
+
+  const handleUserUpdate = useCallback(async (userId: string, changes: Partial<UserRow>) => {
+    const supabase = createClient();
+    const keys = Object.keys(changes) as (keyof UserRow)[];
+
+    // Callers outside the Users tab (e.g. the Reports "Deactivate User"
+    // shortcut) may target a user who was never loaded into local `users`
+    // state — fetch the current row rather than silently no-op-ing.
+    let before: Partial<UserRow>;
+    const localUser = users.find(u => u.id === userId);
+    if (localUser) {
+      before = Object.fromEntries(keys.map(k => [k, localUser[k]])) as Partial<UserRow>;
+    } else {
+      const { data: row, error: fetchErr } = await supabase
+        .from("profiles")
+        .select(keys.join(", "))
+        .eq("id", userId)
+        .single();
+      if (fetchErr || !row) {
+        console.error("Admin — user update: could not load current row:", fetchErr);
+        setToast({ ok: false, msg: "Update failed — user not found." });
+        setTimeout(() => setToast(null), 2500);
+        return;
+      }
+      before = row as Partial<UserRow>;
+    }
+
+    setUsers(list => list.map(u => u.id === userId ? { ...u, ...changes } : u));
+    const { error } = await supabase.from("profiles").update(changes).eq("id", userId);
+
+    if (error) {
+      console.error("Admin — user update error:", error);
+      setUsers(list => list.map(u => u.id === userId ? { ...u, ...before } : u));
+      setToast({ ok: false, msg: "Update failed — please try again." });
+    } else {
+      void logAdminAction(
+        "update_user_profile", "profile", userId,
+        before as Record<string, unknown>, changes as Record<string, unknown>,
+      );
+      setToast({ ok: true, msg: "User updated." });
+      setTimeout(() => setToast(null), 2500);
+    }
+  }, [users, logAdminAction]);
+
+  const handleInquiryDelete = useCallback(async (id: string) => {
+    const target = inquiries.find(i => i.id === id) ?? null;
+    setInFlight(id);
+    const supabase = createClient();
+    const { error } = await supabase.from("inquiries").delete().eq("id", id);
+
+    if (error) {
+      console.error("Admin — inquiry delete error:", error);
+      setToast({ ok: false, msg: "Delete failed — please try again." });
+    } else {
+      void logAdminAction("delete_inquiry", "inquiry", id, target ? {
+        property_title: target.property_title,
+        seller_email: target.seller_email,
+        inquirer_name: target.inquirer_name,
+        inquirer_email: target.inquirer_email,
+        inquirer_phone: target.inquirer_phone,
+        message: target.message,
+        inquiry_type: target.inquiry_type,
+        status: target.status,
+      } : null, null);
+      setInquiries(prev => prev.filter(i => i.id !== id));
+      setStats(s => ({ ...s, inquiries: Math.max(0, s.inquiries - 1) }));
+      setToast({ ok: true, msg: "Inquiry deleted." });
+    }
+    setInFlight(null);
+    setTimeout(() => setToast(null), 2500);
+  }, [inquiries, logAdminAction]);
+
+  const handleInquirySpam = useCallback(async (id: string) => {
+    const oldStatus = inquiries.find(i => i.id === id)?.status ?? null;
+    setInFlight(id);
+    const supabase = createClient();
+    const { error } = await supabase.from("inquiries").update({ status: "spam" }).eq("id", id);
+
+    if (error) {
+      console.error("Admin — inquiry spam error:", error);
+      setToast({ ok: false, msg: "Update failed — please try again." });
+    } else {
+      void logAdminAction("mark_inquiry_spam", "inquiry", id, { status: oldStatus }, { status: "spam" });
+      setInquiries(prev => prev.map(i => i.id === id ? { ...i, status: "spam" } : i));
+      setToast({ ok: true, msg: "Marked as spam." });
+    }
+    setInFlight(null);
+    setTimeout(() => setToast(null), 2500);
+  }, [inquiries, logAdminAction]);
+
+  const handleReportResolve = useCallback(async (id: string, newStatus: "resolved" | "dismissed") => {
+    const report = reports.find(r => r.id === id);
+    if (!report || !user) return;
+    setInFlight(id);
+    const supabase = createClient();
+    const resolvedAt = new Date().toISOString();
+    const { error } = await supabase
+      .from("reports")
+      .update({ status: newStatus, resolved_at: resolvedAt, resolved_by: user.id })
+      .eq("id", id);
+
+    if (error) {
+      console.error("Admin — report resolve error:", error);
+      setToast({ ok: false, msg: "Update failed — please try again." });
+    } else {
+      void logAdminAction(
+        newStatus === "resolved" ? "resolve_report" : "dismiss_report",
+        "report", id, { status: report.status }, { status: newStatus },
+      );
+      setReports(prev => prev.map(r => r.id === id ? { ...r, status: newStatus, resolved_at: resolvedAt, resolved_by: user.id } : r));
+      setStats(s => report.status === "open" ? { ...s, reportsOpen: Math.max(0, s.reportsOpen - 1) } : s);
+      setToast({ ok: true, msg: newStatus === "resolved" ? "Report resolved." : "Report dismissed." });
+    }
+    setInFlight(null);
+    setTimeout(() => setToast(null), 2500);
+  }, [reports, user, logAdminAction]);
+
+  const handleReportRejectListing = useCallback(async (report: ReportRow) => {
+    const preview = reportListingPreviews[report.entity_id];
+    const fromSection = preview?.status === "active" ? "approved" : preview?.status === "rejected" ? "rejected" : "pending";
+    await handleListingStatus(report.entity_id, "rejected", fromSection);
+    await handleReportResolve(report.id, "resolved");
+  }, [reportListingPreviews, handleListingStatus, handleReportResolve]);
+
+  const handleReportDeactivateUser = useCallback(async (report: ReportRow) => {
+    await handleUserUpdate(report.entity_id, { is_active: false });
+    await handleReportResolve(report.id, "resolved");
+  }, [handleUserUpdate, handleReportResolve]);
 
   const handleAgentApprove = useCallback(async (id: string, userId: string) => {
     setInFlight(id);
+    const oldStatus = agentApps.find(a => a.id === id)?.status ?? null;
     const supabase = createClient();
     const { error: statusErr } = await supabase.from("agent_profiles").update({ status: "approved" }).eq("id", id);
     const { error: roleErr } = statusErr ? { error: null } : await supabase.from("profiles").update({ role: "agent" }).eq("id", userId);
@@ -1561,15 +2242,17 @@ export default function AdminPage() {
       console.error("Admin — agent approve error:", statusErr ?? roleErr);
       setToast({ ok: false, msg: "Approval failed — please try again." });
     } else {
+      void logAdminAction("approve_agent_application", "agent_profile", id, { status: oldStatus }, { status: "approved" });
       setAgentApps(prev => prev.map(a => a.id === id ? { ...a, status: "approved" } : a));
       setToast({ ok: true, msg: "Agent approved." });
     }
     setInFlight(null);
     setTimeout(() => setToast(null), 3000);
-  }, []);
+  }, [agentApps, logAdminAction]);
 
   const handleAgentReject = useCallback(async (id: string) => {
     setInFlight(id);
+    const oldStatus = agentApps.find(a => a.id === id)?.status ?? null;
     const supabase = createClient();
     const { error } = await supabase.from("agent_profiles").update({ status: "rejected" }).eq("id", id);
 
@@ -1577,12 +2260,13 @@ export default function AdminPage() {
       console.error("Admin — agent reject error:", error);
       setToast({ ok: false, msg: "Rejection failed — please try again." });
     } else {
+      void logAdminAction("reject_agent_application", "agent_profile", id, { status: oldStatus }, { status: "rejected" });
       setAgentApps(prev => prev.map(a => a.id === id ? { ...a, status: "rejected" } : a));
       setToast({ ok: true, msg: "Agent application rejected." });
     }
     setInFlight(null);
     setTimeout(() => setToast(null), 3000);
-  }, []);
+  }, [agentApps, logAdminAction]);
 
   const handleAddAgent = useCallback(async (data: {
     userId: string; licenseNumber: string; agencyName: string; bio: string;
@@ -1620,6 +2304,14 @@ export default function AdminPage() {
     const { error: roleErr } = await supabase.from("profiles").update({ role: "agent" }).eq("id", data.userId);
     if (roleErr) console.error("Admin — add agent role update error:", roleErr);
 
+    void logAdminAction("add_agent", "agent_profile", inserted.id, null, {
+      user_id: data.userId,
+      license_number: data.licenseNumber || null,
+      agency_name: data.agencyName || null,
+      status: "approved",
+      cities: data.cities,
+    });
+
     setAgentApps(prev => [
       { ...inserted, agent_service_cities: data.cities.map(city => ({ city })) } as AgentApplication,
       ...prev,
@@ -1627,7 +2319,7 @@ export default function AdminPage() {
     setToast({ ok: true, msg: "Agent added." });
     setTimeout(() => setToast(null), 3000);
     return { ok: true };
-  }, []);
+  }, [logAdminAction]);
 
   if (authChecking) {
     return (
@@ -1696,10 +2388,35 @@ export default function AdminPage() {
         users={users}
         loading={usersLoading}
         onRoleChange={(uid, role) => void handleUserRole(uid, role)}
+        onUpdateUser={handleUserUpdate}
+      />
+    );
+  } else if (active === "inquiries") {
+    content = (
+      <InquiriesSection
+        inquiries={inquiries}
+        loading={inquiriesLoading}
+        inFlight={inFlight}
+        onDelete={id => void handleInquiryDelete(id)}
+        onMarkSpam={id => void handleInquirySpam(id)}
+      />
+    );
+  } else if (active === "reports") {
+    content = (
+      <ReportsSection
+        reports={reports}
+        loading={reportsLoading}
+        inFlight={inFlight}
+        listingPreviews={reportListingPreviews}
+        profilePreviews={reportProfilePreviews}
+        onDismiss={id => void handleReportResolve(id, "dismissed")}
+        onResolve={id => void handleReportResolve(id, "resolved")}
+        onRejectListing={report => void handleReportRejectListing(report)}
+        onDeactivateUser={report => void handleReportDeactivateUser(report)}
       />
     );
   } else {
-    content = <InquiriesSection inquiries={inquiries} loading={inquiriesLoading} />;
+    content = <AuditLogSection entries={auditLog} loading={auditLoading} />;
   }
 
   return (
@@ -1768,9 +2485,10 @@ export default function AdminPage() {
             <nav style={{ flex: 1, padding: "12px 10px" }}>
               {NAV.map(item => {
                 const badge =
-                  item.id === "pending"  ? stats.pending  :
-                  item.id === "approved" ? stats.active   :
-                  item.id === "rejected" ? stats.rejected : 0;
+                  item.id === "pending"  ? stats.pending     :
+                  item.id === "approved" ? stats.active      :
+                  item.id === "rejected" ? stats.rejected    :
+                  item.id === "reports"  ? stats.reportsOpen : 0;
                 return (
                   <button
                     key={item.id}

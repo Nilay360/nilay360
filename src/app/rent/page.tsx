@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { optimizedImageUrl } from "@/lib/image-url";
 
 // ── Types ─────────────────────────────────────────────────────
 type Property = {
@@ -75,7 +76,7 @@ function RentalCard({ p }: { p: Property }) {
       style={{ background: "#161A1F", borderRadius: "16px", overflow: "hidden", border: "1px solid rgba(255,255,255,0.07)", boxShadow: hover ? "0 20px 52px rgba(43,168,224,0.1)" : "0 2px 8px rgba(0,0,0,0.3)", transform: hover ? "translateY(-5px)" : "none", transition: "all 0.25s" }}
     >
       <div style={{ position: "relative", height: "215px", overflow: "hidden" }}>
-        <img src={img} alt={p.title} style={{ width: "100%", height: "100%", objectFit: "cover", transform: hover ? "scale(1.06)" : "scale(1)", transition: "transform 0.35s" }} />
+        <img src={optimizedImageUrl(img, 600)} alt={p.title} loading="lazy" style={{ width: "100%", height: "100%", objectFit: "cover", transform: hover ? "scale(1.06)" : "scale(1)", transition: "transform 0.35s" }} />
         <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(5,8,12,0.5) 0%, transparent 55%)" }} />
         <span style={{ position: "absolute", top: "12px", left: "12px", padding: "4px 11px", borderRadius: "100px", fontSize: "9px", fontWeight: 800, letterSpacing: "0.1em", textTransform: "uppercase", background: "rgba(45,106,79,0.9)", color: "#0B0D10" }}>For Rent</span>
         {p.is_furnished && (

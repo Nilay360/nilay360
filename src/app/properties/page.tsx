@@ -5,6 +5,7 @@ import { IMAGES } from "@/constants/images";
 import { useSavedProperties } from "@/hooks/useSavedProperties";
 import { useCompare } from "@/context/CompareContext";
 import RecentlyViewed from "@/components/property/RecentlyViewed";
+import { optimizedImageUrl } from "@/lib/image-url";
 
 type Property = {
   id: string;
@@ -120,7 +121,7 @@ function PropertyCard({ property, savedIds, onToggleSave }: { property: Property
       onMouseLeave={e => { const d = e.currentTarget as HTMLElement; d.style.transform = "translateY(0)"; d.style.borderColor = "rgba(245,242,236,0.08)"; d.style.boxShadow = "none"; }}
     >
       <div style={{ position: "relative", height: "220px", overflow: "hidden", background: "#0a150f" }}>
-        <img src={img} alt={property.title} onError={() => setImgError(true)} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+        <img src={optimizedImageUrl(img, 600)} alt={property.title} loading="lazy" onError={() => setImgError(true)} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
         <div style={{ position: "absolute", top: "12px", left: "12px", display: "flex", gap: "6px" }}>
           <span style={{ padding: "4px 10px", borderRadius: "100px", fontSize: "10px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", background: property.listing_type === "rent" ? "rgba(45,106,79,0.9)" : "rgba(201,168,76,0.9)", color: property.listing_type === "rent" ? "#0B0D10" : "#000000", backdropFilter: "blur(8px)" }}>
             {property.listing_type === "rent" ? "For Rent" : "For Sale"}
@@ -462,7 +463,7 @@ export default function PropertiesPage() {
                     onMouseLeave={e => { const d = e.currentTarget as HTMLElement; d.style.borderColor = "rgba(245,242,236,0.08)"; d.style.boxShadow = "none"; }}
                   >
                     <div className="pr-list-img" style={{ width: "280px", flexShrink: 0, position: "relative" }}>
-                      <img src={p.images?.[0] || IMAGES.properties[p.type?.toLowerCase() as keyof typeof IMAGES.properties] || IMAGES.properties.apartment} alt={p.title} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block", minHeight: "180px" }} />
+                      <img src={optimizedImageUrl(p.images?.[0], 600) || IMAGES.properties[p.type?.toLowerCase() as keyof typeof IMAGES.properties] || IMAGES.properties.apartment} alt={p.title} loading="lazy" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block", minHeight: "180px" }} />
                       <span style={{ position: "absolute", top: "12px", left: "12px", padding: "4px 10px", borderRadius: "100px", fontSize: "10px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", background: p.listing_type === "rent" ? "rgba(45,106,79,0.9)" : "rgba(201,168,76,0.9)", color: p.listing_type === "rent" ? "#0B0D10" : "#000000", backdropFilter: "blur(8px)" }}>
                         {p.listing_type === "rent" ? "For Rent" : "For Sale"}
                       </span>

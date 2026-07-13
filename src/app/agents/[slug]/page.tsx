@@ -2,10 +2,16 @@
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import ReportButton from "@/components/shared/ReportButton";
+import { optimizedImageUrl } from "@/lib/image-url";
 
 // ── Static agent data (same as directory page) ────────────────
 type Agent = {
-  id: string; slug: string; full_name: string; title: string;
+  /** agent_profiles.id — used for listings lookups (assigned_agent_id) and demo ids. */
+  id: string;
+  /** profiles.id (the real user account) — this is what a "profile" report/moderation action must target, NOT agent_profiles.id. Falls back to `id` for demo/fallback agents. */
+  userId: string;
+  slug: string; full_name: string; title: string;
   agency: string; city: string; cities_served: string[];
   specialisation: string; specialisations: string[];
   languages: string[]; experience_years: number;
@@ -21,7 +27,7 @@ type Property = { id: string; slug: string; title: string; price: number; type: 
 
 const AGENTS: Record<string, Agent> = {
   "arjun-mehta": {
-    id: "a1", slug: "arjun-mehta", full_name: "Arjun Mehta", title: "Senior Property Consultant", agency: "Nilay 360 Premium Realty",
+    id: "a1", userId: "a1", slug: "arjun-mehta", full_name: "Arjun Mehta", title: "Senior Property Consultant", agency: "Nilay 360 Premium Realty",
     city: "Hyderabad", cities_served: ["Hyderabad", "Secunderabad", "Warangal"],
     specialisation: "Luxury Apartments", specialisations: ["Luxury Apartments", "Penthouse Sales", "NRI Investments", "Builder Tie-ups"],
     languages: ["English", "Hindi", "Telugu"], experience_years: 12,
@@ -31,7 +37,7 @@ const AGENTS: Record<string, Agent> = {
     phone: "+919876543210", email: "arjun.mehta@nilay360.com", whatsapp: "+919876543210",
   },
   "priya-raghavan": {
-    id: "a2", slug: "priya-raghavan", full_name: "Priya Raghavan", title: "Principal Advisor", agency: "Nilay 360 Premium Realty",
+    id: "a2", userId: "a2", slug: "priya-raghavan", full_name: "Priya Raghavan", title: "Principal Advisor", agency: "Nilay 360 Premium Realty",
     city: "Mumbai", cities_served: ["Mumbai", "Navi Mumbai", "Thane"],
     specialisation: "Sea-View Residences", specialisations: ["Sea-View Residences", "Bandra & Worli", "NRI Clients", "Luxury Rentals"],
     languages: ["English", "Hindi", "Tamil"], experience_years: 9,
@@ -41,7 +47,7 @@ const AGENTS: Record<string, Agent> = {
     phone: "+919876543211", email: "priya.raghavan@nilay360.com", whatsapp: "+919876543211",
   },
   "rohit-desai": {
-    id: "a3", slug: "rohit-desai", full_name: "Rohit Desai", title: "Investment Specialist", agency: "Nilay 360 Premium Realty",
+    id: "a3", userId: "a3", slug: "rohit-desai", full_name: "Rohit Desai", title: "Investment Specialist", agency: "Nilay 360 Premium Realty",
     city: "Bengaluru", cities_served: ["Bengaluru", "Mysuru", "Hosur"],
     specialisation: "IT Corridor Homes", specialisations: ["IT Corridor Homes", "Investment Portfolios", "Pre-Launch Projects", "Tech Professionals"],
     languages: ["English", "Hindi", "Kannada"], experience_years: 8,
@@ -52,10 +58,47 @@ const AGENTS: Record<string, Agent> = {
   },
 };
 
+// ── Real agent_profiles row → Agent (used once a slug matches a live, approved agent) ──
+const AVATAR_COLORS = ["#000000", "#1E3A5F", "#3B1F5F", "#4A2A0F", "#0F3D2E"];
+function colorForName(name: string): string {
+  let hash = 0;
+  for (let i = 0; i < name.length; i++) hash = (hash * 31 + name.charCodeAt(i)) | 0;
+  return AVATAR_COLORS[Math.abs(hash) % AVATAR_COLORS.length];
+}
+
+type AgentProfileRow = {
+  id: string;
+  user_id: string;
+  agency_name: string | null;
+  bio: string | null;
+  years_experience: number | null;
+  license_number: string | null;
+  profiles: { full_name: string | null; phone: string | null; email: string | null } | null;
+  agent_service_cities: { city: string }[] | null;
+};
+
+function mapAgentProfileRow(row: AgentProfileRow, slug: string): Agent {
+  const fullName = row.profiles?.full_name?.trim() || "Nilay 360 Agent";
+  const cities = (row.agent_service_cities ?? []).map(c => c.city);
+  const phone = row.profiles?.phone ?? "";
+  return {
+    id: row.id, userId: row.user_id, slug, full_name: fullName, title: "Property Consultant",
+    agency: row.agency_name || "Nilay 360 Premium Realty",
+    city: cities[0] ?? "India", cities_served: cities.length > 0 ? cities : ["Pan India"],
+    specialisation: "Residential Properties", specialisations: ["Residential Properties"],
+    languages: ["English"], experience_years: row.years_experience ?? 0,
+    rating: 0, reviews_count: 0, properties_sold: 0, properties_listed: 0,
+    rera_number: row.license_number || "—", verified: true, featured: false,
+    avatar_color: colorForName(fullName),
+    bio: row.bio || `${fullName} is a verified real estate professional at Nilay 360, helping buyers and sellers navigate the market with transparent, client-first advisory.`,
+    phone, email: row.profiles?.email ?? "", whatsapp: phone,
+  };
+}
+
 function buildFallback(slug: string): Agent {
   const name = slug.replace(/-/g, " ").replace(/\b\w/g, l => l.toUpperCase());
   return {
-    id: slug, slug, full_name: name, title: "Property Consultant", agency: "Nilay 360 Premium Realty",
+    id: slug, userId: slug, slug, full_name: name, title: "Property Consultant", agency: "Nilay 360 Premium Realty",
     city: "India", cities_served: ["Pan India"],
     specialisation: "Residential Properties", specialisations: ["Residential Properties", "Investment Advisory"],
     languages: ["English", "Hindi"], experience_years: 5,
@@ -138,7 +181,7 @@ function PropCard({ p }: { p: Property }) {
     <a href={`/property/${p.slug}`} style={{ textDecoration: "none", display: "block", background: "#fff", borderRadius: "12px", overflow: "hidden", border: "1px solid rgba(13,43,31,0.07)", boxShadow: hover ? "0 12px 36px rgba(13,43,31,0.1)" : "0 1px 5px rgba(13,43,31,0.04)", transform: hover ? "translateY(-3px)" : "none", transition: "all 0.2s" }}
       onMouseEnter={() => setHover(true)} onMouseLeave={() => setHover(false)}>
       <div style={{ height: "170px", overflow: "hidden", position: "relative" }}>
-        <img src={p.image} alt={p.title} style={{ width: "100%", height: "100%", objectFit: "cover", transform: hover ? "scale(1.05)" : "scale(1)", transition: "transform 0.3s" }} />
+        <img src={optimizedImageUrl(p.image, 400)} alt={p.title} loading="lazy" style={{ width: "100%", height: "100%", objectFit: "cover", transform: hover ? "scale(1.05)" : "scale(1)", transition: "transform 0.3s" }} />
         <span style={{ position: "absolute", top: "10px", left: "10px", padding: "3px 9px", borderRadius: "100px", fontSize: "9px", fontWeight: 800, letterSpacing: "0.1em", textTransform: "uppercase", background: p.listing_type === "sale" ? "#2BA8E0" : "#3B82F6", color: p.listing_type === "sale" ? "#000000" : "#fff" }}>
           {p.listing_type === "sale" ? "For Sale" : "For Rent"}
         </span>
@@ -209,30 +252,97 @@ function ContactForm({ agent }: { agent: Agent }) {
 export default function AgentProfilePage() {
   const params = useParams();
   const slug   = (params?.slug as string) ?? "";
-  const agent  = AGENTS[slug] ?? buildFallback(slug);
 
+  const [agent,       setAgent]       = useState<Agent | null>(null);
+  const [agentLoading, setAgentLoading] = useState(true);
+  const [isRealAgent, setIsRealAgent] = useState(false);
   const [properties, setProperties] = useState<Property[]>(PLACEHOLDER_PROPERTIES);
   const [reviews,    setReviews]    = useState<Review[]>(PLACEHOLDER_REVIEWS);
   const [activeTab,  setActiveTab]  = useState<"listings" | "reviews">("listings");
 
+  // Resolve the slug against real agent_profiles first (status = approved);
+  // only fall back to demo/hardcoded data when no live match exists.
   useEffect(() => {
+    let cancelled = false;
+    async function loadAgent() {
+      if (!slug) return;
+      setAgentLoading(true);
+      try {
+        const supabase = createClient();
+        const { data: row } = await supabase
+          .from("agent_profiles")
+          .select("id, user_id, agency_name, bio, years_experience, license_number, profiles(full_name, phone, email), agent_service_cities(city)")
+          .eq("slug", slug)
+          .eq("status", "approved")
+          .maybeSingle();
+        if (cancelled) return;
+        if (row) {
+          setAgent(mapAgentProfileRow(row as unknown as AgentProfileRow, slug));
+          setIsRealAgent(true);
+          // Real agents start with no demo listings/reviews — avoids fabricated
+          // testimonials appearing under a real person's name before the fetch below resolves.
+          setProperties([]);
+          setReviews([]);
+        } else {
+          setAgent(AGENTS[slug] ?? buildFallback(slug));
+          setIsRealAgent(false);
+        }
+      } catch (_) {
+        if (!cancelled) { setAgent(AGENTS[slug] ?? buildFallback(slug)); setIsRealAgent(false); }
+      } finally {
+        if (!cancelled) setAgentLoading(false);
+      }
+    }
+    void loadAgent();
+    return () => { cancelled = true; };
+  }, [slug]);
+
+  useEffect(() => {
+    if (!agent) return;
     async function load() {
       try {
         const supabase = createClient();
-        const [{ data: props }, { data: revs }] = await Promise.all([
-          supabase.from("properties").select("*").eq("agent_id", agent.id).eq("status", "active").limit(6),
-          supabase.from("agent_reviews").select("*").eq("agent_id", agent.id).order("created_at", { ascending: false }).limit(12),
-        ]);
-        if (props && props.length > 0) setProperties(props);
-        if (revs  && revs.length  > 0) setReviews(revs.map((r: any) => ({ name: r.reviewer_name, rating: r.rating, date: r.created_at?.slice(0,7) ?? "", text: r.text, property: r.property_title ?? "" })));
+        if (isRealAgent) {
+          const { data: listings } = await supabase
+            .from("property_listings")
+            .select("id, slug, title, price, property_category, city, bedrooms, built_up_area, photo_urls, listing_type")
+            .eq("assigned_agent_id", agent!.id)
+            .eq("status", "active")
+            .limit(6);
+          const mapped: Property[] = (listings ?? []).map((r: any) => ({
+            id: r.id, slug: r.slug ?? r.id, title: r.title ?? "Untitled Property",
+            price: r.price ?? 0, type: r.property_category ?? "Property", city: r.city ?? "",
+            bedrooms: r.bedrooms ?? 0, area: r.built_up_area ?? 0,
+            image: Array.isArray(r.photo_urls) && r.photo_urls[0] ? r.photo_urls[0] : "https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=600&q=80",
+            listing_type: r.listing_type ?? "sale",
+          }));
+          setProperties(mapped);
+          // No real review system wired yet — leave empty rather than show fabricated reviews for a real agent.
+          setReviews([]);
+        } else {
+          const [{ data: props }, { data: revs }] = await Promise.all([
+            supabase.from("properties").select("*").eq("agent_id", agent!.id).eq("status", "active").limit(6),
+            supabase.from("agent_reviews").select("*").eq("agent_id", agent!.id).order("created_at", { ascending: false }).limit(12),
+          ]);
+          if (props && props.length > 0) setProperties(props);
+          if (revs  && revs.length  > 0) setReviews(revs.map((r: any) => ({ name: r.reviewer_name, rating: r.rating, date: r.created_at?.slice(0,7) ?? "", text: r.text, property: r.property_title ?? "" })));
+        }
       } catch (_) {}
     }
-    load();
-  }, [agent.id]);
+    void load();
+  }, [agent, isRealAgent]);
 
   const ratingBreakdown = [5,4,3,2,1].map(star => ({
     star, pct: star === 5 ? 72 : star === 4 ? 18 : star === 3 ? 6 : star === 2 ? 3 : 1
   }));
+
+  if (agentLoading || !agent) {
+    return (
+      <div style={{ minHeight: "100vh", background: "#000000", display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <span style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "20px", color: "rgba(245,242,236,0.5)" }}>Loading agent…</span>
+      </div>
+    );
+  }
 
   return (
     <>
@@ -504,6 +614,8 @@ export default function AgentProfilePage() {
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
               Share Profile
             </button>
+
+            <ReportButton entityType="profile" entityId={agent.userId} variant="light" />
           </div>
         </div>
 

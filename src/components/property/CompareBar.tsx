@@ -1,5 +1,6 @@
 "use client";
 import { useCompare, COMPARE_MAX } from "@/context/CompareContext";
+import { optimizedImageUrl } from "@/lib/image-url";
 
 const G = { dark: "#000000", gold: "#2BA8E0" };
 
@@ -18,7 +19,7 @@ export default function CompareBar() {
         <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
           {items.map(p => (
             <div key={p.id} style={{ display: "flex", alignItems: "center", gap: "8px", padding: "5px 8px 5px 5px", background: "rgba(245,242,236,0.06)", borderRadius: "8px", border: "1px solid rgba(245,242,236,0.12)" }}>
-              <img src={p.image || `https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=80&q=80`} alt="" style={{ width: "30px", height: "30px", borderRadius: "6px", objectFit: "cover", flexShrink: 0 }} />
+              <img src={optimizedImageUrl(p.image, 100) || `https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=80&q=80`} alt="" loading="lazy" style={{ width: "30px", height: "30px", borderRadius: "6px", objectFit: "cover", flexShrink: 0 }} />
               <span style={{ fontSize: "12px", color: "#000000", maxWidth: "140px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{p.title}</span>
               <span onClick={() => remove(p.id)} role="button" aria-label="Remove from comparison" style={{ color: "rgba(245,242,236,0.45)", cursor: "pointer", fontSize: "15px", fontWeight: 700, lineHeight: 1, padding: "0 2px" }}>×</span>
             </div>

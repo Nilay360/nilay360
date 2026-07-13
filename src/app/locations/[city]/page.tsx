@@ -2,6 +2,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { useParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { optimizedImageUrl } from "@/lib/image-url";
 
 // ── Static city config ────────────────────────────────────────
 type CityConfig = {
@@ -197,7 +198,7 @@ function PropCard({ p }: { p: Property }) {
     <a href={`/property/${p.slug}`} style={{ textDecoration: "none", display: "block", background: "#fff", borderRadius: "14px", overflow: "hidden", border: "1px solid rgba(13,43,31,0.07)", boxShadow: hover ? "0 16px 44px rgba(13,43,31,0.12)" : "0 1px 5px rgba(13,43,31,0.04)", transform: hover ? "translateY(-4px)" : "none", transition: "all 0.2s" }}
       onMouseEnter={() => setHover(true)} onMouseLeave={() => setHover(false)}>
       <div style={{ height: "200px", overflow: "hidden", position: "relative" }}>
-        <img src={img} alt={p.title} style={{ width: "100%", height: "100%", objectFit: "cover", transform: hover ? "scale(1.05)" : "scale(1)", transition: "transform 0.3s" }} />
+        <img src={optimizedImageUrl(img, 500)} alt={p.title} loading="lazy" style={{ width: "100%", height: "100%", objectFit: "cover", transform: hover ? "scale(1.05)" : "scale(1)", transition: "transform 0.3s" }} />
         <span style={{ position: "absolute", top: "12px", left: "12px", padding: "3px 10px", borderRadius: "100px", fontSize: "9px", fontWeight: 800, letterSpacing: "0.1em", textTransform: "uppercase", background: p.listing_type === "sale" ? "#2BA8E0" : "#4A90D9", color: p.listing_type === "sale" ? "#000000" : "#fff" }}>{p.listing_type === "sale" ? "For Sale" : "For Rent"}</span>
       </div>
       <div style={{ padding: "16px 18px" }}>
