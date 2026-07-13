@@ -6,6 +6,7 @@ import { useAuth } from "@/context/AuthContext";
 import { SavedSearchesList } from "@/components/dashboard/SavedSearchesList";
 import { MyListingsList } from "@/components/dashboard/MyListingsList";
 import { CITIES } from "@/constants";
+import { optimizedImageUrl } from "@/lib/image-url";
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
@@ -570,7 +571,7 @@ function SavedTab({ savedItems, loading, onRemove }: {
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: "16px", flexWrap: "wrap" }}>
                   <div style={{ display: "flex", gap: "16px", flex: 1, minWidth: 0 }}>
                     {image && (
-                      <img src={image} alt={title ?? "Property"} style={{ width: "80px", height: "64px", objectFit: "cover", borderRadius: "8px", flexShrink: 0 }} />
+                      <img src={optimizedImageUrl(image, 160)} alt={title ?? "Property"} loading="lazy" style={{ width: "80px", height: "64px", objectFit: "cover", borderRadius: "8px", flexShrink: 0 }} />
                     )}
                     <div style={{ flex: 1, minWidth: 0 }}>
                       {propType && (
@@ -748,7 +749,7 @@ function ProfileTab({ email, userId, profile, loading, onSave }: {
           {/* Avatar */}
           <div style={{ width: 80, height: 80, borderRadius: "50%", background: avatarSrc ? "transparent" : "rgba(43,168,224,0.12)", border: "2.5px solid rgba(43,168,224,0.35)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, overflow: "hidden" }}>
             {avatarSrc
-              ? <img src={avatarSrc} alt={displayName} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+              ? <img src={optimizedImageUrl(avatarSrc, 160)} alt={displayName} loading="lazy" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
               : <span style={{ fontSize: 28, fontWeight: 700, color: "#2BA8E0", fontFamily: "'DM Sans', sans-serif" }}>{displayName[0].toUpperCase()}</span>
             }
           </div>

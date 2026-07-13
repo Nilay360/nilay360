@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import ReportButton from "@/components/shared/ReportButton";
+import { optimizedImageUrl } from "@/lib/image-url";
 
 // ── Static agent data (same as directory page) ────────────────
 type Agent = {
@@ -180,7 +181,7 @@ function PropCard({ p }: { p: Property }) {
     <a href={`/property/${p.slug}`} style={{ textDecoration: "none", display: "block", background: "#fff", borderRadius: "12px", overflow: "hidden", border: "1px solid rgba(13,43,31,0.07)", boxShadow: hover ? "0 12px 36px rgba(13,43,31,0.1)" : "0 1px 5px rgba(13,43,31,0.04)", transform: hover ? "translateY(-3px)" : "none", transition: "all 0.2s" }}
       onMouseEnter={() => setHover(true)} onMouseLeave={() => setHover(false)}>
       <div style={{ height: "170px", overflow: "hidden", position: "relative" }}>
-        <img src={p.image} alt={p.title} style={{ width: "100%", height: "100%", objectFit: "cover", transform: hover ? "scale(1.05)" : "scale(1)", transition: "transform 0.3s" }} />
+        <img src={optimizedImageUrl(p.image, 400)} alt={p.title} loading="lazy" style={{ width: "100%", height: "100%", objectFit: "cover", transform: hover ? "scale(1.05)" : "scale(1)", transition: "transform 0.3s" }} />
         <span style={{ position: "absolute", top: "10px", left: "10px", padding: "3px 9px", borderRadius: "100px", fontSize: "9px", fontWeight: 800, letterSpacing: "0.1em", textTransform: "uppercase", background: p.listing_type === "sale" ? "#2BA8E0" : "#3B82F6", color: p.listing_type === "sale" ? "#000000" : "#fff" }}>
           {p.listing_type === "sale" ? "For Sale" : "For Rent"}
         </span>

@@ -3,6 +3,7 @@
 import React, { useState } from "react"
 import Link from "next/link"
 import { cn, formatPrice, formatArea } from "@/lib/utils"
+import { optimizedImageUrl } from "@/lib/image-url"
 import { Badge } from "@/components/ui/Badge"
 import { useCompare } from "@/context/CompareContext"
 
@@ -79,8 +80,9 @@ export function PropertyCard({
         <div className="relative h-48 overflow-hidden bg-[#121519]">
           {images[0] && !imgError ? (
             <img
-              src={images[0]}
+              src={optimizedImageUrl(images[0], 600)}
               alt={title}
+              loading="lazy"
               className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
               onError={() => setImgError(true)}
             />

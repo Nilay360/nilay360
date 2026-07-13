@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { useAuth } from "@/context/AuthContext";
 import { CITIES } from "@/constants";
+import { optimizedImageUrl } from "@/lib/image-url";
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
@@ -270,7 +271,7 @@ function ListingCard({
         {/* Thumbnail */}
         <div style={{ width: "150px", flexShrink: 0, position: "relative", background: "#0B0D10", overflow: "hidden", minHeight: "140px" }}>
           {thumb ? (
-            <img src={thumb} alt={listing.title ?? "Property"} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+            <img src={optimizedImageUrl(thumb, 300)} alt={listing.title ?? "Property"} loading="lazy" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
           ) : (
             <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", color: "#2BA8E0", opacity: 0.3, minHeight: "140px" }}>
               <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>

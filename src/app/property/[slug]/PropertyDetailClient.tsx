@@ -7,6 +7,7 @@ import { useRecentlyViewed } from "@/hooks/useRecentlyViewed";
 import { useAuth } from "@/context/AuthContext";
 import { useSavedProperties } from "@/hooks/useSavedProperties";
 import ReportButton from "@/components/shared/ReportButton";
+import { optimizedImageUrl } from "@/lib/image-url";
 
 // ── Types ────────────────────────────────────────────────────
 type Property = {
@@ -327,7 +328,7 @@ function SimilarCard({ p }: { p: Property }) {
         onMouseLeave={e => { const d = e.currentTarget as HTMLDivElement; d.style.transform = "translateY(0)"; d.style.boxShadow = "0 4px 24px rgba(0,0,0,0.18)"; }}
       >
         <div style={{ height: "160px", overflow: "hidden", position: "relative" }}>
-          <img src={img} alt={p.title} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+          <img src={optimizedImageUrl(img, 500)} alt={p.title} loading="lazy" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
           <span style={{ position: "absolute", top: "10px", left: "10px", padding: "3px 9px", borderRadius: "100px", fontSize: "10px", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", background: p.listing_type === "rent" ? "rgba(11,13,16,0.85)" : "rgba(43,168,224,0.9)", color: p.listing_type === "rent" ? "#2BA8E0" : "#000000", border: p.listing_type === "rent" ? "1px solid rgba(43,168,224,0.5)" : "none" }}>
             {p.listing_type === "rent" ? "Rent" : "Sale"}
           </span>
@@ -730,7 +731,7 @@ export default function PropertyDetailClient() {
             {/* Main image */}
             <div style={{ position: "relative", height: "520px", overflow: "hidden" }}>
               <img
-                src={images[activeImg]}
+                src={optimizedImageUrl(images[activeImg], 1600)}
                 alt={property.title}
                 onClick={() => setLightboxOpen(true)}
                 style={{ width: "100%", height: "100%", objectFit: "cover", display: "block", transition: "opacity 0.3s", cursor: "zoom-in" }}
@@ -792,7 +793,7 @@ export default function PropertyDetailClient() {
                   onClick={() => setActiveImg(i)}
                   style={{ flex: 1, height: "80px", overflow: "hidden", cursor: "pointer", opacity: activeImg === i ? 1 : 0.55, border: activeImg === i ? "2px solid #2BA8E0" : "2px solid transparent", borderRadius: "4px", transition: "opacity 0.15s, border-color 0.15s" }}
                 >
-                  <img src={img} alt={`View ${i + 1}`} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+                  <img src={optimizedImageUrl(img, 200)} alt={`View ${i + 1}`} loading="lazy" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
                 </div>
               ))}
             </div>
@@ -1221,7 +1222,7 @@ export default function PropertyDetailClient() {
 
           <img
             key={activeImg}
-            src={images[activeImg]}
+            src={optimizedImageUrl(images[activeImg], 1920)}
             alt={`${property.title} — photo ${activeImg + 1}`}
             onClick={(e) => e.stopPropagation()}
             style={{ maxWidth: "86vw", maxHeight: "82vh", objectFit: "contain", borderRadius: "6px", animation: "lbFade 0.25s ease" }}

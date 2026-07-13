@@ -1,6 +1,7 @@
 "use client";
 import Reveal from "@/components/ui/Reveal";
 import { useRecentlyViewed } from "@/hooks/useRecentlyViewed";
+import { optimizedImageUrl } from "@/lib/image-url";
 
 const G = { dark: "#000000", gold: "#2BA8E0" };
 
@@ -42,7 +43,7 @@ export default function RecentlyViewed({ theme = "light" }: { theme?: "light" | 
                 onMouseEnter={e => { const d = e.currentTarget as HTMLElement; d.style.transform = "translateY(-3px)"; d.style.boxShadow = "0 12px 32px rgba(0,0,0,0.18)"; }}
                 onMouseLeave={e => { const d = e.currentTarget as HTMLElement; d.style.transform = "translateY(0)"; d.style.boxShadow = "none"; }}>
                 <div style={{ height: "120px", overflow: "hidden" }}>
-                  <img src={img} alt={p.title} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+                  <img src={optimizedImageUrl(img, 400)} alt={p.title} loading="lazy" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
                 </div>
                 <div style={{ padding: "12px 14px" }}>
                   <div style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "16px", fontWeight: 600, color: G.gold, marginBottom: "4px" }}>{fmt(p.price, p.listing_type)}</div>
