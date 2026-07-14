@@ -35,6 +35,7 @@ type AdminListing = {
   submitted_at: string;
   status: string;
   assigned_agent_id?: string | null;
+  kuula_tour_url?: string | null;
 };
 
 type ApprovedAgentOption = { id: string; name: string };
@@ -254,12 +255,15 @@ function ListingCard({
   actions,
   inFlight,
   assignControl,
+  kuulaTourControl,
 }: {
   listing: AdminListing;
   actions: React.ReactNode;
   inFlight: boolean;
   /** Optional slot for an "Assign Agent" control — only Pending/Approved sections supply this. */
   assignControl?: React.ReactNode;
+  /** Optional slot for the Kuula 360° tour URL control — only Pending/Approved sections supply this. */
+  kuulaTourControl?: React.ReactNode;
 }) {
   const thumb = Array.isArray(listing.photo_urls) ? listing.photo_urls[0] ?? null : null;
   const label = listing.listing_type === "sale" ? "For Sale" : listing.listing_type === "rent" ? "For Rent" : (listing.listing_type ?? "");
@@ -333,6 +337,10 @@ function ListingCard({
             <div style={{ display: "flex", alignItems: "center" }}>{assignControl}</div>
           )}
 
+          {kuulaTourControl && (
+            <div style={{ display: "flex", alignItems: "center" }}>{kuulaTourControl}</div>
+          )}
+
           {/* Actions */}
           <div style={{ display: "flex", gap: "8px", alignItems: "center", flexWrap: "wrap" }}>
             {listing.slug && (
@@ -385,6 +393,40 @@ function AssignAgentControl({
         </select>
         <span style={{ position: "absolute", right: 8, top: "50%", transform: "translateY(-50%)", pointerEvents: "none", color: "rgba(255,255,255,0.45)", fontSize: 9 }}>▼</span>
       </div>
+    </div>
+  );
+}
+
+// ── Kuula 360° Tour control (Pending/Approved only) ─────────────────────────────
+
+function KuulaTourControl({
+  currentUrl, onSave, disabled,
+}: {
+  currentUrl: string | null | undefined;
+  onSave: (url: string | null) => void;
+  disabled: boolean;
+}) {
+  const [value, setValue] = useState(currentUrl ?? "");
+  const dirty = value.trim() !== (currentUrl ?? "");
+
+  return (
+    <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap", padding: "8px 12px", background: "rgba(255,255,255,0.03)", borderRadius: "8px", border: "1px solid rgba(255,255,255,0.06)" }}>
+      <span style={{ fontSize: "11px", color: "rgba(255,255,255,0.45)", flexShrink: 0 }}>360° Tour URL:</span>
+      <input
+        type="text"
+        value={value}
+        disabled={disabled}
+        onChange={e => setValue(e.target.value)}
+        placeholder="https://kuula.co/share/..."
+        style={{ flex: "1 1 220px", minWidth: "160px", padding: "6px 10px", background: "rgba(255,255,255,0.06)", border: "1.5px solid rgba(255,255,255,0.12)", borderRadius: "7px", fontSize: "12px", color: "#E8EAED", fontFamily: "'DM Sans', sans-serif", outline: "none" }}
+      />
+      <button
+        onClick={() => onSave(value.trim() || null)}
+        disabled={disabled || !dirty}
+        style={{ padding: "6px 14px", borderRadius: "7px", fontSize: "11px", fontWeight: 600, background: dirty ? "#2BA8E0" : "rgba(255,255,255,0.06)", color: dirty ? "#000000" : "rgba(255,255,255,0.4)", border: "none", cursor: disabled || !dirty ? "not-allowed" : "pointer", fontFamily: "'DM Sans', sans-serif", flexShrink: 0 }}
+      >
+        Save
+      </button>
     </div>
   );
 }
@@ -507,7 +549,7 @@ function OverviewSection({ stats, loading }: { stats: Stats; loading: boolean })
 // ── Section: Pending Review ────────────────────────────────────────────────────
 
 function PendingSection({
-  listings, loading, inFlight, onApprove, onReject, agents, onAssignAgent,
+  listings, loading, inFlight, onApprove, onReject, agents, onAssignAgent, onKuulaTourUrl,
 }: {
   listings: AdminListing[];
   loading: boolean;
@@ -516,6 +558,7 @@ function PendingSection({
   onReject: (id: string) => void;
   agents: ApprovedAgentOption[];
   onAssignAgent: (id: string, agentId: string | null) => void;
+  onKuulaTourUrl: (id: string, url: string | null) => void;
 }) {
   if (loading) return <Spinner />;
   return (
@@ -542,6 +585,13 @@ function PendingSection({
                   agents={agents}
                   disabled={inFlight === l.id}
                   onAssign={agentId => onAssignAgent(l.id, agentId)}
+                />
+              }
+              kuulaTourControl={
+                <KuulaTourControl
+                  currentUrl={l.kuula_tour_url}
+                  disabled={inFlight === l.id}
+                  onSave={url => onKuulaTourUrl(l.id, url)}
                 />
               }
               actions={
@@ -573,7 +623,7 @@ function PendingSection({
 // ── Section: Approved Listings ─────────────────────────────────────────────────
 
 function ApprovedSection({
-  listings, loading, inFlight, onUnpublish, agents, onAssignAgent,
+  listings, loading, inFlight, onUnpublish, agents, onAssignAgent, onKuulaTourUrl,
 }: {
   listings: AdminListing[];
   loading: boolean;
@@ -581,6 +631,7 @@ function ApprovedSection({
   onUnpublish: (id: string) => void;
   agents: ApprovedAgentOption[];
   onAssignAgent: (id: string, agentId: string | null) => void;
+  onKuulaTourUrl: (id: string, url: string | null) => void;
 }) {
   if (loading) return <Spinner />;
   return (
@@ -603,6 +654,13 @@ function ApprovedSection({
                   agents={agents}
                   disabled={inFlight === l.id}
                   onAssign={agentId => onAssignAgent(l.id, agentId)}
+                />
+              }
+              kuulaTourControl={
+                <KuulaTourControl
+                  currentUrl={l.kuula_tour_url}
+                  disabled={inFlight === l.id}
+                  onSave={url => onKuulaTourUrl(l.id, url)}
                 />
               }
               actions={
@@ -1897,7 +1955,7 @@ export default function AdminPage() {
       setPendingLoading(true);
       supabase
         .from("property_listings")
-        .select("id, slug, title, property_category, listing_type, city, locality, price, photo_urls, seller_name, seller_email, seller_phone, submitted_at, status, assigned_agent_id")
+        .select("id, slug, title, property_category, listing_type, city, locality, price, photo_urls, seller_name, seller_email, seller_phone, submitted_at, status, assigned_agent_id, kuula_tour_url")
         .eq("status", "pending_review")
         .order("submitted_at", { ascending: true })
         .then((res: { data: unknown }) => {
@@ -1908,7 +1966,7 @@ export default function AdminPage() {
       setApprovedLoading(true);
       supabase
         .from("property_listings")
-        .select("id, slug, title, property_category, listing_type, city, locality, price, photo_urls, seller_name, seller_email, seller_phone, submitted_at, status, assigned_agent_id")
+        .select("id, slug, title, property_category, listing_type, city, locality, price, photo_urls, seller_name, seller_email, seller_phone, submitted_at, status, assigned_agent_id, kuula_tour_url")
         .eq("status", "active")
         .order("submitted_at", { ascending: false })
         .then((res: { data: unknown }) => {
@@ -2082,6 +2140,30 @@ export default function AdminPage() {
       if (fromSection === "pending") setPendingListings(updater);
       else setApprovedListings(updater);
       setToast({ ok: true, msg: agentId ? "Agent assigned." : "Agent unassigned." });
+    }
+    setInFlight(null);
+    setTimeout(() => setToast(null), 2500);
+  }, [pendingListings, approvedListings, logAdminAction]);
+
+  const handleKuulaTourUrl = useCallback(async (
+    id: string,
+    url: string | null,
+    fromSection: "pending" | "approved",
+  ) => {
+    setInFlight(id);
+    const oldUrl = (fromSection === "pending" ? pendingListings : approvedListings).find(l => l.id === id)?.kuula_tour_url ?? null;
+    const supabase = createClient();
+    const { error } = await supabase.from("property_listings").update({ kuula_tour_url: url }).eq("id", id);
+
+    if (error) {
+      console.error("Admin — kuula tour url error:", error);
+      setToast({ ok: false, msg: "Update failed — please try again." });
+    } else {
+      void logAdminAction("update_kuula_tour_url", "property_listing", id, { kuula_tour_url: oldUrl }, { kuula_tour_url: url });
+      const updater = (prev: AdminListing[]) => prev.map(l => l.id === id ? { ...l, kuula_tour_url: url } : l);
+      if (fromSection === "pending") setPendingListings(updater);
+      else setApprovedListings(updater);
+      setToast({ ok: true, msg: url ? "360° tour URL saved." : "360° tour URL cleared." });
     }
     setInFlight(null);
     setTimeout(() => setToast(null), 2500);
@@ -2349,6 +2431,7 @@ export default function AdminPage() {
         onReject={id => void handleListingStatus(id, "rejected", "pending")}
         agents={approvedAgents}
         onAssignAgent={(id, agentId) => void handleAssignAgent(id, agentId, "pending")}
+        onKuulaTourUrl={(id, url) => void handleKuulaTourUrl(id, url, "pending")}
       />
     );
   } else if (active === "approved") {
@@ -2360,6 +2443,7 @@ export default function AdminPage() {
         onUnpublish={id => void handleListingStatus(id, "pending_review", "approved")}
         agents={approvedAgents}
         onAssignAgent={(id, agentId) => void handleAssignAgent(id, agentId, "approved")}
+        onKuulaTourUrl={(id, url) => void handleKuulaTourUrl(id, url, "approved")}
       />
     );
   } else if (active === "rejected") {

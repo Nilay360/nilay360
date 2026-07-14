@@ -45,6 +45,7 @@ type Property = {
   saves: number;
   created_at: string;
   video_url: string | null;
+  kuula_tour_url: string | null;
   seller_email?: string;
   seller_name?: string;
   seller_phone?: string;
@@ -98,6 +99,7 @@ function mapListingToProperty(row: Record<string, unknown>): Property {
       ? row.created_at
       : (typeof row.submitted_at === "string" ? row.submitted_at : new Date().toISOString()),
     video_url:      typeof row.video_url === "string" && row.video_url.trim() ? row.video_url : null,
+    kuula_tour_url: typeof row.kuula_tour_url === "string" && row.kuula_tour_url.trim() ? row.kuula_tour_url : null,
     seller_email:    typeof row.seller_email === "string" ? row.seller_email : undefined,
     seller_name:     typeof row.seller_name === "string" ? row.seller_name : undefined,
     seller_phone:    typeof row.seller_phone === "string" ? row.seller_phone : undefined,
@@ -895,6 +897,22 @@ export default function PropertyDetailClient() {
                         </span>
                       </button>
                     )}
+                  </div>
+                </Card>
+              )}
+
+              {/* ── 360° VIRTUAL TOUR ── */}
+              {property.kuula_tour_url && (
+                <Card>
+                  <SectionHeading>360° Virtual Tour</SectionHeading>
+                  <div style={{ position: "relative", width: "100%", paddingTop: "56.25%", borderRadius: "12px", overflow: "hidden", background: "#0B0D10" }}>
+                    <iframe
+                      src={property.kuula_tour_url}
+                      title={`${property.title} — 360° virtual tour`}
+                      allow="xr-spatial-tracking; gyroscope; accelerometer; fullscreen"
+                      allowFullScreen
+                      style={{ position: "absolute", inset: 0, width: "100%", height: "100%", border: "none" }}
+                    />
                   </div>
                 </Card>
               )}
