@@ -36,6 +36,7 @@ type AdminListing = {
   status: string;
   assigned_agent_id?: string | null;
   kuula_tour_url?: string | null;
+  google_maps_url?: string | null;
 };
 
 type ApprovedAgentOption = { id: string; name: string };
@@ -256,6 +257,7 @@ function ListingCard({
   inFlight,
   assignControl,
   kuulaTourControl,
+  googleMapsUrlControl,
 }: {
   listing: AdminListing;
   actions: React.ReactNode;
@@ -264,6 +266,8 @@ function ListingCard({
   assignControl?: React.ReactNode;
   /** Optional slot for the Kuula 360° tour URL control — only Pending/Approved sections supply this. */
   kuulaTourControl?: React.ReactNode;
+  /** Optional slot for the Google Maps URL control — only Pending/Approved sections supply this. */
+  googleMapsUrlControl?: React.ReactNode;
 }) {
   const thumb = Array.isArray(listing.photo_urls) ? listing.photo_urls[0] ?? null : null;
   const label = listing.listing_type === "sale" ? "For Sale" : listing.listing_type === "rent" ? "For Rent" : (listing.listing_type ?? "");
@@ -339,6 +343,10 @@ function ListingCard({
 
           {kuulaTourControl && (
             <div style={{ display: "flex", alignItems: "center" }}>{kuulaTourControl}</div>
+          )}
+
+          {googleMapsUrlControl && (
+            <div style={{ display: "flex", alignItems: "center" }}>{googleMapsUrlControl}</div>
           )}
 
           {/* Actions */}
@@ -418,6 +426,40 @@ function KuulaTourControl({
         disabled={disabled}
         onChange={e => setValue(e.target.value)}
         placeholder="https://kuula.co/share/..."
+        style={{ flex: "1 1 220px", minWidth: "160px", padding: "6px 10px", background: "rgba(255,255,255,0.06)", border: "1.5px solid rgba(255,255,255,0.12)", borderRadius: "7px", fontSize: "12px", color: "#E8EAED", fontFamily: "'DM Sans', sans-serif", outline: "none" }}
+      />
+      <button
+        onClick={() => onSave(value.trim() || null)}
+        disabled={disabled || !dirty}
+        style={{ padding: "6px 14px", borderRadius: "7px", fontSize: "11px", fontWeight: 600, background: dirty ? "#2BA8E0" : "rgba(255,255,255,0.06)", color: dirty ? "#000000" : "rgba(255,255,255,0.4)", border: "none", cursor: disabled || !dirty ? "not-allowed" : "pointer", fontFamily: "'DM Sans', sans-serif", flexShrink: 0 }}
+      >
+        Save
+      </button>
+    </div>
+  );
+}
+
+// ── Google Maps URL control (Pending/Approved only) ─────────────────────────────
+
+function GoogleMapsUrlControl({
+  currentUrl, onSave, disabled,
+}: {
+  currentUrl: string | null | undefined;
+  onSave: (url: string | null) => void;
+  disabled: boolean;
+}) {
+  const [value, setValue] = useState(currentUrl ?? "");
+  const dirty = value.trim() !== (currentUrl ?? "");
+
+  return (
+    <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap", padding: "8px 12px", background: "rgba(255,255,255,0.03)", borderRadius: "8px", border: "1px solid rgba(255,255,255,0.06)" }}>
+      <span style={{ fontSize: "11px", color: "rgba(255,255,255,0.45)", flexShrink: 0 }}>Google Maps URL:</span>
+      <input
+        type="text"
+        value={value}
+        disabled={disabled}
+        onChange={e => setValue(e.target.value)}
+        placeholder="https://www.google.com/maps/place/..."
         style={{ flex: "1 1 220px", minWidth: "160px", padding: "6px 10px", background: "rgba(255,255,255,0.06)", border: "1.5px solid rgba(255,255,255,0.12)", borderRadius: "7px", fontSize: "12px", color: "#E8EAED", fontFamily: "'DM Sans', sans-serif", outline: "none" }}
       />
       <button
@@ -549,7 +591,7 @@ function OverviewSection({ stats, loading }: { stats: Stats; loading: boolean })
 // ── Section: Pending Review ────────────────────────────────────────────────────
 
 function PendingSection({
-  listings, loading, inFlight, onApprove, onReject, agents, onAssignAgent, onKuulaTourUrl,
+  listings, loading, inFlight, onApprove, onReject, agents, onAssignAgent, onKuulaTourUrl, onGoogleMapsUrl,
 }: {
   listings: AdminListing[];
   loading: boolean;
@@ -559,6 +601,7 @@ function PendingSection({
   agents: ApprovedAgentOption[];
   onAssignAgent: (id: string, agentId: string | null) => void;
   onKuulaTourUrl: (id: string, url: string | null) => void;
+  onGoogleMapsUrl: (id: string, url: string | null) => void;
 }) {
   if (loading) return <Spinner />;
   return (
@@ -594,6 +637,13 @@ function PendingSection({
                   onSave={url => onKuulaTourUrl(l.id, url)}
                 />
               }
+              googleMapsUrlControl={
+                <GoogleMapsUrlControl
+                  currentUrl={l.google_maps_url}
+                  disabled={inFlight === l.id}
+                  onSave={url => onGoogleMapsUrl(l.id, url)}
+                />
+              }
               actions={
                 <>
                   <button
@@ -623,7 +673,7 @@ function PendingSection({
 // ── Section: Approved Listings ─────────────────────────────────────────────────
 
 function ApprovedSection({
-  listings, loading, inFlight, onUnpublish, agents, onAssignAgent, onKuulaTourUrl,
+  listings, loading, inFlight, onUnpublish, agents, onAssignAgent, onKuulaTourUrl, onGoogleMapsUrl,
 }: {
   listings: AdminListing[];
   loading: boolean;
@@ -632,6 +682,7 @@ function ApprovedSection({
   agents: ApprovedAgentOption[];
   onAssignAgent: (id: string, agentId: string | null) => void;
   onKuulaTourUrl: (id: string, url: string | null) => void;
+  onGoogleMapsUrl: (id: string, url: string | null) => void;
 }) {
   if (loading) return <Spinner />;
   return (
@@ -661,6 +712,13 @@ function ApprovedSection({
                   currentUrl={l.kuula_tour_url}
                   disabled={inFlight === l.id}
                   onSave={url => onKuulaTourUrl(l.id, url)}
+                />
+              }
+              googleMapsUrlControl={
+                <GoogleMapsUrlControl
+                  currentUrl={l.google_maps_url}
+                  disabled={inFlight === l.id}
+                  onSave={url => onGoogleMapsUrl(l.id, url)}
                 />
               }
               actions={
@@ -1955,7 +2013,7 @@ export default function AdminPage() {
       setPendingLoading(true);
       supabase
         .from("property_listings")
-        .select("id, slug, title, property_category, listing_type, city, locality, price, photo_urls, seller_name, seller_email, seller_phone, submitted_at, status, assigned_agent_id, kuula_tour_url")
+        .select("id, slug, title, property_category, listing_type, city, locality, price, photo_urls, seller_name, seller_email, seller_phone, submitted_at, status, assigned_agent_id, kuula_tour_url, google_maps_url")
         .eq("status", "pending_review")
         .order("submitted_at", { ascending: true })
         .then((res: { data: unknown }) => {
@@ -1966,7 +2024,7 @@ export default function AdminPage() {
       setApprovedLoading(true);
       supabase
         .from("property_listings")
-        .select("id, slug, title, property_category, listing_type, city, locality, price, photo_urls, seller_name, seller_email, seller_phone, submitted_at, status, assigned_agent_id, kuula_tour_url")
+        .select("id, slug, title, property_category, listing_type, city, locality, price, photo_urls, seller_name, seller_email, seller_phone, submitted_at, status, assigned_agent_id, kuula_tour_url, google_maps_url")
         .eq("status", "active")
         .order("submitted_at", { ascending: false })
         .then((res: { data: unknown }) => {
@@ -2164,6 +2222,30 @@ export default function AdminPage() {
       if (fromSection === "pending") setPendingListings(updater);
       else setApprovedListings(updater);
       setToast({ ok: true, msg: url ? "360° tour URL saved." : "360° tour URL cleared." });
+    }
+    setInFlight(null);
+    setTimeout(() => setToast(null), 2500);
+  }, [pendingListings, approvedListings, logAdminAction]);
+
+  const handleGoogleMapsUrl = useCallback(async (
+    id: string,
+    url: string | null,
+    fromSection: "pending" | "approved",
+  ) => {
+    setInFlight(id);
+    const oldUrl = (fromSection === "pending" ? pendingListings : approvedListings).find(l => l.id === id)?.google_maps_url ?? null;
+    const supabase = createClient();
+    const { error } = await supabase.from("property_listings").update({ google_maps_url: url }).eq("id", id);
+
+    if (error) {
+      console.error("Admin — google maps url error:", error);
+      setToast({ ok: false, msg: "Update failed — please try again." });
+    } else {
+      void logAdminAction("update_google_maps_url", "property_listing", id, { google_maps_url: oldUrl }, { google_maps_url: url });
+      const updater = (prev: AdminListing[]) => prev.map(l => l.id === id ? { ...l, google_maps_url: url } : l);
+      if (fromSection === "pending") setPendingListings(updater);
+      else setApprovedListings(updater);
+      setToast({ ok: true, msg: url ? "Google Maps URL saved." : "Google Maps URL cleared." });
     }
     setInFlight(null);
     setTimeout(() => setToast(null), 2500);
@@ -2432,6 +2514,7 @@ export default function AdminPage() {
         agents={approvedAgents}
         onAssignAgent={(id, agentId) => void handleAssignAgent(id, agentId, "pending")}
         onKuulaTourUrl={(id, url) => void handleKuulaTourUrl(id, url, "pending")}
+        onGoogleMapsUrl={(id, url) => void handleGoogleMapsUrl(id, url, "pending")}
       />
     );
   } else if (active === "approved") {
@@ -2444,6 +2527,7 @@ export default function AdminPage() {
         agents={approvedAgents}
         onAssignAgent={(id, agentId) => void handleAssignAgent(id, agentId, "approved")}
         onKuulaTourUrl={(id, url) => void handleKuulaTourUrl(id, url, "approved")}
+        onGoogleMapsUrl={(id, url) => void handleGoogleMapsUrl(id, url, "approved")}
       />
     );
   } else if (active === "rejected") {
