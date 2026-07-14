@@ -536,6 +536,12 @@ export default function PropertyDetailClient() {
   const today = new Date().toISOString().split("T")[0];
   const video = useMemo(() => parseVideoUrl(property?.video_url ?? null), [property?.video_url]);
 
+  // Locality + city + state only — no precise street address in the query, per privacy-by-default.
+  const mapsUrl = useMemo(() => {
+    const query = [property?.neighbourhood, property?.city, property?.state].filter(Boolean).join(", ");
+    return query ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}` : null;
+  }, [property?.neighbourhood, property?.city, property?.state]);
+
   async function submitVisit() {
     if (!property) return;
     if (!visitName.trim() || !visitPhone.trim()) { setVisitError("Name and phone are required"); return; }
@@ -844,9 +850,22 @@ export default function PropertyDetailClient() {
 
                 <h1 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "32px", fontWeight: 500, color: "#FFFFFF", lineHeight: 1.2, marginBottom: "12px" }}>{property.title}</h1>
 
-                <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "24px" }}>
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#2BA8E0" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" /><circle cx="12" cy="10" r="3" /></svg>
-                  <span style={{ fontSize: "14px", color: "#AEB4BC" }}>{property.address}{property.neighbourhood ? `, ${property.neighbourhood}` : ""}, {property.city}, {property.state}</span>
+                <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "24px", flexWrap: "wrap" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#2BA8E0" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" /><circle cx="12" cy="10" r="3" /></svg>
+                    <span style={{ fontSize: "14px", color: "#AEB4BC" }}>{property.address}{property.neighbourhood ? `, ${property.neighbourhood}` : ""}, {property.city}, {property.state}</span>
+                  </div>
+                  {mapsUrl && (
+                    <a
+                      href={mapsUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{ display: "inline-flex", alignItems: "center", gap: "6px", padding: "5px 12px", borderRadius: "100px", fontSize: "12px", fontWeight: 600, color: "#2BA8E0", background: "rgba(43,168,224,0.1)", border: "1px solid rgba(43,168,224,0.3)", textDecoration: "none" }}
+                    >
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" /><circle cx="12" cy="10" r="3" /></svg>
+                      View on Google Maps
+                    </a>
+                  )}
                 </div>
 
                 {/* Key specs grid */}
