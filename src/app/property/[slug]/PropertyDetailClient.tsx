@@ -46,6 +46,7 @@ type Property = {
   created_at: string;
   video_url: string | null;
   kuula_tour_url: string | null;
+  google_maps_url: string | null;
   seller_email?: string;
   seller_name?: string;
   seller_phone?: string;
@@ -100,6 +101,7 @@ function mapListingToProperty(row: Record<string, unknown>): Property {
       : (typeof row.submitted_at === "string" ? row.submitted_at : new Date().toISOString()),
     video_url:      typeof row.video_url === "string" && row.video_url.trim() ? row.video_url : null,
     kuula_tour_url: typeof row.kuula_tour_url === "string" && row.kuula_tour_url.trim() ? row.kuula_tour_url : null,
+    google_maps_url: typeof row.google_maps_url === "string" && row.google_maps_url.trim() ? row.google_maps_url : null,
     seller_email:    typeof row.seller_email === "string" ? row.seller_email : undefined,
     seller_name:     typeof row.seller_name === "string" ? row.seller_name : undefined,
     seller_phone:    typeof row.seller_phone === "string" ? row.seller_phone : undefined,
@@ -544,6 +546,13 @@ export default function PropertyDetailClient() {
     return query ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}` : null;
   }, [property?.neighbourhood, property?.city, property?.state]);
 
+  // Admin-provided real Google Maps share URL, converted to its embeddable form.
+  const embedMapsUrl = useMemo(() => {
+    const url = property?.google_maps_url;
+    if (!url) return null;
+    return url + (url.includes("?") ? "&output=embed" : "?output=embed");
+  }, [property?.google_maps_url]);
+
   async function submitVisit() {
     if (!property) return;
     if (!visitName.trim() || !visitPhone.trim()) { setVisitError("Name and phone are required"); return; }
@@ -857,7 +866,7 @@ export default function PropertyDetailClient() {
                     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#2BA8E0" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" /><circle cx="12" cy="10" r="3" /></svg>
                     <span style={{ fontSize: "14px", color: "#AEB4BC" }}>{property.address}{property.neighbourhood ? `, ${property.neighbourhood}` : ""}, {property.city}, {property.state}</span>
                   </div>
-                  {mapsUrl && (
+                  {mapsUrl && !embedMapsUrl && (
                     <a
                       href={mapsUrl}
                       target="_blank"
@@ -929,6 +938,22 @@ export default function PropertyDetailClient() {
                       src={property.kuula_tour_url}
                       title={`${property.title} — 360° virtual tour`}
                       allow="xr-spatial-tracking; gyroscope; accelerometer; fullscreen"
+                      allowFullScreen
+                      style={{ position: "absolute", inset: 0, width: "100%", height: "100%", border: "none" }}
+                    />
+                  </div>
+                </Card>
+              )}
+
+              {/* ── LOCATION MAP ── */}
+              {embedMapsUrl && (
+                <Card>
+                  <SectionHeading>Location</SectionHeading>
+                  <div style={{ position: "relative", width: "100%", paddingTop: "56.25%", borderRadius: "12px", overflow: "hidden", background: "#0B0D10" }}>
+                    <iframe
+                      src={embedMapsUrl}
+                      title={`${property.title} — location map`}
+                      loading="lazy"
                       allowFullScreen
                       style={{ position: "absolute", inset: 0, width: "100%", height: "100%", border: "none" }}
                     />
