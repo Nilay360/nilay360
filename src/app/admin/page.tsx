@@ -55,6 +55,7 @@ type UserRow = {
   whatsapp: string | null;
   nationality: string | null;
   bio: string | null;
+  subscription_tier: string | null;
 };
 
 type InquiryRow = {
@@ -819,10 +820,11 @@ const userModalInputStyle: React.CSSProperties = {
   color: "#000000", fontFamily: "'DM Sans', sans-serif", outlineColor: "#2BA8E0",
 };
 
-function UserDetailModal({ user, onClose, onSave }: {
+function UserDetailModal({ user, onClose, onSave, onSubscriptionTierChange }: {
   user: UserRow;
   onClose: () => void;
   onSave: (userId: string, changes: Partial<UserRow>) => Promise<void>;
+  onSubscriptionTierChange: (userId: string, newTier: string) => void;
 }) {
   const [editing,        setEditing]        = useState(false);
   const [draft,          setDraft]          = useState<UserEditableFields>({
@@ -957,6 +959,22 @@ function UserDetailModal({ user, onClose, onSave }: {
           {togglingActive ? "Updating…" : isActive ? "Deactivate Account" : "Reactivate Account"}
         </button>
 
+        {/* Subscription tier */}
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "10px", marginBottom: "18px", padding: "10px 14px", background: "#F8F6F1", borderRadius: "9px", border: "1px solid rgba(13,43,31,0.07)" }}>
+          <span style={{ fontSize: "11px", fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase" as const, color: "#374151" }}>Subscription Tier</span>
+          <div style={{ position: "relative", flexShrink: 0 }}>
+            <select
+              value={user.subscription_tier ?? "free"}
+              onChange={e => onSubscriptionTierChange(user.id, e.target.value)}
+              style={{ padding: "6px 28px 6px 10px", background: "#fff", border: "1.5px solid rgba(13,43,31,0.15)", borderRadius: "7px", fontSize: "12px", fontWeight: 600, color: "#000000", fontFamily: "'DM Sans', sans-serif", outline: "none", appearance: "none", cursor: "pointer" }}
+            >
+              <option value="free">Free</option>
+              <option value="premium">Premium</option>
+            </select>
+            <span style={{ position: "absolute", right: 8, top: "50%", transform: "translateY(-50%)", pointerEvents: "none", color: "rgba(0,0,0,0.4)", fontSize: 9 }}>▼</span>
+          </div>
+        </div>
+
         {/* Fields */}
         {editing ? (
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px 20px", paddingTop: "18px", borderTop: "1px solid rgba(13,43,31,0.07)" }}>
@@ -1017,12 +1035,13 @@ function UserDetailModal({ user, onClose, onSave }: {
 }
 
 function UsersSection({
-  users, loading, onRoleChange, onUpdateUser,
+  users, loading, onRoleChange, onUpdateUser, onSubscriptionTierChange,
 }: {
   users: UserRow[];
   loading: boolean;
   onRoleChange: (userId: string, newRole: string) => void;
   onUpdateUser: (userId: string, changes: Partial<UserRow>) => Promise<void>;
+  onSubscriptionTierChange: (userId: string, newTier: string) => void;
 }) {
   const [search,     setSearch]     = useState("");
   const [roleFilter, setRoleFilter] = useState<string>("all");
@@ -1163,6 +1182,7 @@ function UsersSection({
           user={selected}
           onClose={() => setSelectedId(null)}
           onSave={onUpdateUser}
+          onSubscriptionTierChange={onSubscriptionTierChange}
         />
       )}
     </div>
@@ -2054,7 +2074,7 @@ export default function AdminPage() {
       setUsersLoading(true);
       supabase
         .from("profiles")
-        .select("id, full_name, city, role, phone, email, created_at, is_verified, is_active, is_nri, whatsapp, nationality, bio")
+        .select("id, full_name, city, role, phone, email, created_at, is_verified, is_active, is_nri, whatsapp, nationality, bio, subscription_tier")
         .order("created_at", { ascending: false })
         .then((res: { data: unknown }) => {
           setUsers((res.data as UserRow[] | null) ?? []);
@@ -2271,6 +2291,22 @@ export default function AdminPage() {
     } else {
       void logAdminAction("update_user_role", "profile", userId, { role: prev }, { role: newRole });
       setToast({ ok: true, msg: `Role updated to ${newRole}.` });
+      setTimeout(() => setToast(null), 2500);
+    }
+  }, [users, logAdminAction]);
+
+  const handleSubscriptionTier = useCallback(async (userId: string, newTier: string) => {
+    const prev = users.find(u => u.id === userId)?.subscription_tier ?? "free";
+    setUsers(list => list.map(u => u.id === userId ? { ...u, subscription_tier: newTier } : u));
+    const supabase = createClient();
+    const { error } = await supabase.from("profiles").update({ subscription_tier: newTier }).eq("id", userId);
+    if (error) {
+      console.error("Admin — subscription tier update error:", error);
+      setUsers(list => list.map(u => u.id === userId ? { ...u, subscription_tier: prev } : u));
+      setToast({ ok: false, msg: "Subscription tier update failed." });
+    } else {
+      void logAdminAction("update_subscription_tier", "profile", userId, { subscription_tier: prev }, { subscription_tier: newTier });
+      setToast({ ok: true, msg: `Subscription tier updated to ${newTier}.` });
       setTimeout(() => setToast(null), 2500);
     }
   }, [users, logAdminAction]);
@@ -2565,6 +2601,7 @@ export default function AdminPage() {
         loading={usersLoading}
         onRoleChange={(uid, role) => void handleUserRole(uid, role)}
         onUpdateUser={handleUserUpdate}
+        onSubscriptionTierChange={(uid, tier) => void handleSubscriptionTier(uid, tier)}
       />
     );
   } else if (active === "inquiries") {
