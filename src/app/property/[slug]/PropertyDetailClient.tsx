@@ -546,11 +546,14 @@ export default function PropertyDetailClient() {
     return query ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}` : null;
   }, [property?.neighbourhood, property?.city, property?.state]);
 
-  // Admin-provided real Google Maps share URL, converted to its embeddable form.
+  // Only a real Google Maps "Embed a map" link (google.com/maps/embed?pb=...) will
+  // render in an iframe — regular share/place links set X-Frame-Options and refuse
+  // to be framed, and no client-side query-string trick can change that. If the
+  // admin pasted the wrong kind of link, fall back to the search link-button below
+  // instead of showing a broken iframe.
   const embedMapsUrl = useMemo(() => {
     const url = property?.google_maps_url;
-    if (!url) return null;
-    return url + (url.includes("?") ? "&output=embed" : "?output=embed");
+    return url && url.includes("google.com/maps/embed") ? url : null;
   }, [property?.google_maps_url]);
 
   async function submitVisit() {

@@ -450,25 +450,33 @@ function GoogleMapsUrlControl({
 }) {
   const [value, setValue] = useState(currentUrl ?? "");
   const dirty = value.trim() !== (currentUrl ?? "");
+  const looksLikeEmbed = value.trim() === "" || value.includes("google.com/maps/embed");
 
   return (
-    <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap", padding: "8px 12px", background: "rgba(255,255,255,0.03)", borderRadius: "8px", border: "1px solid rgba(255,255,255,0.06)" }}>
-      <span style={{ fontSize: "11px", color: "rgba(255,255,255,0.45)", flexShrink: 0 }}>Google Maps URL:</span>
-      <input
-        type="text"
-        value={value}
-        disabled={disabled}
-        onChange={e => setValue(e.target.value)}
-        placeholder="https://www.google.com/maps/place/..."
-        style={{ flex: "1 1 220px", minWidth: "160px", padding: "6px 10px", background: "rgba(255,255,255,0.06)", border: "1.5px solid rgba(255,255,255,0.12)", borderRadius: "7px", fontSize: "12px", color: "#E8EAED", fontFamily: "'DM Sans', sans-serif", outline: "none" }}
-      />
-      <button
-        onClick={() => onSave(value.trim() || null)}
-        disabled={disabled || !dirty}
-        style={{ padding: "6px 14px", borderRadius: "7px", fontSize: "11px", fontWeight: 600, background: dirty ? "#2BA8E0" : "rgba(255,255,255,0.06)", color: dirty ? "#000000" : "rgba(255,255,255,0.4)", border: "none", cursor: disabled || !dirty ? "not-allowed" : "pointer", fontFamily: "'DM Sans', sans-serif", flexShrink: 0 }}
-      >
-        Save
-      </button>
+    <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+      <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap", padding: "8px 12px", background: "rgba(255,255,255,0.03)", borderRadius: "8px", border: "1px solid rgba(255,255,255,0.06)" }}>
+        <span style={{ fontSize: "11px", color: "rgba(255,255,255,0.45)", flexShrink: 0 }}>Google Maps Embed URL:</span>
+        <input
+          type="text"
+          value={value}
+          disabled={disabled}
+          onChange={e => setValue(e.target.value)}
+          placeholder="https://www.google.com/maps/embed?pb=... (Share → Embed a map)"
+          style={{ flex: "1 1 220px", minWidth: "160px", padding: "6px 10px", background: "rgba(255,255,255,0.06)", border: "1.5px solid rgba(255,255,255,0.12)", borderRadius: "7px", fontSize: "12px", color: "#E8EAED", fontFamily: "'DM Sans', sans-serif", outline: "none" }}
+        />
+        <button
+          onClick={() => onSave(value.trim() || null)}
+          disabled={disabled || !dirty}
+          style={{ padding: "6px 14px", borderRadius: "7px", fontSize: "11px", fontWeight: 600, background: dirty ? "#2BA8E0" : "rgba(255,255,255,0.06)", color: dirty ? "#000000" : "rgba(255,255,255,0.4)", border: "none", cursor: disabled || !dirty ? "not-allowed" : "pointer", fontFamily: "'DM Sans', sans-serif", flexShrink: 0 }}
+        >
+          Save
+        </button>
+      </div>
+      {!looksLikeEmbed && (
+        <span style={{ fontSize: "11px", color: "#F59E0B", paddingLeft: "2px" }}>
+          ⚠ This doesn't look like an embed link — regular Share/place links won't display (Google blocks them from being framed). Open the location on Google Maps, click Share → &quot;Embed a map&quot;, and paste that URL instead.
+        </span>
+      )}
     </div>
   );
 }
