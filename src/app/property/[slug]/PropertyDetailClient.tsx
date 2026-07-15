@@ -399,7 +399,7 @@ export default function PropertyDetailClient() {
   const [videoPlaying, setVideoPlaying] = useState(false);
 
   // Feature 2 — schedule visit modal
-  const { user, profile } = useAuth();
+  const { user, profile, openAuthModal } = useAuth();
   const [visitOpen, setVisitOpen] = useState(false);
   const [visitDate, setVisitDate] = useState("");
   const [visitSlot, setVisitSlot] = useState<"morning" | "afternoon" | "evening">("morning");
@@ -539,6 +539,28 @@ export default function PropertyDetailClient() {
 
   const today = new Date().toISOString().split("T")[0];
   const video = useMemo(() => parseVideoUrl(property?.video_url ?? null), [property?.video_url]);
+
+  // Fetched in isolation (not via AuthContext's profile) so a missing
+  // subscription_tier column only affects this gate, not every signed-in
+  // page's auth state.
+  const [subscriptionTier, setSubscriptionTier] = useState<string | null>(null);
+  useEffect(() => {
+    if (!user?.id || !property?.kuula_tour_url) { setSubscriptionTier(null); return; }
+    let cancelled = false;
+    const supabase = createClient();
+    supabase
+      .from("profiles")
+      .select("subscription_tier")
+      .eq("id", user.id)
+      .maybeSingle()
+      .then(({ data, error }: { data: { subscription_tier?: string } | null; error: unknown }) => {
+        if (cancelled) return;
+        if (error) { console.error("Subscription tier fetch error:", error); return; }
+        setSubscriptionTier(data?.subscription_tier ?? null);
+      });
+    return () => { cancelled = true; };
+  }, [user?.id, property?.kuula_tour_url]);
+  const isPremium = subscriptionTier === "premium";
 
   // Locality + city + state only — no precise street address in the query, per privacy-by-default.
   const mapsUrl = useMemo(() => {
@@ -933,7 +955,7 @@ export default function PropertyDetailClient() {
               )}
 
               {/* ── 360° VIRTUAL TOUR ── */}
-              {property.kuula_tour_url && (
+              {property.kuula_tour_url && (isPremium ? (
                 <Card>
                   <SectionHeading>360° Virtual Tour</SectionHeading>
                   <div style={{ position: "relative", width: "100%", paddingTop: "56.25%", borderRadius: "12px", overflow: "hidden", background: "#0B0D10" }}>
@@ -946,7 +968,44 @@ export default function PropertyDetailClient() {
                     />
                   </div>
                 </Card>
-              )}
+              ) : (
+                <Card>
+                  <SectionHeading>360° Virtual Tour</SectionHeading>
+                  <div style={{ position: "relative", width: "100%", paddingTop: "56.25%", borderRadius: "12px", overflow: "hidden", background: "#0B0D10" }}>
+                    <div
+                      style={{
+                        position: "absolute", inset: 0,
+                        backgroundImage: property.images?.[0] ? `url(${optimizedImageUrl(property.images[0], 900)})` : undefined,
+                        backgroundSize: "cover", backgroundPosition: "center",
+                        filter: "blur(16px)", transform: "scale(1.1)",
+                      }}
+                    />
+                    <div style={{ position: "absolute", inset: 0, background: "rgba(11,13,16,0.72)" }} />
+                    <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "12px", padding: "24px", textAlign: "center" }}>
+                      <span style={{ width: "52px", height: "52px", borderRadius: "50%", background: "rgba(43,168,224,0.15)", border: "1.5px solid rgba(43,168,224,0.35)", display: "flex", alignItems: "center", justifyContent: "center", color: "#2BA8E0" }}>
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>
+                      </span>
+                      <div style={{ fontSize: "15px", fontWeight: 600, color: "#E8EAED" }}>360° Virtual Tour</div>
+                      <div style={{ fontSize: "13px", color: "#AEB4BC", maxWidth: "320px" }}>Upgrade to Premium to view</div>
+                      {user ? (
+                        <a
+                          href="/pricing"
+                          style={{ display: "inline-flex", alignItems: "center", gap: "6px", padding: "9px 20px", borderRadius: "100px", fontSize: "12px", fontWeight: 700, letterSpacing: "0.03em", color: "#000000", background: "#2BA8E0", textDecoration: "none", fontFamily: "'DM Sans', sans-serif" }}
+                        >
+                          Upgrade to Premium
+                        </a>
+                      ) : (
+                        <button
+                          onClick={() => openAuthModal("signin")}
+                          style={{ display: "inline-flex", alignItems: "center", gap: "6px", padding: "9px 20px", borderRadius: "100px", fontSize: "12px", fontWeight: 700, letterSpacing: "0.03em", color: "#000000", background: "#2BA8E0", border: "none", cursor: "pointer", fontFamily: "'DM Sans', sans-serif" }}
+                        >
+                          Sign In to Unlock
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                </Card>
+              ))}
 
               {/* ── LOCATION MAP ── */}
               {embedMapsUrl && (
