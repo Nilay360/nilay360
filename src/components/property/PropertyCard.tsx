@@ -7,6 +7,10 @@ import { optimizedImageUrl } from "@/lib/image-url"
 import { Badge } from "@/components/ui/Badge"
 import { useCompare } from "@/context/CompareContext"
 
+// Mirrors post-property/page.tsx's COMMERCIAL_CATEGORIES — these categories
+// store "rooms/cabins" in the bedrooms field, not a BHK count.
+const COMMERCIAL_CATEGORIES = ["office", "retail", "warehouse"]
+
 export interface PropertyCardProps {
   id: string
   slug: string
@@ -182,7 +186,7 @@ export function PropertyCard({
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
                   <path d="M3 22V8a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v14M3 22h18M3 12h18" />
                 </svg>
-                <strong className="text-[#000000] font-medium">{bedrooms}</strong> BHK
+                <strong className="text-[#000000] font-medium">{bedrooms}</strong> {COMMERCIAL_CATEGORIES.includes(type) ? "Rooms" : "BHK"}
               </div>
             )}
             {bathrooms !== undefined && (
@@ -190,7 +194,7 @@ export function PropertyCard({
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
                   <path d="M4 12h16M4 12V8a2 2 0 0 1 2-2h1M4 12v4a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-4" />
                 </svg>
-                <strong className="text-[#000000] font-medium">{bathrooms}</strong> Bath
+                <strong className="text-[#000000] font-medium">{bathrooms}</strong> {COMMERCIAL_CATEGORIES.includes(type) ? "Wash" : "Bath"}
               </div>
             )}
             <div className="flex items-center gap-1 text-[11px] text-[#6B7C72] ml-auto">

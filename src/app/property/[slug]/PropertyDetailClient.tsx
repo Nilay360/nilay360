@@ -9,6 +9,11 @@ import { useSavedProperties } from "@/hooks/useSavedProperties";
 import ReportButton from "@/components/shared/ReportButton";
 import { optimizedImageUrl } from "@/lib/image-url";
 
+// Mirrors post-property/page.tsx's COMMERCIAL_CATEGORIES — these categories
+// store "rooms/cabins" in the bedrooms field, not a BHK count, so display
+// must not label it "Bedrooms" / "X BHK".
+const COMMERCIAL_CATEGORIES = ["office", "retail", "warehouse"];
+
 // ── Types ────────────────────────────────────────────────────
 type Property = {
   id: string;
@@ -279,8 +284,10 @@ function buildBrochureHtml(p: Property): string {
     <table>
       ${spec("Listing Type", p.listing_type === "rent" ? "For Rent" : "For Sale")}
       ${spec("Property Type", p.type ? p.type.charAt(0).toUpperCase() + p.type.slice(1) : null)}
-      ${spec("Bedrooms", p.bedrooms != null ? `${p.bedrooms} BHK` : null)}
-      ${spec("Bathrooms", p.bathrooms != null ? String(p.bathrooms) : null)}
+      ${COMMERCIAL_CATEGORIES.includes(p.type)
+        ? spec("Rooms / Cabins", p.bedrooms != null ? String(p.bedrooms) : null)
+        : spec("Bedrooms", p.bedrooms != null ? `${p.bedrooms} BHK` : null)}
+      ${spec(COMMERCIAL_CATEGORIES.includes(p.type) ? "Washrooms" : "Bathrooms", p.bathrooms != null ? String(p.bathrooms) : null)}
       ${spec("Built-up Area", p.area_sqft ? `${p.area_sqft.toLocaleString("en-IN")} sqft` : null)}
       ${spec("Floor", p.floor_number != null ? `${p.floor_number}${p.total_floors ? ` of ${p.total_floors}` : ""}` : null)}
       ${spec("Facing", p.facing)}
@@ -342,7 +349,7 @@ function SimilarCard({ p }: { p: Property }) {
           <div style={{ fontSize: "13px", fontWeight: 500, color: "#FFFFFF", marginBottom: "4px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{p.title}</div>
           <div style={{ fontSize: "11px", color: "#AEB4BC" }}>{p.neighbourhood ? `${p.neighbourhood}, ` : ""}{p.city}</div>
           <div style={{ display: "flex", gap: "12px", marginTop: "10px", paddingTop: "10px", borderTop: "1px solid rgba(255,255,255,0.08)" }}>
-            {[{ v: p.bedrooms, l: "Beds" }, { v: p.bathrooms, l: "Bath" }, { v: p.area_sqft?.toLocaleString("en-IN"), l: "sqft" }].map(s => s.v != null && (
+            {[{ v: p.bedrooms, l: COMMERCIAL_CATEGORIES.includes(p.type) ? "Rooms" : "Beds" }, { v: p.bathrooms, l: COMMERCIAL_CATEGORIES.includes(p.type) ? "Wash" : "Bath" }, { v: p.area_sqft?.toLocaleString("en-IN"), l: "sqft" }].map(s => s.v != null && (
               <div key={s.l} style={{ display: "flex", flexDirection: "column", gap: "1px" }}>
                 <span style={{ fontSize: "12px", fontWeight: 600, color: "#E8EAED" }}>{s.v}</span>
                 <span style={{ fontSize: "10px", color: "rgba(255,255,255,0.45)", textTransform: "uppercase", letterSpacing: "0.05em" }}>{s.l}</span>
@@ -906,16 +913,23 @@ export default function PropertyDetailClient() {
 
                 {/* Key specs grid */}
                 <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(110px, 1fr))", gap: "12px" }}>
-                  {[
-                    { icon: "🛏", label: "Bedrooms", value: property.bedrooms != null ? `${property.bedrooms} BHK` : null },
-                    { icon: "🚿", label: "Bathrooms", value: property.bathrooms != null ? `${property.bathrooms} Bath` : null },
+                  {(() => {
+                    const isCommSpec = COMMERCIAL_CATEGORIES.includes(property.type);
+                    return [
+                      isCommSpec
+                        ? { icon: "🏢", label: "Rooms / Cabins", value: property.bedrooms != null ? `${property.bedrooms}` : null }
+                        : { icon: "🛏", label: "Bedrooms", value: property.bedrooms != null ? `${property.bedrooms} BHK` : null },
+                      isCommSpec
+                        ? { icon: "🚿", label: "Washrooms", value: property.bathrooms != null ? `${property.bathrooms}` : null }
+                        : { icon: "🚿", label: "Bathrooms", value: property.bathrooms != null ? `${property.bathrooms} Bath` : null },
                     { icon: "⬛", label: "Area", value: property.area_sqft ? `${property.area_sqft.toLocaleString("en-IN")} sqft` : null },
                     { icon: "🏢", label: "Floor", value: property.floor_number != null ? `${property.floor_number}${property.total_floors ? ` of ${property.total_floors}` : ""}` : null },
                     { icon: "🚗", label: "Parking", value: property.parking_spaces != null ? `${property.parking_spaces} Car${property.parking_spaces !== 1 ? "s" : ""}` : null },
                     { icon: "📅", label: "Year Built", value: property.year_built ? `${property.year_built}` : null },
                     { icon: "🧭", label: "Facing", value: property.facing ?? null },
                     { icon: "🏠", label: "Ownership", value: property.ownership_type ?? null },
-                  ].filter(s => s.value !== null).map(spec => (
+                    ];
+                  })().filter(s => s.value !== null).map(spec => (
                     <div key={spec.label} style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.10)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", borderRadius: "16px", padding: "14px 12px", textAlign: "center" }}>
                       <div style={{ fontSize: "18px", marginBottom: "6px" }}>{spec.icon}</div>
                       <div style={{ fontSize: "12px", fontWeight: 600, color: "#E8EAED", marginBottom: "2px" }}>{spec.value}</div>
