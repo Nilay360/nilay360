@@ -235,6 +235,11 @@ const CATEGORIES: Record<string, Array<{ value: PropertyCategory; label: string;
   ],
 }
 
+// Categories where "bedrooms" really means rooms/cabins, not BHK — used to keep
+// the wizard, validation, and review summary from talking about "BHK" for a
+// commercial listing. Property detail page display mirrors this list.
+const COMMERCIAL_CATEGORIES = ['office', 'retail', 'warehouse']
+
 const CITIES = ['Hyderabad', 'Mumbai', 'Bengaluru', 'Delhi NCR', 'Chennai', 'Pune', 'Kolkata', 'Ahmedabad']
 
 const PP_CITY_STATE_MAP: Record<string, string> = {
@@ -604,7 +609,7 @@ function Step2({ state, dispatch }: { state: FormState; dispatch: React.Dispatch
 function Step3({ state, dispatch }: { state: FormState; dispatch: React.Dispatch<Action> }) {
   const f = (field: keyof FormState) => (v: string) => dispatch({ type: 'SET', field, value: v })
   const isPlot = state.propertyCategory === 'plot'
-  const isComm = ['office', 'retail', 'warehouse'].includes(state.propertyCategory)
+  const isComm = COMMERCIAL_CATEGORIES.includes(state.propertyCategory)
 
   const numPills = (count: number, start = 1) =>
     Array.from({ length: count }, (_, i) => String(i + start))
@@ -1094,6 +1099,7 @@ function Step7({
   uploadProgress: { current: number; total: number } | null
 }) {
   const set = (field: keyof FormState) => (v: string) => dispatch({ type: 'SET', field, value: v })
+  const isComm = COMMERCIAL_CATEGORIES.includes(state.propertyCategory)
 
   const rows: [string, string][] = [
     ['Listing Type',   state.listingType ? state.listingType.charAt(0).toUpperCase() + state.listingType.slice(1) : '—'],
@@ -1101,7 +1107,7 @@ function Step7({
     ['Address',        [state.address, state.locality, state.city, state.stateField, state.pincode].filter(Boolean).join(', ') || '—'],
     ['Landmark',       state.landmark || '—'],
     ['Built-up Area',  state.areaSqft ? `${Number(state.areaSqft).toLocaleString('en-IN')} sq ft` : '—'],
-    ['Bedrooms',       state.bedrooms || '—'],
+    [isComm ? 'Rooms / Cabins' : 'Bedrooms', state.bedrooms || '—'],
     ['Bathrooms',      state.bathrooms || '—'],
     ['Balconies',      state.balconies || '—'],
     ['Floor',          state.floor ? `${state.floor} of ${state.totalFloors || '?'}` : '—'],
@@ -1276,7 +1282,9 @@ function validate(step: number, s: FormState): string | null {
     if (!s.areaSqft || isNaN(Number(s.areaSqft)) || Number(s.areaSqft) <= 0)
       return 'Please enter a valid built-up area in sq ft'
     if (s.propertyCategory !== 'plot' && !s.bedrooms)
-      return 'Please select the number of bedrooms'
+      return COMMERCIAL_CATEGORIES.includes(s.propertyCategory)
+        ? 'Please enter the number of rooms / cabins'
+        : 'Please select the number of bedrooms'
   }
   if (step === 4) {
     if (!s.price || isNaN(Number(s.price)) || Number(s.price) <= 0)
@@ -1391,9 +1399,10 @@ export default function PostPropertyPage() {
       if (state.coveredParking) parkingParts.push(`${state.coveredParking} Covered`)
       if (state.openParking)    parkingParts.push(`${state.openParking} Open`)
 
+      const isCommTitle = COMMERCIAL_CATEGORIES.includes(state.propertyCategory)
       const { error: insertErr } = await supabase.from('property_listings').insert([{
         slug:               `${slugBase}-${Date.now()}`,
-        title:              `${state.bedrooms ? state.bedrooms + ' BHK ' : ''}${state.propertyCategory} in ${state.locality}, ${state.city}`.trim(),
+        title:              `${!isCommTitle && state.bedrooms ? state.bedrooms + ' BHK ' : ''}${state.propertyCategory} in ${state.locality}, ${state.city}`.trim(),
         // Schema column names (requirements-aligned)
         listing_type:       state.listingType,
         property_category:  state.propertyCategory,
