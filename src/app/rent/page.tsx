@@ -21,6 +21,10 @@ type Property = {
   is_furnished?: boolean;
 };
 
+// Mirrors post-property/page.tsx's COMMERCIAL_CATEGORIES — these categories
+// store "rooms/cabins" in the bedrooms field, not a BHK count.
+const COMMERCIAL_CATEGORIES = ["office", "retail", "warehouse"];
+
 // ── Mapper: property_listings row → Property shape ────────────
 function num(v: unknown): number | null {
   if (v == null || v === "") return null;
@@ -93,7 +97,7 @@ function RentalCard({ p }: { p: Property }) {
           {p.neighbourhood ? `${p.neighbourhood}, ` : ""}{p.city}
         </p>
         <div style={{ display: "flex", borderTop: "1px solid rgba(255,255,255,0.07)", paddingTop: "14px" }}>
-          {[{ v: p.bedrooms, l: "Beds" }, { v: p.bathrooms, l: "Baths" }, { v: p.area_sqft?.toLocaleString("en-IN"), l: "sqft" }].map((s, i) => s.v != null && (
+          {[{ v: p.bedrooms, l: COMMERCIAL_CATEGORIES.includes(p.type) ? "Rooms" : "Beds" }, { v: p.bathrooms, l: COMMERCIAL_CATEGORIES.includes(p.type) ? "Wash" : "Baths" }, { v: p.area_sqft?.toLocaleString("en-IN"), l: "sqft" }].map((s, i) => s.v != null && (
             <div key={i} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: "3px", borderRight: i < 2 ? "1px solid rgba(255,255,255,0.07)" : "none" }}>
               <span style={{ fontSize: "13px", fontWeight: 700, color: "#E8EAED" }}>{s.v}</span>
               <span style={{ fontSize: "9px", color: "#9CA3AF", textTransform: "uppercase", letterSpacing: "0.08em" }}>{s.l}</span>

@@ -190,6 +190,10 @@ function FaqItem({ q, a, idx }: { q: string; a: string; idx: number }) {
   );
 }
 
+// Mirrors post-property/page.tsx's COMMERCIAL_CATEGORIES — these categories
+// store "rooms/cabins" in the bedrooms field, not a BHK count.
+const COMMERCIAL_CATEGORIES = ["office", "retail", "warehouse"];
+
 // ── Property card ─────────────────────────────────────────────
 function PropCard({ p }: { p: Property }) {
   const [hover, setHover] = useState(false);
@@ -207,7 +211,7 @@ function PropCard({ p }: { p: Property }) {
         <p style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "19px", fontWeight: 600, color: "#2BA8E0", marginBottom: "10px" }}>{fmtINR(p.price, true)}{p.listing_type === "rent" ? "/mo" : ""}</p>
         {(p.bedrooms || p.bathrooms || p.area_sqft) && (
           <div style={{ display: "flex", gap: "12px" }}>
-            {p.bedrooms    && <span style={{ fontSize: "11px", color: "#6B7C72" }}>🛏 {p.bedrooms} BHK</span>}
+            {p.bedrooms    && <span style={{ fontSize: "11px", color: "#6B7C72" }}>🛏 {p.bedrooms} {COMMERCIAL_CATEGORIES.includes(p.property_type?.toLowerCase()) ? "Rooms" : "BHK"}</span>}
             {p.bathrooms   && <span style={{ fontSize: "11px", color: "#6B7C72" }}>🚿 {p.bathrooms}</span>}
             {p.area_sqft   && <span style={{ fontSize: "11px", color: "#6B7C72" }}>📐 {p.area_sqft.toLocaleString("en-IN")} sqft</span>}
           </div>

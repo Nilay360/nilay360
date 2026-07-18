@@ -87,6 +87,7 @@ const lbl: React.CSSProperties = {
 
 const LISTING_TYPES   = ['sale', 'rent', 'commercial']
 const CATEGORIES      = ['apartment', 'villa', 'plot', 'office', 'retail', 'penthouse', 'townhouse', 'warehouse']
+const COMMERCIAL_CATEGORIES = ['office', 'retail', 'warehouse']
 const CITIES          = ['Hyderabad', 'Mumbai', 'Bengaluru', 'Delhi NCR', 'Chennai', 'Pune', 'Kolkata', 'Ahmedabad']
 const STATES          = ['Andhra Pradesh', 'Karnataka', 'Maharashtra', 'Telangana', 'Tamil Nadu', 'Delhi', 'Gujarat', 'Rajasthan', 'West Bengal', 'Punjab', 'Uttar Pradesh', 'Kerala', 'Madhya Pradesh', 'Haryana', 'Goa']
 const FACING_OPTS     = ['North', 'South', 'East', 'West', 'North-East', 'North-West', 'South-East', 'South-West']
@@ -381,10 +382,10 @@ export default function EditListingPage() {
               <Field label="Built-up Area (sq ft)">
                 <TInput value={form.built_up_area} onChange={set('built_up_area') as (v: string) => void} type="number" placeholder="e.g. 1200" />
               </Field>
-              <Field label="Bedrooms">
+              <Field label={COMMERCIAL_CATEGORIES.includes(form.property_category) ? 'Rooms / Cabins' : 'Bedrooms'}>
                 <TInput value={form.bedrooms} onChange={set('bedrooms') as (v: string) => void} type="number" placeholder="e.g. 3" />
               </Field>
-              <Field label="Bathrooms">
+              <Field label={COMMERCIAL_CATEGORIES.includes(form.property_category) ? 'Washrooms' : 'Bathrooms'}>
                 <TInput value={form.bathrooms} onChange={set('bathrooms') as (v: string) => void} type="number" placeholder="e.g. 2" />
               </Field>
               <Field label="Balconies">

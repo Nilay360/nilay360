@@ -31,6 +31,10 @@ type Property = {
   saves: number;
 };
 
+// Mirrors post-property/page.tsx's COMMERCIAL_CATEGORIES — these categories
+// store "rooms/cabins" in the bedrooms field, not a BHK count.
+const COMMERCIAL_CATEGORIES = ["office", "retail", "warehouse"];
+
 function formatPrice(price: number, listingType: string): string {
   if (listingType === "rent") {
     if (price >= 100000) return `₹${(price / 100000).toFixed(1)}L/mo`;
@@ -160,7 +164,7 @@ function PropertyCard({ property, savedIds, onToggleSave }: { property: Property
           <span style={{ fontSize: "12px", color: "rgba(245,242,236,0.5)" }}>{property.neighbourhood ? `${property.neighbourhood}, ` : ""}{property.city}</span>
         </div>
         <div style={{ display: "flex", borderTop: "1px solid rgba(245,242,236,0.07)", paddingTop: "14px" }}>
-          {[{ value: property.bedrooms, label: "Beds" }, { value: property.bathrooms, label: "Baths" }, { value: property.area_sqft?.toLocaleString("en-IN"), label: "sqft" }].map((s, i) => s.value != null && (
+          {[{ value: property.bedrooms, label: COMMERCIAL_CATEGORIES.includes(property.type) ? "Rooms" : "Beds" }, { value: property.bathrooms, label: COMMERCIAL_CATEGORIES.includes(property.type) ? "Wash" : "Baths" }, { value: property.area_sqft?.toLocaleString("en-IN"), label: "sqft" }].map((s, i) => s.value != null && (
             <div key={i} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: "3px", borderRight: i < 2 ? "1px solid rgba(245,242,236,0.07)" : "none" }}>
               <span style={{ fontSize: "13px", fontWeight: 600, color: "#000000" }}>{s.value}</span>
               <span style={{ fontSize: "10px", color: "rgba(245,242,236,0.35)", letterSpacing: "0.06em", textTransform: "uppercase" }}>{s.label}</span>
@@ -481,7 +485,7 @@ export default function PropertiesPage() {
                         {p.description && <p style={{ fontSize: "13px", color: "rgba(245,242,236,0.4)", lineHeight: 1.6, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{p.description}</p>}
                       </div>
                       <div style={{ display: "flex", gap: "20px", marginTop: "16px", paddingTop: "16px", borderTop: "1px solid rgba(245,242,236,0.07)" }}>
-                        {[{ label: "Beds", value: p.bedrooms }, { label: "Baths", value: p.bathrooms }, { label: "sqft", value: p.area_sqft?.toLocaleString("en-IN") }].map(s => s.value != null && (
+                        {[{ label: COMMERCIAL_CATEGORIES.includes(p.type) ? "Rooms" : "Beds", value: p.bedrooms }, { label: COMMERCIAL_CATEGORIES.includes(p.type) ? "Wash" : "Baths", value: p.bathrooms }, { label: "sqft", value: p.area_sqft?.toLocaleString("en-IN") }].map(s => s.value != null && (
                           <div key={s.label} style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
                             <span style={{ fontSize: "15px", fontWeight: 600, color: "#000000" }}>{s.value}</span>
                             <span style={{ fontSize: "10px", color: "rgba(245,242,236,0.35)", textTransform: "uppercase", letterSpacing: "0.06em" }}>{s.label}</span>

@@ -18,6 +18,10 @@ type Property = {
   facing: string | null; possession: string | null;
 };
 
+// Mirrors post-property/page.tsx's COMMERCIAL_CATEGORIES — these categories
+// store "rooms/cabins" in the bedrooms field, not a BHK count.
+const COMMERCIAL_CATEGORIES = ["office", "retail", "warehouse"];
+
 // ── Helpers ───────────────────────────────────────────────────
 function fmt(price: number, lt: string): string {
   if (lt === "rent") {
@@ -244,7 +248,7 @@ function PropertyCard({ p, comparing, onCompare, onSave, saved }: { p: Property;
             <span style={{ fontSize: "11px", color: "rgba(255,255,255,0.45)" }}>{p.neighbourhood ? `${p.neighbourhood}, ` : ""}{p.city}</span>
           </div>
           <div style={{ display: "flex", borderTop: "1px solid rgba(255,255,255,0.07)", paddingTop: "12px" }}>
-            {[{ v: p.bedrooms, l: "Beds" }, { v: p.bathrooms, l: "Bath" }, { v: p.area_sqft?.toLocaleString("en-IN"), l: "sqft" }].map((s, i) => s.v != null && (
+            {[{ v: p.bedrooms, l: COMMERCIAL_CATEGORIES.includes(p.type) ? "Rooms" : "Beds" }, { v: p.bathrooms, l: COMMERCIAL_CATEGORIES.includes(p.type) ? "Wash" : "Bath" }, { v: p.area_sqft?.toLocaleString("en-IN"), l: "sqft" }].map((s, i) => s.v != null && (
               <div key={i} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: "2px", borderRight: i < 2 ? "1px solid rgba(255,255,255,0.07)" : "none" }}>
                 <span style={{ fontSize: "12px", fontWeight: 700, color: "#E8EAED" }}>{s.v}</span>
                 <span style={{ fontSize: "9px", color: "#9CA3AF", textTransform: "uppercase", letterSpacing: "0.06em" }}>{s.l}</span>
@@ -286,7 +290,7 @@ function ListRow({ p, comparing, onCompare, onSave, saved }: { p: Property; comp
           {p.description && <p style={{ fontSize: "13px", color: "rgba(255,255,255,0.45)", lineHeight: 1.6, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{p.description}</p>}
         </div>
         <div style={{ display: "flex", gap: "16px", paddingTop: "12px", borderTop: "1px solid rgba(255,255,255,0.07)", marginTop: "12px", alignItems: "center" }}>
-          {[{ v: p.bedrooms, l: "Beds" }, { v: p.bathrooms, l: "Bath" }, { v: p.area_sqft?.toLocaleString("en-IN"), l: "sqft" }].map((s, i) => s.v != null && (
+          {[{ v: p.bedrooms, l: COMMERCIAL_CATEGORIES.includes(p.type) ? "Rooms" : "Beds" }, { v: p.bathrooms, l: COMMERCIAL_CATEGORIES.includes(p.type) ? "Wash" : "Bath" }, { v: p.area_sqft?.toLocaleString("en-IN"), l: "sqft" }].map((s, i) => s.v != null && (
             <div key={i}>
               <span style={{ fontSize: "13px", fontWeight: 700, color: "#E8EAED" }}>{s.v}</span>
               <span style={{ fontSize: "10px", color: "#9CA3AF", marginLeft: "3px", textTransform: "uppercase" }}>{s.l}</span>

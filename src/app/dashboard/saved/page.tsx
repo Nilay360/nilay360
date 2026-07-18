@@ -30,6 +30,10 @@ interface SavedItem extends SaveRow {
 
 const G = { dark: "#000000", gold: "#2BA8E0", ivory: "#000000", mid: "#0B0D10" };
 
+// Mirrors post-property/page.tsx's COMMERCIAL_CATEGORIES — these categories
+// store "rooms/cabins" in the bedrooms field, not a BHK count.
+const COMMERCIAL_CATEGORIES = ["office", "retail", "warehouse"];
+
 function fmtPrice(price: number | null, listingType?: string | null): string {
   if (price == null) return "—";
   if (listingType === "rent") {
@@ -257,7 +261,7 @@ export default function SavedPropertiesPage() {
                             </span>
                             {d.bedrooms != null && (
                               <span style={{ fontSize: 13, color: "#AEB4BC", fontFamily: "'DM Sans', sans-serif" }}>
-                                {d.bedrooms} BHK
+                                {d.bedrooms} {d.property_category && COMMERCIAL_CATEGORIES.includes(d.property_category) ? "Rooms" : "BHK"}
                               </span>
                             )}
                             <span style={{ fontSize: 13, fontWeight: 600, color: "#E8EAED", fontFamily: "'DM Sans', sans-serif" }}>

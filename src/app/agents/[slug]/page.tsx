@@ -174,6 +174,10 @@ function ReviewCard({ r }: { r: Review }) {
   );
 }
 
+// Mirrors post-property/page.tsx's COMMERCIAL_CATEGORIES — these categories
+// store "rooms/cabins" in the bedrooms field, not a BHK count.
+const COMMERCIAL_CATEGORIES = ["office", "retail", "warehouse"];
+
 // ── Property mini-card ────────────────────────────────────────
 function PropCard({ p }: { p: Property }) {
   const [hover, setHover] = useState(false);
@@ -190,7 +194,7 @@ function PropCard({ p }: { p: Property }) {
         <p style={{ fontSize: "9px", fontWeight: 700, letterSpacing: "0.1em", color: "#2BA8E0", textTransform: "uppercase", marginBottom: "3px" }}>{p.type}</p>
         <h4 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "14px", fontWeight: 600, color: "#000000", marginBottom: "6px", lineHeight: 1.3, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{p.title}</h4>
         <p style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "16px", fontWeight: 600, color: "#2BA8E0", marginBottom: "6px" }}>{fmtINR(p.price)}{p.listing_type === "rent" ? "/mo" : ""}</p>
-        <p style={{ fontSize: "11px", color: "#9CA3AF" }}>🛏 {p.bedrooms} BHK · 📐 {p.area.toLocaleString("en-IN")} sqft</p>
+        <p style={{ fontSize: "11px", color: "#9CA3AF" }}>🛏 {p.bedrooms} {COMMERCIAL_CATEGORIES.includes(p.type) ? "Rooms" : "BHK"} · 📐 {p.area.toLocaleString("en-IN")} sqft</p>
       </div>
     </a>
   );
