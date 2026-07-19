@@ -113,6 +113,8 @@ type AuditLogRow = {
   profiles: { full_name: string | null; email: string | null } | null;
 };
 
+type SiteContentRow = { key: string; value: string; updated_at: string };
+
 type ReportRow = {
   id: string;
   reporter_id: string;
@@ -485,72 +487,118 @@ function GoogleMapsUrlControl({
 
 // ── Section: Site Content ──────────────────────────────────────────────────────
 
-function SiteContentField({
-  label, description, value, onSave, disabled, multiline,
+function SiteContentRowEditor({
+  row, disabled, onSave, onDelete,
 }: {
-  label: string; description?: string; value: string;
-  onSave: (v: string) => void; disabled: boolean; multiline?: boolean;
+  row: SiteContentRow; disabled: boolean;
+  onSave: (key: string, value: string) => void;
+  onDelete: (key: string) => void;
 }) {
-  const [draft, setDraft] = useState(value);
-  useEffect(() => { setDraft(value); }, [value]);
-  const dirty = draft !== value;
+  const [draft, setDraft] = useState(row.value);
+  useEffect(() => { setDraft(row.value); }, [row.value]);
+  const dirty = draft !== row.value;
 
   return (
-    <div style={{ background: "rgba(255,255,255,0.05)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", borderRadius: "14px", border: "1px solid rgba(255,255,255,0.08)", padding: "20px 22px", marginBottom: "14px" }}>
-      <label style={{ fontSize: "12px", fontWeight: 700, color: "#E8EAED", display: "block", marginBottom: "4px" }}>{label}</label>
-      {description && <p style={{ fontSize: "11px", color: "#AEB4BC", marginBottom: "10px" }}>{description}</p>}
-      <div style={{ display: "flex", gap: "10px", alignItems: multiline ? "flex-start" : "center", flexWrap: "wrap" }}>
-        {multiline ? (
-          <textarea
-            value={draft} disabled={disabled} onChange={e => setDraft(e.target.value)} rows={2}
-            style={{ flex: "1 1 260px", minWidth: "200px", padding: "10px 12px", background: "rgba(255,255,255,0.06)", border: "1.5px solid rgba(255,255,255,0.12)", borderRadius: "8px", fontSize: "13px", color: "#E8EAED", fontFamily: "'DM Sans', sans-serif", outline: "none", resize: "vertical" }}
-          />
-        ) : (
-          <input
-            type="text" value={draft} disabled={disabled} onChange={e => setDraft(e.target.value)}
-            style={{ flex: "1 1 260px", minWidth: "200px", padding: "10px 12px", background: "rgba(255,255,255,0.06)", border: "1.5px solid rgba(255,255,255,0.12)", borderRadius: "8px", fontSize: "13px", color: "#E8EAED", fontFamily: "'DM Sans', sans-serif", outline: "none" }}
-          />
-        )}
-        <button
-          onClick={() => onSave(draft)}
-          disabled={disabled || !dirty}
-          style={{ padding: "9px 20px", borderRadius: "8px", fontSize: "12px", fontWeight: 700, background: dirty ? "#2BA8E0" : "rgba(255,255,255,0.06)", color: dirty ? "#000000" : "rgba(255,255,255,0.4)", border: "none", cursor: disabled || !dirty ? "not-allowed" : "pointer", fontFamily: "'DM Sans', sans-serif", flexShrink: 0 }}
-        >
-          Save
-        </button>
+    <div style={{ background: "rgba(255,255,255,0.05)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", borderRadius: "14px", border: "1px solid rgba(255,255,255,0.08)", padding: "18px 20px", marginBottom: "12px" }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "8px", gap: "10px", flexWrap: "wrap" }}>
+        <code style={{ fontSize: "12px", fontWeight: 700, color: "#2BA8E0", background: "rgba(43,168,224,0.1)", padding: "3px 9px", borderRadius: "6px" }}>{row.key}</code>
+        <span style={{ fontSize: "10px", color: "rgba(255,255,255,0.3)" }}>
+          Updated {new Date(row.updated_at).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}
+        </span>
+      </div>
+      <div style={{ display: "flex", gap: "10px", alignItems: "flex-start", flexWrap: "wrap" }}>
+        <textarea
+          value={draft} disabled={disabled} onChange={e => setDraft(e.target.value)} rows={2}
+          style={{ flex: "1 1 260px", minWidth: "200px", padding: "10px 12px", background: "rgba(255,255,255,0.06)", border: "1.5px solid rgba(255,255,255,0.12)", borderRadius: "8px", fontSize: "13px", color: "#E8EAED", fontFamily: "'DM Sans', sans-serif", outline: "none", resize: "vertical" }}
+        />
+        <div style={{ display: "flex", gap: "8px", flexShrink: 0 }}>
+          <button
+            onClick={() => onSave(row.key, draft)}
+            disabled={disabled || !dirty}
+            style={{ padding: "9px 18px", borderRadius: "8px", fontSize: "12px", fontWeight: 700, background: dirty ? "#2BA8E0" : "rgba(255,255,255,0.06)", color: dirty ? "#000000" : "rgba(255,255,255,0.4)", border: "none", cursor: disabled || !dirty ? "not-allowed" : "pointer", fontFamily: "'DM Sans', sans-serif" }}
+          >
+            Save
+          </button>
+          <button
+            onClick={() => { if (window.confirm(`Delete key "${row.key}"? Any page reading it will fall back to its hardcoded default.`)) onDelete(row.key); }}
+            disabled={disabled}
+            style={{ padding: "9px 14px", borderRadius: "8px", fontSize: "12px", fontWeight: 600, background: "rgba(248,113,113,0.1)", color: "#F87171", border: "1.5px solid rgba(248,113,113,0.3)", cursor: disabled ? "not-allowed" : "pointer", fontFamily: "'DM Sans', sans-serif" }}
+          >
+            Delete
+          </button>
+        </div>
       </div>
     </div>
   );
 }
 
-const SITE_CONTENT_FIELDS: { key: string; label: string; description: string; multiline?: boolean }[] = [
-  { key: "hero_line1",     label: "Homepage Hero — Line 1",       description: "Main headline on the homepage hero." },
-  { key: "hero_line2",     label: "Homepage Hero — Line 2",       description: "Italic second line under the headline." },
-  { key: "hero_subtitle",  label: "Homepage Hero — Subtitle",     description: "Short line under the headline.", multiline: true },
-  { key: "trust_bar_note", label: "Trust Bar Note (optional)",    description: "Short label shown near the stats strip — leave blank to hide it." },
-];
+function SiteContentAddForm({
+  disabled, existingKeys, onAdd,
+}: {
+  disabled: boolean; existingKeys: string[];
+  onAdd: (key: string, value: string) => void;
+}) {
+  const [key, setKey] = useState("");
+  const [value, setValue] = useState("");
+  const normalized = key.trim().toLowerCase().replace(/\s+/g, "_");
+  const duplicate = normalized !== "" && existingKeys.includes(normalized);
+  const canAdd = normalized !== "" && value.trim() !== "" && !duplicate;
+
+  return (
+    <div style={{ background: "rgba(43,168,224,0.05)", border: "1.5px dashed rgba(43,168,224,0.3)", borderRadius: "14px", padding: "18px 20px", marginBottom: "20px" }}>
+      <p style={{ fontSize: "12px", fontWeight: 700, color: "#E8EAED", marginBottom: "10px" }}>Add New Key</p>
+      <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", alignItems: "flex-start" }}>
+        <input
+          type="text" placeholder="key_name (e.g. about_hero_title)" value={key} disabled={disabled}
+          onChange={e => setKey(e.target.value)}
+          style={{ flex: "0 1 220px", minWidth: "180px", padding: "10px 12px", background: "rgba(255,255,255,0.06)", border: "1.5px solid rgba(255,255,255,0.12)", borderRadius: "8px", fontSize: "13px", color: "#E8EAED", fontFamily: "'DM Sans', sans-serif", outline: "none" }}
+        />
+        <textarea
+          placeholder="Value" value={value} disabled={disabled} rows={2}
+          onChange={e => setValue(e.target.value)}
+          style={{ flex: "1 1 260px", minWidth: "200px", padding: "10px 12px", background: "rgba(255,255,255,0.06)", border: "1.5px solid rgba(255,255,255,0.12)", borderRadius: "8px", fontSize: "13px", color: "#E8EAED", fontFamily: "'DM Sans', sans-serif", outline: "none", resize: "vertical" }}
+        />
+        <button
+          onClick={() => { onAdd(normalized, value.trim()); setKey(""); setValue(""); }}
+          disabled={disabled || !canAdd}
+          style={{ padding: "9px 20px", borderRadius: "8px", fontSize: "12px", fontWeight: 700, background: canAdd ? "#2BA8E0" : "rgba(255,255,255,0.06)", color: canAdd ? "#000000" : "rgba(255,255,255,0.4)", border: "none", cursor: disabled || !canAdd ? "not-allowed" : "pointer", fontFamily: "'DM Sans', sans-serif", flexShrink: 0 }}
+        >
+          Add
+        </button>
+      </div>
+      {duplicate && <p style={{ fontSize: "11px", color: "#F59E0B", marginTop: "8px" }}>A key with this name already exists.</p>}
+    </div>
+  );
+}
 
 function SiteContentSection({
-  content, loading, disabled, onSave,
+  rows, loading, disabled, onSave, onAdd, onDelete,
 }: {
-  content: Record<string, string>; loading: boolean; disabled: string | null;
+  rows: SiteContentRow[]; loading: boolean; disabled: string | null;
   onSave: (key: string, value: string) => void;
+  onAdd: (key: string, value: string) => void;
+  onDelete: (key: string) => void;
 }) {
   if (loading) return <Spinner />;
   return (
     <div>
-      <SectionHeading title="Site Content" subtitle="Edit commonly-changed homepage copy — changes appear immediately, no code deploy needed." />
-      {SITE_CONTENT_FIELDS.map(f => (
-        <SiteContentField
-          key={f.key}
-          label={f.label}
-          description={f.description}
-          multiline={f.multiline}
-          value={content[f.key] ?? ""}
-          disabled={disabled === f.key}
-          onSave={v => onSave(f.key, v)}
-        />
-      ))}
+      <SectionHeading title="Site Content" subtitle="Edit any site copy stored in the content table — changes appear immediately, no code deploy needed." count={rows.length} />
+      <SiteContentAddForm disabled={disabled !== null} existingKeys={rows.map(r => r.key)} onAdd={onAdd} />
+      {rows.length === 0 ? (
+        <div style={{ padding: "60px 24px", textAlign: "center", background: "rgba(255,255,255,0.05)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", borderRadius: "18px", border: "1px solid rgba(255,255,255,0.08)" }}>
+          <p style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "20px", color: "#E8EAED" }}>No content keys yet</p>
+        </div>
+      ) : (
+        rows.map(row => (
+          <SiteContentRowEditor
+            key={row.key}
+            row={row}
+            disabled={disabled === row.key}
+            onSave={onSave}
+            onDelete={onDelete}
+          />
+        ))
+      )}
     </div>
   );
 }
@@ -2012,7 +2060,7 @@ export default function AdminPage() {
   const [approvedAgents,   setApprovedAgents]   = useState<ApprovedAgentOption[]>([]);
   const [auditLog,         setAuditLog]         = useState<AuditLogRow[]>([]);
   const [reports,          setReports]          = useState<ReportRow[]>([]);
-  const [siteContent,      setSiteContent]      = useState<Record<string, string>>({});
+  const [siteContentRows,  setSiteContentRows]  = useState<SiteContentRow[]>([]);
   const [reportListingPreviews, setReportListingPreviews] = useState<Record<string, ReportListingPreview>>({});
   const [reportProfilePreviews, setReportProfilePreviews] = useState<Record<string, ReportProfilePreview>>({});
 
@@ -2191,12 +2239,10 @@ export default function AdminPage() {
       setContentLoading(true);
       supabase
         .from("site_content")
-        .select("key, value")
+        .select("key, value, updated_at")
+        .order("key", { ascending: true })
         .then((res: { data: unknown }) => {
-          const rows = (res.data as { key: string; value: string }[] | null) ?? [];
-          const map: Record<string, string> = {};
-          rows.forEach(r => { map[r.key] = r.value; });
-          setSiteContent(map);
+          setSiteContentRows((res.data as SiteContentRow[] | null) ?? []);
           setContentLoading(false);
         });
     } else if (active === "reports") {
@@ -2250,11 +2296,12 @@ export default function AdminPage() {
 
   const handleSiteContentSave = useCallback(async (key: string, newValue: string) => {
     setInFlight(key);
-    const oldValue = siteContent[key] ?? "";
+    const oldValue = siteContentRows.find(r => r.key === key)?.value ?? "";
     const supabase = createClient();
+    const nowIso = new Date().toISOString();
     const { error } = await supabase
       .from("site_content")
-      .update({ value: newValue, updated_by: user?.id ?? null, updated_at: new Date().toISOString() })
+      .update({ value: newValue, updated_by: user?.id ?? null, updated_at: nowIso })
       .eq("key", key);
 
     if (error) {
@@ -2262,12 +2309,50 @@ export default function AdminPage() {
       setToast({ ok: false, msg: "Save failed — please try again." });
     } else {
       void logAdminAction("update_site_content", "site_content", null, { key, value: oldValue }, { key, value: newValue });
-      setSiteContent(prev => ({ ...prev, [key]: newValue }));
+      setSiteContentRows(prev => prev.map(r => r.key === key ? { ...r, value: newValue, updated_at: nowIso } : r));
       setToast({ ok: true, msg: "Saved." });
     }
     setInFlight(null);
     setTimeout(() => setToast(null), 2500);
-  }, [siteContent, logAdminAction, user]);
+  }, [siteContentRows, logAdminAction, user]);
+
+  const handleSiteContentAdd = useCallback(async (key: string, value: string) => {
+    setInFlight(key);
+    const supabase = createClient();
+    const nowIso = new Date().toISOString();
+    const { error } = await supabase
+      .from("site_content")
+      .insert({ key, value, updated_by: user?.id ?? null });
+
+    if (error) {
+      console.error("Admin — site content add error:", error);
+      setToast({ ok: false, msg: error.code === "23505" ? "That key already exists." : "Add failed — please try again." });
+    } else {
+      void logAdminAction("create_site_content", "site_content", null, null, { key, value });
+      setSiteContentRows(prev => [...prev, { key, value, updated_at: nowIso }].sort((a, b) => a.key.localeCompare(b.key)));
+      setToast({ ok: true, msg: "Key added." });
+    }
+    setInFlight(null);
+    setTimeout(() => setToast(null), 2500);
+  }, [logAdminAction, user]);
+
+  const handleSiteContentDelete = useCallback(async (key: string) => {
+    setInFlight(key);
+    const oldValue = siteContentRows.find(r => r.key === key)?.value ?? "";
+    const supabase = createClient();
+    const { error } = await supabase.from("site_content").delete().eq("key", key);
+
+    if (error) {
+      console.error("Admin — site content delete error:", error);
+      setToast({ ok: false, msg: "Delete failed — please try again." });
+    } else {
+      void logAdminAction("delete_site_content", "site_content", null, { key, value: oldValue }, null);
+      setSiteContentRows(prev => prev.filter(r => r.key !== key));
+      setToast({ ok: true, msg: "Key deleted." });
+    }
+    setInFlight(null);
+    setTimeout(() => setToast(null), 2500);
+  }, [siteContentRows, logAdminAction, user]);
 
   const handleListingStatus = useCallback(async (
     id: string,
@@ -2740,10 +2825,12 @@ export default function AdminPage() {
   } else if (active === "content") {
     content = (
       <SiteContentSection
-        content={siteContent}
+        rows={siteContentRows}
         loading={contentLoading}
         disabled={inFlight}
         onSave={(key, value) => void handleSiteContentSave(key, value)}
+        onAdd={(key, value) => void handleSiteContentAdd(key, value)}
+        onDelete={key => void handleSiteContentDelete(key)}
       />
     );
   } else {
