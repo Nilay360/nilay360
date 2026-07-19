@@ -2,6 +2,36 @@
 import { useState, useEffect, useRef } from "react";
 import { createClient } from "@/lib/supabase/client";
 
+// ── Editable page copy — falls back to these defaults if a key is
+// missing/deleted from site_content, so the page is never blank ──
+const DEFAULT_ABOUT_CONTENT: Record<string, string> = {
+  about_hero_title:            "India's Most Trusted\nPremium Real Estate Platform",
+  about_hero_quote:            "Your Trust. Our Promise.",
+  about_hero_description:      "Nilay 360 was built on a conviction that India's premium property buyers deserve more — more transparency, more expertise, and more integrity than the market has historically provided.",
+  about_story_heading_line1:   "Born From a",
+  about_story_heading_line2:   "Simple Belief",
+  about_story_paragraph1:      "Nilay 360 was founded in 2024 with a straightforward conviction: India's most discerning property buyers deserved a platform that matched their standards. The existing market — fragmented, opaque, riddled with unverified listings and unqualified agents — was failing them.",
+  about_story_paragraph2:      "Starting in Hyderabad, we built from first principles. Every listing manually verified. Every agent background-checked and RERA-certified. Every piece of market data sourced from real transactions. Within three months we had 100 listings — and a waitlist of agents who wanted to join a platform that actually cared about quality.",
+  about_story_paragraph3:      "Today Nilay 360 operates across 14 cities, has facilitated over ₹18,000 crore in property transactions, and has become the benchmark for what premium real estate looks like in India. We're just getting started.",
+  about_story_quote:           "Premium real estate deserves a premium experience — from first search to final signature.",
+  about_mission_heading:       "Why We Exist",
+  about_mission_text:          "To simplify India's premium property market by connecting serious buyers with verified listings, certified agents, and independent legal guidance — removing uncertainty at every step of the transaction.",
+  about_vision_text:           "To become the most trusted real estate platform in India — the name every premium buyer, NRI investor, and luxury developer thinks of first when quality, integrity, and expertise matter most.",
+  about_why_heading_line1:     "Why Discerning Buyers",
+  about_why_heading_line2:     "Choose Nilay 360",
+  about_stats_heading_line1:   "The Numbers Behind",
+  about_stats_heading_line2:   "Our Promise",
+  about_team_heading:          "Leadership Team",
+  about_team_subtitle:         "Experienced operators, technologists, and real estate professionals united by a single standard: excellence.",
+  about_awards_heading:        "Awards & Certifications",
+  about_testimonials_heading:  "Trusted by Thousands",
+  about_cta_heading_line1:     "Join Thousands of",
+  about_cta_heading_line2:     "Satisfied Clients",
+  about_cta_description:       "Whether you're buying, selling, investing, or renting — Nilay 360 gives you the expertise, the data, and the integrity to make the right decision with complete confidence.",
+  about_cta_button_primary:    "Browse Properties",
+  about_cta_button_secondary:  "Contact Us",
+};
+
 // ── Counter animation hook ────────────────────────────────────
 function useCountUp(target: number, duration = 1800, start = false) {
   const [count, setCount] = useState(0);
@@ -48,6 +78,24 @@ function StatItem({ target, suffix, prefix, label, inView }: { target: number; s
 export default function AboutPage() {
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const { ref: statsRef, inView: statsInView } = useInView(0.3);
+
+  const [content, setContent] = useState<Record<string, string>>(DEFAULT_ABOUT_CONTENT);
+  useEffect(() => {
+    async function loadContent() {
+      try {
+        const supabase = createClient();
+        const { data } = await supabase.from("site_content").select("key, value").in("key", Object.keys(DEFAULT_ABOUT_CONTENT));
+        if (data) {
+          setContent(prev => {
+            const next = { ...prev };
+            data.forEach((row: any) => { if (row.value) next[row.key] = row.value; });
+            return next;
+          });
+        }
+      } catch (_) {}
+    }
+    loadContent();
+  }, []);
 
   const TEAM = [
     { initials: "VK", name: "Vanith K", role: "Founder & CEO", bio: "A serial entrepreneur with 12+ years in Indian real estate, Vanith founded Nilay 360 to bring transparency and trust to premium property transactions across India.", color: "#2BA8E0" },
@@ -155,13 +203,13 @@ export default function AboutPage() {
               <span style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.2em", color: "#2BA8E0", textTransform: "uppercase" }}>About Nilay 360</span>
             </div>
             <h1 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "clamp(36px, 5.5vw, 66px)", fontWeight: 300, color: "#000000", lineHeight: 1.12, marginBottom: "18px", animation: "fadeUp 0.6s ease-out both" }}>
-              India's Most Trusted<br />Premium Real Estate Platform
+              {content.about_hero_title.split("\n").map((line, i) => <span key={i}>{i > 0 && <br />}{line}</span>)}
             </h1>
             <p style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "clamp(20px, 2.5vw, 28px)", fontStyle: "italic", fontWeight: 400, color: "#2BA8E0", marginBottom: "22px", animation: "fadeUp 0.6s 0.1s ease-out both" }}>
-              "Your Trust. Our Promise."
+              "{content.about_hero_quote}"
             </p>
             <p style={{ fontSize: "15px", color: "rgba(245,242,236,0.55)", lineHeight: 1.8, maxWidth: "600px", margin: "0 auto 36px", animation: "fadeUp 0.6s 0.2s ease-out both" }}>
-              Nilay 360 was built on a conviction that India's premium property buyers deserve more — more transparency, more expertise, and more integrity than the market has historically provided.
+              {content.about_hero_description}
             </p>
             <div style={{ display: "flex", gap: "12px", justifyContent: "center", flexWrap: "wrap", animation: "fadeUp 0.6s 0.3s ease-out both" }}>
               {["Est. 2024", "Hyderabad, India"].map(pill => (
@@ -181,16 +229,16 @@ export default function AboutPage() {
                 <span style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.22em", color: "#2BA8E0", textTransform: "uppercase" }}>Our Story</span>
               </div>
               <h2 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "clamp(34px, 4vw, 52px)", fontWeight: 400, color: "#000000", lineHeight: 1.15, marginBottom: "28px" }}>
-                Born From a<br /><em style={{ fontStyle: "italic", color: "#2BA8E0" }}>Simple Belief</em>
+                {content.about_story_heading_line1}<br /><em style={{ fontStyle: "italic", color: "#2BA8E0" }}>{content.about_story_heading_line2}</em>
               </h2>
               <p style={{ fontSize: "15px", color: "#4B5563", lineHeight: 1.8, marginBottom: "18px" }}>
-                Nilay 360 was founded in 2024 with a straightforward conviction: India's most discerning property buyers deserved a platform that matched their standards. The existing market — fragmented, opaque, riddled with unverified listings and unqualified agents — was failing them.
+                {content.about_story_paragraph1}
               </p>
               <p style={{ fontSize: "15px", color: "#4B5563", lineHeight: 1.8, marginBottom: "18px" }}>
-                Starting in Hyderabad, we built from first principles. Every listing manually verified. Every agent background-checked and RERA-certified. Every piece of market data sourced from real transactions. Within three months we had 100 listings — and a waitlist of agents who wanted to join a platform that actually cared about quality.
+                {content.about_story_paragraph2}
               </p>
               <p style={{ fontSize: "15px", color: "#4B5563", lineHeight: 1.8, marginBottom: "40px" }}>
-                Today Nilay 360 operates across 14 cities, has facilitated over ₹18,000 crore in property transactions, and has become the benchmark for what premium real estate looks like in India. We're just getting started.
+                {content.about_story_paragraph3}
               </p>
               {/* Timeline */}
               <div style={{ borderLeft: "2px solid rgba(201,168,76,0.3)", paddingLeft: "24px", display: "flex", flexDirection: "column", gap: "0" }}>
@@ -215,7 +263,7 @@ export default function AboutPage() {
                 <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(13,43,31,0.6) 0%, transparent 50%)" }} />
                 <div style={{ position: "absolute", bottom: "28px", left: "28px", right: "28px" }}>
                   <div style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "22px", fontWeight: 500, color: "#000000", lineHeight: 1.3 }}>
-                    "Premium real estate deserves a premium experience — from first search to final signature."
+                    "{content.about_story_quote}"
                   </div>
                   <div style={{ marginTop: "10px", fontSize: "12px", color: "rgba(245,242,236,0.5)" }}>— Vanith K, Founder & CEO</div>
                 </div>
@@ -240,7 +288,7 @@ export default function AboutPage() {
                 <div style={{ width: "28px", height: "1px", background: "rgba(201,168,76,0.5)" }} />
               </div>
               <h2 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "clamp(32px, 4vw, 50px)", fontWeight: 300, color: "#000000", lineHeight: 1.15 }}>
-                Why We Exist
+                {content.about_mission_heading}
               </h2>
             </div>
             <div className="ab-mission-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "24px" }}>
@@ -248,13 +296,13 @@ export default function AboutPage() {
                 {
                   label: "Our Mission", sub: "What We Do Today",
                   icon: "◎",
-                  text: "To simplify India's premium property market by connecting serious buyers with verified listings, certified agents, and independent legal guidance — removing uncertainty at every step of the transaction.",
+                  text: content.about_mission_text,
                   accent: "#2BA8E0",
                 },
                 {
                   label: "Our Vision", sub: "Where We're Going",
                   icon: "◈",
-                  text: "To become the most trusted real estate platform in India — the name every premium buyer, NRI investor, and luxury developer thinks of first when quality, integrity, and expertise matter most.",
+                  text: content.about_vision_text,
                   accent: "rgba(201,168,76,0.6)",
                 },
               ].map(card => (
@@ -279,7 +327,7 @@ export default function AboutPage() {
                 <div style={{ width: "28px", height: "1px", background: "rgba(201,168,76,0.5)" }} />
               </div>
               <h2 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "clamp(32px, 4vw, 50px)", fontWeight: 400, color: "#000000", lineHeight: 1.15 }}>
-                Why Discerning Buyers<br /><em style={{ fontStyle: "italic", color: "#2BA8E0" }}>Choose Nilay 360</em>
+                {content.about_why_heading_line1}<br /><em style={{ fontStyle: "italic", color: "#2BA8E0" }}>{content.about_why_heading_line2}</em>
               </h2>
             </div>
             <div className="ab-why-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "20px" }}>
@@ -305,7 +353,7 @@ export default function AboutPage() {
           <div ref={statsRef} style={{ position: "relative", zIndex: 2, maxWidth: "1200px", margin: "0 auto" }}>
             <div style={{ textAlign: "center", marginBottom: "60px" }}>
               <h2 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "clamp(30px, 3.5vw, 46px)", fontWeight: 300, color: "#000000" }}>
-                The Numbers Behind<br /><em style={{ fontStyle: "italic", color: "#2BA8E0" }}>Our Promise</em>
+                {content.about_stats_heading_line1}<br /><em style={{ fontStyle: "italic", color: "#2BA8E0" }}>{content.about_stats_heading_line2}</em>
               </h2>
             </div>
             <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: "0", borderTop: "1px solid rgba(201,168,76,0.12)", borderBottom: "1px solid rgba(201,168,76,0.12)", padding: "48px 0" }}>
@@ -330,10 +378,10 @@ export default function AboutPage() {
                 <div style={{ width: "28px", height: "1px", background: "rgba(201,168,76,0.5)" }} />
               </div>
               <h2 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "clamp(32px, 4vw, 50px)", fontWeight: 400, color: "#000000", lineHeight: 1.15 }}>
-                Leadership Team
+                {content.about_team_heading}
               </h2>
               <p style={{ fontSize: "15px", color: "#6B7C72", marginTop: "14px", maxWidth: "500px", margin: "14px auto 0", lineHeight: 1.7 }}>
-                Experienced operators, technologists, and real estate professionals united by a single standard: excellence.
+                {content.about_team_subtitle}
               </p>
             </div>
             <div className="ab-team-grid" style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "20px" }}>
@@ -364,7 +412,7 @@ export default function AboutPage() {
                 <div style={{ width: "28px", height: "1px", background: "rgba(201,168,76,0.5)" }} />
               </div>
               <h2 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "clamp(28px, 3.5vw, 44px)", fontWeight: 400, color: "#000000" }}>
-                Awards & Certifications
+                {content.about_awards_heading}
               </h2>
             </div>
             <div className="ab-awards-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "18px" }}>
@@ -389,7 +437,7 @@ export default function AboutPage() {
                 <div style={{ width: "28px", height: "1px", background: "rgba(201,168,76,0.5)" }} />
               </div>
               <h2 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "clamp(30px, 3.8vw, 48px)", fontWeight: 400, color: "#000000" }}>
-                Trusted by Thousands
+                {content.about_testimonials_heading}
               </h2>
             </div>
             {testimonials.length === 0 ? (
@@ -423,18 +471,18 @@ export default function AboutPage() {
           <div style={{ position: "absolute", inset: 0, background: "radial-gradient(ellipse 60% 60% at 50% 120%, rgba(201,168,76,0.1) 0%, transparent 55%)", pointerEvents: "none" }} />
           <div style={{ position: "relative", zIndex: 2, maxWidth: "680px", margin: "0 auto", textAlign: "center" }}>
             <h2 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "clamp(34px, 5vw, 58px)", fontWeight: 300, color: "#000000", lineHeight: 1.15, marginBottom: "16px" }}>
-              Join Thousands of<br /><em style={{ fontStyle: "italic", color: "#2BA8E0" }}>Satisfied Clients</em>
+              {content.about_cta_heading_line1}<br /><em style={{ fontStyle: "italic", color: "#2BA8E0" }}>{content.about_cta_heading_line2}</em>
             </h2>
             <p style={{ fontSize: "15px", color: "rgba(245,242,236,0.5)", lineHeight: 1.75, marginBottom: "36px" }}>
-              Whether you're buying, selling, investing, or renting — Nilay 360 gives you the expertise, the data, and the integrity to make the right decision with complete confidence.
+              {content.about_cta_description}
             </p>
             <div style={{ display: "flex", gap: "14px", justifyContent: "center", flexWrap: "wrap" }}>
               <a href="/properties" style={{ padding: "14px 36px", background: "#2BA8E0", border: "none", borderRadius: "9px", color: "#000000", fontSize: "13px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", textDecoration: "none", display: "inline-flex", alignItems: "center", gap: "8px" }}>
-                Browse Properties
+                {content.about_cta_button_primary}
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" /></svg>
               </a>
               <a href="mailto:contact@nilay360.com" style={{ padding: "14px 36px", background: "transparent", border: "1.5px solid rgba(245,242,236,0.2)", borderRadius: "9px", color: "rgba(245,242,236,0.75)", fontSize: "13px", fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase", textDecoration: "none" }}>
-                Contact Us
+                {content.about_cta_button_secondary}
               </a>
             </div>
           </div>
