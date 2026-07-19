@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
+import { createClient } from "@/lib/supabase/client";
 
 // ── Counter animation hook ────────────────────────────────────
 function useCountUp(target: number, duration = 1800, start = false) {
@@ -68,14 +69,32 @@ export default function AboutPage() {
     { icon: "🏛", label: "RERA Compliant Platform", sub: "All 13 RERA jurisdictions" },
     { icon: "🏆", label: "Best PropTech Startup", sub: "India PropTech Awards 2025" },
     { icon: "✅", label: "ISO 27001 Certified", sub: "Data security & privacy" },
-    { icon: "⭐", label: "Google Verified Business", sub: "4.9 / 5 · 2,400+ reviews" },
   ];
 
-  const TESTIMONIALS = [
-    { quote: "Nilay 360 made buying our first home in Jubilee Hills a genuinely pleasant experience. Our advisor knew every lane and helped us avoid two developers with pending litigations. Couldn't have done it without them.", name: "Priya & Karthik M.", role: "Home buyers, Jubilee Hills", initials: "PK" },
-    { quote: "As an NRI buying from Dubai, I was nervous about the process. Nilay 360 assigned a dedicated advisor who handled everything — virtual tours, legal checks, POA, even interior referrals. Completely seamless.", name: "Suresh Nambiar", role: "NRI buyer, Gachibowli Villa", initials: "SN" },
-    { quote: "I've worked with several portals as a seller. Nilay 360 is the only one where I felt my listing was being handled with the same care I give it. Serious buyers only, no time-wasters.", name: "Meera Agarwal", role: "Property owner, Banjara Hills", initials: "MA" },
-  ];
+  const [testimonials, setTestimonials] = useState<{ id: string; quote: string; name: string; role: string; initials: string }[]>([]);
+  useEffect(() => {
+    async function loadTestimonials() {
+      try {
+        const supabase = createClient();
+        const { data } = await supabase
+          .from("testimonials")
+          .select("id, name, designation, company, content")
+          .eq("is_featured", true)
+          .order("sort_order", { ascending: true })
+          .limit(6);
+        if (data) {
+          setTestimonials(data.map((t: any) => ({
+            id: t.id,
+            quote: t.content,
+            name: t.name,
+            role: [t.designation, t.company].filter(Boolean).join(", "),
+            initials: (t.name || "").split(" ").map((w: string) => w[0]).join("").slice(0, 2).toUpperCase(),
+          })));
+        }
+      } catch (_) {}
+    }
+    loadTestimonials();
+  }, []);
 
   const TIMELINE = [
     { year: "2024", label: "Nilay 360 Founded", detail: "Launched in Hyderabad with a mission to bring integrity to premium real estate." },
@@ -297,8 +316,6 @@ export default function AboutPage() {
               <StatItem target={14}                         label="Cities"              inView={statsInView} />
               <div style={{ width: "1px", background: "rgba(201,168,76,0.15)", margin: "0 8px" }} />
               <StatItem target={98}     suffix="%"          label="Client Satisfaction" inView={statsInView} />
-              <div style={{ width: "1px", background: "rgba(201,168,76,0.15)", margin: "0 8px" }} />
-              <StatItem target={18000}  suffix="Cr" prefix="₹" label="Deals Facilitated" inView={statsInView} />
             </div>
           </div>
         </section>
@@ -350,7 +367,7 @@ export default function AboutPage() {
                 Awards & Certifications
               </h2>
             </div>
-            <div className="ab-awards-grid" style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "18px" }}>
+            <div className="ab-awards-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "18px" }}>
               {AWARDS.map((a, i) => (
                 <div key={i} style={{ background: "#F8F6F1", border: "1px solid rgba(13,43,31,0.07)", borderRadius: "16px", padding: "32px 20px", textAlign: "center" }}>
                   <div style={{ fontSize: "36px", marginBottom: "14px", filter: "grayscale(0)" }}>{a.icon}</div>
@@ -375,21 +392,28 @@ export default function AboutPage() {
                 Trusted by Thousands
               </h2>
             </div>
-            <div className="ab-testimonials-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "20px" }}>
-              {TESTIMONIALS.map((t, i) => (
-                <div key={i} style={{ background: "#fff", border: "1px solid rgba(13,43,31,0.07)", borderRadius: "18px", padding: "36px 32px" }}>
-                  <div style={{ fontSize: "36px", fontFamily: "Georgia, serif", color: "#2BA8E0", lineHeight: 0.9, marginBottom: "18px", opacity: 0.7 }}>"</div>
-                  <p style={{ fontSize: "14px", color: "#374151", lineHeight: 1.8, fontStyle: "italic", marginBottom: "24px" }}>{t.quote}</p>
-                  <div style={{ display: "flex", alignItems: "center", gap: "12px", paddingTop: "18px", borderTop: "1px solid rgba(13,43,31,0.06)" }}>
-                    <div style={{ width: "38px", height: "38px", borderRadius: "50%", background: "linear-gradient(135deg, rgba(201,168,76,0.2), rgba(201,168,76,0.4))", border: "1.5px solid rgba(201,168,76,0.3)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "12px", fontWeight: 700, color: "#2BA8E0", flexShrink: 0 }}>{t.initials}</div>
-                    <div>
-                      <div style={{ fontSize: "13px", fontWeight: 600, color: "#000000" }}>{t.name}</div>
-                      <div style={{ fontSize: "11px", color: "#9CA3AF" }}>{t.role}</div>
+            {testimonials.length === 0 ? (
+              <div style={{ background: "#fff", border: "1px solid rgba(13,43,31,0.07)", borderRadius: "18px", padding: "56px 32px", textAlign: "center", maxWidth: "560px", margin: "0 auto" }}>
+                <p style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "22px", color: "#000000", marginBottom: "8px" }}>Be the First to Share Your Story</p>
+                <p style={{ fontSize: "13px", color: "#9CA3AF" }}>We're just getting started — client testimonials will appear here as they come in.</p>
+              </div>
+            ) : (
+              <div className="ab-testimonials-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "20px" }}>
+                {testimonials.map((t) => (
+                  <div key={t.id} style={{ background: "#fff", border: "1px solid rgba(13,43,31,0.07)", borderRadius: "18px", padding: "36px 32px" }}>
+                    <div style={{ fontSize: "36px", fontFamily: "Georgia, serif", color: "#2BA8E0", lineHeight: 0.9, marginBottom: "18px", opacity: 0.7 }}>"</div>
+                    <p style={{ fontSize: "14px", color: "#374151", lineHeight: 1.8, fontStyle: "italic", marginBottom: "24px" }}>{t.quote}</p>
+                    <div style={{ display: "flex", alignItems: "center", gap: "12px", paddingTop: "18px", borderTop: "1px solid rgba(13,43,31,0.06)" }}>
+                      <div style={{ width: "38px", height: "38px", borderRadius: "50%", background: "linear-gradient(135deg, rgba(201,168,76,0.2), rgba(201,168,76,0.4))", border: "1.5px solid rgba(201,168,76,0.3)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "12px", fontWeight: 700, color: "#2BA8E0", flexShrink: 0 }}>{t.initials}</div>
+                      <div>
+                        <div style={{ fontSize: "13px", fontWeight: 600, color: "#000000" }}>{t.name}</div>
+                        <div style={{ fontSize: "11px", color: "#9CA3AF" }}>{t.role}</div>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
           </div>
         </section>
 

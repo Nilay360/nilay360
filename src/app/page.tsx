@@ -91,13 +91,14 @@ const LOCATIONS = [
   { city:"Chennai", area:"OMR", listings:91, avg:"₹7,600/sqft", grad:"linear-gradient(135deg,#201010,#401a1a)", img:"https://images.unsplash.com/photo-1582510003544-4d00b7f74220?w=800&q=80" },
 ];
 
-const REVIEWS = [
-  { name:"Arjun Mehta", role:"Home Buyer, Hyderabad", stars:5, text:"Nilay 360 made our search genuinely effortless. The RERA verification gave us peace of mind we could not find anywhere else. Highly recommended for serious buyers.", date:"Jan 2025" },
-  { name:"Priya Raghavan", role:"Property Investor, Mumbai", stars:5, text:"Purchased two investment properties through Nilay 360. The market insights are incredibly accurate. Their agents actually know the market.", date:"Feb 2025" },
-  { name:"Rohit Desai", role:"NRI Buyer, Bengaluru", stars:5, text:"As an NRI, I was worried about the complexity. Nilay 360 handled everything — legal, FEMA compliance, registration. Truly world-class service.", date:"Mar 2025" },
-  { name:"Kavitha Nair", role:"First-time Buyer, Chennai", stars:5, text:"The EMI calculator and affordability tools helped us plan perfectly. Found our dream flat in 3 weeks. Exceptional platform.", date:"Apr 2025" },
-  { name:"Vikram Sharma", role:"Developer Partner, Pune", stars:5, text:"Listed our project and got qualified leads within 48 hours. The RERA verification badge has significantly improved buyer trust.", date:"May 2025" },
-];
+type Testimonial = { id: string; name: string; role: string; rating: number; text: string; date: string };
+
+const DEFAULT_SITE_CONTENT: Record<string, string> = {
+  hero_line1: "Find Your Dream Property",
+  hero_line2: "Now in Hyderabad",
+  hero_subtitle: "From search to possession — India's most trusted premium platform",
+  trust_bar_note: "",
+};
 
 /* ─── Helpers ─────────────────────────────────────────────── */
 function SvgIcon({ d, size=20, color="currentColor", strokeWidth=1.5 }: { d:string; size?:number; color?:string; strokeWidth?:number }) {
@@ -124,6 +125,67 @@ export default function HomePage() {
       setUserId(data.user?.id ?? null)
     })
   }, [])
+
+  const [siteContent, setSiteContent] = useState<Record<string, string>>(DEFAULT_SITE_CONTENT);
+  useEffect(() => {
+    async function loadSiteContent() {
+      try {
+        const supabase = createClient();
+        const { data } = await supabase.from("site_content").select("key, value");
+        if (data) {
+          setSiteContent(prev => {
+            const next = { ...prev };
+            data.forEach((row: any) => { if (row.value) next[row.key] = row.value; });
+            return next;
+          });
+        }
+      } catch (_) {}
+    }
+    loadSiteContent();
+  }, []);
+
+  const [liveStats, setLiveStats] = useState({ listings: 0, agents: 0, cities: 0 });
+  useEffect(() => {
+    async function loadLiveStats() {
+      try {
+        const supabase = createClient();
+        const [{ count: listingsCount }, { count: agentsCount }, { data: cityRows }] = await Promise.all([
+          supabase.from("property_listings").select("*", { count: "exact", head: true }).eq("status", "active"),
+          supabase.from("agent_profiles").select("*", { count: "exact", head: true }).eq("status", "approved"),
+          supabase.from("property_listings").select("city").eq("status", "active"),
+        ]);
+        const uniqueCities = new Set((cityRows ?? []).map((r: any) => r.city).filter(Boolean)).size;
+        setLiveStats({ listings: listingsCount ?? 0, agents: agentsCount ?? 0, cities: uniqueCities });
+      } catch (_) {}
+    }
+    loadLiveStats();
+  }, []);
+
+  const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
+  useEffect(() => {
+    async function loadTestimonials() {
+      try {
+        const supabase = createClient();
+        const { data } = await supabase
+          .from("testimonials")
+          .select("id, name, designation, company, content, rating, created_at")
+          .eq("is_featured", true)
+          .order("sort_order", { ascending: true })
+          .limit(9);
+        if (data) {
+          setTestimonials(data.map((t: any) => ({
+            id: t.id,
+            name: t.name,
+            role: [t.designation, t.company].filter(Boolean).join(", "),
+            rating: t.rating ?? 5,
+            text: t.content,
+            date: t.created_at ? new Date(t.created_at).toLocaleDateString("en-IN", { month: "short", year: "numeric" }) : "",
+          })));
+        }
+      } catch (_) {}
+    }
+    loadTestimonials();
+  }, []);
 
   const [searchTab, setSearchTab] = useState("Buy");
   const [searchCity, setSearchCity] = useState("");
@@ -154,9 +216,10 @@ export default function HomePage() {
   };
 
   useEffect(() => {
-    const t = setInterval(() => setReviewIdx(i => (i+1) % REVIEWS.length), 5000);
+    if (testimonials.length === 0) return;
+    const t = setInterval(() => setReviewIdx(i => (i+1) % testimonials.length), 5000);
     return () => clearInterval(t);
-  }, []);
+  }, [testimonials.length]);
 
 
   // Hero cursor glow — soft gold radial that follows the cursor within the hero only
@@ -716,12 +779,6 @@ export default function HomePage() {
           className="hero-content"
           style={{position:"relative", zIndex:2, padding:"0 16px 48px", maxWidth:"min(860px, 100%)", margin:"0 auto", textAlign:"center", width:"100%", boxSizing:"border-box"}}
         >
-          {/* 1 — Rating pill */}
-          <div className="hero-pill" style={{display:"inline-flex", alignItems:"center", gap:8, background:"rgba(43,168,224,0.06)", border:"0.5px solid rgba(43,168,224,0.30)", borderRadius:999, padding:"6px 16px", marginBottom:28, backdropFilter:"blur(12px)"}}>
-            <span style={{color:G.gold, fontSize:13}}>★</span>
-            <span style={{fontSize:12, color:"rgba(255,255,255,0.75)", fontWeight:500}}>4.9 · 18,000+ Google Reviews</span>
-          </div>
-
           {/* 2 — Search bar */}
           <div className="hero-searchbox" style={{background:"rgba(255,255,255,0.06)", backdropFilter:"blur(30px)", WebkitBackdropFilter:"blur(30px)", border:"1px solid rgba(255,255,255,0.10)", borderRadius:24, overflow:"visible", maxWidth:"min(820px, 100%)", marginBottom:36, margin:"0 auto 36px", width:"100%", boxSizing:"border-box", boxShadow:"0 20px 60px rgba(0,0,0,0.45), 0 0 0 1px rgba(43,168,224,0.08), inset 0 1px 0 rgba(255,255,255,0.06)", position:"relative", zIndex:10}}>
             <div style={{display:"flex", borderBottom:"1px solid rgba(255,255,255,0.08)", paddingLeft:4, overflowX:"auto"}} className="hide-scroll">
@@ -789,23 +846,26 @@ export default function HomePage() {
 
           {/* 3 — Stats strip */}
           <div className="hero-stats" style={{display:"flex", flexWrap:"wrap", justifyContent:"center", gap:"12px", width:"100%", maxWidth:"100%", boxSizing:"border-box", marginBottom:40, paddingBottom:32, borderBottom:"1px solid rgba(43,168,224,0.12)", position:"relative", zIndex:2}}>
-            {[["2,400+","Listings"],["500+","Agents"],["14","Cities"],["₹18,000Cr","Deals Closed"]].map(([v,l])=>(
+            {[[liveStats.listings.toLocaleString("en-IN"),"Listings"],[liveStats.agents.toLocaleString("en-IN"),"Agents"],[String(liveStats.cities),"Cities"]].map(([v,l])=>(
               <div key={l} className="hero-stat" style={{background:"rgba(255,255,255,0.04)", backdropFilter:"blur(12px)", WebkitBackdropFilter:"blur(12px)", border:"1px solid rgba(43,168,224,0.12)", borderRadius:12, flex:"1 1 auto"}}>
                 <div className="stat-value" style={{fontFamily:"'Cormorant Garamond',Georgia,serif", fontSize:19, fontWeight:600, background:"linear-gradient(135deg, #E8EAED 0%, #2BA8E0 100%)", WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent"}}>{v}</div>
                 <div style={{fontSize:9.5, color:"rgba(255,255,255,0.50)", marginTop:2, letterSpacing:"0.06em", textTransform:"uppercase"}}>{l}</div>
               </div>
             ))}
           </div>
+          {siteContent.trust_bar_note && (
+            <p style={{fontSize:11, color:"rgba(255,255,255,0.4)", textAlign:"center", marginTop:-28, marginBottom:32}}>{siteContent.trust_bar_note}</p>
+          )}
 
           {/* 4 — Headline */}
           <h1 className="hero-h1" style={{fontFamily:"'Cormorant Garamond',Georgia,serif", fontSize:"clamp(32px,7vw,72px)", fontWeight:300, color:"#fff", lineHeight:1.05, marginBottom:16, letterSpacing:"-0.01em", wordBreak:"break-word", maxWidth:"100%"}}>
-            Find Your Dream Property
-            <em style={{display:"block", color:G.goldLt, fontStyle:"italic", fontWeight:400}}>Anywhere in India</em>
+            {siteContent.hero_line1}
+            <em style={{display:"block", color:G.goldLt, fontStyle:"italic", fontWeight:400}}>{siteContent.hero_line2}</em>
           </h1>
 
           {/* 5 — Subline */}
           <p className="hero-subline" style={{fontSize:15, color:"rgba(255,255,255,0.5)", lineHeight:1.75, marginBottom:0, maxWidth:500, fontWeight:300, margin:"0 auto", padding:"0 8px", maxWidth:"100%", boxSizing:"border-box"}}>
-            From search to possession — India's most trusted premium platform
+            {siteContent.hero_subtitle}
           </p>
         </motion.div>
       </section>
@@ -817,7 +877,7 @@ export default function HomePage() {
           <div className="glow-dot" />
           <span style={{ fontSize:12, color:"rgba(255,255,255,0.5)", fontWeight:500, letterSpacing:"0.05em", whiteSpace:"nowrap" }}>INDIA'S PREMIUM REAL ESTATE PLATFORM</span>
           <div style={{ flex:1, height:1, background:"rgba(255,255,255,0.06)" }} />
-          {["RERA Verified Listings", "500+ Expert Agents", "14 Cities", "₹18,000 Cr Deals"].map((t,i) => (
+          {["RERA Verified Listings", `${liveStats.agents}+ Expert Agents`, `${liveStats.cities} Cities`].map((t,i) => (
             <div key={i} style={{ display:"flex", alignItems:"center", gap:8, flexShrink:0 }}>
               <div style={{ width:4, height:4, borderRadius:"50%", background:"#2BA8E0" }} />
               <span style={{ fontSize:12, color:"rgba(255,255,255,0.45)", whiteSpace:"nowrap" }}>{t}</span>
@@ -1158,43 +1218,49 @@ export default function HomePage() {
           <div style={{textAlign:"center", marginBottom:28}}>
             <div style={{fontSize:11, color:G.gold, fontWeight:700, letterSpacing:2, textTransform:"uppercase", marginBottom:8}}>Client Stories</div>
             <h2 className="testimonials-heading" style={{fontFamily:"'Cormorant Garamond',Georgia,serif", fontSize:32, fontWeight:700, color:"#fff", marginBottom:8, wordBreak:"break-word", maxWidth:"100%"}}>What Our Clients Say</h2>
-            <div style={{display:"flex", alignItems:"center", justifyContent:"center", gap:8}}>
-              <span style={{color:G.gold, fontSize:16}}>★★★★★</span>
-              <span style={{fontSize:14, color:"rgba(255,255,255,0.45)"}}>4.9 / 5 on Google Reviews · 18,000+ reviews</span>
-            </div>
           </div>
           </Reveal>
 
-          {/* Review cards */}
-          <div className="testimonials-grid" style={{display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:16, marginBottom:24}}>
-            {[reviewIdx, (reviewIdx+1)%REVIEWS.length, (reviewIdx+2)%REVIEWS.length].map((i,pos)=>{
-              const r = REVIEWS[i];
-              return (
-                <Reveal key={pos} delay={pos*0.08}>
-                <div className="premium-card" style={{borderRadius:20, padding:"32px", borderTop:"2px solid rgba(43,168,224,0.25)", transition:"opacity 0.3s", height:"100%"}}>
-                  <StarRow n={r.stars} />
-                  <p style={{fontFamily:"'Cormorant Garamond',Georgia,serif", fontSize:17, color:"rgba(255,255,255,0.85)", lineHeight:1.65, margin:"14px 0 20px", fontStyle:"italic"}}>{`"${r.text}"`}</p>
-                  <div style={{display:"flex", alignItems:"center", gap:12}}>
-                    <div style={{width:38, height:38, borderRadius:"50%", background:"linear-gradient(135deg, #2BA8E0 0%, #1577B8 100%)", display:"flex", alignItems:"center", justifyContent:"center"}}>
-                      <span style={{fontSize:14, fontWeight:700, color:"#fff"}}>{r.name[0]}</span>
-                    </div>
-                    <div>
-                      <div style={{fontSize:13, fontWeight:700, color:"#fff"}}>{r.name}</div>
-                      <div style={{fontSize:11, color:"rgba(255,255,255,0.4)"}}>{r.role} · {r.date}</div>
+          {testimonials.length === 0 ? (
+            <Reveal>
+              <div className="premium-card" style={{borderRadius:20, padding:"48px 32px", textAlign:"center", borderTop:"2px solid rgba(43,168,224,0.25)", maxWidth:560, margin:"0 auto"}}>
+                <p style={{fontFamily:"'Cormorant Garamond',Georgia,serif", fontSize:20, color:"rgba(255,255,255,0.8)", marginBottom:8}}>Be the First to Share Your Experience</p>
+                <p style={{fontSize:13, color:"rgba(255,255,255,0.45)"}}>We're just getting started — client reviews will appear here as they come in.</p>
+              </div>
+            </Reveal>
+          ) : (
+            <>
+              {/* Review cards */}
+              <div className="testimonials-grid" style={{display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:16, marginBottom:24}}>
+                {Array.from({length: Math.min(3, testimonials.length)}, (_,k) => testimonials[(reviewIdx+k)%testimonials.length]).map((r,pos)=>(
+                  <Reveal key={r.id} delay={pos*0.08}>
+                  <div className="premium-card" style={{borderRadius:20, padding:"32px", borderTop:"2px solid rgba(43,168,224,0.25)", transition:"opacity 0.3s", height:"100%"}}>
+                    <StarRow n={r.rating} />
+                    <p style={{fontFamily:"'Cormorant Garamond',Georgia,serif", fontSize:17, color:"rgba(255,255,255,0.85)", lineHeight:1.65, margin:"14px 0 20px", fontStyle:"italic"}}>{`"${r.text}"`}</p>
+                    <div style={{display:"flex", alignItems:"center", gap:12}}>
+                      <div style={{width:38, height:38, borderRadius:"50%", background:"linear-gradient(135deg, #2BA8E0 0%, #1577B8 100%)", display:"flex", alignItems:"center", justifyContent:"center"}}>
+                        <span style={{fontSize:14, fontWeight:700, color:"#fff"}}>{r.name[0]}</span>
+                      </div>
+                      <div>
+                        <div style={{fontSize:13, fontWeight:700, color:"#fff"}}>{r.name}</div>
+                        <div style={{fontSize:11, color:"rgba(255,255,255,0.4)"}}>{r.role}{r.role && r.date ? " · " : ""}{r.date}</div>
+                      </div>
                     </div>
                   </div>
-                </div>
-                </Reveal>
-              );
-            })}
-          </div>
+                  </Reveal>
+                ))}
+              </div>
 
-          {/* Dots */}
-          <div style={{display:"flex", justifyContent:"center", gap:8}}>
-            {REVIEWS.map((_,i)=>(
-              <button key={i} onClick={()=>setReviewIdx(i)} style={{width: i===reviewIdx ? 24 : 8, height:8, borderRadius:4, background: i===reviewIdx ? G.gold : "rgba(255,255,255,0.15)", border:"none", cursor:"pointer", transition:"all 0.3s"}} />
-            ))}
-          </div>
+              {/* Dots */}
+              {testimonials.length > 1 && (
+                <div style={{display:"flex", justifyContent:"center", gap:8}}>
+                  {testimonials.map((t,i)=>(
+                    <button key={t.id} onClick={()=>setReviewIdx(i)} style={{width: i===reviewIdx ? 24 : 8, height:8, borderRadius:4, background: i===reviewIdx ? G.gold : "rgba(255,255,255,0.15)", border:"none", cursor:"pointer", transition:"all 0.3s"}} />
+                  ))}
+                </div>
+              )}
+            </>
+          )}
         </div>
       </section>
 

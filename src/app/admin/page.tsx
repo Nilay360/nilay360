@@ -8,7 +8,7 @@ import { optimizedImageUrl } from "@/lib/image-url";
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
-type AdminSection = "overview" | "pending" | "approved" | "rejected" | "users" | "inquiries" | "agents" | "reports" | "audit";
+type AdminSection = "overview" | "pending" | "approved" | "rejected" | "users" | "inquiries" | "agents" | "reports" | "content" | "audit";
 
 type Stats = {
   pending: number;
@@ -181,6 +181,7 @@ function IconOut()     { return <svg width="15" height="15" viewBox="0 0 24 24" 
 function IconBuilding(){ return <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M9 22V12h6v10"/><path d="M8 6h.01M16 6h.01M8 10h.01M16 10h.01"/></svg>; }
 function IconBriefcase(){ return <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>; }
 function IconAudit()  { return <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="15" y2="17"/></svg>; }
+function IconEdit()   { return <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4z"/></svg>; }
 function IconFlag()   { return <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>; }
 function IconChevron(){ return <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"/></svg>; }
 
@@ -478,6 +479,78 @@ function GoogleMapsUrlControl({
           ⚠ This doesn't look like an embed link — regular Share/place links won't display (Google blocks them from being framed). Open the location on Google Maps, click Share → &quot;Embed a map&quot;, and paste that URL instead.
         </span>
       )}
+    </div>
+  );
+}
+
+// ── Section: Site Content ──────────────────────────────────────────────────────
+
+function SiteContentField({
+  label, description, value, onSave, disabled, multiline,
+}: {
+  label: string; description?: string; value: string;
+  onSave: (v: string) => void; disabled: boolean; multiline?: boolean;
+}) {
+  const [draft, setDraft] = useState(value);
+  useEffect(() => { setDraft(value); }, [value]);
+  const dirty = draft !== value;
+
+  return (
+    <div style={{ background: "rgba(255,255,255,0.05)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", borderRadius: "14px", border: "1px solid rgba(255,255,255,0.08)", padding: "20px 22px", marginBottom: "14px" }}>
+      <label style={{ fontSize: "12px", fontWeight: 700, color: "#E8EAED", display: "block", marginBottom: "4px" }}>{label}</label>
+      {description && <p style={{ fontSize: "11px", color: "#AEB4BC", marginBottom: "10px" }}>{description}</p>}
+      <div style={{ display: "flex", gap: "10px", alignItems: multiline ? "flex-start" : "center", flexWrap: "wrap" }}>
+        {multiline ? (
+          <textarea
+            value={draft} disabled={disabled} onChange={e => setDraft(e.target.value)} rows={2}
+            style={{ flex: "1 1 260px", minWidth: "200px", padding: "10px 12px", background: "rgba(255,255,255,0.06)", border: "1.5px solid rgba(255,255,255,0.12)", borderRadius: "8px", fontSize: "13px", color: "#E8EAED", fontFamily: "'DM Sans', sans-serif", outline: "none", resize: "vertical" }}
+          />
+        ) : (
+          <input
+            type="text" value={draft} disabled={disabled} onChange={e => setDraft(e.target.value)}
+            style={{ flex: "1 1 260px", minWidth: "200px", padding: "10px 12px", background: "rgba(255,255,255,0.06)", border: "1.5px solid rgba(255,255,255,0.12)", borderRadius: "8px", fontSize: "13px", color: "#E8EAED", fontFamily: "'DM Sans', sans-serif", outline: "none" }}
+          />
+        )}
+        <button
+          onClick={() => onSave(draft)}
+          disabled={disabled || !dirty}
+          style={{ padding: "9px 20px", borderRadius: "8px", fontSize: "12px", fontWeight: 700, background: dirty ? "#2BA8E0" : "rgba(255,255,255,0.06)", color: dirty ? "#000000" : "rgba(255,255,255,0.4)", border: "none", cursor: disabled || !dirty ? "not-allowed" : "pointer", fontFamily: "'DM Sans', sans-serif", flexShrink: 0 }}
+        >
+          Save
+        </button>
+      </div>
+    </div>
+  );
+}
+
+const SITE_CONTENT_FIELDS: { key: string; label: string; description: string; multiline?: boolean }[] = [
+  { key: "hero_line1",     label: "Homepage Hero — Line 1",       description: "Main headline on the homepage hero." },
+  { key: "hero_line2",     label: "Homepage Hero — Line 2",       description: "Italic second line under the headline." },
+  { key: "hero_subtitle",  label: "Homepage Hero — Subtitle",     description: "Short line under the headline.", multiline: true },
+  { key: "trust_bar_note", label: "Trust Bar Note (optional)",    description: "Short label shown near the stats strip — leave blank to hide it." },
+];
+
+function SiteContentSection({
+  content, loading, disabled, onSave,
+}: {
+  content: Record<string, string>; loading: boolean; disabled: string | null;
+  onSave: (key: string, value: string) => void;
+}) {
+  if (loading) return <Spinner />;
+  return (
+    <div>
+      <SectionHeading title="Site Content" subtitle="Edit commonly-changed homepage copy — changes appear immediately, no code deploy needed." />
+      {SITE_CONTENT_FIELDS.map(f => (
+        <SiteContentField
+          key={f.key}
+          label={f.label}
+          description={f.description}
+          multiline={f.multiline}
+          value={content[f.key] ?? ""}
+          disabled={disabled === f.key}
+          onSave={v => onSave(f.key, v)}
+        />
+      ))}
     </div>
   );
 }
@@ -1907,6 +1980,7 @@ const NAV: { id: AdminSection; label: string; icon: React.ReactNode }[] = [
   { id: "users",      label: "All Users",          icon: <IconUsers /> },
   { id: "inquiries",  label: "All Inquiries",      icon: <IconMsg /> },
   { id: "reports",    label: "Reports",            icon: <IconFlag /> },
+  { id: "content",    label: "Site Content",       icon: <IconEdit /> },
   { id: "audit",      label: "Audit Log",          icon: <IconAudit /> },
 ];
 
@@ -1938,6 +2012,7 @@ export default function AdminPage() {
   const [approvedAgents,   setApprovedAgents]   = useState<ApprovedAgentOption[]>([]);
   const [auditLog,         setAuditLog]         = useState<AuditLogRow[]>([]);
   const [reports,          setReports]          = useState<ReportRow[]>([]);
+  const [siteContent,      setSiteContent]      = useState<Record<string, string>>({});
   const [reportListingPreviews, setReportListingPreviews] = useState<Record<string, ReportListingPreview>>({});
   const [reportProfilePreviews, setReportProfilePreviews] = useState<Record<string, ReportProfilePreview>>({});
 
@@ -1949,6 +2024,7 @@ export default function AdminPage() {
   const [agentAppsLoading, setAgentAppsLoading] = useState(false);
   const [auditLoading,     setAuditLoading]     = useState(false);
   const [reportsLoading,   setReportsLoading]   = useState(false);
+  const [contentLoading,   setContentLoading]   = useState(false);
 
   const [inFlight, setInFlight] = useState<string | null>(null);
 
@@ -2111,6 +2187,18 @@ export default function AdminPage() {
           setAuditLog((res.data as AuditLogRow[] | null) ?? []);
           setAuditLoading(false);
         });
+    } else if (active === "content") {
+      setContentLoading(true);
+      supabase
+        .from("site_content")
+        .select("key, value")
+        .then((res: { data: unknown }) => {
+          const rows = (res.data as { key: string; value: string }[] | null) ?? [];
+          const map: Record<string, string> = {};
+          rows.forEach(r => { map[r.key] = r.value; });
+          setSiteContent(map);
+          setContentLoading(false);
+        });
     } else if (active === "reports") {
       setReportsLoading(true);
       (async () => {
@@ -2159,6 +2247,27 @@ export default function AdminPage() {
     });
     if (error) console.error("Admin — audit log write failed:", error);
   }, []);
+
+  const handleSiteContentSave = useCallback(async (key: string, newValue: string) => {
+    setInFlight(key);
+    const oldValue = siteContent[key] ?? "";
+    const supabase = createClient();
+    const { error } = await supabase
+      .from("site_content")
+      .update({ value: newValue, updated_by: user?.id ?? null, updated_at: new Date().toISOString() })
+      .eq("key", key);
+
+    if (error) {
+      console.error("Admin — site content save error:", error);
+      setToast({ ok: false, msg: "Save failed — please try again." });
+    } else {
+      void logAdminAction("update_site_content", "site_content", null, { key, value: oldValue }, { key, value: newValue });
+      setSiteContent(prev => ({ ...prev, [key]: newValue }));
+      setToast({ ok: true, msg: "Saved." });
+    }
+    setInFlight(null);
+    setTimeout(() => setToast(null), 2500);
+  }, [siteContent, logAdminAction, user]);
 
   const handleListingStatus = useCallback(async (
     id: string,
@@ -2626,6 +2735,15 @@ export default function AdminPage() {
         onResolve={id => void handleReportResolve(id, "resolved")}
         onRejectListing={report => void handleReportRejectListing(report)}
         onDeactivateUser={report => void handleReportDeactivateUser(report)}
+      />
+    );
+  } else if (active === "content") {
+    content = (
+      <SiteContentSection
+        content={siteContent}
+        loading={contentLoading}
+        disabled={inFlight}
+        onSave={(key, value) => void handleSiteContentSave(key, value)}
       />
     );
   } else {

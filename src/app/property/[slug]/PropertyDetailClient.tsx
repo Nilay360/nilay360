@@ -1176,10 +1176,6 @@ export default function PropertyDetailClient() {
                   <div>
                     <div style={{ fontSize: "14px", fontWeight: 600, color: "#E8EAED" }}>Nilay 360 Expert</div>
                     <div style={{ fontSize: "12px", color: "#AEB4BC" }}>Property Specialist</div>
-                    <div style={{ display: "flex", alignItems: "center", gap: "4px", marginTop: "2px" }}>
-                      {"★★★★★".split("").map((s, i) => <span key={i} style={{ color: "#2BA8E0", fontSize: "10px" }}>{s}</span>)}
-                      <span style={{ fontSize: "10px", color: "#AEB4BC", marginLeft: "2px" }}>5.0</span>
-                    </div>
                   </div>
                 </div>
 
