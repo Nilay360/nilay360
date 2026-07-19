@@ -29,6 +29,10 @@ type Property = {
   featured_image?: string | null;
 };
 
+// Mirrors post-property/page.tsx's COMMERCIAL_CATEGORIES — these categories
+// store "rooms/cabins" in the bedrooms field, not a BHK count.
+const COMMERCIAL_CATEGORIES = ["office", "retail", "warehouse"];
+
 // ── Placeholder pool ──────────────────────────────────────────
 const PLACEHOLDER_PROPERTIES: Property[] = [
   {
@@ -558,8 +562,8 @@ export default function ComparePage() {
                   <CmpRow label="Status" values={vals(p => p.status?.charAt(0).toUpperCase() + p.status.slice(1))} />
 
                   <SectionRow label="Specifications" colCount={activeCount} />
-                  <CmpRow label="Bedrooms"       values={vals(p => p.bedrooms ?? "—")}           type="best-high" />
-                  <CmpRow label="Bathrooms"      values={vals(p => p.bathrooms ?? "—")}          type="best-high" />
+                  <CmpRow label={active.every(p => COMMERCIAL_CATEGORIES.includes(p.property_type)) ? "Rooms / Cabins" : "Bedrooms"} values={vals(p => p.bedrooms ?? "—")}           type="best-high" />
+                  <CmpRow label={active.every(p => COMMERCIAL_CATEGORIES.includes(p.property_type)) ? "Washrooms" : "Bathrooms"} values={vals(p => p.bathrooms ?? "—")}          type="best-high" />
                   <CmpRow label="Area (sqft)"    values={vals(p => p.area_sqft ? p.area_sqft.toLocaleString("en-IN") + " sqft" : "—")} />
                   <CmpRow label="Floor"          values={vals(p => p.floor_number != null ? `${p.floor_number} / ${p.total_floors ?? "?"}` : "—")} />
                   <CmpRow label="Parking"        values={vals(p => p.parking_spaces ?? "—")}     type="best-high" />
