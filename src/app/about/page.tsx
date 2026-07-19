@@ -316,8 +316,6 @@ export default function AboutPage() {
               <StatItem target={14}                         label="Cities"              inView={statsInView} />
               <div style={{ width: "1px", background: "rgba(201,168,76,0.15)", margin: "0 8px" }} />
               <StatItem target={98}     suffix="%"          label="Client Satisfaction" inView={statsInView} />
-              <div style={{ width: "1px", background: "rgba(201,168,76,0.15)", margin: "0 8px" }} />
-              <StatItem target={18000}  suffix="Cr" prefix="₹" label="Deals Facilitated" inView={statsInView} />
             </div>
           </div>
         </section>

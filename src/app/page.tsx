@@ -93,6 +93,13 @@ const LOCATIONS = [
 
 type Testimonial = { id: string; name: string; role: string; rating: number; text: string; date: string };
 
+const DEFAULT_SITE_CONTENT: Record<string, string> = {
+  hero_line1: "Find Your Dream Property",
+  hero_line2: "Now in Hyderabad",
+  hero_subtitle: "From search to possession — India's most trusted premium platform",
+  trust_bar_note: "",
+};
+
 /* ─── Helpers ─────────────────────────────────────────────── */
 function SvgIcon({ d, size=20, color="currentColor", strokeWidth=1.5 }: { d:string; size?:number; color?:string; strokeWidth?:number }) {
   return (
@@ -118,6 +125,41 @@ export default function HomePage() {
       setUserId(data.user?.id ?? null)
     })
   }, [])
+
+  const [siteContent, setSiteContent] = useState<Record<string, string>>(DEFAULT_SITE_CONTENT);
+  useEffect(() => {
+    async function loadSiteContent() {
+      try {
+        const supabase = createClient();
+        const { data } = await supabase.from("site_content").select("key, value");
+        if (data) {
+          setSiteContent(prev => {
+            const next = { ...prev };
+            data.forEach((row: any) => { if (row.value) next[row.key] = row.value; });
+            return next;
+          });
+        }
+      } catch (_) {}
+    }
+    loadSiteContent();
+  }, []);
+
+  const [liveStats, setLiveStats] = useState({ listings: 0, agents: 0, cities: 0 });
+  useEffect(() => {
+    async function loadLiveStats() {
+      try {
+        const supabase = createClient();
+        const [{ count: listingsCount }, { count: agentsCount }, { data: cityRows }] = await Promise.all([
+          supabase.from("property_listings").select("*", { count: "exact", head: true }).eq("status", "active"),
+          supabase.from("agent_profiles").select("*", { count: "exact", head: true }).eq("status", "approved"),
+          supabase.from("property_listings").select("city").eq("status", "active"),
+        ]);
+        const uniqueCities = new Set((cityRows ?? []).map((r: any) => r.city).filter(Boolean)).size;
+        setLiveStats({ listings: listingsCount ?? 0, agents: agentsCount ?? 0, cities: uniqueCities });
+      } catch (_) {}
+    }
+    loadLiveStats();
+  }, []);
 
   const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
   useEffect(() => {
@@ -804,23 +846,26 @@ export default function HomePage() {
 
           {/* 3 — Stats strip */}
           <div className="hero-stats" style={{display:"flex", flexWrap:"wrap", justifyContent:"center", gap:"12px", width:"100%", maxWidth:"100%", boxSizing:"border-box", marginBottom:40, paddingBottom:32, borderBottom:"1px solid rgba(43,168,224,0.12)", position:"relative", zIndex:2}}>
-            {[["2,400+","Listings"],["500+","Agents"],["14","Cities"]].map(([v,l])=>(
+            {[[liveStats.listings.toLocaleString("en-IN"),"Listings"],[liveStats.agents.toLocaleString("en-IN"),"Agents"],[String(liveStats.cities),"Cities"]].map(([v,l])=>(
               <div key={l} className="hero-stat" style={{background:"rgba(255,255,255,0.04)", backdropFilter:"blur(12px)", WebkitBackdropFilter:"blur(12px)", border:"1px solid rgba(43,168,224,0.12)", borderRadius:12, flex:"1 1 auto"}}>
                 <div className="stat-value" style={{fontFamily:"'Cormorant Garamond',Georgia,serif", fontSize:19, fontWeight:600, background:"linear-gradient(135deg, #E8EAED 0%, #2BA8E0 100%)", WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent"}}>{v}</div>
                 <div style={{fontSize:9.5, color:"rgba(255,255,255,0.50)", marginTop:2, letterSpacing:"0.06em", textTransform:"uppercase"}}>{l}</div>
               </div>
             ))}
           </div>
+          {siteContent.trust_bar_note && (
+            <p style={{fontSize:11, color:"rgba(255,255,255,0.4)", textAlign:"center", marginTop:-28, marginBottom:32}}>{siteContent.trust_bar_note}</p>
+          )}
 
           {/* 4 — Headline */}
           <h1 className="hero-h1" style={{fontFamily:"'Cormorant Garamond',Georgia,serif", fontSize:"clamp(32px,7vw,72px)", fontWeight:300, color:"#fff", lineHeight:1.05, marginBottom:16, letterSpacing:"-0.01em", wordBreak:"break-word", maxWidth:"100%"}}>
-            Find Your Dream Property
-            <em style={{display:"block", color:G.goldLt, fontStyle:"italic", fontWeight:400}}>Anywhere in India</em>
+            {siteContent.hero_line1}
+            <em style={{display:"block", color:G.goldLt, fontStyle:"italic", fontWeight:400}}>{siteContent.hero_line2}</em>
           </h1>
 
           {/* 5 — Subline */}
           <p className="hero-subline" style={{fontSize:15, color:"rgba(255,255,255,0.5)", lineHeight:1.75, marginBottom:0, maxWidth:500, fontWeight:300, margin:"0 auto", padding:"0 8px", maxWidth:"100%", boxSizing:"border-box"}}>
-            From search to possession — India's most trusted premium platform
+            {siteContent.hero_subtitle}
           </p>
         </motion.div>
       </section>
@@ -832,7 +877,7 @@ export default function HomePage() {
           <div className="glow-dot" />
           <span style={{ fontSize:12, color:"rgba(255,255,255,0.5)", fontWeight:500, letterSpacing:"0.05em", whiteSpace:"nowrap" }}>INDIA'S PREMIUM REAL ESTATE PLATFORM</span>
           <div style={{ flex:1, height:1, background:"rgba(255,255,255,0.06)" }} />
-          {["RERA Verified Listings", "500+ Expert Agents", "14 Cities"].map((t,i) => (
+          {["RERA Verified Listings", `${liveStats.agents}+ Expert Agents`, `${liveStats.cities} Cities`].map((t,i) => (
             <div key={i} style={{ display:"flex", alignItems:"center", gap:8, flexShrink:0 }}>
               <div style={{ width:4, height:4, borderRadius:"50%", background:"#2BA8E0" }} />
               <span style={{ fontSize:12, color:"rgba(255,255,255,0.45)", whiteSpace:"nowrap" }}>{t}</span>
