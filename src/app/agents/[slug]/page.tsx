@@ -31,7 +31,7 @@ const AGENTS: Record<string, Agent> = {
     city: "Hyderabad", cities_served: ["Hyderabad", "Secunderabad", "Warangal"],
     specialisation: "Luxury Apartments", specialisations: ["Luxury Apartments", "Penthouse Sales", "NRI Investments", "Builder Tie-ups"],
     languages: ["English", "Hindi", "Telugu"], experience_years: 12,
-    rating: 4.9, reviews_count: 214, properties_sold: 318, properties_listed: 42,
+    rating: 0, reviews_count: 0, properties_sold: 318, properties_listed: 42,
     rera_number: "A02400001234", verified: true, featured: true, avatar_color: "#000000",
     bio: "Arjun Mehta is one of Hyderabad's most decorated luxury real estate consultants, with over 12 years of deep expertise across the Jubilee Hills, Banjara Hills, Kokapet, and Financial District corridors.\n\nHis client portfolio spans C-suite executives, NRI professionals in the Gulf and USA, and institutional investors. Arjun is known for his meticulous due diligence, transparent advisory, and ability to negotiate complex high-value transactions with grace.\n\nHe holds certifications from RERA Telangana, the National Association of Realtors (NAR India), and the Nilay 360 Certified Advisor programme. In 2024, he was recognised as Nilay 360's Top Performer of the Year — an honour voted on by verified client reviews.",
     phone: "+919876543210", email: "arjun.mehta@nilay360.com", whatsapp: "+919876543210",
@@ -41,7 +41,7 @@ const AGENTS: Record<string, Agent> = {
     city: "Mumbai", cities_served: ["Mumbai", "Navi Mumbai", "Thane"],
     specialisation: "Sea-View Residences", specialisations: ["Sea-View Residences", "Bandra & Worli", "NRI Clients", "Luxury Rentals"],
     languages: ["English", "Hindi", "Tamil"], experience_years: 9,
-    rating: 4.8, reviews_count: 187, properties_sold: 241, properties_listed: 38,
+    rating: 0, reviews_count: 0, properties_sold: 241, properties_listed: 38,
     rera_number: "A51900002817", verified: true, featured: true, avatar_color: "#1E3A5F",
     bio: "Priya Raghavan is Mumbai's go-to specialist for premium sea-facing residences. Over nine years, she has curated transactions across Worli, Bandra West, Lower Parel, and Juhu — consistently delivering above-market outcomes for buyers and sellers alike.\n\nHer NRI clientele base spans the UAE, United Kingdom, and North America, and she offers a seamless end-to-end remote buying experience including virtual tours, FEMA-compliant documentation, and Power of Attorney coordination.\n\nPriya was previously with JLL Residential and brings institutional rigour to every advisory engagement.",
     phone: "+919876543211", email: "priya.raghavan@nilay360.com", whatsapp: "+919876543211",
@@ -51,7 +51,7 @@ const AGENTS: Record<string, Agent> = {
     city: "Bengaluru", cities_served: ["Bengaluru", "Mysuru", "Hosur"],
     specialisation: "IT Corridor Homes", specialisations: ["IT Corridor Homes", "Investment Portfolios", "Pre-Launch Projects", "Tech Professionals"],
     languages: ["English", "Hindi", "Kannada"], experience_years: 8,
-    rating: 4.9, reviews_count: 156, properties_sold: 198, properties_listed: 31,
+    rating: 0, reviews_count: 0, properties_sold: 198, properties_listed: 31,
     rera_number: "A29200003441", verified: true, featured: true, avatar_color: "#3B1F5F",
     bio: "Rohit Desai brings a uniquely data-driven approach to property investment in Bengaluru's technology corridor. He specialises in helping software professionals, startup founders, and GCC employees build wealth through real estate — structuring purchases as portfolio investments rather than one-off transactions.\n\nHis deep knowledge of the Whitefield–Sarjapur belt, Koramangala, and Electronic City micro-markets, combined with strong builder relationships, gives his clients access to pre-launch pricing and off-market opportunities unavailable to the general public.",
     phone: "+919876543212", email: "rohit.desai@nilay360.com", whatsapp: "+919876543212",
@@ -102,19 +102,12 @@ function buildFallback(slug: string): Agent {
     city: "India", cities_served: ["Pan India"],
     specialisation: "Residential Properties", specialisations: ["Residential Properties", "Investment Advisory"],
     languages: ["English", "Hindi"], experience_years: 5,
-    rating: 4.7, reviews_count: 62, properties_sold: 88, properties_listed: 14,
+    rating: 0, reviews_count: 0, properties_sold: 88, properties_listed: 14,
     rera_number: "A00000000000", verified: true, featured: false, avatar_color: "#000000",
     bio: `${name} is a certified real estate professional at Nilay 360, specialising in residential properties across India's premium markets. With a focus on transparency and client-first advisory, they bring deep market knowledge and a commitment to helping buyers and investors make confident decisions.`,
     phone: "+919999999999", email: "contact@nilay360.com", whatsapp: "+919999999999",
   };
 }
-
-const PLACEHOLDER_REVIEWS: Review[] = [
-  { name: "Aditya Sharma", rating: 5, date: "Nov 2024", property: "3BHK in Kokapet", text: "Exceptional service from start to finish. The agent understood exactly what we were looking for and showed us properties that actually matched our requirements — not just whatever was in the database. Closed within 3 weeks." },
-  { name: "Shalini Verma", rating: 5, date: "Oct 2024", property: "4BHK Villa, Jubilee Hills", text: "As an NRI buyer, I was nervous about the process. The agent handled everything remotely — virtual tours, legal checks, registration — with complete transparency. I'd recommend them to any NRI looking to invest in Hyderabad." },
-  { name: "Rajesh Patel", rating: 4, date: "Sep 2024", property: "2BHK Investment Flat", text: "Very professional and patient through a long process. Deep knowledge of the Financial District market and helped us get a great price on a resale flat. Only giving 4 stars because registration took longer than expected — though that wasn't the agent's fault." },
-  { name: "Kavitha Nair", rating: 5, date: "Aug 2024", property: "Penthouse, Banjara Hills", text: "Handled a very complex seller-side transaction for us. The agent brought 3 serious buyers within two weeks and ultimately achieved a price 8% above our target. Phenomenal negotiation skills and complete confidentiality throughout." },
-];
 
 const PLACEHOLDER_PROPERTIES: Property[] = [
   { id: "pr1", slug: "luxury-4bhk-kokapet", title: "Luxury 4BHK — Prestige Luminary, Kokapet", price: 32500000, type: "Apartment", city: "Hyderabad", bedrooms: 4, area: 3200, image: "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=600&q=80", listing_type: "sale" },
@@ -261,7 +254,7 @@ export default function AgentProfilePage() {
   const [agentLoading, setAgentLoading] = useState(true);
   const [isRealAgent, setIsRealAgent] = useState(false);
   const [properties, setProperties] = useState<Property[]>(PLACEHOLDER_PROPERTIES);
-  const [reviews,    setReviews]    = useState<Review[]>(PLACEHOLDER_REVIEWS);
+  const [reviews,    setReviews]    = useState<Review[]>([]);
   const [activeTab,  setActiveTab]  = useState<"listings" | "reviews">("listings");
 
   // Resolve the slug against real agent_profiles first (status = approved);
@@ -326,19 +319,17 @@ export default function AgentProfilePage() {
         } else {
           const [{ data: props }, { data: revs }] = await Promise.all([
             supabase.from("properties").select("*").eq("agent_id", agent!.id).eq("status", "active").limit(6),
-            supabase.from("agent_reviews").select("*").eq("agent_id", agent!.id).order("created_at", { ascending: false }).limit(12),
+            supabase.from("reviews").select("id, rating, title, content, created_at, profiles(full_name), properties(title)").eq("agent_id", agent!.id).eq("is_approved", true).order("created_at", { ascending: false }).limit(12),
           ]);
           if (props && props.length > 0) setProperties(props);
-          if (revs  && revs.length  > 0) setReviews(revs.map((r: any) => ({ name: r.reviewer_name, rating: r.rating, date: r.created_at?.slice(0,7) ?? "", text: r.text, property: r.property_title ?? "" })));
+          if (revs  && revs.length  > 0) setReviews(revs.map((r: any) => ({ name: r.profiles?.full_name || "Verified Client", rating: r.rating, date: r.created_at?.slice(0,7) ?? "", text: r.content ?? "", property: r.properties?.title ?? r.title ?? "" })));
         }
       } catch (_) {}
     }
     void load();
   }, [agent, isRealAgent]);
 
-  const ratingBreakdown = [5,4,3,2,1].map(star => ({
-    star, pct: star === 5 ? 72 : star === 4 ? 18 : star === 3 ? 6 : star === 2 ? 3 : 1
-  }));
+  const avgRating = reviews.length > 0 ? reviews.reduce((s, r) => s + r.rating, 0) / reviews.length : 0;
 
   if (agentLoading || !agent) {
     return (
@@ -451,9 +442,15 @@ export default function AgentProfilePage() {
 
                 {/* Rating */}
                 <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                  <Stars rating={agent.rating} size={16} />
-                  <span style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "22px", fontWeight: 600, color: "#2BA8E0" }}>{agent.rating}</span>
-                  <span style={{ fontSize: "12px", color: "rgba(245,242,236,0.35)" }}>({agent.reviews_count} verified reviews)</span>
+                  {agent.reviews_count > 0 ? (
+                    <>
+                      <Stars rating={agent.rating} size={16} />
+                      <span style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "22px", fontWeight: 600, color: "#2BA8E0" }}>{agent.rating}</span>
+                      <span style={{ fontSize: "12px", color: "rgba(245,242,236,0.35)" }}>({agent.reviews_count} verified reviews)</span>
+                    </>
+                  ) : (
+                    <span style={{ fontSize: "13px", color: "rgba(245,242,236,0.4)", fontStyle: "italic" }}>No reviews yet</span>
+                  )}
                 </div>
               </div>
 
@@ -485,7 +482,7 @@ export default function AgentProfilePage() {
                 { label: "Properties Listed", value: agent.properties_listed, suffix: "" },
                 { label: "Properties Sold",   value: agent.properties_sold,   suffix: "" },
                 { label: "Years Experience",  value: agent.experience_years,  suffix: "yrs" },
-                { label: "Client Rating",     value: agent.rating,             suffix: "/5" },
+                { label: "Client Rating",     value: agent.reviews_count > 0 ? agent.rating : "—", suffix: agent.reviews_count > 0 ? "/5" : "" },
               ].map((s, i) => (
                 <div key={s.label} style={{ padding: "28px 20px", borderRight: i < 3 ? "1px solid rgba(245,242,236,0.06)" : "none", textAlign: "center" }}>
                   <p style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "38px", fontWeight: 600, color: "#2BA8E0", lineHeight: 1 }}>{s.value}<span style={{ fontSize: "20px" }}>{s.suffix}</span></p>
@@ -554,26 +551,16 @@ export default function AgentProfilePage() {
                       {properties.map(p => <PropCard key={p.id} p={p} />)}
                     </div>
                   )
+                ) : reviews.length === 0 ? (
+                  <p style={{ textAlign: "center", color: "#9CA3AF", fontSize: "14px", padding: "40px" }}>No reviews yet.</p>
                 ) : (
                   <div>
                     {/* Rating summary */}
                     <div style={{ display: "flex", gap: "28px", alignItems: "center", padding: "20px", background: "#F8F6F1", borderRadius: "14px", marginBottom: "22px" }}>
                       <div style={{ textAlign: "center" }}>
-                        <p style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "52px", fontWeight: 600, color: "#2BA8E0", lineHeight: 1 }}>{agent.rating}</p>
-                        <Stars rating={agent.rating} size={14} />
-                        <p style={{ fontSize: "11px", color: "#9CA3AF", marginTop: "4px" }}>{agent.reviews_count} reviews</p>
-                      </div>
-                      <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: "5px" }}>
-                        {ratingBreakdown.map(rb => (
-                          <div key={rb.star} style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                            <span style={{ fontSize: "11px", fontWeight: 700, color: "#9CA3AF", width: "8px", textAlign: "right" }}>{rb.star}</span>
-                            <svg width="11" height="11" viewBox="0 0 24 24" fill="#2BA8E0" stroke="#2BA8E0" strokeWidth="1.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-                            <div style={{ flex: 1, height: "6px", background: "rgba(13,43,31,0.08)", borderRadius: "3px", overflow: "hidden" }}>
-                              <div style={{ height: "100%", width: `${rb.pct}%`, background: "#2BA8E0", borderRadius: "3px", transition: "width 0.4s" }} />
-                            </div>
-                            <span style={{ fontSize: "10px", color: "#9CA3AF", width: "26px" }}>{rb.pct}%</span>
-                          </div>
-                        ))}
+                        <p style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "52px", fontWeight: 600, color: "#2BA8E0", lineHeight: 1 }}>{avgRating.toFixed(1)}</p>
+                        <Stars rating={avgRating} size={14} />
+                        <p style={{ fontSize: "11px", color: "#9CA3AF", marginTop: "4px" }}>{reviews.length} reviews</p>
                       </div>
                     </div>
                     {/* Review cards */}

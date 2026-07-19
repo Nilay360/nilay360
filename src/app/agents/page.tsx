@@ -25,18 +25,18 @@ type Agent = {
 
 // ── Placeholder data ──────────────────────────────────────────
 const PLACEHOLDER_AGENTS: Agent[] = [
-  { id: "a1",  slug: "arjun-mehta",        full_name: "Arjun Mehta",        title: "Senior Property Consultant",  city: "Hyderabad",  specialisation: "Luxury Apartments",   languages: ["English","Hindi","Telugu"],   experience_years: 12, rating: 4.9, reviews_count: 214, properties_sold: 318, properties_listed: 42, rera_number: "A02400001234", verified: true,  featured: true,  avatar_color: "#000000", bio: "Arjun is one of Hyderabad's most decorated luxury real estate consultants, with over 12 years of experience in the Jubilee Hills, Banjara Hills, and Financial District corridors." },
-  { id: "a2",  slug: "priya-raghavan",     full_name: "Priya Raghavan",     title: "Principal Advisor",           city: "Mumbai",     specialisation: "Sea-View Residences", languages: ["English","Hindi","Tamil"],    experience_years: 9,  rating: 4.8, reviews_count: 187, properties_sold: 241, properties_listed: 38, rera_number: "A51900002817", verified: true,  featured: true,  avatar_color: "#1E3A5F", bio: "Priya specialises in Mumbai's premium sea-facing residences across Worli, Bandra, and Juhu. Her NRI clientele spans the UAE, UK, and North America." },
-  { id: "a3",  slug: "rohit-desai",        full_name: "Rohit Desai",        title: "Investment Specialist",       city: "Bengaluru",  specialisation: "IT Corridor Homes",   languages: ["English","Hindi","Kannada"], experience_years: 8,  rating: 4.9, reviews_count: 156, properties_sold: 198, properties_listed: 31, rera_number: "A29200003441", verified: true,  featured: true,  avatar_color: "#3B1F5F", bio: "Rohit brings a data-driven approach to property investment, specialising in the Whitefield–Sarjapur corridor and helping tech professionals build property portfolios." },
-  { id: "a4",  slug: "sunita-krishnan",    full_name: "Sunita Krishnan",    title: "Property Consultant",        city: "Chennai",    specialisation: "Villas & Plots",      languages: ["English","Tamil","Telugu"],   experience_years: 7,  rating: 4.7, reviews_count: 98,  properties_sold: 142, properties_listed: 22, rera_number: "A33100004512", verified: true,  featured: false, avatar_color: "#5F1F3B", bio: "" },
-  { id: "a5",  slug: "vikram-nair",        full_name: "Vikram Nair",        title: "NRI Specialist",              city: "Hyderabad",  specialisation: "NRI Investments",     languages: ["English","Hindi","Malayalam"],experience_years: 11, rating: 4.8, reviews_count: 172, properties_sold: 276, properties_listed: 34, rera_number: "A02400005623", verified: true,  featured: false, avatar_color: "#1F4D2B", bio: "" },
-  { id: "a6",  slug: "ananya-sharma",      full_name: "Ananya Sharma",      title: "Luxury Homes Expert",        city: "Delhi NCR",  specialisation: "Ultra Luxury",        languages: ["English","Hindi","Punjabi"],  experience_years: 10, rating: 4.9, reviews_count: 203, properties_sold: 289, properties_listed: 45, rera_number: "A07200006718", verified: true,  featured: false, avatar_color: "#4D2B00", bio: "" },
-  { id: "a7",  slug: "karthik-subramanian",full_name: "Karthik Subramanian",title: "Commercial Expert",           city: "Bengaluru",  specialisation: "Commercial Spaces",   languages: ["English","Tamil","Kannada"], experience_years: 6,  rating: 4.6, reviews_count: 74,  properties_sold: 98,  properties_listed: 18, rera_number: "A29200007834", verified: true,  featured: false, avatar_color: "#001F4D", bio: "" },
-  { id: "a8",  slug: "meera-pillai",       full_name: "Meera Pillai",       title: "Property Consultant",        city: "Pune",       specialisation: "Mid-Segment Homes",   languages: ["English","Hindi","Marathi"],  experience_years: 5,  rating: 4.7, reviews_count: 88,  properties_sold: 112, properties_listed: 19, rera_number: "A27200008921", verified: true,  featured: false, avatar_color: "#2B1F5F", bio: "" },
-  { id: "a9",  slug: "rahul-agarwal",      full_name: "Rahul Agarwal",      title: "Investment Advisor",         city: "Mumbai",     specialisation: "Plot Investments",    languages: ["English","Hindi","Gujarati"], experience_years: 8,  rating: 4.7, reviews_count: 121, properties_sold: 167, properties_listed: 28, rera_number: "A51900009012", verified: true,  featured: false, avatar_color: "#0D3B1F", bio: "" },
-  { id: "a10", slug: "deepika-menon",      full_name: "Deepika Menon",      title: "Leasing Specialist",         city: "Hyderabad",  specialisation: "Premium Rentals",     languages: ["English","Malayalam","Telugu"],experience_years: 4, rating: 4.8, reviews_count: 64,  properties_sold: 89,  properties_listed: 21, rera_number: "A02400010134", verified: false, featured: false, avatar_color: "#3B0D1F", bio: "" },
-  { id: "a11", slug: "sanjay-kapoor",      full_name: "Sanjay Kapoor",      title: "Senior Advisor",             city: "Delhi NCR",  specialisation: "Luxury Villas",       languages: ["English","Hindi"],            experience_years: 14, rating: 4.9, reviews_count: 248, properties_sold: 342, properties_listed: 52, rera_number: "A07200011245", verified: true,  featured: false, avatar_color: "#1A0D2B", bio: "" },
-  { id: "a12", slug: "lakshmi-iyer",       full_name: "Lakshmi Iyer",       title: "Property Consultant",        city: "Chennai",    specialisation: "Waterfront Homes",    languages: ["English","Tamil"],            experience_years: 6,  rating: 4.6, reviews_count: 79,  properties_sold: 103, properties_listed: 17, rera_number: "A33100012356", verified: true,  featured: false, avatar_color: "#0D1F3B", bio: "" },
+  { id: "a1",  slug: "arjun-mehta",        full_name: "Arjun Mehta",        title: "Senior Property Consultant",  city: "Hyderabad",  specialisation: "Luxury Apartments",   languages: ["English","Hindi","Telugu"],   experience_years: 12, rating: 0, reviews_count: 0, properties_sold: 318, properties_listed: 42, rera_number: "A02400001234", verified: true,  featured: true,  avatar_color: "#000000", bio: "Arjun is one of Hyderabad's most decorated luxury real estate consultants, with over 12 years of experience in the Jubilee Hills, Banjara Hills, and Financial District corridors." },
+  { id: "a2",  slug: "priya-raghavan",     full_name: "Priya Raghavan",     title: "Principal Advisor",           city: "Mumbai",     specialisation: "Sea-View Residences", languages: ["English","Hindi","Tamil"],    experience_years: 9,  rating: 0, reviews_count: 0, properties_sold: 241, properties_listed: 38, rera_number: "A51900002817", verified: true,  featured: true,  avatar_color: "#1E3A5F", bio: "Priya specialises in Mumbai's premium sea-facing residences across Worli, Bandra, and Juhu. Her NRI clientele spans the UAE, UK, and North America." },
+  { id: "a3",  slug: "rohit-desai",        full_name: "Rohit Desai",        title: "Investment Specialist",       city: "Bengaluru",  specialisation: "IT Corridor Homes",   languages: ["English","Hindi","Kannada"], experience_years: 8,  rating: 0, reviews_count: 0, properties_sold: 198, properties_listed: 31, rera_number: "A29200003441", verified: true,  featured: true,  avatar_color: "#3B1F5F", bio: "Rohit brings a data-driven approach to property investment, specialising in the Whitefield–Sarjapur corridor and helping tech professionals build property portfolios." },
+  { id: "a4",  slug: "sunita-krishnan",    full_name: "Sunita Krishnan",    title: "Property Consultant",        city: "Chennai",    specialisation: "Villas & Plots",      languages: ["English","Tamil","Telugu"],   experience_years: 7,  rating: 0, reviews_count: 0, properties_sold: 142, properties_listed: 22, rera_number: "A33100004512", verified: true,  featured: false, avatar_color: "#5F1F3B", bio: "" },
+  { id: "a5",  slug: "vikram-nair",        full_name: "Vikram Nair",        title: "NRI Specialist",              city: "Hyderabad",  specialisation: "NRI Investments",     languages: ["English","Hindi","Malayalam"],experience_years: 11, rating: 0, reviews_count: 0, properties_sold: 276, properties_listed: 34, rera_number: "A02400005623", verified: true,  featured: false, avatar_color: "#1F4D2B", bio: "" },
+  { id: "a6",  slug: "ananya-sharma",      full_name: "Ananya Sharma",      title: "Luxury Homes Expert",        city: "Delhi NCR",  specialisation: "Ultra Luxury",        languages: ["English","Hindi","Punjabi"],  experience_years: 10, rating: 0, reviews_count: 0, properties_sold: 289, properties_listed: 45, rera_number: "A07200006718", verified: true,  featured: false, avatar_color: "#4D2B00", bio: "" },
+  { id: "a7",  slug: "karthik-subramanian",full_name: "Karthik Subramanian",title: "Commercial Expert",           city: "Bengaluru",  specialisation: "Commercial Spaces",   languages: ["English","Tamil","Kannada"], experience_years: 6,  rating: 0, reviews_count: 0, properties_sold: 98,  properties_listed: 18, rera_number: "A29200007834", verified: true,  featured: false, avatar_color: "#001F4D", bio: "" },
+  { id: "a8",  slug: "meera-pillai",       full_name: "Meera Pillai",       title: "Property Consultant",        city: "Pune",       specialisation: "Mid-Segment Homes",   languages: ["English","Hindi","Marathi"],  experience_years: 5,  rating: 0, reviews_count: 0, properties_sold: 112, properties_listed: 19, rera_number: "A27200008921", verified: true,  featured: false, avatar_color: "#2B1F5F", bio: "" },
+  { id: "a9",  slug: "rahul-agarwal",      full_name: "Rahul Agarwal",      title: "Investment Advisor",         city: "Mumbai",     specialisation: "Plot Investments",    languages: ["English","Hindi","Gujarati"], experience_years: 8,  rating: 0, reviews_count: 0, properties_sold: 167, properties_listed: 28, rera_number: "A51900009012", verified: true,  featured: false, avatar_color: "#0D3B1F", bio: "" },
+  { id: "a10", slug: "deepika-menon",      full_name: "Deepika Menon",      title: "Leasing Specialist",         city: "Hyderabad",  specialisation: "Premium Rentals",     languages: ["English","Malayalam","Telugu"],experience_years: 4, rating: 0, reviews_count: 0, properties_sold: 89,  properties_listed: 21, rera_number: "A02400010134", verified: false, featured: false, avatar_color: "#3B0D1F", bio: "" },
+  { id: "a11", slug: "sanjay-kapoor",      full_name: "Sanjay Kapoor",      title: "Senior Advisor",             city: "Delhi NCR",  specialisation: "Luxury Villas",       languages: ["English","Hindi"],            experience_years: 14, rating: 0, reviews_count: 0, properties_sold: 342, properties_listed: 52, rera_number: "A07200011245", verified: true,  featured: false, avatar_color: "#1A0D2B", bio: "" },
+  { id: "a12", slug: "lakshmi-iyer",       full_name: "Lakshmi Iyer",       title: "Property Consultant",        city: "Chennai",    specialisation: "Waterfront Homes",    languages: ["English","Tamil"],            experience_years: 6,  rating: 0, reviews_count: 0, properties_sold: 103, properties_listed: 17, rera_number: "A33100012356", verified: true,  featured: false, avatar_color: "#0D1F3B", bio: "" },
 ];
 
 // ── Helpers ───────────────────────────────────────────────────
@@ -92,9 +92,15 @@ function FeaturedCard({ a }: { a: Agent }) {
       <span style={{ padding: "4px 12px", background: "rgba(201,168,76,0.08)", border: "1px solid rgba(201,168,76,0.2)", borderRadius: "100px", fontSize: "10px", fontWeight: 700, color: "#2BA8E0", marginBottom: "16px" }}>{a.specialisation}</span>
       {/* Rating */}
       <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "16px" }}>
-        <Stars rating={a.rating} />
-        <span style={{ fontSize: "13px", fontWeight: 700, color: "#000000" }}>{a.rating}</span>
-        <span style={{ fontSize: "11px", color: "#9CA3AF" }}>({a.reviews_count} reviews)</span>
+        {a.reviews_count > 0 ? (
+          <>
+            <Stars rating={a.rating} />
+            <span style={{ fontSize: "13px", fontWeight: 700, color: "#000000" }}>{a.rating}</span>
+            <span style={{ fontSize: "11px", color: "#9CA3AF" }}>({a.reviews_count} reviews)</span>
+          </>
+        ) : (
+          <span style={{ fontSize: "11px", color: "#9CA3AF", fontStyle: "italic" }}>No reviews yet</span>
+        )}
       </div>
       {/* Stats */}
       <div style={{ display: "flex", gap: "20px", marginBottom: "16px", padding: "14px 0", borderTop: "1px solid rgba(13,43,31,0.06)", borderBottom: "1px solid rgba(13,43,31,0.06)", width: "100%" }}>
@@ -142,9 +148,15 @@ function AgentCard({ a }: { a: Agent }) {
         {a.city}
       </p>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "5px", marginBottom: "10px" }}>
-        <Stars rating={a.rating} />
-        <span style={{ fontSize: "11px", fontWeight: 700, color: hover ? "rgba(245,242,236,0.75)" : "#000000" }}>{a.rating}</span>
-        <span style={{ fontSize: "10px", color: hover ? "rgba(245,242,236,0.3)" : "#9CA3AF" }}>({a.reviews_count})</span>
+        {a.reviews_count > 0 ? (
+          <>
+            <Stars rating={a.rating} />
+            <span style={{ fontSize: "11px", fontWeight: 700, color: hover ? "rgba(245,242,236,0.75)" : "#000000" }}>{a.rating}</span>
+            <span style={{ fontSize: "10px", color: hover ? "rgba(245,242,236,0.3)" : "#9CA3AF" }}>({a.reviews_count})</span>
+          </>
+        ) : (
+          <span style={{ fontSize: "10px", color: hover ? "rgba(245,242,236,0.4)" : "#9CA3AF", fontStyle: "italic" }}>No reviews yet</span>
+        )}
       </div>
       <p style={{ fontSize: "11px", color: hover ? "rgba(245,242,236,0.4)" : "#9CA3AF", marginBottom: "14px" }}>
         {a.properties_sold} properties sold · {a.experience_years}yr exp
@@ -257,7 +269,7 @@ export default function AgentsPage() {
               RERA certified professionals with proven track records
             </p>
             <div className="ag-stats" style={{ display: "flex", justifyContent: "center", gap: "60px", paddingTop: "28px", borderTop: "1px solid rgba(245,242,236,0.06)", animation: "fadeUp 0.5s 0.25s ease-out both" }}>
-              {[["500+","Verified Agents"],["14","Cities Covered"],["4.9","Avg Rating"]].map(([v,l]) => (
+              {[["500+","Verified Agents"],["14","Cities Covered"]].map(([v,l]) => (
                 <div key={l} style={{ textAlign: "center" }}>
                   <p style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "34px", fontWeight: 600, color: "#2BA8E0" }}>{v}</p>
                   <p style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.14em", color: "rgba(245,242,236,0.3)", textTransform: "uppercase" }}>{l}</p>
