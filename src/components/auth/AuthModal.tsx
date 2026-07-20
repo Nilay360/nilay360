@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import { useEffect, useRef, useState, useCallback } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useAuth, type AuthMode } from "@/context/AuthContext";
@@ -20,8 +20,8 @@ const CITIES = ["Hyderabad", "Bengaluru", "Mumbai", "Delhi", "Pune", "Chennai", 
 
 type AccountType = "individual" | "agent";
 
-const GOLD = "#2BA8E0";
-const GREEN = "#0B0D10";
+const GOLD = "#10C4C3";
+const GREEN = "#0A1526";
 const CARD_BG = "#0a0a0a";
 
 // ─── Small shared bits ─────────────────────────────────────────────────────────
@@ -408,7 +408,7 @@ function AuthModalInner({
 
           {/* Brand */}
           <div className="am-brand">
-            <img src="/nilay_logo_final.png" alt="Nilay 360" style={{ height: 36, width: "auto", objectFit: "contain" }} />
+            <img src="/brand/nilay360_logo_horizontal_dark-bg.png" alt="Nilay 360" style={{ height: 36, width: "auto", objectFit: "contain" }} />
           </div>
 
           {/* Tabs */}
@@ -695,7 +695,7 @@ const styles = `
     display: flex; align-items: center; justify-content: center;
     padding: 24px;
     animation: amOverlayIn 0.2s ease;
-    font-family: 'DM Sans', system-ui, sans-serif;
+    font-family: 'Cal Sans', system-ui, sans-serif;
   }
   .am-card {
     position: relative;
@@ -730,7 +730,7 @@ const styles = `
   .am-tab {
     flex: 1; padding: 9px 0; border: none; cursor: pointer;
     background: transparent; border-radius: 7px;
-    font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 600;
+    font-family: 'Cal Sans', sans-serif; font-size: 13px; font-weight: 600;
     letter-spacing: 0.04em; color: rgba(245,242,236,0.5);
     transition: background 0.18s, color 0.18s;
   }
@@ -740,7 +740,7 @@ const styles = `
   .am-step { animation: amStepIn 0.22s ease; }
 
   .am-title {
-    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-family: 'Cal Sans', Georgia, serif;
     font-size: 30px; font-weight: 500; line-height: 1.1;
     color: #FFFFFF; margin: 0 0 6px;
   }
@@ -759,7 +759,7 @@ const styles = `
     background: rgba(255,255,255,0.04);
     border: 1.5px solid rgba(255,255,255,0.12);
     border-radius: 9px;
-    font-family: 'DM Sans', sans-serif; font-size: 14px; color: #F5F2EC;
+    font-family: 'Cal Sans', sans-serif; font-size: 14px; color: #F5F2EC;
     outline: none; transition: border-color 0.18s, box-shadow 0.18s;
     -webkit-appearance: none;
   }
@@ -781,7 +781,7 @@ const styles = `
     text-align: center; font-size: 22px; font-weight: 600;
     color: #F5F2EC; background: rgba(255,255,255,0.04);
     border: 1.5px solid rgba(255,255,255,0.14); border-radius: 10px;
-    outline: none; font-family: 'DM Sans', sans-serif;
+    outline: none; font-family: 'Cal Sans', sans-serif;
     transition: border-color 0.15s, box-shadow 0.15s;
   }
   .am-otp-box:focus { border-color: ${GOLD}; box-shadow: 0 0 0 3px rgba(201,168,76,0.16); }
@@ -789,11 +789,11 @@ const styles = `
   .am-btn-gold {
     width: 100%; padding: 13px 24px; margin-top: 4px;
     background: ${GOLD}; border: none; border-radius: 9px;
-    font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 700;
+    font-family: 'Cal Sans', sans-serif; font-size: 14px; font-weight: 700;
     letter-spacing: 0.04em; color: #0a0a0a; cursor: pointer;
     transition: background 0.18s, transform 0.12s, box-shadow 0.18s;
   }
-  .am-btn-gold:hover:not(:disabled) { background: #3DBEF5; box-shadow: 0 6px 22px rgba(201,168,76,0.32); transform: translateY(-1px); }
+  .am-btn-gold:hover:not(:disabled) { background: #3DDAD9; box-shadow: 0 6px 22px rgba(201,168,76,0.32); transform: translateY(-1px); }
   .am-btn-gold:disabled { opacity: 0.6; cursor: not-allowed; }
 
   .am-or { display: flex; align-items: center; gap: 12px; margin: 18px 0; }
@@ -804,7 +804,7 @@ const styles = `
     width: 100%; padding: 12px 24px;
     background: #fff; border: 1px solid rgba(255,255,255,0.2); border-radius: 9px;
     display: flex; align-items: center; justify-content: center; gap: 10px;
-    font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500;
+    font-family: 'Cal Sans', sans-serif; font-size: 14px; font-weight: 500;
     color: #1a1a1a; cursor: pointer; transition: box-shadow 0.18s, transform 0.12s;
   }
   .am-btn-google:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.3); transform: translateY(-1px); }
@@ -818,7 +818,7 @@ const styles = `
 
   .am-resend { text-align: center; font-size: 13px; color: rgba(245,242,236,0.5); margin: 16px 0 0; }
   .am-resend-wait { color: rgba(245,242,236,0.35); }
-  .am-resend-link { background: none; border: none; cursor: pointer; color: ${GOLD}; font-weight: 600; font-size: 13px; font-family: 'DM Sans', sans-serif; }
+  .am-resend-link { background: none; border: none; cursor: pointer; color: ${GOLD}; font-weight: 600; font-size: 13px; font-family: 'Cal Sans', sans-serif; }
   .am-resend-link:hover { text-decoration: underline; }
 
   .am-role {

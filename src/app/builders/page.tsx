@@ -1,13 +1,13 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 
 // ─── Design tokens ───────────────────────────────────────────────────────────
-const DARK_GREEN = "#000000";
-const GOLD = "#2BA8E0";
-const IVORY = "#000000";
+const DARK_GREEN = "#020C1C";
+const GOLD = "#10C4C3";
+const IVORY = "#020C1C";
 const FOOTER_BG = "#05080C";
 
 // ─── Static developer data ────────────────────────────────────────────────────
@@ -199,7 +199,7 @@ function DeveloperCard({ dev }: { dev: (typeof ALL_DEVELOPERS)[0] }) {
       >
         <span
           style={{
-            fontFamily: "'Cormorant Garamond', serif",
+            fontFamily: "'Cal Sans', serif",
             fontSize: 22,
             fontWeight: 700,
             color: GOLD,
@@ -212,7 +212,7 @@ function DeveloperCard({ dev }: { dev: (typeof ALL_DEVELOPERS)[0] }) {
       {/* Name */}
       <div
         style={{
-          fontFamily: "'Cormorant Garamond', serif",
+          fontFamily: "'Cal Sans', serif",
           fontSize: 22,
           fontWeight: 600,
           color: DARK_GREEN,
@@ -226,7 +226,7 @@ function DeveloperCard({ dev }: { dev: (typeof ALL_DEVELOPERS)[0] }) {
       {/* Cities */}
       <div
         style={{
-          fontFamily: "'DM Sans', sans-serif",
+          fontFamily: "'Cal Sans', sans-serif",
           fontSize: 12,
           color: "#888",
           marginBottom: 10,
@@ -238,7 +238,7 @@ function DeveloperCard({ dev }: { dev: (typeof ALL_DEVELOPERS)[0] }) {
       {/* Stats */}
       <div
         style={{
-          fontFamily: "'DM Sans', sans-serif",
+          fontFamily: "'Cal Sans', sans-serif",
           fontSize: 13,
           color: "#555",
           marginBottom: 14,
@@ -254,7 +254,7 @@ function DeveloperCard({ dev }: { dev: (typeof ALL_DEVELOPERS)[0] }) {
             display: "inline-block",
             background: "#16a34a",
             color: "#fff",
-            fontFamily: "'DM Sans', sans-serif",
+            fontFamily: "'Cal Sans', sans-serif",
             fontSize: 10,
             fontWeight: 600,
             padding: "3px 10px",
@@ -270,7 +270,7 @@ function DeveloperCard({ dev }: { dev: (typeof ALL_DEVELOPERS)[0] }) {
       <Link
         href={`/new-projects?developer=${dev.slug}`}
         style={{
-          fontFamily: "'DM Sans', sans-serif",
+          fontFamily: "'Cal Sans', sans-serif",
           fontSize: 13,
           fontWeight: 600,
           color: GOLD,
@@ -322,7 +322,7 @@ function FeaturedCard({ dev }: { dev: (typeof ALL_DEVELOPERS)[0] }) {
       >
         <span
           style={{
-            fontFamily: "'Cormorant Garamond', serif",
+            fontFamily: "'Cal Sans', serif",
             fontSize: 28,
             fontWeight: 700,
             color: GOLD,
@@ -336,7 +336,7 @@ function FeaturedCard({ dev }: { dev: (typeof ALL_DEVELOPERS)[0] }) {
       <div style={{ flex: 1 }}>
         <div
           style={{
-            fontFamily: "'Cormorant Garamond', serif",
+            fontFamily: "'Cal Sans', serif",
             fontSize: 32,
             fontWeight: 600,
             color: DARK_GREEN,
@@ -348,7 +348,7 @@ function FeaturedCard({ dev }: { dev: (typeof ALL_DEVELOPERS)[0] }) {
         </div>
         <div
           style={{
-            fontFamily: "'DM Sans', sans-serif",
+            fontFamily: "'Cal Sans', sans-serif",
             fontSize: 15,
             color: "#777",
             marginBottom: 16,
@@ -365,7 +365,7 @@ function FeaturedCard({ dev }: { dev: (typeof ALL_DEVELOPERS)[0] }) {
               style={{
                 border: `1px solid ${GOLD}`,
                 color: DARK_GREEN,
-                fontFamily: "'DM Sans', sans-serif",
+                fontFamily: "'Cal Sans', sans-serif",
                 fontSize: 10,
                 fontWeight: 600,
                 padding: "3px 10px",
@@ -381,7 +381,7 @@ function FeaturedCard({ dev }: { dev: (typeof ALL_DEVELOPERS)[0] }) {
         {/* Stats */}
         <div
           style={{
-            fontFamily: "'DM Sans', sans-serif",
+            fontFamily: "'Cal Sans', sans-serif",
             fontSize: 13,
             color: "#555",
             marginBottom: 20,
@@ -398,7 +398,7 @@ function FeaturedCard({ dev }: { dev: (typeof ALL_DEVELOPERS)[0] }) {
               display: "inline-block",
               background: GOLD,
               color: DARK_GREEN,
-              fontFamily: "'DM Sans', sans-serif",
+              fontFamily: "'Cal Sans', sans-serif",
               fontSize: 13,
               fontWeight: 700,
               padding: "10px 24px",
@@ -413,7 +413,7 @@ function FeaturedCard({ dev }: { dev: (typeof ALL_DEVELOPERS)[0] }) {
             style={{
               background: "#16a34a",
               color: "#fff",
-              fontFamily: "'DM Sans', sans-serif",
+              fontFamily: "'Cal Sans', sans-serif",
               fontSize: 11,
               fontWeight: 600,
               padding: "4px 12px",
@@ -475,7 +475,7 @@ export default function BuildersPage() {
   const featuredDevs = ALL_DEVELOPERS.filter((d) => d.featured);
 
   const inputStyle: React.CSSProperties = {
-    fontFamily: "'DM Sans', sans-serif",
+    fontFamily: "'Cal Sans', sans-serif",
     fontSize: 14,
     border: "1px solid #ddd",
     borderRadius: 4,
@@ -486,7 +486,7 @@ export default function BuildersPage() {
   };
 
   const selectStyle: React.CSSProperties = {
-    fontFamily: "'DM Sans', sans-serif",
+    fontFamily: "'Cal Sans', sans-serif",
     fontSize: 14,
     border: "1px solid #ddd",
     borderRadius: 4,
@@ -509,11 +509,10 @@ export default function BuildersPage() {
     <>
       {/* ── Global font import ── */}
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=DM+Sans:wght@300;400;500;600;700&display=swap');
 
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
         html { scroll-behavior: smooth; }
-        body { font-family: 'DM Sans', sans-serif; background: ${IVORY}; }
+        body { font-family: 'Cal Sans', sans-serif; background: ${IVORY}; }
 
         @keyframes fadeInUp {
           from { opacity: 0; transform: translateY(28px); }
@@ -530,7 +529,7 @@ export default function BuildersPage() {
         .shimmer-card { animation: pulse-gold 1.6s ease-in-out infinite; }
 
         .nav-link {
-          font-family: 'DM Sans', sans-serif;
+          font-family: 'Cal Sans', sans-serif;
           font-size: 14px;
           color: rgba(255,255,255,0.85);
           text-decoration: none;
@@ -540,7 +539,7 @@ export default function BuildersPage() {
         .nav-link:hover { color: ${GOLD}; }
 
         .footer-link {
-          font-family: 'DM Sans', sans-serif;
+          font-family: 'Cal Sans', sans-serif;
           font-size: 14px;
           color: rgba(245,242,236,0.6);
           text-decoration: none;
@@ -615,7 +614,7 @@ export default function BuildersPage() {
         <Link
           href="/"
           style={{
-            fontFamily: "'Cormorant Garamond', serif",
+            fontFamily: "'Cal Sans', serif",
             fontSize: 22,
             fontWeight: 700,
             color: GOLD,
@@ -641,7 +640,7 @@ export default function BuildersPage() {
           <Link
             href="/login"
             style={{
-              fontFamily: "'DM Sans', sans-serif",
+              fontFamily: "'Cal Sans', sans-serif",
               fontSize: 14,
               color: "#fff",
               textDecoration: "none",
@@ -655,7 +654,7 @@ export default function BuildersPage() {
               display: "inline-block",
               background: GOLD,
               color: DARK_GREEN,
-              fontFamily: "'DM Sans', sans-serif",
+              fontFamily: "'Cal Sans', sans-serif",
               fontSize: 12,
               fontWeight: 700,
               padding: "8px 18px",
@@ -689,7 +688,7 @@ export default function BuildersPage() {
         <div
           className="fade-in"
           style={{
-            fontFamily: "'DM Sans', sans-serif",
+            fontFamily: "'Cal Sans', sans-serif",
             fontSize: 12,
             fontWeight: 600,
             color: GOLD,
@@ -705,7 +704,7 @@ export default function BuildersPage() {
         <h1
           className="fade-in-delay"
           style={{
-            fontFamily: "'Cormorant Garamond', serif",
+            fontFamily: "'Cal Sans', serif",
             fontSize: 56,
             fontWeight: 600,
             color: "#fff",
@@ -725,7 +724,7 @@ export default function BuildersPage() {
         <p
           className="fade-in-delay-2"
           style={{
-            fontFamily: "'DM Sans', sans-serif",
+            fontFamily: "'Cal Sans', sans-serif",
             fontSize: 18,
             color: IVORY,
             opacity: 0.85,
@@ -751,7 +750,7 @@ export default function BuildersPage() {
             <div key={stat.label} style={{ textAlign: "center" }}>
               <div
                 style={{
-                  fontFamily: "'Cormorant Garamond', serif",
+                  fontFamily: "'Cal Sans', serif",
                   fontSize: 32,
                   fontWeight: 700,
                   color: "#fff",
@@ -763,7 +762,7 @@ export default function BuildersPage() {
               </div>
               <div
                 style={{
-                  fontFamily: "'DM Sans', sans-serif",
+                  fontFamily: "'Cal Sans', sans-serif",
                   fontSize: 12,
                   fontWeight: 500,
                   color: GOLD,
@@ -846,7 +845,7 @@ export default function BuildersPage() {
           {/* Result count */}
           <div
             style={{
-              fontFamily: "'DM Sans', sans-serif",
+              fontFamily: "'Cal Sans', sans-serif",
               fontSize: 14,
               color: "#888",
             }}
@@ -864,7 +863,7 @@ export default function BuildersPage() {
         <div style={{ maxWidth: 1200, margin: "0 auto" }}>
           <h2
             style={{
-              fontFamily: "'Cormorant Garamond', serif",
+              fontFamily: "'Cal Sans', serif",
               fontSize: 40,
               fontWeight: 600,
               color: DARK_GREEN,
@@ -895,7 +894,7 @@ export default function BuildersPage() {
         <div style={{ maxWidth: 1200, margin: "0 auto" }}>
           <h2
             style={{
-              fontFamily: "'Cormorant Garamond', serif",
+              fontFamily: "'Cal Sans', serif",
               fontSize: 40,
               fontWeight: 600,
               color: "#fff",
@@ -934,7 +933,7 @@ export default function BuildersPage() {
                     gridColumn: "1 / -1",
                     textAlign: "center",
                     padding: "60px 0",
-                    fontFamily: "'DM Sans', sans-serif",
+                    fontFamily: "'Cal Sans', sans-serif",
                     fontSize: 16,
                     color: "rgba(255,255,255,0.5)",
                   }}
@@ -960,7 +959,7 @@ export default function BuildersPage() {
         >
           <h2
             style={{
-              fontFamily: "'Cormorant Garamond', serif",
+              fontFamily: "'Cal Sans', serif",
               fontSize: 40,
               fontWeight: 600,
               color: DARK_GREEN,
@@ -971,7 +970,7 @@ export default function BuildersPage() {
           </h2>
           <p
             style={{
-              fontFamily: "'DM Sans', sans-serif",
+              fontFamily: "'Cal Sans', sans-serif",
               fontSize: 16,
               color: "#777",
               marginBottom: 64,
@@ -1060,7 +1059,7 @@ export default function BuildersPage() {
                 >
                   <span
                     style={{
-                      fontFamily: "'Cormorant Garamond', serif",
+                      fontFamily: "'Cal Sans', serif",
                       fontSize: 22,
                       fontWeight: 700,
                       color: GOLD,
@@ -1076,7 +1075,7 @@ export default function BuildersPage() {
                 {/* Title */}
                 <div
                   style={{
-                    fontFamily: "'Cormorant Garamond', serif",
+                    fontFamily: "'Cal Sans', serif",
                     fontSize: 20,
                     fontWeight: 600,
                     color: DARK_GREEN,
@@ -1090,7 +1089,7 @@ export default function BuildersPage() {
                 {/* Desc */}
                 <div
                   style={{
-                    fontFamily: "'DM Sans', sans-serif",
+                    fontFamily: "'Cal Sans', sans-serif",
                     fontSize: 13,
                     color: "#888",
                     lineHeight: 1.6,
@@ -1120,7 +1119,7 @@ export default function BuildersPage() {
         <div style={{ maxWidth: 700, margin: "0 auto" }}>
           <h2
             style={{
-              fontFamily: "'Cormorant Garamond', serif",
+              fontFamily: "'Cal Sans', serif",
               fontSize: 44,
               fontWeight: 600,
               color: "#fff",
@@ -1132,7 +1131,7 @@ export default function BuildersPage() {
           </h2>
           <p
             style={{
-              fontFamily: "'DM Sans', sans-serif",
+              fontFamily: "'Cal Sans', sans-serif",
               fontSize: 16,
               color: GOLD,
               marginBottom: 40,
@@ -1186,7 +1185,7 @@ export default function BuildersPage() {
                 </span>
                 <span
                   style={{
-                    fontFamily: "'DM Sans', sans-serif",
+                    fontFamily: "'Cal Sans', sans-serif",
                     fontSize: 15,
                     color: "rgba(245,242,236,0.9)",
                   }}
@@ -1212,7 +1211,7 @@ export default function BuildersPage() {
                 display: "inline-block",
                 background: GOLD,
                 color: DARK_GREEN,
-                fontFamily: "'DM Sans', sans-serif",
+                fontFamily: "'Cal Sans', sans-serif",
                 fontSize: 15,
                 fontWeight: 700,
                 padding: "16px 40px",
@@ -1226,7 +1225,7 @@ export default function BuildersPage() {
             <Link
               href="/login"
               style={{
-                fontFamily: "'DM Sans', sans-serif",
+                fontFamily: "'Cal Sans', sans-serif",
                 fontSize: 14,
                 color: "rgba(255,255,255,0.7)",
                 textDecoration: "none",
@@ -1252,7 +1251,7 @@ export default function BuildersPage() {
         <div style={{ maxWidth: 700, margin: "0 auto" }}>
           <h2
             style={{
-              fontFamily: "'Cormorant Garamond', serif",
+              fontFamily: "'Cal Sans', serif",
               fontSize: 44,
               fontWeight: 600,
               color: DARK_GREEN,
@@ -1264,7 +1263,7 @@ export default function BuildersPage() {
           </h2>
           <p
             style={{
-              fontFamily: "'DM Sans', sans-serif",
+              fontFamily: "'Cal Sans', sans-serif",
               fontSize: 17,
               color: "#777",
               marginBottom: 40,
@@ -1282,7 +1281,7 @@ export default function BuildersPage() {
                 display: "inline-block",
                 background: DARK_GREEN,
                 color: IVORY,
-                fontFamily: "'DM Sans', sans-serif",
+                fontFamily: "'Cal Sans', sans-serif",
                 fontSize: 14,
                 fontWeight: 600,
                 padding: "14px 32px",
@@ -1300,7 +1299,7 @@ export default function BuildersPage() {
                 border: `2px solid ${GOLD}`,
                 color: GOLD,
                 background: "transparent",
-                fontFamily: "'DM Sans', sans-serif",
+                fontFamily: "'Cal Sans', sans-serif",
                 fontSize: 14,
                 fontWeight: 600,
                 padding: "12px 32px",
@@ -1334,7 +1333,7 @@ export default function BuildersPage() {
           <div>
             <div
               style={{
-                fontFamily: "'DM Sans', sans-serif",
+                fontFamily: "'Cal Sans', sans-serif",
                 fontSize: 11,
                 fontWeight: 700,
                 color: GOLD,
@@ -1363,7 +1362,7 @@ export default function BuildersPage() {
           <div>
             <div
               style={{
-                fontFamily: "'DM Sans', sans-serif",
+                fontFamily: "'Cal Sans', sans-serif",
                 fontSize: 11,
                 fontWeight: 700,
                 color: GOLD,
@@ -1391,7 +1390,7 @@ export default function BuildersPage() {
           <div>
             <div
               style={{
-                fontFamily: "'DM Sans', sans-serif",
+                fontFamily: "'Cal Sans', sans-serif",
                 fontSize: 11,
                 fontWeight: 700,
                 color: GOLD,
@@ -1418,7 +1417,7 @@ export default function BuildersPage() {
           <div>
             <div
               style={{
-                fontFamily: "'DM Sans', sans-serif",
+                fontFamily: "'Cal Sans', sans-serif",
                 fontSize: 11,
                 fontWeight: 700,
                 color: GOLD,
@@ -1458,7 +1457,7 @@ export default function BuildersPage() {
         >
           <span
             style={{
-              fontFamily: "'DM Sans', sans-serif",
+              fontFamily: "'Cal Sans', sans-serif",
               fontSize: 13,
               color: "rgba(245,242,236,0.4)",
             }}
@@ -1467,7 +1466,7 @@ export default function BuildersPage() {
           </span>
           <span
             style={{
-              fontFamily: "'DM Sans', sans-serif",
+              fontFamily: "'Cal Sans', sans-serif",
               fontSize: 13,
               color: "rgba(245,242,236,0.4)",
             }}

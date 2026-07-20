@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
@@ -28,7 +28,7 @@ interface SavedItem extends SaveRow {
   detail: PropertyDetail | null;
 }
 
-const G = { dark: "#000000", gold: "#2BA8E0", ivory: "#000000", mid: "#0B0D10" };
+const G = { dark: "#020C1C", gold: "#10C4C3", ivory: "#020C1C", mid: "#0A1526" };
 
 // Mirrors post-property/page.tsx's COMMERCIAL_CATEGORIES — these categories
 // store "rooms/cabins" in the bedrooms field, not a BHK count.
@@ -135,7 +135,7 @@ export default function SavedPropertiesPage() {
   if (loading) {
     return (
       <div style={{ minHeight: "100vh", background: G.ivory, paddingTop: 64, display: "flex", alignItems: "center", justifyContent: "center" }}>
-        <span style={{ color: "#AEB4BC", fontFamily: "'DM Sans', sans-serif", fontSize: 14 }}>Loading saved properties…</span>
+        <span style={{ color: "#A9B4C2", fontFamily: "'Cal Sans', sans-serif", fontSize: 14 }}>Loading saved properties…</span>
       </div>
     );
   }
@@ -143,8 +143,8 @@ export default function SavedPropertiesPage() {
   if (!userId) {
     return (
       <div style={{ minHeight: "100vh", background: G.ivory, paddingTop: 64, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 16 }}>
-        <p style={{ color: "#E8EAED", fontFamily: "'DM Sans', sans-serif", fontSize: 16 }}>Please sign in to view your saved properties.</p>
-        <Link href="/login" style={{ color: G.gold, fontWeight: 600, fontFamily: "'DM Sans', sans-serif", textDecoration: "none" }}>Sign In →</Link>
+        <p style={{ color: "#FFFFFF", fontFamily: "'Cal Sans', sans-serif", fontSize: 16 }}>Please sign in to view your saved properties.</p>
+        <Link href="/login" style={{ color: G.gold, fontWeight: 600, fontFamily: "'Cal Sans', sans-serif", textDecoration: "none" }}>Sign In →</Link>
       </div>
     );
   }
@@ -153,7 +153,7 @@ export default function SavedPropertiesPage() {
     <div style={{ minHeight: "100vh", background: G.ivory, paddingTop: 64 }}>
       <style>{`
 .sv-card { transition: transform 0.4s cubic-bezier(0.16,1,0.3,1), box-shadow 0.4s cubic-bezier(0.16,1,0.3,1); will-change: transform; }
-.sv-card:hover { transform: translateY(-8px); box-shadow: 0 20px 60px rgba(0,0,0,.45), 0 0 0 1px rgba(43,168,224,0.22); }
+.sv-card:hover { transform: translateY(-8px); box-shadow: 0 20px 60px rgba(0,0,0,.45), 0 0 0 1px rgba(16,196,195,0.22); }
 @media (max-width: 768px) {
   .sv-header { flex-direction: column !important; align-items: flex-start !important; gap: 12px !important; padding: 16px !important; }
   .sv-card { flex-direction: column !important; }
@@ -170,19 +170,19 @@ export default function SavedPropertiesPage() {
 
         <div className="sv-header" style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 36, flexWrap: "wrap", gap: 16 }}>
           <div>
-            <h1 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: 34, fontWeight: 600, color: "#E8EAED", margin: 0, lineHeight: 1.15 }}>
+            <h1 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: 34, fontWeight: 600, color: "#FFFFFF", margin: 0, lineHeight: 1.15 }}>
               Saved Properties
             </h1>
-            <p style={{ color: "#AEB4BC", fontFamily: "'DM Sans', sans-serif", fontSize: 14, margin: "6px 0 0" }}>
+            <p style={{ color: "#A9B4C2", fontFamily: "'Cal Sans', sans-serif", fontSize: 14, margin: "6px 0 0" }}>
               {items.length} {items.length === 1 ? "property" : "properties"} saved
             </p>
           </div>
           <Link href="/dashboard" style={{ textDecoration: "none" }}>
             <button style={{
               padding: "9px 16px", fontSize: 13, fontWeight: 500,
-              color: "#E8EAED", background: "rgba(255,255,255,0.05)",
+              color: "#FFFFFF", background: "rgba(255,255,255,0.05)",
               border: "1px solid rgba(255,255,255,0.15)", borderRadius: 8,
-              cursor: "pointer", fontFamily: "'DM Sans', sans-serif",
+              cursor: "pointer", fontFamily: "'Cal Sans', sans-serif",
             }}>
               ← Dashboard
             </button>
@@ -190,12 +190,12 @@ export default function SavedPropertiesPage() {
         </div>
 
         {items.length === 0 ? (
-          <div style={{ textAlign: "center", padding: "80px 0", color: "rgba(255,255,255,0.45)", fontFamily: "'DM Sans', sans-serif" }}>
+          <div style={{ textAlign: "center", padding: "80px 0", color: "rgba(255,255,255,0.45)", fontFamily: "'Cal Sans', sans-serif" }}>
             <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" style={{ opacity: 0.35, marginBottom: 16 }}>
               <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
             </svg>
             <p style={{ fontSize: 16, margin: "0 0 12px" }}>No saved properties yet.</p>
-            <Link href="/properties" style={{ color: G.gold, fontWeight: 600, fontFamily: "'DM Sans', sans-serif", textDecoration: "none" }}>
+            <Link href="/properties" style={{ color: G.gold, fontWeight: 600, fontFamily: "'Cal Sans', sans-serif", textDecoration: "none" }}>
               Browse properties →
             </Link>
           </div>
@@ -221,7 +221,7 @@ export default function SavedPropertiesPage() {
                     display: "flex", alignItems: "center", justifyContent: "center",
                   }}>
                     {!thumb && (
-                      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="rgba(43,168,224,0.35)" strokeWidth="1.5">
+                      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="rgba(16,196,195,0.35)" strokeWidth="1.5">
                         <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
                       </svg>
                     )}
@@ -235,40 +235,40 @@ export default function SavedPropertiesPage() {
                             <span style={{
                               fontSize: 11, fontWeight: 600, textTransform: "uppercase",
                               letterSpacing: "0.07em",
-                              color: "#2BA8E0",
-                              background: "rgba(43,168,224,0.15)",
+                              color: "#10C4C3",
+                              background: "rgba(16,196,195,0.15)",
                               borderRadius: 4, padding: "2px 8px",
-                              fontFamily: "'DM Sans', sans-serif",
+                              fontFamily: "'Cal Sans', sans-serif",
                             }}>
                               {d.listing_type === "rent" ? "For Rent" : "For Sale"}
                             </span>
                             {d.property_category && (
-                              <span style={{ fontSize: 12, color: "rgba(255,255,255,0.45)", fontFamily: "'DM Sans', sans-serif", textTransform: "capitalize" }}>
+                              <span style={{ fontSize: 12, color: "rgba(255,255,255,0.45)", fontFamily: "'Cal Sans', sans-serif", textTransform: "capitalize" }}>
                                 {d.property_category}
                               </span>
                             )}
                           </div>
                           <h3 style={{
-                            fontFamily: "'Cormorant Garamond', Georgia, serif",
-                            fontSize: 19, fontWeight: 600, color: "#E8EAED",
+                            fontFamily: "'Cal Sans', Georgia, serif",
+                            fontSize: 19, fontWeight: 600, color: "#FFFFFF",
                             margin: "0 0 4px", lineHeight: 1.2,
                           }}>
                             {d.title ?? "Untitled property"}
                           </h3>
                           <div style={{ display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
-                            <span style={{ fontSize: 13, color: "#AEB4BC", fontFamily: "'DM Sans', sans-serif" }}>
+                            <span style={{ fontSize: 13, color: "#A9B4C2", fontFamily: "'Cal Sans', sans-serif" }}>
                               {[d.locality, d.city].filter(Boolean).join(", ") || "—"}
                             </span>
                             {d.bedrooms != null && (
-                              <span style={{ fontSize: 13, color: "#AEB4BC", fontFamily: "'DM Sans', sans-serif" }}>
+                              <span style={{ fontSize: 13, color: "#A9B4C2", fontFamily: "'Cal Sans', sans-serif" }}>
                                 {d.bedrooms} {d.property_category && COMMERCIAL_CATEGORIES.includes(d.property_category) ? "Rooms" : "BHK"}
                               </span>
                             )}
-                            <span style={{ fontSize: 13, fontWeight: 600, color: "#E8EAED", fontFamily: "'DM Sans', sans-serif" }}>
+                            <span style={{ fontSize: 13, fontWeight: 600, color: "#FFFFFF", fontFamily: "'Cal Sans', sans-serif" }}>
                               {fmtPrice(d.price, d.listing_type)}
                             </span>
                           </div>
-                          <div style={{ fontSize: 11.5, color: "rgba(255,255,255,0.45)", fontFamily: "'DM Sans', sans-serif", marginTop: 4 }}>
+                          <div style={{ fontSize: 11.5, color: "rgba(255,255,255,0.45)", fontFamily: "'Cal Sans', sans-serif", marginTop: 4 }}>
                             Saved {fmtDate(item.created_at)}
                           </div>
                         </div>
@@ -278,10 +278,10 @@ export default function SavedPropertiesPage() {
                             <Link href={`/properties/${d.slug}`} style={{ textDecoration: "none" }}>
                               <button style={{
                                 padding: "7px 14px", fontSize: 13, fontWeight: 600,
-                                color: "#000000", background: G.gold,
+                                color: "#020C1C", background: G.gold,
                                 boxShadow: "0 10px 30px rgba(30,167,255,.35)",
                                 border: "none", borderRadius: 7, cursor: "pointer",
-                                fontFamily: "'DM Sans', sans-serif",
+                                fontFamily: "'Cal Sans', sans-serif",
                               }}>
                                 View
                               </button>
@@ -296,7 +296,7 @@ export default function SavedPropertiesPage() {
                               background: "rgba(248,113,113,0.10)",
                               border: `1px solid ${removing === item.id ? "rgba(255,255,255,0.20)" : "rgba(248,113,113,0.30)"}`,
                               borderRadius: 7, cursor: removing === item.id ? "not-allowed" : "pointer",
-                              fontFamily: "'DM Sans', sans-serif",
+                              fontFamily: "'Cal Sans', sans-serif",
                             }}
                           >
                             {removing === item.id ? "…" : "Unsave"}
@@ -306,13 +306,13 @@ export default function SavedPropertiesPage() {
                     ) : (
                       <>
                         <div style={{ flex: 1, minWidth: 200 }}>
-                          <div style={{ fontSize: 13, color: "#AEB4BC", fontFamily: "'DM Sans', sans-serif" }}>
+                          <div style={{ fontSize: 13, color: "#A9B4C2", fontFamily: "'Cal Sans', sans-serif" }}>
                             Property no longer available
                           </div>
                           <div style={{ fontSize: 12, color: "rgba(255,255,255,0.45)", fontFamily: "monospace", marginTop: 4 }}>
                             ID: {item.property_id ?? "—"}
                           </div>
-                          <div style={{ fontSize: 11.5, color: "rgba(255,255,255,0.45)", fontFamily: "'DM Sans', sans-serif", marginTop: 4 }}>
+                          <div style={{ fontSize: 11.5, color: "rgba(255,255,255,0.45)", fontFamily: "'Cal Sans', sans-serif", marginTop: 4 }}>
                             Saved {fmtDate(item.created_at)}
                           </div>
                         </div>
@@ -326,7 +326,7 @@ export default function SavedPropertiesPage() {
                               background: "rgba(248,113,113,0.10)",
                               border: `1px solid ${removing === item.id ? "rgba(255,255,255,0.20)" : "rgba(248,113,113,0.30)"}`,
                               borderRadius: 7, cursor: removing === item.id ? "not-allowed" : "pointer",
-                              fontFamily: "'DM Sans', sans-serif",
+                              fontFamily: "'Cal Sans', sans-serif",
                             }}
                           >
                             {removing === item.id ? "…" : "Remove"}

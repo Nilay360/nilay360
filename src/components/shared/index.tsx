@@ -1,4 +1,4 @@
-import React from "react"
+﻿import React from "react"
 import { cn } from "@/lib/utils"
 
 // ── SectionHeader ─────────────────────────────────────────────────────────────
@@ -24,7 +24,7 @@ export function SectionHeader({
       {eyebrow && (
         <p className={cn(
           "text-[11px] font-semibold tracking-[0.18em] uppercase mb-3",
-          dark ? "text-[#2BA8E0]" : "text-[#2BA8E0]"
+          dark ? "text-[#10C4C3]" : "text-[#10C4C3]"
         )}>
           {eyebrow}
         </p>
@@ -32,7 +32,7 @@ export function SectionHeader({
       <h2 className={cn(
         "font-display font-semibold leading-tight",
         "text-[2rem] md:text-[2.5rem]",
-        dark ? "text-white" : "text-[#000000]"
+        dark ? "text-white" : "text-[#020C1C]"
       )}>
         {title}
       </h2>
@@ -62,7 +62,7 @@ export function StatCard({ value, label, dark = true, className }: StatCardProps
     <div className={cn("text-center", className)}>
       <div className={cn(
         "font-display text-[2rem] font-semibold leading-none mb-1",
-        dark ? "text-[#3DBEF5]" : "text-[#0B0D10]"
+        dark ? "text-[#3DDAD9]" : "text-[#0A1526]"
       )}>
         {value}
       </div>
@@ -87,7 +87,7 @@ export function GoldDivider({ label, className }: GoldDividerProps) {
     <div className={cn("flex items-center gap-3", className)}>
       <div className="flex-1 h-px bg-[rgba(201,168,76,0.3)]" />
       {label && (
-        <span className="text-[11px] font-medium text-[#2BA8E0] tracking-[0.1em] uppercase">
+        <span className="text-[11px] font-medium text-[#10C4C3] tracking-[0.1em] uppercase">
           {label}
         </span>
       )}
@@ -102,7 +102,7 @@ export function LoadingSpinner({ size = 24, className }: { size?: number; classN
     <svg
       width={size} height={size}
       viewBox="0 0 24 24" fill="none"
-      className={cn("animate-spin text-[#2BA8E0]", className)}
+      className={cn("animate-spin text-[#10C4C3]", className)}
     >
       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />

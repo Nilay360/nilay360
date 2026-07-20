@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
@@ -114,7 +114,7 @@ function PropertyCard({ prop }: { prop: Property }) {
       {/* Image / placeholder */}
       <div style={{
         height: 200,
-        background: typeColors[prop.property_type] || "#000000",
+        background: typeColors[prop.property_type] || "#020C1C",
         position: "relative",
         display: "flex",
         alignItems: "center",
@@ -131,9 +131,9 @@ function PropertyCard({ prop }: { prop: Property }) {
           position: "absolute",
           top: 14,
           right: 14,
-          background: "#2BA8E0",
-          color: "#000000",
-          fontFamily: "'DM Sans', sans-serif",
+          background: "#10C4C3",
+          color: "#020C1C",
+          fontFamily: "'Cal Sans', sans-serif",
           fontSize: 11,
           fontWeight: 600,
           letterSpacing: 1,
@@ -148,17 +148,17 @@ function PropertyCard({ prop }: { prop: Property }) {
       {/* Body */}
       <div style={{ padding: "20px 24px 24px", flex: 1, display: "flex", flexDirection: "column" }}>
         <h3 style={{
-          fontFamily: "'Cormorant Garamond', serif",
+          fontFamily: "'Cal Sans', serif",
           fontSize: 22,
           fontWeight: 600,
-          color: "#000000",
+          color: "#020C1C",
           margin: "0 0 6px",
           lineHeight: 1.25,
         }}>
           {prop.title}
         </h3>
         <p style={{
-          fontFamily: "'DM Sans', sans-serif",
+          fontFamily: "'Cal Sans', sans-serif",
           fontSize: 13,
           color: "#888",
           margin: "0 0 16px",
@@ -167,17 +167,17 @@ function PropertyCard({ prop }: { prop: Property }) {
         </p>
 
         <p style={{
-          fontFamily: "'Cormorant Garamond', serif",
+          fontFamily: "'Cal Sans', serif",
           fontSize: 24,
           fontWeight: 600,
-          color: "#2BA8E0",
+          color: "#10C4C3",
           margin: "0 0 6px",
         }}>
           {formatINR(prop.price)}
         </p>
 
         <p style={{
-          fontFamily: "'DM Sans', sans-serif",
+          fontFamily: "'Cal Sans', sans-serif",
           fontSize: 12,
           color: "#aaa",
           margin: "0 0 14px",
@@ -191,10 +191,10 @@ function PropertyCard({ prop }: { prop: Property }) {
           alignItems: "center",
           gap: 6,
           background: "rgba(13,43,31,0.08)",
-          color: "#000000",
+          color: "#020C1C",
           borderRadius: 4,
           padding: "4px 10px",
-          fontFamily: "'DM Sans', sans-serif",
+          fontFamily: "'Cal Sans', sans-serif",
           fontSize: 12,
           fontWeight: 500,
           alignSelf: "flex-start",
@@ -206,9 +206,9 @@ function PropertyCard({ prop }: { prop: Property }) {
 
         <Link href={`/property/${prop.id}`} style={{
           marginTop: "auto",
-          fontFamily: "'DM Sans', sans-serif",
+          fontFamily: "'Cal Sans', sans-serif",
           fontSize: 13,
-          color: "#2BA8E0",
+          color: "#10C4C3",
           textDecoration: "none",
           fontWeight: 500,
           letterSpacing: 0.3,
@@ -298,9 +298,9 @@ export default function CommercialPage() {
   });
 
   const selectStyle: React.CSSProperties = {
-    fontFamily: "'DM Sans', sans-serif",
+    fontFamily: "'Cal Sans', sans-serif",
     fontSize: 14,
-    color: "#000000",
+    color: "#020C1C",
     background: "#fff",
     border: "1px solid rgba(13,43,31,0.2)",
     borderRadius: 6,
@@ -314,11 +314,10 @@ export default function CommercialPage() {
     <>
       {/* ── Google Fonts ─────────────────────────────────────────────── */}
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,400;1,600&family=DM+Sans:wght@300;400;500;600&display=swap');
 
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
         html { scroll-behavior: smooth; }
-        body { font-family: 'DM Sans', sans-serif; background: #000000; }
+        body { font-family: 'Cal Sans', sans-serif; background: #020C1C; }
 
         @keyframes shimmer {
           0%   { background-position: 200% 0; }
@@ -347,7 +346,7 @@ export default function CommercialPage() {
           width: 18px;
           height: 18px;
           border-radius: 50%;
-          background: #2BA8E0;
+          background: #10C4C3;
           cursor: pointer;
           border: 2px solid #fff;
           box-shadow: 0 1px 6px rgba(0,0,0,0.3);
@@ -356,7 +355,7 @@ export default function CommercialPage() {
           width: 18px;
           height: 18px;
           border-radius: 50%;
-          background: #2BA8E0;
+          background: #10C4C3;
           cursor: pointer;
           border: 2px solid #fff;
           box-shadow: 0 1px 6px rgba(0,0,0,0.3);
@@ -389,15 +388,15 @@ export default function CommercialPage() {
           box-shadow: 0 16px 48px rgba(0,0,0,0.35) !important;
           transform: translateY(-4px) !important;
         }
-        .footer-link:hover { color: #000000 !important; }
-        .nav-link:hover { color: #2BA8E0 !important; }
+        .footer-link:hover { color: #020C1C !important; }
+        .nav-link:hover { color: #10C4C3 !important; }
         .cta-browse:hover { opacity: 0.88; }
         .cta-talk:hover { background: rgba(255,255,255,0.1) !important; }
       `}</style>
 
       {/* ── HERO ─────────────────────────────────────────────────────── */}
       <section className="cm-hero" style={{
-        background: "#000000",
+        background: "#020C1C",
         minHeight: "60vh",
         paddingTop: 64,
         display: "flex",
@@ -412,9 +411,9 @@ export default function CommercialPage() {
         }}>
           {/* Eyebrow */}
           <p style={{
-            fontFamily: "'DM Sans', sans-serif",
+            fontFamily: "'Cal Sans', sans-serif",
             fontSize: 12,
-            color: "#2BA8E0",
+            color: "#10C4C3",
             letterSpacing: 3,
             textTransform: "uppercase",
             marginBottom: 24,
@@ -424,7 +423,7 @@ export default function CommercialPage() {
 
           {/* H1 */}
           <h1 style={{
-            fontFamily: "'Cormorant Garamond', serif",
+            fontFamily: "'Cal Sans', serif",
             fontSize: 56,
             fontWeight: 600,
             color: "#fff",
@@ -433,16 +432,16 @@ export default function CommercialPage() {
           }}>
             Premium Commercial Properties
             <br />
-            <span style={{ fontStyle: "italic", color: "#2BA8E0" }}>
+            <span style={{ fontStyle: "italic", color: "#10C4C3" }}>
               for Forward-Thinking Businesses
             </span>
           </h1>
 
           {/* Subtitle */}
           <p style={{
-            fontFamily: "'DM Sans', sans-serif",
+            fontFamily: "'Cal Sans', sans-serif",
             fontSize: 18,
-            color: "#000000",
+            color: "#020C1C",
             maxWidth: 600,
             margin: "0 auto 56px",
             lineHeight: 1.65,
@@ -469,14 +468,14 @@ export default function CommercialPage() {
                   <div style={{
                     width: 1,
                     height: 48,
-                    background: "#2BA8E0",
+                    background: "#10C4C3",
                     opacity: 0.5,
                     margin: "0 40px",
                   }} />
                 )}
                 <div style={{ textAlign: "center" }}>
                   <p style={{
-                    fontFamily: "'Cormorant Garamond', serif",
+                    fontFamily: "'Cal Sans', serif",
                     fontSize: 32,
                     fontWeight: 600,
                     color: "#fff",
@@ -486,9 +485,9 @@ export default function CommercialPage() {
                     {stat.num}
                   </p>
                   <p style={{
-                    fontFamily: "'DM Sans', sans-serif",
+                    fontFamily: "'Cal Sans', sans-serif",
                     fontSize: 12,
-                    color: "#2BA8E0",
+                    color: "#10C4C3",
                     letterSpacing: 1,
                     textTransform: "uppercase",
                   }}>
@@ -503,15 +502,15 @@ export default function CommercialPage() {
 
       {/* ── COMMERCIAL TYPES ─────────────────────────────────────────── */}
       <section className="cm-types" style={{
-        background: "#000000",
+        background: "#020C1C",
         padding: "80px 40px",
       }}>
         <div style={{ maxWidth: 900, margin: "0 auto" }}>
           <h2 style={{
-            fontFamily: "'Cormorant Garamond', serif",
+            fontFamily: "'Cal Sans', serif",
             fontSize: 40,
             fontWeight: 600,
-            color: "#000000",
+            color: "#020C1C",
             marginBottom: 48,
             textAlign: "center",
           }}>
@@ -533,7 +532,7 @@ export default function CommercialPage() {
                 key={type.name}
                 className="type-card"
                 style={{
-                  background: "#000000",
+                  background: "#020C1C",
                   border: "1px solid rgba(201,168,76,0.3)",
                   borderRadius: 8,
                   padding: 40,
@@ -543,16 +542,16 @@ export default function CommercialPage() {
               >
                 <div style={{ fontSize: 48, marginBottom: 20 }}>{type.icon}</div>
                 <h3 style={{
-                  fontFamily: "'Cormorant Garamond', serif",
+                  fontFamily: "'Cal Sans', serif",
                   fontSize: 28,
                   fontWeight: 600,
-                  color: "#2BA8E0",
+                  color: "#10C4C3",
                   marginBottom: 8,
                 }}>
                   {type.name}
                 </h3>
                 <p style={{
-                  fontFamily: "'DM Sans', sans-serif",
+                  fontFamily: "'Cal Sans', sans-serif",
                   fontSize: 14,
                   color: "rgba(245,242,236,0.7)",
                   marginBottom: 6,
@@ -560,17 +559,17 @@ export default function CommercialPage() {
                   {type.count}
                 </p>
                 <p style={{
-                  fontFamily: "'DM Sans', sans-serif",
+                  fontFamily: "'Cal Sans', sans-serif",
                   fontSize: 14,
-                  color: "#2BA8E0",
+                  color: "#10C4C3",
                   marginBottom: 24,
                 }}>
                   {type.yield}
                 </p>
                 <Link href={type.href} style={{
-                  fontFamily: "'DM Sans', sans-serif",
+                  fontFamily: "'Cal Sans', sans-serif",
                   fontSize: 13,
-                  color: "#2BA8E0",
+                  color: "#10C4C3",
                   fontWeight: 500,
                   letterSpacing: 0.3,
                 }}>
@@ -584,14 +583,14 @@ export default function CommercialPage() {
 
       {/* ── ROI CALCULATOR ───────────────────────────────────────────── */}
       <section className="cm-roi" style={{
-        background: "#000000",
+        background: "#020C1C",
         padding: "80px 40px",
       }}>
         <div style={{ maxWidth: 900, margin: "0 auto" }}>
           {/* Header */}
           <div style={{ textAlign: "center", marginBottom: 56 }}>
             <h2 style={{
-              fontFamily: "'Cormorant Garamond', serif",
+              fontFamily: "'Cal Sans', serif",
               fontSize: 40,
               fontWeight: 600,
               color: "#fff",
@@ -600,9 +599,9 @@ export default function CommercialPage() {
               ROI Calculator
             </h2>
             <p style={{
-              fontFamily: "'DM Sans', sans-serif",
+              fontFamily: "'Cal Sans', sans-serif",
               fontSize: 16,
-              color: "#2BA8E0",
+              color: "#10C4C3",
             }}>
               Estimate your commercial property returns
             </p>
@@ -617,7 +616,7 @@ export default function CommercialPage() {
           }}>
             {/* Inputs */}
             <div style={{
-              background: "#000000",
+              background: "#020C1C",
               borderRadius: 8,
               padding: 40,
             }}>
@@ -629,9 +628,9 @@ export default function CommercialPage() {
                   marginBottom: 12,
                 }}>
                   <label style={{
-                    fontFamily: "'DM Sans', sans-serif",
+                    fontFamily: "'Cal Sans', sans-serif",
                     fontSize: 12,
-                    color: "#000000",
+                    color: "#020C1C",
                     fontWeight: 600,
                     letterSpacing: 1,
                     textTransform: "uppercase",
@@ -639,10 +638,10 @@ export default function CommercialPage() {
                     Property Value
                   </label>
                   <span style={{
-                    fontFamily: "'Cormorant Garamond', serif",
+                    fontFamily: "'Cal Sans', serif",
                     fontSize: 20,
                     fontWeight: 600,
-                    color: "#2BA8E0",
+                    color: "#10C4C3",
                   }}>
                     {formatINR(propValue)}
                   </span>
@@ -660,8 +659,8 @@ export default function CommercialPage() {
                   justifyContent: "space-between",
                   marginTop: 6,
                 }}>
-                  <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 11, color: "#888" }}>₹50 L</span>
-                  <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 11, color: "#888" }}>₹50 Cr</span>
+                  <span style={{ fontFamily: "'Cal Sans', sans-serif", fontSize: 11, color: "#888" }}>₹50 L</span>
+                  <span style={{ fontFamily: "'Cal Sans', sans-serif", fontSize: 11, color: "#888" }}>₹50 Cr</span>
                 </div>
               </div>
 
@@ -669,9 +668,9 @@ export default function CommercialPage() {
               <div style={{ marginBottom: 36 }}>
                 <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 12 }}>
                   <label style={{
-                    fontFamily: "'DM Sans', sans-serif",
+                    fontFamily: "'Cal Sans', sans-serif",
                     fontSize: 12,
-                    color: "#000000",
+                    color: "#020C1C",
                     fontWeight: 600,
                     letterSpacing: 1,
                     textTransform: "uppercase",
@@ -679,10 +678,10 @@ export default function CommercialPage() {
                     Annual Rental Yield
                   </label>
                   <span style={{
-                    fontFamily: "'Cormorant Garamond', serif",
+                    fontFamily: "'Cal Sans', serif",
                     fontSize: 20,
                     fontWeight: 600,
-                    color: "#2BA8E0",
+                    color: "#10C4C3",
                   }}>
                     {rentalYield}%
                   </span>
@@ -696,8 +695,8 @@ export default function CommercialPage() {
                   onChange={(e) => setRentalYield(Number(e.target.value))}
                 />
                 <div style={{ display: "flex", justifyContent: "space-between", marginTop: 6 }}>
-                  <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 11, color: "#888" }}>4%</span>
-                  <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 11, color: "#888" }}>12%</span>
+                  <span style={{ fontFamily: "'Cal Sans', sans-serif", fontSize: 11, color: "#888" }}>4%</span>
+                  <span style={{ fontFamily: "'Cal Sans', sans-serif", fontSize: 11, color: "#888" }}>12%</span>
                 </div>
               </div>
 
@@ -705,9 +704,9 @@ export default function CommercialPage() {
               <div>
                 <label style={{
                   display: "block",
-                  fontFamily: "'DM Sans', sans-serif",
+                  fontFamily: "'Cal Sans', sans-serif",
                   fontSize: 12,
-                  color: "#000000",
+                  color: "#020C1C",
                   fontWeight: 600,
                   letterSpacing: 1,
                   textTransform: "uppercase",
@@ -725,9 +724,9 @@ export default function CommercialPage() {
                         padding: "10px 0",
                         border: "1px solid rgba(201,168,76,0.4)",
                         borderRadius: 4,
-                        background: loanPct === pct ? "#2BA8E0" : "transparent",
-                        color: loanPct === pct ? "#000000" : "#000000",
-                        fontFamily: "'DM Sans', sans-serif",
+                        background: loanPct === pct ? "#10C4C3" : "transparent",
+                        color: loanPct === pct ? "#020C1C" : "#020C1C",
+                        fontFamily: "'Cal Sans', sans-serif",
                         fontSize: 13,
                         fontWeight: 600,
                         cursor: "pointer",
@@ -764,9 +763,9 @@ export default function CommercialPage() {
                   }}
                 >
                   <p style={{
-                    fontFamily: "'DM Sans', sans-serif",
+                    fontFamily: "'Cal Sans', sans-serif",
                     fontSize: 12,
-                    color: "#2BA8E0",
+                    color: "#10C4C3",
                     letterSpacing: 1.5,
                     textTransform: "uppercase",
                     marginBottom: 6,
@@ -774,7 +773,7 @@ export default function CommercialPage() {
                     {item.label}
                   </p>
                   <p style={{
-                    fontFamily: "'Cormorant Garamond', serif",
+                    fontFamily: "'Cal Sans', serif",
                     fontSize: 32,
                     fontWeight: 600,
                     color: "#fff",
@@ -790,11 +789,11 @@ export default function CommercialPage() {
                   marginTop: 32,
                   width: "100%",
                   padding: "14px 0",
-                  background: "#2BA8E0",
-                  color: "#000000",
+                  background: "#10C4C3",
+                  color: "#020C1C",
                   border: "none",
                   borderRadius: 4,
-                  fontFamily: "'DM Sans', sans-serif",
+                  fontFamily: "'Cal Sans', sans-serif",
                   fontSize: 13,
                   fontWeight: 600,
                   letterSpacing: 1,
@@ -811,15 +810,15 @@ export default function CommercialPage() {
 
       {/* ── FILTERS + LISTINGS ───────────────────────────────────────── */}
       <section className="cm-listings" style={{
-        background: "#000000",
+        background: "#020C1C",
         padding: "80px 40px",
       }}>
         <div style={{ maxWidth: 1200, margin: "0 auto" }}>
           <h2 style={{
-            fontFamily: "'Cormorant Garamond', serif",
+            fontFamily: "'Cal Sans', serif",
             fontSize: 40,
             fontWeight: 600,
-            color: "#000000",
+            color: "#020C1C",
             marginBottom: 40,
             textAlign: "center",
           }}>
@@ -882,9 +881,9 @@ export default function CommercialPage() {
                     padding: "60px 0",
                   }}>
                     <p style={{
-                      fontFamily: "'Cormorant Garamond', serif",
+                      fontFamily: "'Cal Sans', serif",
                       fontSize: 28,
-                      color: "#000000",
+                      color: "#020C1C",
                       opacity: 0.5,
                     }}>
                       No properties match your filters.
@@ -897,12 +896,12 @@ export default function CommercialPage() {
 
       {/* ── COMMERCIAL ADVANTAGES ────────────────────────────────────── */}
       <section className="cm-advantages" style={{
-        background: "#000000",
+        background: "#020C1C",
         padding: "80px 40px",
       }}>
         <div style={{ maxWidth: 1100, margin: "0 auto" }}>
           <h2 style={{
-            fontFamily: "'Cormorant Garamond', serif",
+            fontFamily: "'Cal Sans', serif",
             fontSize: 40,
             fontWeight: 600,
             color: "#fff",
@@ -927,7 +926,7 @@ export default function CommercialPage() {
               <div
                 key={item.title}
                 style={{
-                  background: "#000000",
+                  background: "#020C1C",
                   borderRadius: 8,
                   padding: 32,
                   maxWidth: 240,
@@ -936,16 +935,16 @@ export default function CommercialPage() {
               >
                 <div style={{ fontSize: 36, marginBottom: 16 }}>{item.icon}</div>
                 <h3 style={{
-                  fontFamily: "'Cormorant Garamond', serif",
+                  fontFamily: "'Cal Sans', serif",
                   fontSize: 22,
                   fontWeight: 600,
-                  color: "#000000",
+                  color: "#020C1C",
                   marginBottom: 10,
                 }}>
                   {item.title}
                 </h3>
                 <p style={{
-                  fontFamily: "'DM Sans', sans-serif",
+                  fontFamily: "'Cal Sans', sans-serif",
                   fontSize: 14,
                   color: "#555",
                   lineHeight: 1.6,
@@ -960,15 +959,15 @@ export default function CommercialPage() {
 
       {/* ── WHY LEASE THROUGH Nilay 360 ─────────────────────────────────── */}
       <section className="cm-why" style={{
-        background: "#000000",
+        background: "#020C1C",
         padding: "80px 40px",
       }}>
         <div style={{ maxWidth: 900, margin: "0 auto" }}>
           <h2 style={{
-            fontFamily: "'Cormorant Garamond', serif",
+            fontFamily: "'Cal Sans', serif",
             fontSize: 40,
             fontWeight: 600,
-            color: "#000000",
+            color: "#020C1C",
             marginBottom: 56,
             textAlign: "center",
           }}>
@@ -1007,15 +1006,15 @@ export default function CommercialPage() {
                   width: 64,
                   height: 64,
                   borderRadius: "50%",
-                  background: "#000000",
-                  border: "2px solid #2BA8E0",
+                  background: "#020C1C",
+                  border: "2px solid #10C4C3",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  fontFamily: "'Cormorant Garamond', serif",
+                  fontFamily: "'Cal Sans', serif",
                   fontSize: 20,
                   fontWeight: 600,
-                  color: "#2BA8E0",
+                  color: "#10C4C3",
                 }}>
                   {item.num}
                 </div>
@@ -1023,16 +1022,16 @@ export default function CommercialPage() {
                 {/* Text */}
                 <div style={{ paddingTop: 8 }}>
                   <h3 style={{
-                    fontFamily: "'Cormorant Garamond', serif",
+                    fontFamily: "'Cal Sans', serif",
                     fontSize: 28,
                     fontWeight: 600,
-                    color: "#000000",
+                    color: "#020C1C",
                     marginBottom: 10,
                   }}>
                     {item.title}
                   </h3>
                   <p style={{
-                    fontFamily: "'DM Sans', sans-serif",
+                    fontFamily: "'Cal Sans', sans-serif",
                     fontSize: 16,
                     color: "#555",
                     lineHeight: 1.7,
@@ -1049,12 +1048,12 @@ export default function CommercialPage() {
 
       {/* ── CTA SECTION ──────────────────────────────────────────────── */}
       <section className="cm-cta" style={{
-        background: "#000000",
+        background: "#020C1C",
         padding: "80px 40px",
         textAlign: "center",
       }}>
         <h2 style={{
-          fontFamily: "'Cormorant Garamond', serif",
+          fontFamily: "'Cal Sans', serif",
           fontSize: 44,
           fontWeight: 600,
           color: "#fff",
@@ -1065,9 +1064,9 @@ export default function CommercialPage() {
           Ready to Invest in Commercial Property?
         </h2>
         <p style={{
-          fontFamily: "'DM Sans', sans-serif",
+          fontFamily: "'Cal Sans', sans-serif",
           fontSize: 16,
-          color: "#000000",
+          color: "#020C1C",
           opacity: 0.8,
           marginBottom: 40,
         }}>
@@ -1079,11 +1078,11 @@ export default function CommercialPage() {
             href="/commercial"
             className="cta-browse"
             style={{
-              fontFamily: "'DM Sans', sans-serif",
+              fontFamily: "'Cal Sans', sans-serif",
               fontSize: 14,
               fontWeight: 600,
-              color: "#000000",
-              background: "#2BA8E0",
+              color: "#020C1C",
+              background: "#10C4C3",
               padding: "14px 32px",
               borderRadius: 4,
               textDecoration: "none",
@@ -1097,7 +1096,7 @@ export default function CommercialPage() {
             href="/contact"
             className="cta-talk"
             style={{
-              fontFamily: "'DM Sans', sans-serif",
+              fontFamily: "'Cal Sans', sans-serif",
               fontSize: 14,
               fontWeight: 600,
               color: "#fff",
@@ -1123,17 +1122,17 @@ export default function CommercialPage() {
         {/* Logo + tagline */}
         <div style={{ marginBottom: 48 }}>
           <p style={{
-            fontFamily: "'Cormorant Garamond', serif",
+            fontFamily: "'Cal Sans', serif",
             fontSize: 24,
             fontWeight: 600,
-            color: "#2BA8E0",
+            color: "#10C4C3",
             letterSpacing: 2,
             marginBottom: 8,
           }}>
             Nilay 360 ·
           </p>
           <p style={{
-            fontFamily: "'DM Sans', sans-serif",
+            fontFamily: "'Cal Sans', sans-serif",
             fontSize: 13,
             color: "rgba(245,242,236,0.5)",
             maxWidth: 260,
@@ -1193,9 +1192,9 @@ export default function CommercialPage() {
           ].map((col) => (
             <div key={col.heading}>
               <p style={{
-                fontFamily: "'DM Sans', sans-serif",
+                fontFamily: "'Cal Sans', sans-serif",
                 fontSize: 11,
-                color: "#2BA8E0",
+                color: "#10C4C3",
                 letterSpacing: 2,
                 textTransform: "uppercase",
                 fontWeight: 600,
@@ -1210,7 +1209,7 @@ export default function CommercialPage() {
                       href={link.href}
                       className="footer-link"
                       style={{
-                        fontFamily: "'DM Sans', sans-serif",
+                        fontFamily: "'Cal Sans', sans-serif",
                         fontSize: 14,
                         color: "rgba(245,242,236,0.6)",
                         textDecoration: "none",
@@ -1237,14 +1236,14 @@ export default function CommercialPage() {
           gap: 12,
         }}>
           <p style={{
-            fontFamily: "'DM Sans', sans-serif",
+            fontFamily: "'Cal Sans', sans-serif",
             fontSize: 13,
             color: "rgba(245,242,236,0.4)",
           }}>
             © 2025 Nilay 360. All rights reserved.
           </p>
           <p style={{
-            fontFamily: "'DM Sans', sans-serif",
+            fontFamily: "'Cal Sans', sans-serif",
             fontSize: 13,
             color: "rgba(245,242,236,0.4)",
           }}>

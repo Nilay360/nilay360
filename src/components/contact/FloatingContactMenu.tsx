@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useRef, useEffect } from "react";
 import { AnimatePresence, motion } from "framer-motion";
@@ -73,7 +73,7 @@ const MENU_ITEMS = [
     id: "callback",
     label: "Request a Callback",
     icon: <IconPhone />,
-    color: "#2BA8E0",
+    color: "#10C4C3",
     action: "modal" as const,
   },
   {
@@ -186,7 +186,7 @@ export default function FloatingContactMenu() {
           border: 1px solid rgba(255,255,255,0.1);
           border-radius: 100px;
           cursor: pointer;
-          font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 600; color: #fff;
+          font-family: 'Cal Sans', sans-serif; font-size: 13px; font-weight: 600; color: #fff;
           text-decoration: none; white-space: nowrap;
           transition: border-color 0.15s, background 0.15s;
           box-shadow: 0 4px 16px rgba(0,0,0,0.4);
@@ -199,15 +199,15 @@ export default function FloatingContactMenu() {
           cursor: pointer; display: flex; align-items: center; justify-content: center;
           color: #fff; outline: none;
           transition: transform 0.2s, background 0.2s;
-          box-shadow: 0 4px 20px rgba(43,168,224,0.45);
+          box-shadow: 0 4px 20px rgba(16,196,195,0.45);
         }
         .fcm-fab:hover { transform: scale(1.08); }
-        .fcm-fab:focus-visible { outline: 3px solid rgba(43,168,224,0.6); outline-offset: 3px; }
+        .fcm-fab:focus-visible { outline: 3px solid rgba(16,196,195,0.6); outline-offset: 3px; }
         .fcm-fab--closed { animation: fcmPulse 2.2s ease-out infinite; }
         @keyframes fcmPulse {
-          0%   { box-shadow: 0 4px 20px rgba(43,168,224,0.45), 0 0 0 0 rgba(43,168,224,0.35); }
-          70%  { box-shadow: 0 4px 20px rgba(43,168,224,0.45), 0 0 0 14px rgba(43,168,224,0); }
-          100% { box-shadow: 0 4px 20px rgba(43,168,224,0.45), 0 0 0 0 rgba(43,168,224,0); }
+          0%   { box-shadow: 0 4px 20px rgba(16,196,195,0.45), 0 0 0 0 rgba(16,196,195,0.35); }
+          70%  { box-shadow: 0 4px 20px rgba(16,196,195,0.45), 0 0 0 14px rgba(16,196,195,0); }
+          100% { box-shadow: 0 4px 20px rgba(16,196,195,0.45), 0 0 0 0 rgba(16,196,195,0); }
         }
         .fcm-input {
           padding: 10px 12px;
@@ -215,11 +215,11 @@ export default function FloatingContactMenu() {
           border: 1px solid rgba(255,255,255,0.12);
           border-radius: 10px;
           font-size: 13px; color: #fff;
-          font-family: 'DM Sans', sans-serif;
+          font-family: 'Cal Sans', sans-serif;
           outline: none; width: 100%; box-sizing: border-box;
           transition: border-color 0.15s;
         }
-        .fcm-input:focus { border-color: rgba(43,168,224,0.5); }
+        .fcm-input:focus { border-color: rgba(16,196,195,0.5); }
         .fcm-input::placeholder { color: rgba(255,255,255,0.28); }
         @media (max-width: 480px) {
           .fcm-fab { width: 48px; height: 48px; }
@@ -341,7 +341,7 @@ export default function FloatingContactMenu() {
                 borderRadius: 18,
                 padding: "20px 20px 16px",
                 width: 272,
-                fontFamily: "'DM Sans', sans-serif",
+                fontFamily: "'Cal Sans', sans-serif",
                 boxShadow: "0 8px 32px rgba(0,0,0,0.5)",
               }}
             >
@@ -393,7 +393,7 @@ export default function FloatingContactMenu() {
                   <button
                     type="submit"
                     disabled={submitting}
-                    style={{ padding: "11px 16px", background: submitting ? "rgba(43,168,224,0.45)" : "#2BA8E0", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, color: "#000", letterSpacing: "0.05em", cursor: submitting ? "not-allowed" : "pointer", fontFamily: "'DM Sans', sans-serif", marginTop: 2, transition: "background 0.15s" }}
+                    style={{ padding: "11px 16px", background: submitting ? "rgba(16,196,195,0.45)" : "#10C4C3", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, color: "#000", letterSpacing: "0.05em", cursor: submitting ? "not-allowed" : "pointer", fontFamily: "'Cal Sans', sans-serif", marginTop: 2, transition: "background 0.15s" }}
                   >
                     {submitting ? "Sending…" : "Request Callback"}
                   </button>
@@ -410,7 +410,7 @@ export default function FloatingContactMenu() {
           aria-label={open ? "Close contact menu" : "Open contact menu"}
           aria-expanded={open}
           aria-haspopup="true"
-          style={{ background: open ? "rgba(20,20,34,0.95)" : "#2BA8E0" }}
+          style={{ background: open ? "rgba(20,20,34,0.95)" : "#10C4C3" }}
           type="button"
         >
           <motion.span

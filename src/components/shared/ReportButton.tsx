@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useAuth } from "@/context/AuthContext";
@@ -8,7 +8,7 @@ const REASONS = ["Misleading information", "Spam", "Inappropriate content", "Oth
 const inputStyle: React.CSSProperties = {
   width: "100%", padding: "10px 13px", background: "#F8F6F1",
   border: "1.5px solid rgba(13,43,31,0.08)", borderRadius: "8px", fontSize: "13px",
-  color: "#000000", fontFamily: "'DM Sans', sans-serif", outline: "none",
+  color: "#020C1C", fontFamily: "'Cal Sans', sans-serif", outline: "none",
 };
 
 const labelStyle: React.CSSProperties = {
@@ -67,8 +67,8 @@ export default function ReportButton({
   };
 
   const triggerStyle: React.CSSProperties = variant === "dark"
-    ? { display: "flex", alignItems: "center", gap: "7px", padding: "8px 16px", borderRadius: "999px", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.10)", color: "#fff", fontSize: "12px", fontWeight: 500, cursor: "pointer", fontFamily: "'DM Sans', sans-serif", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)" }
-    : { display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", padding: "12px", background: "#fff", border: "1.5px solid rgba(13,43,31,0.1)", borderRadius: "10px", fontSize: "12px", fontWeight: 600, color: "#6B7C72", cursor: "pointer", fontFamily: "'DM Sans', sans-serif", width: "100%" };
+    ? { display: "flex", alignItems: "center", gap: "7px", padding: "8px 16px", borderRadius: "999px", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.10)", color: "#fff", fontSize: "12px", fontWeight: 500, cursor: "pointer", fontFamily: "'Cal Sans', sans-serif", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)" }
+    : { display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", padding: "12px", background: "#fff", border: "1.5px solid rgba(13,43,31,0.1)", borderRadius: "10px", fontSize: "12px", fontWeight: 600, color: "#6B7C72", cursor: "pointer", fontFamily: "'Cal Sans', sans-serif", width: "100%" };
 
   return (
     <>
@@ -87,19 +87,19 @@ export default function ReportButton({
         >
           <div
             onClick={e => e.stopPropagation()}
-            style={{ background: "#fff", borderRadius: "18px", border: "1px solid rgba(13,43,31,0.07)", boxShadow: "0 12px 48px rgba(0,0,0,0.25)", width: "100%", maxWidth: "420px", padding: "26px 28px", fontFamily: "'DM Sans', sans-serif" }}
+            style={{ background: "#fff", borderRadius: "18px", border: "1px solid rgba(13,43,31,0.07)", boxShadow: "0 12px 48px rgba(0,0,0,0.25)", width: "100%", maxWidth: "420px", padding: "26px 28px", fontFamily: "'Cal Sans', sans-serif" }}
           >
             {submitted ? (
               <div style={{ textAlign: "center", padding: "12px 0" }}>
                 <div style={{ fontSize: "36px", marginBottom: "10px" }}>✅</div>
-                <p style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "20px", color: "#000000", marginBottom: "8px" }}>Report submitted</p>
+                <p style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "20px", color: "#020C1C", marginBottom: "8px" }}>Report submitted</p>
                 <p style={{ fontSize: "12px", color: "#6B7C72", lineHeight: 1.7, marginBottom: "18px" }}>Our team will review this shortly. Thank you for helping keep Nilay 360 trustworthy.</p>
-                <button onClick={close} style={{ padding: "10px 20px", background: "#2BA8E0", border: "none", borderRadius: "8px", color: "#000000", fontSize: "12px", fontWeight: 700, cursor: "pointer", fontFamily: "'DM Sans', sans-serif" }}>Close</button>
+                <button onClick={close} style={{ padding: "10px 20px", background: "#10C4C3", border: "none", borderRadius: "8px", color: "#020C1C", fontSize: "12px", fontWeight: 700, cursor: "pointer", fontFamily: "'Cal Sans', sans-serif" }}>Close</button>
               </div>
             ) : (
               <>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "18px" }}>
-                  <h3 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "22px", fontWeight: 600, color: "#000000" }}>Report {entityType === "listing" ? "Listing" : "Profile"}</h3>
+                  <h3 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "22px", fontWeight: 600, color: "#020C1C" }}>Report {entityType === "listing" ? "Listing" : "Profile"}</h3>
                   <button onClick={close} aria-label="Close" style={{ width: "28px", height: "28px", borderRadius: "7px", background: "#F8F6F1", border: "1px solid rgba(13,43,31,0.1)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: "#374151" }}>
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                   </button>
@@ -126,7 +126,7 @@ export default function ReportButton({
                   <button
                     onClick={() => void handleSubmit()}
                     disabled={submitting}
-                    style={{ padding: "12px", background: "#2BA8E0", border: "none", borderRadius: "9px", color: "#000000", fontSize: "12px", fontWeight: 700, letterSpacing: "0.04em", cursor: submitting ? "not-allowed" : "pointer", opacity: submitting ? 0.6 : 1, fontFamily: "'DM Sans', sans-serif" }}
+                    style={{ padding: "12px", background: "#10C4C3", border: "none", borderRadius: "9px", color: "#020C1C", fontSize: "12px", fontWeight: 700, letterSpacing: "0.04em", cursor: submitting ? "not-allowed" : "pointer", opacity: submitting ? 0.6 : 1, fontFamily: "'Cal Sans', sans-serif" }}
                   >
                     {submitting ? "Submitting…" : "Submit Report"}
                   </button>

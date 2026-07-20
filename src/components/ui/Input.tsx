@@ -18,7 +18,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
         {label && (
           <label
             htmlFor={inputId}
-            className="text-[12px] font-medium text-[#121519] tracking-wide uppercase"
+            className="text-[12px] font-medium text-[#111F33] tracking-wide uppercase"
           >
             {label}
           </label>
@@ -34,11 +34,11 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
             id={inputId}
             className={cn(
               "w-full px-4 py-3 rounded-[8px] text-[14px] font-normal",
-              "bg-white text-[#000000] placeholder:text-[#6B7C72]",
+              "bg-white text-[#020C1C] placeholder:text-[#6B7C72]",
               "border border-[rgba(27,67,50,0.15)]",
               "transition-all duration-150",
-              "focus:outline-none focus:border-[#2BA8E0] focus:ring-2 focus:ring-[rgba(201,168,76,0.15)]",
-              "disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-[#000000]",
+              "focus:outline-none focus:border-[#10C4C3] focus:ring-2 focus:ring-[rgba(201,168,76,0.15)]",
+              "disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-[#020C1C]",
               error && "border-red-400 focus:border-red-400 focus:ring-red-100",
               leftIcon && "pl-10",
               rightIcon && "pr-10",
@@ -73,7 +73,7 @@ export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
     return (
       <div className="flex flex-col gap-1.5 w-full">
         {label && (
-          <label htmlFor={selectId} className="text-[12px] font-medium text-[#121519] tracking-wide uppercase">
+          <label htmlFor={selectId} className="text-[12px] font-medium text-[#111F33] tracking-wide uppercase">
             {label}
           </label>
         )}
@@ -82,9 +82,9 @@ export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
           id={selectId}
           className={cn(
             "w-full px-4 py-3 rounded-[8px] text-[14px]",
-            "bg-white text-[#000000]",
+            "bg-white text-[#020C1C]",
             "border border-[rgba(27,67,50,0.15)]",
-            "focus:outline-none focus:border-[#2BA8E0] focus:ring-2 focus:ring-[rgba(201,168,76,0.15)]",
+            "focus:outline-none focus:border-[#10C4C3] focus:ring-2 focus:ring-[rgba(201,168,76,0.15)]",
             "disabled:opacity-50 cursor-pointer",
             error && "border-red-400",
             className

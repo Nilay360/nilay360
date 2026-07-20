@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import React, {
   useReducer, useEffect, useRef, useCallback, DragEvent,
@@ -115,9 +115,9 @@ const C = {
   surface: '#0f0f0f',
   surface2: '#161616',
   border: '#1e1e1e',
-  green: '#0B0D10',
-  greenMid: '#121519',
-  gold: '#2BA8E0',
+  green: '#0A1526',
+  greenMid: '#111F33',
+  gold: '#10C4C3',
   goldDim: 'rgba(201,168,76,0.10)',
   goldBorder: 'rgba(201,168,76,0.30)',
   text: '#F5F2EC',
@@ -128,8 +128,8 @@ const C = {
   error: '#e05555',
 } as const
 
-const FD = '"Cormorant Garamond", Georgia, "Times New Roman", serif'
-const FB = '"DM Sans", -apple-system, BlinkMacSystemFont, sans-serif'
+const FD = '"Cal Sans", Georgia, "Times New Roman", serif'
+const FB = '"Cal Sans", -apple-system, BlinkMacSystemFont, sans-serif'
 
 // ─── Shared styles ─────────────────────────────────────────────────────────────
 
@@ -158,7 +158,7 @@ const S = {
   } as React.CSSProperties,
 
   btnPrimary: {
-    background: `linear-gradient(135deg, ${C.gold} 0%, #1577B8 100%)`,
+    background: `linear-gradient(135deg, ${C.gold} 0%, #0B9C9B 100%)`,
     color: '#0a0a0a',
     fontFamily: FB,
     fontWeight: 600,
@@ -1555,7 +1555,6 @@ export default function PostPropertyPage() {
       </div>
 
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap');
         *, *::before, *::after { box-sizing: border-box; }
         input, select, textarea { outline: none; }
         input:focus, select:focus, textarea:focus {

@@ -248,7 +248,6 @@ function buildBrochureHtml(p: Property): string {
   return `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">
 <title>${esc(p.title)} — Nilay 360</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=DM+Sans:wght@400;500;600&display=swap');
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: 'Cal Sans', Arial, sans-serif; color: #020C1C; background: #fff; padding: 48px; }
   .header { text-align: center; padding-bottom: 24px; border-bottom: 2px solid #10C4C3; margin-bottom: 32px; }
@@ -700,7 +699,6 @@ export default function PropertyDetailClient() {
 
   if (loading) return (
     <>
-      <style>{`@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,600&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap'); *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; } body { font-family: 'Cal Sans', sans-serif; background: #020C1C; } @keyframes pulse { 0%,100%{opacity:1}50%{opacity:0.4} }`}</style>
       <div style={{ minHeight: "100vh", background: "#020C1C", display: "flex", alignItems: "center", justifyContent: "center" }}>
         <div style={{ textAlign: "center" }}>
           <div style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "28px", color: "#FFFFFF", opacity: 0.6, animation: "pulse 1.6s ease-in-out infinite" }}>Loading property…</div>
@@ -711,7 +709,6 @@ export default function PropertyDetailClient() {
 
   if (notFound) return (
     <>
-      <style>{`@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,600&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap'); *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; } body { font-family: 'Cal Sans', sans-serif; background: #020C1C; }`}</style>
       <div style={{ minHeight: "100vh", background: "#020C1C", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "16px" }}>
         <div style={{ fontSize: "64px", opacity: 0.25, color: "#FFFFFF" }}>⌂</div>
         <h1 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "40px", fontWeight: 300, color: "#FFFFFF" }}>Property Not Found</h1>
@@ -726,7 +723,6 @@ export default function PropertyDetailClient() {
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,600&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap');
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: 'Cal Sans', system-ui, sans-serif; background: #020C1C; color: #FFFFFF; overflow-x: hidden; }
         select { appearance: none; -webkit-appearance: none; }

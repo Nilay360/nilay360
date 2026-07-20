@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import { useState } from "react";
 
 export default function LegalGuidePage() {
@@ -211,14 +211,13 @@ export default function LegalGuidePage() {
   return (
     <div
       style={{
-        fontFamily: "'DM Sans', sans-serif",
+        fontFamily: "'Cal Sans', sans-serif",
         margin: 0,
         padding: 0,
         boxSizing: "border-box",
       }}
     >
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,600&family=DM+Sans:wght@300;400;500;600&display=swap');
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
         body { margin: 0; padding: 0; }
         a { text-decoration: none; }
@@ -245,9 +244,9 @@ export default function LegalGuidePage() {
         <a
           href="/"
           style={{
-            fontFamily: "'Cormorant Garamond', serif",
+            fontFamily: "'Cal Sans', serif",
             fontSize: "24px",
-            color: "#2BA8E0",
+            color: "#10C4C3",
             fontWeight: 600,
             letterSpacing: "2px",
             textDecoration: "none",
@@ -275,7 +274,7 @@ export default function LegalGuidePage() {
               key={link.href}
               href={link.href}
               style={{
-                fontFamily: "'DM Sans', sans-serif",
+                fontFamily: "'Cal Sans', sans-serif",
                 fontSize: "14px",
                 color: "rgba(255,255,255,0.75)",
                 textDecoration: "none",
@@ -291,10 +290,10 @@ export default function LegalGuidePage() {
           <a
             href="/login"
             style={{
-              fontFamily: "'DM Sans', sans-serif",
+              fontFamily: "'Cal Sans', sans-serif",
               fontSize: "14px",
-              color: "#2BA8E0",
-              border: "1px solid #2BA8E0",
+              color: "#10C4C3",
+              border: "1px solid #10C4C3",
               padding: "8px 20px",
               borderRadius: "2px",
               textDecoration: "none",
@@ -306,10 +305,10 @@ export default function LegalGuidePage() {
           <a
             href="/post-property"
             style={{
-              fontFamily: "'DM Sans', sans-serif",
+              fontFamily: "'Cal Sans', sans-serif",
               fontSize: "14px",
               color: "#05080C",
-              background: "#2BA8E0",
+              background: "#10C4C3",
               padding: "8px 20px",
               borderRadius: "2px",
               textDecoration: "none",
@@ -324,7 +323,7 @@ export default function LegalGuidePage() {
       {/* HERO */}
       <section
         style={{
-          background: "#000000",
+          background: "#020C1C",
           paddingTop: "140px",
           paddingBottom: "72px",
           textAlign: "center",
@@ -333,9 +332,9 @@ export default function LegalGuidePage() {
       >
         <p
           style={{
-            fontFamily: "'DM Sans', sans-serif",
+            fontFamily: "'Cal Sans', sans-serif",
             fontSize: "12px",
-            color: "#2BA8E0",
+            color: "#10C4C3",
             letterSpacing: "4px",
             textTransform: "uppercase",
             marginBottom: "20px",
@@ -345,7 +344,7 @@ export default function LegalGuidePage() {
         </p>
         <h1
           style={{
-            fontFamily: "'Cormorant Garamond', serif",
+            fontFamily: "'Cal Sans', serif",
             fontSize: "64px",
             color: "#ffffff",
             fontWeight: 600,
@@ -358,7 +357,7 @@ export default function LegalGuidePage() {
         </h1>
         <p
           style={{
-            fontFamily: "'DM Sans', sans-serif",
+            fontFamily: "'Cal Sans', sans-serif",
             fontSize: "18px",
             color: "rgba(255,255,255,0.6)",
             marginTop: "16px",
@@ -388,9 +387,9 @@ export default function LegalGuidePage() {
           <div>
             <h2
               style={{
-                fontFamily: "'Cormorant Garamond', serif",
+                fontFamily: "'Cal Sans', serif",
                 fontSize: "44px",
-                color: "#000000",
+                color: "#020C1C",
                 fontWeight: 600,
                 marginBottom: "24px",
                 lineHeight: 1.2,
@@ -400,7 +399,7 @@ export default function LegalGuidePage() {
             </h2>
             <p
               style={{
-                fontFamily: "'DM Sans', sans-serif",
+                fontFamily: "'Cal Sans', sans-serif",
                 fontSize: "16px",
                 color: "#555555",
                 lineHeight: 1.8,
@@ -424,16 +423,16 @@ export default function LegalGuidePage() {
 
           <div
             style={{
-              background: "#000000",
+              background: "#020C1C",
               padding: "32px",
               borderRadius: "2px",
             }}
           >
             <h3
               style={{
-                fontFamily: "'Cormorant Garamond', serif",
+                fontFamily: "'Cal Sans', serif",
                 fontSize: "26px",
-                color: "#000000",
+                color: "#020C1C",
                 fontWeight: 600,
                 marginBottom: "20px",
               }}
@@ -456,9 +455,9 @@ export default function LegalGuidePage() {
                 >
                   <span
                     style={{
-                      fontFamily: "'DM Sans', sans-serif",
+                      fontFamily: "'Cal Sans', sans-serif",
                       fontSize: "12px",
-                      color: "#2BA8E0",
+                      color: "#10C4C3",
                       fontWeight: 600,
                       letterSpacing: "1px",
                       textTransform: "uppercase",
@@ -469,7 +468,7 @@ export default function LegalGuidePage() {
                   </span>
                   <span
                     style={{
-                      fontFamily: "'DM Sans', sans-serif",
+                      fontFamily: "'Cal Sans', sans-serif",
                       fontSize: "15px",
                       color: "#333333",
                     }}
@@ -486,16 +485,16 @@ export default function LegalGuidePage() {
       {/* SECTION 2 — YOUR RIGHTS */}
       <section
         style={{
-          background: "#000000",
+          background: "#020C1C",
           padding: "72px 24px",
         }}
       >
         <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
           <h2
             style={{
-              fontFamily: "'Cormorant Garamond', serif",
+              fontFamily: "'Cal Sans', serif",
               fontSize: "48px",
-              color: "#000000",
+              color: "#020C1C",
               fontWeight: 600,
               textAlign: "center",
               marginBottom: "12px",
@@ -505,7 +504,7 @@ export default function LegalGuidePage() {
           </h2>
           <p
             style={{
-              fontFamily: "'DM Sans', sans-serif",
+              fontFamily: "'Cal Sans', sans-serif",
               fontSize: "16px",
               color: "#777777",
               textAlign: "center",
@@ -530,14 +529,14 @@ export default function LegalGuidePage() {
                   padding: "32px",
                   borderRadius: "2px",
                   boxShadow: "0 2px 12px rgba(0,0,0,0.06)",
-                  borderTop: "3px solid #2BA8E0",
+                  borderTop: "3px solid #10C4C3",
                 }}
               >
                 <h3
                   style={{
-                    fontFamily: "'Cormorant Garamond', serif",
+                    fontFamily: "'Cal Sans', serif",
                     fontSize: "22px",
-                    color: "#000000",
+                    color: "#020C1C",
                     fontWeight: 600,
                     marginBottom: "12px",
                     lineHeight: 1.3,
@@ -547,7 +546,7 @@ export default function LegalGuidePage() {
                 </h3>
                 <p
                   style={{
-                    fontFamily: "'DM Sans', sans-serif",
+                    fontFamily: "'Cal Sans', sans-serif",
                     fontSize: "15px",
                     color: "#555555",
                     lineHeight: 1.7,
@@ -571,9 +570,9 @@ export default function LegalGuidePage() {
         <div style={{ maxWidth: "800px", margin: "0 auto" }}>
           <h2
             style={{
-              fontFamily: "'Cormorant Garamond', serif",
+              fontFamily: "'Cal Sans', serif",
               fontSize: "48px",
-              color: "#000000",
+              color: "#020C1C",
               fontWeight: 600,
               textAlign: "center",
               marginBottom: "12px",
@@ -583,7 +582,7 @@ export default function LegalGuidePage() {
           </h2>
           <p
             style={{
-              fontFamily: "'DM Sans', sans-serif",
+              fontFamily: "'Cal Sans', sans-serif",
               fontSize: "16px",
               color: "#777777",
               textAlign: "center",
@@ -617,12 +616,12 @@ export default function LegalGuidePage() {
                       width: "48px",
                       height: "48px",
                       borderRadius: "50%",
-                      background: "#2BA8E0",
+                      background: "#10C4C3",
                       color: "#ffffff",
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
-                      fontFamily: "'Cormorant Garamond', serif",
+                      fontFamily: "'Cal Sans', serif",
                       fontSize: "22px",
                       fontWeight: 600,
                       flexShrink: 0,
@@ -650,9 +649,9 @@ export default function LegalGuidePage() {
                 >
                   <h3
                     style={{
-                      fontFamily: "'Cormorant Garamond', serif",
+                      fontFamily: "'Cal Sans', serif",
                       fontSize: "22px",
-                      color: "#000000",
+                      color: "#020C1C",
                       fontWeight: 600,
                       marginBottom: "8px",
                     }}
@@ -661,7 +660,7 @@ export default function LegalGuidePage() {
                   </h3>
                   <p
                     style={{
-                      fontFamily: "'DM Sans', sans-serif",
+                      fontFamily: "'Cal Sans', sans-serif",
                       fontSize: "15px",
                       color: "#555555",
                       lineHeight: 1.7,
@@ -677,7 +676,7 @@ export default function LegalGuidePage() {
           {/* State RERA Portals */}
           <div
             style={{
-              background: "#000000",
+              background: "#020C1C",
               padding: "32px",
               borderRadius: "2px",
               marginTop: "48px",
@@ -685,9 +684,9 @@ export default function LegalGuidePage() {
           >
             <h3
               style={{
-                fontFamily: "'Cormorant Garamond', serif",
+                fontFamily: "'Cal Sans', serif",
                 fontSize: "28px",
-                color: "#2BA8E0",
+                color: "#10C4C3",
                 fontWeight: 600,
                 marginBottom: "24px",
               }}
@@ -719,9 +718,9 @@ export default function LegalGuidePage() {
                 >
                   <div
                     style={{
-                      fontFamily: "'DM Sans', sans-serif",
+                      fontFamily: "'Cal Sans', sans-serif",
                       fontSize: "14px",
-                      color: "#2BA8E0",
+                      color: "#10C4C3",
                       fontWeight: 600,
                       marginBottom: "4px",
                     }}
@@ -730,7 +729,7 @@ export default function LegalGuidePage() {
                   </div>
                   <div
                     style={{
-                      fontFamily: "'DM Sans', sans-serif",
+                      fontFamily: "'Cal Sans', sans-serif",
                       fontSize: "13px",
                       color: "rgba(255,255,255,0.6)",
                     }}
@@ -747,16 +746,16 @@ export default function LegalGuidePage() {
       {/* SECTION 4 — RED FLAGS */}
       <section
         style={{
-          background: "#000000",
+          background: "#020C1C",
           padding: "72px 24px",
         }}
       >
         <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
           <h2
             style={{
-              fontFamily: "'Cormorant Garamond', serif",
+              fontFamily: "'Cal Sans', serif",
               fontSize: "48px",
-              color: "#000000",
+              color: "#020C1C",
               fontWeight: 600,
               textAlign: "center",
               marginBottom: "12px",
@@ -766,7 +765,7 @@ export default function LegalGuidePage() {
           </h2>
           <p
             style={{
-              fontFamily: "'DM Sans', sans-serif",
+              fontFamily: "'Cal Sans', sans-serif",
               fontSize: "16px",
               color: "#777777",
               textAlign: "center",
@@ -796,9 +795,9 @@ export default function LegalGuidePage() {
               >
                 <h3
                   style={{
-                    fontFamily: "'Cormorant Garamond', serif",
+                    fontFamily: "'Cal Sans', serif",
                     fontSize: "19px",
-                    color: "#000000",
+                    color: "#020C1C",
                     fontWeight: 600,
                     marginBottom: "10px",
                     lineHeight: 1.3,
@@ -808,7 +807,7 @@ export default function LegalGuidePage() {
                 </h3>
                 <p
                   style={{
-                    fontFamily: "'DM Sans', sans-serif",
+                    fontFamily: "'Cal Sans', sans-serif",
                     fontSize: "14px",
                     color: "#555555",
                     lineHeight: 1.7,
@@ -832,9 +831,9 @@ export default function LegalGuidePage() {
         <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
           <h2
             style={{
-              fontFamily: "'Cormorant Garamond', serif",
+              fontFamily: "'Cal Sans', serif",
               fontSize: "48px",
-              color: "#000000",
+              color: "#020C1C",
               fontWeight: 600,
               textAlign: "center",
               marginBottom: "48px",
@@ -857,9 +856,9 @@ export default function LegalGuidePage() {
                 <tr>
                   <th
                     style={{
-                      background: "#000000",
+                      background: "#020C1C",
                       color: "#ffffff",
-                      fontFamily: "'DM Sans', sans-serif",
+                      fontFamily: "'Cal Sans', sans-serif",
                       fontSize: "14px",
                       fontWeight: 500,
                       padding: "16px 20px",
@@ -871,9 +870,9 @@ export default function LegalGuidePage() {
                   </th>
                   <th
                     style={{
-                      background: "#000000",
+                      background: "#020C1C",
                       color: "#ffffff",
-                      fontFamily: "'DM Sans', sans-serif",
+                      fontFamily: "'Cal Sans', sans-serif",
                       fontSize: "14px",
                       fontWeight: 500,
                       padding: "16px 20px",
@@ -890,16 +889,16 @@ export default function LegalGuidePage() {
                   <tr
                     key={i}
                     style={{
-                      background: i % 2 === 0 ? "#ffffff" : "#000000",
+                      background: i % 2 === 0 ? "#ffffff" : "#020C1C",
                     }}
                   >
                     <td
                       style={{
                         padding: "16px 20px",
                         border: "1px solid #E8E3D9",
-                        fontFamily: "'DM Sans', sans-serif",
+                        fontFamily: "'Cal Sans', sans-serif",
                         fontSize: "15px",
-                        color: "#000000",
+                        color: "#020C1C",
                         fontWeight: 500,
                         verticalAlign: "top",
                         whiteSpace: "nowrap",
@@ -911,7 +910,7 @@ export default function LegalGuidePage() {
                       style={{
                         padding: "16px 20px",
                         border: "1px solid #E8E3D9",
-                        fontFamily: "'DM Sans', sans-serif",
+                        fontFamily: "'Cal Sans', sans-serif",
                         fontSize: "15px",
                         color: "#555555",
                         lineHeight: 1.7,
@@ -931,16 +930,16 @@ export default function LegalGuidePage() {
       {/* SECTION 6 — FAQ */}
       <section
         style={{
-          background: "#000000",
+          background: "#020C1C",
           padding: "72px 24px",
         }}
       >
         <div style={{ maxWidth: "800px", margin: "0 auto" }}>
           <h2
             style={{
-              fontFamily: "'Cormorant Garamond', serif",
+              fontFamily: "'Cal Sans', serif",
               fontSize: "48px",
-              color: "#000000",
+              color: "#020C1C",
               fontWeight: 600,
               textAlign: "center",
               marginBottom: "48px",
@@ -972,9 +971,9 @@ export default function LegalGuidePage() {
                 >
                   <h3
                     style={{
-                      fontFamily: "'Cormorant Garamond', serif",
+                      fontFamily: "'Cal Sans', serif",
                       fontSize: "20px",
-                      color: "#000000",
+                      color: "#020C1C",
                       fontWeight: 600,
                       lineHeight: 1.3,
                     }}
@@ -983,9 +982,9 @@ export default function LegalGuidePage() {
                   </h3>
                   <span
                     style={{
-                      fontFamily: "'DM Sans', sans-serif",
+                      fontFamily: "'Cal Sans', sans-serif",
                       fontSize: "22px",
-                      color: "#2BA8E0",
+                      color: "#10C4C3",
                       flexShrink: 0,
                       lineHeight: 1,
                       userSelect: "none",
@@ -997,7 +996,7 @@ export default function LegalGuidePage() {
                 {openFaq === i && (
                   <p
                     style={{
-                      fontFamily: "'DM Sans', sans-serif",
+                      fontFamily: "'Cal Sans', sans-serif",
                       fontSize: "15px",
                       color: "#555555",
                       lineHeight: 1.8,
@@ -1018,14 +1017,14 @@ export default function LegalGuidePage() {
       {/* SECTION 7 — CTA */}
       <section
         style={{
-          background: "#000000",
+          background: "#020C1C",
           padding: "72px 24px",
           textAlign: "center",
         }}
       >
         <h2
           style={{
-            fontFamily: "'Cormorant Garamond', serif",
+            fontFamily: "'Cal Sans', serif",
             fontSize: "48px",
             color: "#ffffff",
             fontWeight: 600,
@@ -1036,7 +1035,7 @@ export default function LegalGuidePage() {
         </h2>
         <p
           style={{
-            fontFamily: "'DM Sans', sans-serif",
+            fontFamily: "'Cal Sans', sans-serif",
             fontSize: "18px",
             color: "rgba(255,255,255,0.7)",
             maxWidth: "600px",
@@ -1051,10 +1050,10 @@ export default function LegalGuidePage() {
           href="/contact"
           style={{
             display: "inline-block",
-            background: "#2BA8E0",
+            background: "#10C4C3",
             color: "#05080C",
             padding: "16px 40px",
-            fontFamily: "'DM Sans', sans-serif",
+            fontFamily: "'Cal Sans', sans-serif",
             fontSize: "15px",
             fontWeight: 600,
             letterSpacing: "1px",
@@ -1067,7 +1066,7 @@ export default function LegalGuidePage() {
         </a>
         <p
           style={{
-            fontFamily: "'DM Sans', sans-serif",
+            fontFamily: "'Cal Sans', sans-serif",
             fontSize: "13px",
             color: "rgba(255,255,255,0.5)",
             marginTop: "16px",
@@ -1139,9 +1138,9 @@ export default function LegalGuidePage() {
               <div key={i}>
                 <h4
                   style={{
-                    fontFamily: "'Cormorant Garamond', serif",
+                    fontFamily: "'Cal Sans', serif",
                     fontSize: "18px",
-                    color: "#2BA8E0",
+                    color: "#10C4C3",
                     fontWeight: 600,
                     marginBottom: "20px",
                     letterSpacing: "0.5px",
@@ -1155,7 +1154,7 @@ export default function LegalGuidePage() {
                       <a
                         href={link.href}
                         style={{
-                          fontFamily: "'DM Sans', sans-serif",
+                          fontFamily: "'Cal Sans', sans-serif",
                           fontSize: "14px",
                           color: "rgba(255,255,255,0.55)",
                           textDecoration: "none",
@@ -1179,7 +1178,7 @@ export default function LegalGuidePage() {
           >
             <p
               style={{
-                fontFamily: "'DM Sans', sans-serif",
+                fontFamily: "'Cal Sans', sans-serif",
                 fontSize: "13px",
                 color: "rgba(255,255,255,0.3)",
               }}

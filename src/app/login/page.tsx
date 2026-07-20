@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
@@ -70,10 +70,9 @@ export default function LoginPage() {
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,600&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap');
 
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'DM Sans', system-ui, sans-serif; background: #000000; overflow-x: hidden; }
+        body { font-family: 'Cal Sans', system-ui, sans-serif; background: #020C1C; overflow-x: hidden; }
 
         .auth-root {
           display: flex; min-height: 100vh;
@@ -82,7 +81,7 @@ export default function LoginPage() {
         /* ── LEFT PANEL ── */
         .auth-left {
           flex: 0 0 42%;
-          background: #000000;
+          background: #020C1C;
           display: flex; flex-direction: column;
           justify-content: space-between;
           padding: 52px 56px;
@@ -109,11 +108,11 @@ export default function LoginPage() {
           text-decoration: none; position: relative; z-index: 2;
         }
         .auth-logo-text {
-          font-family: 'DM Sans', sans-serif;
+          font-family: 'Cal Sans', sans-serif;
           font-size: 18px; font-weight: 600;
           color: #fff; letter-spacing: 0.2em;
         }
-        .auth-logo-dot { color: #2BA8E0; font-size: 22px; line-height: 1; }
+        .auth-logo-dot { color: #10C4C3; font-size: 22px; line-height: 1; }
 
         .auth-left-body {
           position: relative; z-index: 2; flex: 1;
@@ -125,20 +124,20 @@ export default function LoginPage() {
           margin-bottom: 20px;
         }
         .auth-left-eyebrow-line {
-          width: 28px; height: 1px; background: #2BA8E0;
+          width: 28px; height: 1px; background: #10C4C3;
         }
         .auth-left-eyebrow-text {
           font-size: 10px; font-weight: 600; letter-spacing: 0.2em;
-          color: #2BA8E0; text-transform: uppercase;
+          color: #10C4C3; text-transform: uppercase;
         }
         .auth-left-heading {
-          font-family: 'Cormorant Garamond', Georgia, serif;
+          font-family: 'Cal Sans', Georgia, serif;
           font-size: clamp(36px, 4vw, 52px);
           font-weight: 300; line-height: 1.12;
-          color: #000000; margin-bottom: 20px;
+          color: #020C1C; margin-bottom: 20px;
         }
         .auth-left-heading em {
-          font-style: italic; color: #2BA8E0; font-weight: 300;
+          font-style: italic; color: #10C4C3; font-weight: 300;
         }
         .auth-left-sub {
           font-size: 14px; font-weight: 400; line-height: 1.7;
@@ -147,7 +146,7 @@ export default function LoginPage() {
         }
         .auth-left-divider {
           width: 40px; height: 1px;
-          background: linear-gradient(90deg, #2BA8E0, transparent);
+          background: linear-gradient(90deg, #10C4C3, transparent);
           margin-bottom: 28px;
         }
         .auth-quote {
@@ -155,7 +154,7 @@ export default function LoginPage() {
           padding-left: 20px;
         }
         .auth-quote-text {
-          font-family: 'Cormorant Garamond', Georgia, serif;
+          font-family: 'Cal Sans', Georgia, serif;
           font-size: 17px; font-style: italic; font-weight: 300;
           line-height: 1.65; color: rgba(245,242,236,0.65);
         }
@@ -180,7 +179,7 @@ export default function LoginPage() {
           border: 1px solid rgba(201,168,76,0.25);
           border-radius: 50%;
           display: flex; align-items: center; justify-content: center;
-          font-size: 9px; color: #2BA8E0;
+          font-size: 9px; color: #10C4C3;
         }
         .auth-trust-badge-label {
           font-size: 11px; font-weight: 500;
@@ -190,7 +189,7 @@ export default function LoginPage() {
         /* ── RIGHT PANEL ── */
         .auth-right {
           flex: 1;
-          background: #000000;
+          background: #020C1C;
           display: flex; align-items: center; justify-content: center;
           padding: 52px 48px;
           position: relative;
@@ -211,15 +210,15 @@ export default function LoginPage() {
           margin-bottom: 36px;
         }
         .auth-form-title {
-          font-family: 'Cormorant Garamond', Georgia, serif;
+          font-family: 'Cal Sans', Georgia, serif;
           font-size: 36px; font-weight: 500; line-height: 1.1;
-          color: #000000; margin-bottom: 8px;
+          color: #020C1C; margin-bottom: 8px;
         }
         .auth-form-subtitle {
           font-size: 14px; color: #6B7C72; font-weight: 400;
         }
         .auth-form-subtitle a {
-          color: #2BA8E0; text-decoration: none; font-weight: 500;
+          color: #10C4C3; text-decoration: none; font-weight: 500;
         }
         .auth-form-subtitle a:hover { text-decoration: underline; }
 
@@ -233,7 +232,7 @@ export default function LoginPage() {
         .form-label {
           display: block; margin-bottom: 7px;
           font-size: 12px; font-weight: 600; letter-spacing: 0.08em;
-          color: #000000; text-transform: uppercase;
+          color: #020C1C; text-transform: uppercase;
         }
         .form-input-wrap { position: relative; }
         .form-input {
@@ -241,14 +240,14 @@ export default function LoginPage() {
           background: #fff;
           border: 1.5px solid rgba(13,43,31,0.15);
           border-radius: 8px;
-          font-family: 'DM Sans', sans-serif;
-          font-size: 14px; font-weight: 400; color: #000000;
+          font-family: 'Cal Sans', sans-serif;
+          font-size: 14px; font-weight: 400; color: #020C1C;
           outline: none; transition: border-color 0.2s, box-shadow 0.2s;
           -webkit-appearance: none;
         }
         .form-input::placeholder { color: #aab5ae; }
         .form-input:focus {
-          border-color: #2BA8E0;
+          border-color: #10C4C3;
           box-shadow: 0 0 0 3px rgba(201,168,76,0.12);
         }
         .form-input-icon {
@@ -256,7 +255,7 @@ export default function LoginPage() {
           color: #aab5ae; cursor: pointer; font-size: 16px;
           transition: color 0.15s;
         }
-        .form-input-icon:hover { color: #2BA8E0; }
+        .form-input-icon:hover { color: #10C4C3; }
         .form-input-pw { padding-right: 44px; }
 
         .form-row-between {
@@ -268,24 +267,24 @@ export default function LoginPage() {
           font-size: 13px; color: #6B7C72; cursor: pointer;
         }
         .form-check-label input[type="checkbox"] {
-          width: 15px; height: 15px; accent-color: #2BA8E0; cursor: pointer;
+          width: 15px; height: 15px; accent-color: #10C4C3; cursor: pointer;
         }
         .forgot-link {
-          font-size: 13px; color: #2BA8E0; text-decoration: none; font-weight: 500;
+          font-size: 13px; color: #10C4C3; text-decoration: none; font-weight: 500;
         }
         .forgot-link:hover { text-decoration: underline; }
 
         .btn-gold {
           width: 100%; padding: 14px 24px;
-          background: #2BA8E0; border: none; border-radius: 8px;
-          font-family: 'DM Sans', sans-serif;
+          background: #10C4C3; border: none; border-radius: 8px;
+          font-family: 'Cal Sans', sans-serif;
           font-size: 14px; font-weight: 600; letter-spacing: 0.06em;
-          color: #000000; cursor: pointer;
+          color: #020C1C; cursor: pointer;
           transition: background 0.18s, transform 0.12s, box-shadow 0.18s;
           text-transform: uppercase;
         }
         .btn-gold:hover {
-          background: #3DBEF5;
+          background: #3DDAD9;
           box-shadow: 0 4px 20px rgba(201,168,76,0.35);
           transform: translateY(-1px);
         }
@@ -303,8 +302,8 @@ export default function LoginPage() {
           background: #fff; border: 1.5px solid rgba(13,43,31,0.15);
           border-radius: 8px; cursor: pointer;
           display: flex; align-items: center; justify-content: center; gap: 10px;
-          font-family: 'DM Sans', sans-serif;
-          font-size: 14px; font-weight: 500; color: #000000;
+          font-family: 'Cal Sans', sans-serif;
+          font-size: 14px; font-weight: 500; color: #020C1C;
           transition: border-color 0.18s, box-shadow 0.18s;
           margin-bottom: 12px;
         }
@@ -320,11 +319,11 @@ export default function LoginPage() {
           border: 1.5px solid rgba(13,43,31,0.15);
           border-radius: 8px; cursor: pointer;
           display: flex; align-items: center; justify-content: center; gap: 10px;
-          font-family: 'DM Sans', sans-serif;
+          font-family: 'Cal Sans', sans-serif;
           font-size: 14px; font-weight: 500; color: #6B7C72;
           transition: border-color 0.18s, color 0.18s;
         }
-        .btn-otp:hover { border-color: #2BA8E0; color: #2BA8E0; }
+        .btn-otp:hover { border-color: #10C4C3; color: #10C4C3; }
 
         /* ── RESPONSIVE ── */
         @media (max-width: 860px) {
@@ -435,7 +434,7 @@ export default function LoginPage() {
                     onFocus={() => setEmailFocus(true)}
                     onBlur={() => setEmailFocus(false)}
                     autoComplete="email"
-                    style={emailFocus ? { borderColor: '#2BA8E0', boxShadow: '0 0 0 3px rgba(201,168,76,0.12)' } : {}}
+                    style={emailFocus ? { borderColor: '#10C4C3', boxShadow: '0 0 0 3px rgba(201,168,76,0.12)' } : {}}
                   />
                 </div>
               </div>
@@ -454,7 +453,7 @@ export default function LoginPage() {
                     onFocus={() => setPasswordFocus(true)}
                     onBlur={() => setPasswordFocus(false)}
                     autoComplete="current-password"
-                    style={passwordFocus ? { borderColor: '#2BA8E0', boxShadow: '0 0 0 3px rgba(201,168,76,0.12)' } : {}}
+                    style={passwordFocus ? { borderColor: '#10C4C3', boxShadow: '0 0 0 3px rgba(201,168,76,0.12)' } : {}}
                   />
                   <button
                     type="button"

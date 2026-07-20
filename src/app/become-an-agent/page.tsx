@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import { useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { createClient } from "@/lib/supabase/client";
@@ -7,12 +7,12 @@ import { CITIES } from "@/constants";
 const inputStyle: React.CSSProperties = {
   width: "100%", padding: "12px 16px", background: "rgba(255,255,255,0.06)",
   border: "1.5px solid rgba(255,255,255,0.12)", borderRadius: "9px", fontSize: "14px",
-  color: "#E8EAED", fontFamily: "'DM Sans', sans-serif", outlineColor: "#2BA8E0",
+  color: "#FFFFFF", fontFamily: "'Cal Sans', sans-serif", outlineColor: "#10C4C3",
 };
 
 const labelStyle: React.CSSProperties = {
   display: "block", fontSize: "12px", fontWeight: 700, letterSpacing: "0.06em",
-  textTransform: "uppercase" as const, color: "#AEB4BC", marginBottom: "8px",
+  textTransform: "uppercase" as const, color: "#A9B4C2", marginBottom: "8px",
 };
 
 function CityMultiSelect({ selected, onChange }: { selected: string[]; onChange: (cities: string[]) => void }) {
@@ -28,7 +28,7 @@ function CityMultiSelect({ selected, onChange }: { selected: string[]; onChange:
             type="button"
             key={city}
             onClick={() => toggle(city)}
-            style={{ padding: "8px 16px", borderRadius: "100px", fontSize: "13px", fontWeight: on ? 700 : 500, background: on ? "#2BA8E0" : "rgba(255,255,255,0.06)", color: on ? "#000000" : "#AEB4BC", border: on ? "1.5px solid #2BA8E0" : "1.5px solid rgba(255,255,255,0.12)", cursor: "pointer", fontFamily: "'DM Sans', sans-serif" }}
+            style={{ padding: "8px 16px", borderRadius: "100px", fontSize: "13px", fontWeight: on ? 700 : 500, background: on ? "#10C4C3" : "rgba(255,255,255,0.06)", color: on ? "#020C1C" : "#A9B4C2", border: on ? "1.5px solid #10C4C3" : "1.5px solid rgba(255,255,255,0.12)", cursor: "pointer", fontFamily: "'Cal Sans', sans-serif" }}
           >
             {city}
           </button>
@@ -90,15 +90,15 @@ export default function BecomeAnAgentPage() {
   };
 
   const wrap: React.CSSProperties = {
-    minHeight: "100dvh", background: "#000000", paddingTop: "64px",
+    minHeight: "100dvh", background: "#020C1C", paddingTop: "64px",
     display: "flex", flexDirection: "column", alignItems: "center",
-    fontFamily: "'DM Sans', system-ui, sans-serif",
+    fontFamily: "'Cal Sans', system-ui, sans-serif",
   };
 
   if (authLoading) {
     return (
       <div style={{ ...wrap, justifyContent: "center" }}>
-        <div style={{ color: "#2BA8E0" }}>Loading…</div>
+        <div style={{ color: "#10C4C3" }}>Loading…</div>
       </div>
     );
   }
@@ -107,15 +107,15 @@ export default function BecomeAnAgentPage() {
     return (
       <div style={{ ...wrap, justifyContent: "center", padding: "24px" }}>
         <div style={{ textAlign: "center", maxWidth: "440px" }}>
-          <h1 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "32px", fontWeight: 600, color: "#E8EAED", marginBottom: "12px" }}>
+          <h1 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "32px", fontWeight: 600, color: "#FFFFFF", marginBottom: "12px" }}>
             Become an Agent
           </h1>
-          <p style={{ fontSize: "14px", color: "#AEB4BC", marginBottom: "24px", lineHeight: 1.6 }}>
+          <p style={{ fontSize: "14px", color: "#A9B4C2", marginBottom: "24px", lineHeight: 1.6 }}>
             Sign in to apply as a Nilay 360 agent.
           </p>
           <button
             onClick={() => openAuthModal("signin")}
-            style={{ padding: "12px 28px", borderRadius: "9px", background: "#2BA8E0", color: "#000000", border: "none", fontWeight: 700, fontSize: "13px", letterSpacing: "0.04em", cursor: "pointer", fontFamily: "'DM Sans', sans-serif" }}
+            style={{ padding: "12px 28px", borderRadius: "9px", background: "#10C4C3", color: "#020C1C", border: "none", fontWeight: 700, fontSize: "13px", letterSpacing: "0.04em", cursor: "pointer", fontFamily: "'Cal Sans', sans-serif" }}
           >
             Sign In
           </button>
@@ -131,10 +131,10 @@ export default function BecomeAnAgentPage() {
           <div style={{ width: "52px", height: "52px", borderRadius: "50%", background: "rgba(52,211,153,0.08)", border: "1.5px solid rgba(52,211,153,0.2)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 20px", color: "#34D399" }}>
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75"><polyline points="20 6 9 17 4 12"/></svg>
           </div>
-          <h1 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "28px", fontWeight: 600, color: "#E8EAED", marginBottom: "10px" }}>
+          <h1 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "28px", fontWeight: 600, color: "#FFFFFF", marginBottom: "10px" }}>
             Application Received
           </h1>
-          <p style={{ fontSize: "14px", color: "#AEB4BC", lineHeight: 1.6 }}>
+          <p style={{ fontSize: "14px", color: "#A9B4C2", lineHeight: 1.6 }}>
             We&apos;ll review your application and get back to you.
           </p>
         </div>
@@ -145,10 +145,10 @@ export default function BecomeAnAgentPage() {
   return (
     <div style={{ ...wrap, alignItems: "center", padding: "48px 24px 80px" }}>
       <div style={{ width: "100%", maxWidth: "560px" }}>
-        <h1 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "34px", fontWeight: 600, color: "#E8EAED", marginBottom: "8px" }}>
+        <h1 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "34px", fontWeight: 600, color: "#FFFFFF", marginBottom: "8px" }}>
           Become an Agent
         </h1>
-        <p style={{ fontSize: "14px", color: "#AEB4BC", marginBottom: "32px", lineHeight: 1.6 }}>
+        <p style={{ fontSize: "14px", color: "#A9B4C2", marginBottom: "32px", lineHeight: 1.6 }}>
           Tell us about your experience — our team reviews every application.
         </p>
 
@@ -179,7 +179,7 @@ export default function BecomeAnAgentPage() {
           <button
             onClick={() => void handleSubmit()}
             disabled={submitting}
-            style={{ padding: "14px", borderRadius: "9px", background: "#2BA8E0", color: "#000000", border: "none", fontWeight: 700, fontSize: "14px", letterSpacing: "0.04em", cursor: submitting ? "not-allowed" : "pointer", opacity: submitting ? 0.6 : 1, fontFamily: "'DM Sans', sans-serif" }}
+            style={{ padding: "14px", borderRadius: "9px", background: "#10C4C3", color: "#020C1C", border: "none", fontWeight: 700, fontSize: "14px", letterSpacing: "0.04em", cursor: submitting ? "not-allowed" : "pointer", opacity: submitting ? 0.6 : 1, fontFamily: "'Cal Sans', sans-serif" }}
           >
             {submitting ? "Submitting…" : "Submit Application"}
           </button>

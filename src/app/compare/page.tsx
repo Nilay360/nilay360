@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useCompare, type CompareItem } from "@/context/CompareContext";
@@ -143,17 +143,17 @@ function SelectorSlot({
   if (property) {
     const img = property.featured_image || `https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=400&q=80`;
     return (
-      <div style={{ flex: 1, minWidth: 0, border: "2px solid #2BA8E0", borderRadius: "16px", overflow: "hidden", background: "#fff", boxShadow: "0 4px 20px rgba(201,168,76,0.15)" }}>
+      <div style={{ flex: 1, minWidth: 0, border: "2px solid #10C4C3", borderRadius: "16px", overflow: "hidden", background: "#fff", boxShadow: "0 4px 20px rgba(201,168,76,0.15)" }}>
         <div style={{ position: "relative", height: "180px", overflow: "hidden" }}>
           <img src={optimizedImageUrl(img, 500)} alt={property.title} loading="lazy" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
           <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(5,8,12,0.7) 0%, transparent 50%)" }} />
           <button onClick={onRemove} style={{ position: "absolute", top: "10px", right: "10px", width: "28px", height: "28px", borderRadius: "50%", background: "rgba(220,38,38,0.85)", border: "none", color: "#fff", fontSize: "14px", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, backdropFilter: "blur(4px)" }}>×</button>
-          <span style={{ position: "absolute", bottom: "10px", left: "10px", padding: "3px 10px", borderRadius: "100px", fontSize: "9px", fontWeight: 800, letterSpacing: "0.1em", textTransform: "uppercase", background: "#2BA8E0", color: "#000000" }}>{property.listing_type === "sale" ? "For Sale" : "For Rent"}</span>
+          <span style={{ position: "absolute", bottom: "10px", left: "10px", padding: "3px 10px", borderRadius: "100px", fontSize: "9px", fontWeight: 800, letterSpacing: "0.1em", textTransform: "uppercase", background: "#10C4C3", color: "#020C1C" }}>{property.listing_type === "sale" ? "For Sale" : "For Rent"}</span>
         </div>
         <div style={{ padding: "16px 18px" }}>
-          <h3 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "16px", fontWeight: 600, color: "#000000", marginBottom: "4px", lineHeight: 1.3, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{property.title}</h3>
+          <h3 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "16px", fontWeight: 600, color: "#020C1C", marginBottom: "4px", lineHeight: 1.3, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{property.title}</h3>
           <p style={{ fontSize: "11px", color: "#6B7C72", marginBottom: "8px" }}>{property.neighbourhood}, {property.city}</p>
-          <p style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "20px", fontWeight: 600, color: "#2BA8E0" }}>{fmtINR(property.price, true)}</p>
+          <p style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "20px", fontWeight: 600, color: "#10C4C3" }}>{fmtINR(property.price, true)}</p>
         </div>
       </div>
     );
@@ -162,18 +162,18 @@ function SelectorSlot({
   return (
     <div style={{ flex: 1, minWidth: 0 }}>
       {!open ? (
-        <button onClick={() => setOpen(true)} style={{ width: "100%", minHeight: "280px", border: "2px dashed rgba(13,43,31,0.18)", borderRadius: "16px", background: "#fff", cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "10px", transition: "all 0.18s", fontFamily: "'DM Sans', sans-serif" }}
-          onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = "#2BA8E0"; (e.currentTarget as HTMLButtonElement).style.background = "rgba(201,168,76,0.03)"; }}
+        <button onClick={() => setOpen(true)} style={{ width: "100%", minHeight: "280px", border: "2px dashed rgba(13,43,31,0.18)", borderRadius: "16px", background: "#fff", cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "10px", transition: "all 0.18s", fontFamily: "'Cal Sans', sans-serif" }}
+          onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = "#10C4C3"; (e.currentTarget as HTMLButtonElement).style.background = "rgba(201,168,76,0.03)"; }}
           onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = "rgba(13,43,31,0.18)"; (e.currentTarget as HTMLButtonElement).style.background = "#fff"; }}>
-          <div style={{ width: "48px", height: "48px", borderRadius: "50%", background: "rgba(201,168,76,0.1)", border: "1.5px solid rgba(201,168,76,0.3)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "22px", color: "#2BA8E0" }}>+</div>
-          <p style={{ fontSize: "14px", fontWeight: 600, color: "#000000" }}>Add Property</p>
+          <div style={{ width: "48px", height: "48px", borderRadius: "50%", background: "rgba(201,168,76,0.1)", border: "1.5px solid rgba(201,168,76,0.3)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "22px", color: "#10C4C3" }}>+</div>
+          <p style={{ fontSize: "14px", fontWeight: 600, color: "#020C1C" }}>Add Property</p>
           <p style={{ fontSize: "12px", color: "#9CA3AF" }}>Search and select a property</p>
         </button>
       ) : (
         <div style={{ border: "2px solid rgba(201,168,76,0.3)", borderRadius: "16px", background: "#fff", overflow: "hidden" }}>
           <div style={{ padding: "14px 16px", borderBottom: "1px solid rgba(13,43,31,0.06)" }}>
             <input autoFocus type="text" placeholder="Search properties…" value={searchQuery} onChange={e => setSearchQuery(e.target.value)}
-              style={{ width: "100%", padding: "9px 12px", background: "#F8F6F1", border: "1.5px solid rgba(13,43,31,0.12)", borderRadius: "8px", fontSize: "13px", fontFamily: "'DM Sans', sans-serif", outline: "none", color: "#000000" }} />
+              style={{ width: "100%", padding: "9px 12px", background: "#F8F6F1", border: "1.5px solid rgba(13,43,31,0.12)", borderRadius: "8px", fontSize: "13px", fontFamily: "'Cal Sans', sans-serif", outline: "none", color: "#020C1C" }} />
           </div>
           <div style={{ maxHeight: "240px", overflowY: "auto" }}>
             {loading ? (
@@ -182,19 +182,19 @@ function SelectorSlot({
               <p style={{ padding: "20px", textAlign: "center", fontSize: "13px", color: "#9CA3AF" }}>No properties found</p>
             ) : filtered.map(p => (
               <button key={p.id} onClick={() => { onSelect(p); setOpen(false); setSearchQuery(""); }}
-                style={{ width: "100%", display: "flex", alignItems: "center", gap: "12px", padding: "12px 16px", background: "transparent", border: "none", borderBottom: "1px solid rgba(13,43,31,0.05)", cursor: "pointer", fontFamily: "'DM Sans', sans-serif", textAlign: "left" }}
+                style={{ width: "100%", display: "flex", alignItems: "center", gap: "12px", padding: "12px 16px", background: "transparent", border: "none", borderBottom: "1px solid rgba(13,43,31,0.05)", cursor: "pointer", fontFamily: "'Cal Sans', sans-serif", textAlign: "left" }}
                 onMouseEnter={e => (e.currentTarget as HTMLButtonElement).style.background = "#F8F6F1"}
                 onMouseLeave={e => (e.currentTarget as HTMLButtonElement).style.background = "transparent"}>
                 <img src={optimizedImageUrl(p.featured_image, 100) || `https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=100&q=80`} alt="" loading="lazy" style={{ width: "40px", height: "40px", borderRadius: "8px", objectFit: "cover", flexShrink: 0 }} />
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <p style={{ fontSize: "13px", fontWeight: 600, color: "#000000", marginBottom: "2px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{p.title}</p>
+                  <p style={{ fontSize: "13px", fontWeight: 600, color: "#020C1C", marginBottom: "2px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{p.title}</p>
                   <p style={{ fontSize: "11px", color: "#9CA3AF" }}>{p.city} · {fmtINR(p.price, true)}</p>
                 </div>
               </button>
             ))}
           </div>
           <div style={{ padding: "10px 16px", borderTop: "1px solid rgba(13,43,31,0.06)" }}>
-            <button onClick={() => { setOpen(false); setSearchQuery(""); }} style={{ fontSize: "12px", color: "#9CA3AF", background: "transparent", border: "none", cursor: "pointer", fontFamily: "'DM Sans', sans-serif" }}>Cancel</button>
+            <button onClick={() => { setOpen(false); setSearchQuery(""); }} style={{ fontSize: "12px", color: "#9CA3AF", background: "transparent", border: "none", cursor: "pointer", fontFamily: "'Cal Sans', sans-serif" }}>Cancel</button>
           </div>
         </div>
       )}
@@ -237,7 +237,7 @@ function CmpRow({ label, values, type = "text", highlight = false }: {
         if (val !== null && val !== undefined) {
           if (type === "bool") display = val ? <Tick /> : <Cross />;
           else if (type === "amenity") display = val ? <Tick /> : <Cross />;
-          else if (type === "price") display = <span style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "16px", fontWeight: 600, color: "#2BA8E0" }}>{fmtINR(val as number, true)}</span>;
+          else if (type === "price") display = <span style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "16px", fontWeight: 600, color: "#10C4C3" }}>{fmtINR(val as number, true)}</span>;
           else display = String(val);
         }
         return (
@@ -255,7 +255,7 @@ function CmpRow({ label, values, type = "text", highlight = false }: {
 function SectionRow({ label, colCount }: { label: string; colCount: number }) {
   return (
     <tr style={{ background: "#F8F6F1" }}>
-      <td colSpan={colCount + 1} style={{ padding: "10px 16px", fontSize: "10px", fontWeight: 800, letterSpacing: "0.16em", color: "#2BA8E0", textTransform: "uppercase", borderBottom: "1px solid rgba(13,43,31,0.06)", borderTop: "1px solid rgba(13,43,31,0.06)" }}>{label}</td>
+      <td colSpan={colCount + 1} style={{ padding: "10px 16px", fontSize: "10px", fontWeight: 800, letterSpacing: "0.16em", color: "#10C4C3", textTransform: "uppercase", borderBottom: "1px solid rgba(13,43,31,0.06)", borderTop: "1px solid rgba(13,43,31,0.06)" }}>{label}</td>
     </tr>
   );
 }
@@ -271,9 +271,9 @@ function MiniCard({ p }: { p: Property }) {
         <img src={optimizedImageUrl(img, 500)} alt={p.title} loading="lazy" style={{ width: "100%", height: "100%", objectFit: "cover", transform: hover ? "scale(1.05)" : "scale(1)", transition: "transform 0.3s" }} />
       </div>
       <div style={{ padding: "16px 18px" }}>
-        <p style={{ fontSize: "9px", fontWeight: 700, letterSpacing: "0.12em", color: "#2BA8E0", textTransform: "uppercase", marginBottom: "5px" }}>{p.property_type} · {p.city}</p>
-        <h4 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "17px", fontWeight: 600, color: "#000000", marginBottom: "8px", lineHeight: 1.3, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{p.title}</h4>
-        <p style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "18px", fontWeight: 600, color: "#2BA8E0" }}>{fmtINR(p.price, true)}</p>
+        <p style={{ fontSize: "9px", fontWeight: 700, letterSpacing: "0.12em", color: "#10C4C3", textTransform: "uppercase", marginBottom: "5px" }}>{p.property_type} · {p.city}</p>
+        <h4 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "17px", fontWeight: 600, color: "#020C1C", marginBottom: "8px", lineHeight: 1.3, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{p.title}</h4>
+        <p style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "18px", fontWeight: 600, color: "#10C4C3" }}>{fmtINR(p.price, true)}</p>
       </div>
     </a>
   );
@@ -436,10 +436,9 @@ export default function ComparePage() {
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,600&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap');
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
         html { scroll-behavior: smooth; }
-        body { font-family: 'DM Sans', system-ui, sans-serif; background: #000000; overflow-x: hidden; }
+        body { font-family: 'Cal Sans', system-ui, sans-serif; background: #020C1C; overflow-x: hidden; }
         ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-thumb { background: rgba(201,168,76,0.3); border-radius: 2px; }
         @keyframes fadeUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
@@ -458,12 +457,12 @@ export default function ComparePage() {
         }
       `}</style>
 
-      <div style={{ minHeight: "100vh", background: "#000000" }}>
+      <div style={{ minHeight: "100vh", background: "#020C1C" }}>
 
         {/* ── NAVBAR ─────────────────────────────────────────── */}
         <nav className="cp-nav" style={{ position: "fixed", top: 0, left: 0, right: 0, zIndex: 200, height: "68px", display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 48px", background: "rgba(5,8,12,0.88)", backdropFilter: "blur(20px) saturate(180%)", borderBottom: "0.5px solid rgba(201,168,76,0.18)" }}>
-          <a href="/" style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "19px", fontWeight: 600, color: "#fff", letterSpacing: "0.16em", textDecoration: "none", display: "flex", alignItems: "center", gap: "5px" }}>
-            Nilay 360 <span style={{ color: "#2BA8E0", fontSize: "22px", lineHeight: 1 }}>·</span>
+          <a href="/" style={{ fontFamily: "'Cal Sans', sans-serif", fontSize: "19px", fontWeight: 600, color: "#fff", letterSpacing: "0.16em", textDecoration: "none", display: "flex", alignItems: "center", gap: "5px" }}>
+            Nilay 360 <span style={{ color: "#10C4C3", fontSize: "22px", lineHeight: 1 }}>·</span>
           </a>
           <div className="cp-nav-links" style={{ display: "flex", gap: "2px" }}>
             {[["Home", "/"], ["Properties", "/properties"], ["Search", "/search"], ["Blog", "/blog"], ["About", "/about"], ["Contact", "/contact"]].map(([l, h]) => (
@@ -472,21 +471,21 @@ export default function ComparePage() {
           </div>
           <div style={{ display: "flex", gap: "10px" }}>
             <a href="/login"    style={{ padding: "8px 18px", borderRadius: "7px", border: "0.5px solid rgba(255,255,255,0.22)", color: "rgba(255,255,255,0.75)", fontSize: "13px", fontWeight: 500, textDecoration: "none" }}>Sign In</a>
-            <a href="/register" style={{ padding: "8px 22px", borderRadius: "7px", background: "#2BA8E0", color: "#000000", fontSize: "13px", fontWeight: 600, textDecoration: "none" }}>List Property</a>
+            <a href="/register" style={{ padding: "8px 22px", borderRadius: "7px", background: "#10C4C3", color: "#020C1C", fontSize: "13px", fontWeight: 600, textDecoration: "none" }}>List Property</a>
           </div>
         </nav>
 
         {/* ── HERO ───────────────────────────────────────────── */}
-        <section style={{ paddingTop: "68px", background: "#000000", position: "relative", overflow: "hidden" }}>
+        <section style={{ paddingTop: "68px", background: "#020C1C", position: "relative", overflow: "hidden" }}>
           <div style={{ position: "absolute", inset: 0, backgroundImage: "linear-gradient(rgba(201,168,76,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(201,168,76,0.04) 1px, transparent 1px)", backgroundSize: "52px 52px", pointerEvents: "none" }} />
           <div style={{ position: "absolute", inset: 0, background: "radial-gradient(ellipse 60% 65% at 85% 110%, rgba(201,168,76,0.09) 0%, transparent 55%)", pointerEvents: "none" }} />
           <div style={{ position: "relative", zIndex: 2, maxWidth: "720px", margin: "0 auto", padding: "64px 48px 72px", textAlign: "center" }}>
             <div style={{ display: "inline-flex", alignItems: "center", gap: "8px", padding: "5px 16px", background: "rgba(201,168,76,0.1)", border: "1px solid rgba(201,168,76,0.25)", borderRadius: "100px", marginBottom: "22px" }}>
-              <div style={{ width: "5px", height: "5px", borderRadius: "50%", background: "#2BA8E0" }} />
-              <span style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.2em", color: "#2BA8E0", textTransform: "uppercase" }}>Side-by-Side</span>
+              <div style={{ width: "5px", height: "5px", borderRadius: "50%", background: "#10C4C3" }} />
+              <span style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.2em", color: "#10C4C3", textTransform: "uppercase" }}>Side-by-Side</span>
             </div>
-            <h1 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "clamp(42px, 6vw, 68px)", fontWeight: 300, color: "#000000", lineHeight: 1.1, marginBottom: "16px", animation: "fadeUp 0.5s ease-out both" }}>
-              Compare<br /><em style={{ fontStyle: "italic", color: "#2BA8E0" }}>Properties</em>
+            <h1 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "clamp(42px, 6vw, 68px)", fontWeight: 300, color: "#020C1C", lineHeight: 1.1, marginBottom: "16px", animation: "fadeUp 0.5s ease-out both" }}>
+              Compare<br /><em style={{ fontStyle: "italic", color: "#10C4C3" }}>Properties</em>
             </h1>
             <p style={{ fontSize: "15px", color: "rgba(245,242,236,0.5)", lineHeight: 1.75, animation: "fadeUp 0.5s 0.1s ease-out both" }}>
               Select up to 3 properties for a detailed side-by-side comparison. Every spec, every feature.
@@ -498,14 +497,14 @@ export default function ComparePage() {
         <section style={{ maxWidth: "1280px", margin: "0 auto", padding: "52px 48px 0" }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "12px", marginBottom: "24px" }}>
             <div>
-              <h2 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "26px", fontWeight: 500, color: "#000000" }}>Select Properties</h2>
+              <h2 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "26px", fontWeight: 500, color: "#020C1C" }}>Select Properties</h2>
               <p style={{ fontSize: "12px", color: "#9CA3AF", marginTop: "3px" }}>Choose up to 3 properties to compare</p>
             </div>
             <div style={{ display: "flex", gap: "10px" }}>
-              <button onClick={saveComparison} style={{ padding: "9px 20px", background: saved ? "rgba(5,150,105,0.1)" : "#fff", border: `1.5px solid ${saved ? "rgba(5,150,105,0.3)" : "rgba(13,43,31,0.15)"}`, borderRadius: "8px", fontSize: "12px", fontWeight: 700, color: saved ? "#059669" : "#000000", cursor: "pointer", fontFamily: "'DM Sans', sans-serif", display: "flex", alignItems: "center", gap: "7px", letterSpacing: "0.06em", transition: "all 0.2s" }}>
+              <button onClick={saveComparison} style={{ padding: "9px 20px", background: saved ? "rgba(5,150,105,0.1)" : "#fff", border: `1.5px solid ${saved ? "rgba(5,150,105,0.3)" : "rgba(13,43,31,0.15)"}`, borderRadius: "8px", fontSize: "12px", fontWeight: 700, color: saved ? "#059669" : "#020C1C", cursor: "pointer", fontFamily: "'Cal Sans', sans-serif", display: "flex", alignItems: "center", gap: "7px", letterSpacing: "0.06em", transition: "all 0.2s" }}>
                 {saved ? "✓ Saved!" : "💾 Save"}
               </button>
-              <button onClick={shareComparison} disabled={activeCount < 2} style={{ padding: "9px 20px", background: copied ? "rgba(201,168,76,0.1)" : "#fff", border: `1.5px solid ${copied ? "rgba(201,168,76,0.35)" : "rgba(13,43,31,0.15)"}`, borderRadius: "8px", fontSize: "12px", fontWeight: 700, color: copied ? "#2BA8E0" : "#000000", cursor: activeCount < 2 ? "not-allowed" : "pointer", fontFamily: "'DM Sans', sans-serif", display: "flex", alignItems: "center", gap: "7px", opacity: activeCount < 2 ? 0.45 : 1, letterSpacing: "0.06em", transition: "all 0.2s" }}>
+              <button onClick={shareComparison} disabled={activeCount < 2} style={{ padding: "9px 20px", background: copied ? "rgba(201,168,76,0.1)" : "#fff", border: `1.5px solid ${copied ? "rgba(201,168,76,0.35)" : "rgba(13,43,31,0.15)"}`, borderRadius: "8px", fontSize: "12px", fontWeight: 700, color: copied ? "#10C4C3" : "#020C1C", cursor: activeCount < 2 ? "not-allowed" : "pointer", fontFamily: "'Cal Sans', sans-serif", display: "flex", alignItems: "center", gap: "7px", opacity: activeCount < 2 ? 0.45 : 1, letterSpacing: "0.06em", transition: "all 0.2s" }}>
                 {copied ? "✓ Copied!" : "🔗 Share"}
               </button>
             </div>
@@ -531,10 +530,10 @@ export default function ComparePage() {
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "20px" }}>
               <div>
                 <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
-                  <div style={{ width: "24px", height: "1.5px", background: "#2BA8E0" }} />
-                  <span style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.2em", color: "#2BA8E0", textTransform: "uppercase" }}>Side-by-Side</span>
+                  <div style={{ width: "24px", height: "1.5px", background: "#10C4C3" }} />
+                  <span style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.2em", color: "#10C4C3", textTransform: "uppercase" }}>Side-by-Side</span>
                 </div>
-                <h2 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "28px", fontWeight: 500, color: "#000000" }}>Detailed Comparison</h2>
+                <h2 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "28px", fontWeight: 500, color: "#020C1C" }}>Detailed Comparison</h2>
               </div>
               <span style={{ fontSize: "12px", color: "#9CA3AF" }}>🏆 = best value in category</span>
             </div>
@@ -547,7 +546,7 @@ export default function ComparePage() {
                     <th style={{ padding: "14px 16px", fontSize: "10px", fontWeight: 700, letterSpacing: "0.14em", color: "#9CA3AF", textTransform: "uppercase", textAlign: "left", minWidth: "160px", position: "sticky", left: 0, background: "#F8F6F1", zIndex: 2, borderRight: "1px solid rgba(13,43,31,0.06)" }}>Feature</th>
                     {active.map((p, i) => (
                       <th key={p.id} style={{ padding: "14px 16px", textAlign: "center", minWidth: "200px" }}>
-                        <p style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "15px", fontWeight: 600, color: "#000000", marginBottom: "2px", display: "-webkit-box", WebkitLineClamp: 1, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{p.title}</p>
+                        <p style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "15px", fontWeight: 600, color: "#020C1C", marginBottom: "2px", display: "-webkit-box", WebkitLineClamp: 1, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{p.title}</p>
                         <p style={{ fontSize: "11px", color: "#9CA3AF" }}>{p.city}</p>
                       </th>
                     ))}
@@ -596,13 +595,13 @@ export default function ComparePage() {
                     <>
                       <SectionRow label="Overall Verdict" colCount={activeCount} />
                       <tr style={{ background: "rgba(201,168,76,0.04)", borderTop: "2px solid rgba(201,168,76,0.15)" }}>
-                        <td style={{ padding: "18px 16px", fontSize: "12px", fontWeight: 700, color: "#000000", position: "sticky", left: 0, background: "rgba(201,168,76,0.04)", zIndex: 1, borderRight: "1px solid rgba(13,43,31,0.06)" }}>Best Value</td>
+                        <td style={{ padding: "18px 16px", fontSize: "12px", fontWeight: 700, color: "#020C1C", position: "sticky", left: 0, background: "rgba(201,168,76,0.04)", zIndex: 1, borderRight: "1px solid rgba(13,43,31,0.06)" }}>Best Value</td>
                         {verdict.map((v, i) => (
                           <td key={i} style={{ padding: "18px 16px", textAlign: "center" }}>
                             {v.isBest ? (
                               <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "4px" }}>
                                 <span style={{ fontSize: "24px" }}>🏆</span>
-                                <span style={{ fontSize: "11px", fontWeight: 700, color: "#2BA8E0", letterSpacing: "0.08em" }}>TOP PICK</span>
+                                <span style={{ fontSize: "11px", fontWeight: 700, color: "#10C4C3", letterSpacing: "0.08em" }}>TOP PICK</span>
                               </div>
                             ) : (
                               <span style={{ fontSize: "12px", color: "#9CA3AF" }}>—</span>
@@ -623,7 +622,7 @@ export default function ComparePage() {
           <div style={{ maxWidth: "520px", margin: "40px auto 0", padding: "0 48px", textAlign: "center" }}>
             <div style={{ padding: "40px", background: "#fff", borderRadius: "16px", border: "1px solid rgba(13,43,31,0.07)" }}>
               <div style={{ fontSize: "40px", marginBottom: "14px", opacity: 0.3 }}>⚖</div>
-              <h3 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "22px", fontWeight: 500, color: "#000000", marginBottom: "8px" }}>Select at least 2 properties</h3>
+              <h3 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "22px", fontWeight: 500, color: "#020C1C", marginBottom: "8px" }}>Select at least 2 properties</h3>
               <p style={{ fontSize: "13px", color: "#6B7C72", lineHeight: 1.7 }}>Use the slots above to pick properties you'd like to compare side by side.</p>
             </div>
           </div>
@@ -634,12 +633,12 @@ export default function ComparePage() {
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "32px" }}>
             <div>
               <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
-                <div style={{ width: "24px", height: "1.5px", background: "#2BA8E0" }} />
-                <span style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.2em", color: "#2BA8E0", textTransform: "uppercase" }}>Discover More</span>
+                <div style={{ width: "24px", height: "1.5px", background: "#10C4C3" }} />
+                <span style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.2em", color: "#10C4C3", textTransform: "uppercase" }}>Discover More</span>
               </div>
-              <h2 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "28px", fontWeight: 500, color: "#000000" }}>You Might Also Like</h2>
+              <h2 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "28px", fontWeight: 500, color: "#020C1C" }}>You Might Also Like</h2>
             </div>
-            <a href="/properties" style={{ fontSize: "13px", fontWeight: 600, color: "#000000", textDecoration: "none", display: "flex", alignItems: "center", gap: "6px" }}>
+            <a href="/properties" style={{ fontSize: "13px", fontWeight: 600, color: "#020C1C", textDecoration: "none", display: "flex", alignItems: "center", gap: "6px" }}>
               View All
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" /></svg>
             </a>
@@ -650,18 +649,18 @@ export default function ComparePage() {
         </section>
 
         {/* ── CTA BANNER ─────────────────────────────────────── */}
-        <section style={{ background: "#000000", padding: "90px 48px", position: "relative", overflow: "hidden" }}>
+        <section style={{ background: "#020C1C", padding: "90px 48px", position: "relative", overflow: "hidden" }}>
           <div style={{ position: "absolute", inset: 0, backgroundImage: "linear-gradient(rgba(201,168,76,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(201,168,76,0.04) 1px, transparent 1px)", backgroundSize: "52px 52px", pointerEvents: "none" }} />
           <div style={{ position: "absolute", inset: 0, background: "radial-gradient(ellipse 60% 55% at 50% 110%, rgba(201,168,76,0.1) 0%, transparent 55%)", pointerEvents: "none" }} />
           <div style={{ position: "relative", zIndex: 2, maxWidth: "660px", margin: "0 auto", textAlign: "center" }}>
-            <h2 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "clamp(34px, 5vw, 56px)", fontWeight: 300, color: "#000000", lineHeight: 1.15, marginBottom: "16px" }}>
-              Found Your<br /><em style={{ fontStyle: "italic", color: "#2BA8E0" }}>Perfect Match?</em>
+            <h2 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "clamp(34px, 5vw, 56px)", fontWeight: 300, color: "#020C1C", lineHeight: 1.15, marginBottom: "16px" }}>
+              Found Your<br /><em style={{ fontStyle: "italic", color: "#10C4C3" }}>Perfect Match?</em>
             </h2>
             <p style={{ fontSize: "15px", color: "rgba(245,242,236,0.5)", lineHeight: 1.75, marginBottom: "36px" }}>
               Our advisors can arrange viewings for all three properties on the same day. Make the right call with confidence.
             </p>
             <div style={{ display: "flex", gap: "14px", justifyContent: "center", flexWrap: "wrap" }}>
-              <a href="/contact" style={{ padding: "14px 36px", background: "#2BA8E0", borderRadius: "9px", color: "#000000", fontSize: "13px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", textDecoration: "none", display: "inline-flex", alignItems: "center", gap: "8px" }}>
+              <a href="/contact" style={{ padding: "14px 36px", background: "#10C4C3", borderRadius: "9px", color: "#020C1C", fontSize: "13px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", textDecoration: "none", display: "inline-flex", alignItems: "center", gap: "8px" }}>
                 Schedule Viewings
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" /></svg>
               </a>
@@ -677,7 +676,7 @@ export default function ComparePage() {
           <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
             <div className="cp-footer-grid" style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1fr 1fr", gap: "48px", paddingBottom: "56px", borderBottom: "1px solid rgba(245,242,236,0.06)" }}>
               <div>
-                <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "18px", fontWeight: 600, color: "#fff", letterSpacing: "0.16em", marginBottom: "14px" }}>Nilay 360 <span style={{ color: "#2BA8E0" }}>·</span></div>
+                <div style={{ fontFamily: "'Cal Sans', sans-serif", fontSize: "18px", fontWeight: 600, color: "#fff", letterSpacing: "0.16em", marginBottom: "14px" }}>Nilay 360 <span style={{ color: "#10C4C3" }}>·</span></div>
                 <p style={{ fontSize: "13px", color: "rgba(245,242,236,0.35)", lineHeight: 1.75, maxWidth: "280px", marginBottom: "22px" }}>India's most trusted premium real estate platform. Verified listings, certified agents, independent legal guidance.</p>
                 <div style={{ display: "flex", gap: "10px" }}>
                   {["IG", "IN", "TW", "YT"].map(s => (

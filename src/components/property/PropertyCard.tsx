@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import React, { useState } from "react"
 import Link from "next/link"
@@ -81,7 +81,7 @@ export function PropertyCard({
       )}>
 
         {/* Image */}
-        <div className="relative h-48 overflow-hidden bg-[#121519]">
+        <div className="relative h-48 overflow-hidden bg-[#111F33]">
           {images[0] && !imgError ? (
             <img
               src={optimizedImageUrl(images[0], 600)}
@@ -91,8 +91,8 @@ export function PropertyCard({
               onError={() => setImgError(true)}
             />
           ) : (
-            <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#0B0D10] to-[#121519]">
-              <span className="text-[#2BA8E0] text-[13px] font-medium tracking-widest opacity-60">Nilay 360</span>
+            <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#0A1526] to-[#111F33]">
+              <span className="text-[#10C4C3] text-[13px] font-medium tracking-widest opacity-60">Nilay 360</span>
             </div>
           )}
 
@@ -112,8 +112,8 @@ export function PropertyCard({
               "absolute top-3 right-3 w-8 h-8 rounded-full flex items-center justify-center",
               "transition-all duration-150",
               saved
-                ? "bg-[#2BA8E0] text-[#000000]"
-                : "bg-white/90 text-[#6B7C72] hover:bg-white hover:text-[#2BA8E0]"
+                ? "bg-[#10C4C3] text-[#020C1C]"
+                : "bg-white/90 text-[#6B7C72] hover:bg-white hover:text-[#10C4C3]"
             )}
           >
             <svg width="14" height="14" viewBox="0 0 24 24" fill={saved ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2">
@@ -130,8 +130,8 @@ export function PropertyCard({
               "absolute top-3 right-12 h-8 px-2 rounded-full flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wider",
               "transition-all duration-150",
               comparing
-                ? "bg-[#2BA8E0] text-[#000000]"
-                : "bg-white/90 text-[#6B7C72] hover:bg-white hover:text-[#2BA8E0]",
+                ? "bg-[#10C4C3] text-[#020C1C]"
+                : "bg-white/90 text-[#6B7C72] hover:bg-white hover:text-[#10C4C3]",
               !comparing && isFull && "opacity-50 cursor-not-allowed"
             )}
           >
@@ -149,7 +149,7 @@ export function PropertyCard({
               "text-[10px] font-semibold px-2 py-0.5 rounded-full uppercase tracking-wider",
               listing_type === "rent"       ? "bg-blue-600 text-white" :
               listing_type === "commercial" ? "bg-purple-600 text-white" :
-                                             "bg-[#0B0D10] text-[#3DBEF5]"
+                                             "bg-[#0A1526] text-[#3DDAD9]"
             )}>
               {listing_type === "rent" ? "For Rent" : listing_type === "commercial" ? "Commercial" : "For Sale"}
             </span>
@@ -160,13 +160,13 @@ export function PropertyCard({
         <div className="p-4">
           {/* Price */}
           <div className="mb-1">
-            <span className="font-display text-[20px] font-semibold text-[#000000]">
+            <span className="font-display text-[20px] font-semibold text-[#020C1C]">
               {priceLabel}
             </span>
           </div>
 
           {/* Title */}
-          <h3 className="text-[13px] font-medium text-[#000000] mb-1 line-clamp-1">
+          <h3 className="text-[13px] font-medium text-[#020C1C] mb-1 line-clamp-1">
             {title}
           </h3>
 
@@ -186,7 +186,7 @@ export function PropertyCard({
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
                   <path d="M3 22V8a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v14M3 22h18M3 12h18" />
                 </svg>
-                <strong className="text-[#000000] font-medium">{bedrooms}</strong> {COMMERCIAL_CATEGORIES.includes(type) ? "Rooms" : "BHK"}
+                <strong className="text-[#020C1C] font-medium">{bedrooms}</strong> {COMMERCIAL_CATEGORIES.includes(type) ? "Rooms" : "BHK"}
               </div>
             )}
             {bathrooms !== undefined && (
@@ -194,7 +194,7 @@ export function PropertyCard({
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
                   <path d="M4 12h16M4 12V8a2 2 0 0 1 2-2h1M4 12v4a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-4" />
                 </svg>
-                <strong className="text-[#000000] font-medium">{bathrooms}</strong> {COMMERCIAL_CATEGORIES.includes(type) ? "Wash" : "Bath"}
+                <strong className="text-[#020C1C] font-medium">{bathrooms}</strong> {COMMERCIAL_CATEGORIES.includes(type) ? "Wash" : "Bath"}
               </div>
             )}
             <div className="flex items-center gap-1 text-[11px] text-[#6B7C72] ml-auto">
@@ -202,7 +202,7 @@ export function PropertyCard({
                 <rect x="3" y="3" width="18" height="18" rx="1" />
                 <path d="M3 9h18M9 3v18" />
               </svg>
-              <strong className="text-[#000000] font-medium">{formatArea(area_sqft)}</strong>
+              <strong className="text-[#020C1C] font-medium">{formatArea(area_sqft)}</strong>
             </div>
           </div>
 

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import { useParams } from "next/navigation";
 import { PageShell } from "../../_components/SiteChrome";
 
@@ -29,8 +29,8 @@ export default function BlogPostPage() {
           Reach out and our team will be happy to help.
         </p>
         <div style={{ display:"flex", gap:12, flexWrap:"wrap" }}>
-          <a href="/blog" style={{ padding:"12px 26px", background:"#000000", borderRadius:8, color:"#fff", fontSize:14, fontWeight:600 }}>← All Articles</a>
-          <a href="/contact" style={{ padding:"12px 26px", border:"1px solid rgba(13,43,31,0.2)", borderRadius:8, color:"#000000", fontSize:14, fontWeight:500 }}>Suggest a Topic</a>
+          <a href="/blog" style={{ padding:"12px 26px", background:"#020C1C", borderRadius:8, color:"#fff", fontSize:14, fontWeight:600 }}>← All Articles</a>
+          <a href="/contact" style={{ padding:"12px 26px", border:"1px solid rgba(13,43,31,0.2)", borderRadius:8, color:"#020C1C", fontSize:14, fontWeight:500 }}>Suggest a Topic</a>
         </div>
       </div>
     </PageShell>

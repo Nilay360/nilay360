@@ -1,4 +1,4 @@
-import React from "react"
+﻿import React from "react"
 import Link from "next/link"
 import { BRAND, CITIES, NAV_LINKS } from "@/constants"
 
@@ -47,7 +47,7 @@ export function Footer() {
         }
       }
     `}</style>
-    <footer className="bg-[#000000] text-white">
+    <footer className="bg-[#020C1C] text-white">
       {/* Main footer */}
       <div className="nilay360-container py-14">
         <div className="footer-grid" style={{display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(140px, 1fr))", gap:32, width:"100%", maxWidth:"100%", boxSizing:"border-box"}}>
@@ -55,9 +55,9 @@ export function Footer() {
           {/* Brand column */}
           <div className="lg:col-span-2 footer-brand">
             <div className="font-body text-[22px] font-semibold tracking-[0.14em] mb-1">
-              Nilay 360<span className="text-[#2BA8E0] ml-1">·</span>
+              Nilay 360<span className="text-[#10C4C3] ml-1">·</span>
             </div>
-            <p className="text-[12px] text-[#2BA8E0] tracking-[0.1em] mb-4">
+            <p className="text-[12px] text-[#10C4C3] tracking-[0.1em] mb-4">
               YOUR TRUST. OUR PROMISE.
             </p>
             <p className="text-[13px] text-white/55 leading-relaxed mb-6 max-w-[260px]">
@@ -68,7 +68,7 @@ export function Footer() {
             <div className="flex flex-col gap-2 text-[12px] text-white/50 mb-6">
               <span>📍 {BRAND.address}</span>
               <span>📞 {BRAND.phone}</span>
-              <a href={`mailto:${BRAND.email}`} className="hover:text-[#3DBEF5] transition-colors">
+              <a href={`mailto:${BRAND.email}`} className="hover:text-[#3DDAD9] transition-colors">
                 ✉️ {BRAND.email}
               </a>
             </div>
@@ -87,7 +87,7 @@ export function Footer() {
                   aria-label={s.label}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-8 h-8 rounded-full border border-white/15 flex items-center justify-center text-[10px] font-bold text-white/50 hover:border-[#2BA8E0] hover:text-[#3DBEF5] transition-all"
+                  className="w-8 h-8 rounded-full border border-white/15 flex items-center justify-center text-[10px] font-bold text-white/50 hover:border-[#10C4C3] hover:text-[#3DDAD9] transition-all"
                 >
                   {s.icon}
                 </a>
@@ -98,7 +98,7 @@ export function Footer() {
           {/* Link columns */}
           {Object.entries(footerLinks).map(([heading, links]) => (
             <div key={heading}>
-              <h3 className="text-[11px] font-semibold text-[#2BA8E0] tracking-[0.08em] uppercase mb-4">
+              <h3 className="text-[11px] font-semibold text-[#10C4C3] tracking-[0.08em] uppercase mb-4">
                 {heading}
               </h3>
               <ul className="flex flex-col gap-2.5">
@@ -119,7 +119,7 @@ export function Footer() {
 
         {/* Cities */}
         <div className="mt-12 pt-8 border-t border-white/8">
-          <p className="text-[10px] font-semibold text-[#2BA8E0] tracking-[0.1em] uppercase mb-3">
+          <p className="text-[10px] font-semibold text-[#10C4C3] tracking-[0.1em] uppercase mb-3">
             Cities We Serve
           </p>
           <div className="flex flex-wrap gap-x-4 gap-y-2">
@@ -127,7 +127,7 @@ export function Footer() {
               <Link
                 key={city}
                 href={`/locations/${city.toLowerCase().replace(/\s+/g, "-")}`}
-                className="text-[12px] text-white/60 hover:text-[#3DBEF5] transition-colors"
+                className="text-[12px] text-white/60 hover:text-[#3DDAD9] transition-colors"
               >
                 {city}
               </Link>
@@ -143,7 +143,7 @@ export function Footer() {
             © {new Date().getFullYear()} Nilay 360. All rights reserved.
           </p>
           <div className="flex items-center gap-1 text-[12px] text-white/35">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#2BA8E0] animate-pulse" />
+            <span className="w-1.5 h-1.5 rounded-full bg-[#10C4C3] animate-pulse" />
             All systems operational
           </div>
           <p className="text-[12px] text-white/35">

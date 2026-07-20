@@ -1,9 +1,9 @@
-"use client";
+﻿"use client";
 import Reveal from "@/components/ui/Reveal";
 import { useRecentlyViewed } from "@/hooks/useRecentlyViewed";
 import { optimizedImageUrl } from "@/lib/image-url";
 
-const G = { dark: "#000000", gold: "#2BA8E0" };
+const G = { dark: "#020C1C", gold: "#10C4C3" };
 
 function fmt(price: number, listingType: string): string {
   if (listingType === "rent") {
@@ -23,7 +23,7 @@ export default function RecentlyViewed({ theme = "light" }: { theme?: "light" | 
   if (recentlyViewed.length === 0) return null;
 
   const dark = theme === "dark";
-  const titleColor = dark ? "#000000" : G.dark;
+  const titleColor = dark ? "#020C1C" : G.dark;
   const cardBg = dark ? "rgba(245,242,236,0.04)" : "#fff";
   const cardBorder = dark ? "1px solid rgba(245,242,236,0.08)" : "1px solid rgba(13,43,31,0.08)";
   const subColor = dark ? "rgba(245,242,236,0.5)" : "#6B7C72";
@@ -46,7 +46,7 @@ export default function RecentlyViewed({ theme = "light" }: { theme?: "light" | 
                   <img src={optimizedImageUrl(img, 400)} alt={p.title} loading="lazy" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
                 </div>
                 <div style={{ padding: "12px 14px" }}>
-                  <div style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "16px", fontWeight: 600, color: G.gold, marginBottom: "4px" }}>{fmt(p.price, p.listing_type)}</div>
+                  <div style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "16px", fontWeight: 600, color: G.gold, marginBottom: "4px" }}>{fmt(p.price, p.listing_type)}</div>
                   <div style={{ fontSize: "12px", fontWeight: 500, color: titleColor, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{p.title}</div>
                   <div style={{ fontSize: "11px", color: subColor, marginTop: "2px" }}>{p.city}</div>
                 </div>

@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import React, { useState, useEffect, useRef } from "react"
 import { createPortal } from "react-dom"
@@ -168,16 +168,16 @@ function Avatar({
     <div
       style={{
         width:  size, height: size, borderRadius: "50%",
-        background:  "#121519",
-        border:      ring ? "2px solid #2BA8E0" : "1.5px solid rgba(43,168,224,0.45)",
+        background:  "#111F33",
+        border:      ring ? "2px solid #10C4C3" : "1.5px solid rgba(16,196,195,0.45)",
         display: "flex", alignItems: "center", justifyContent: "center",
         flexShrink: 0,
-        fontFamily: "'DM Sans', sans-serif",
+        fontFamily: "'Cal Sans', sans-serif",
         fontSize:   size * 0.4,
         fontWeight: 700,
-        color:      "#2BA8E0",
+        color:      "#10C4C3",
         letterSpacing: "0.02em",
-        boxShadow:  ring ? "0 0 0 1px rgba(43,168,224,0.15)" : "none",
+        boxShadow:  ring ? "0 0 0 1px rgba(16,196,195,0.15)" : "none",
         transition: "box-shadow 0.2s",
       }}
     >
@@ -221,10 +221,10 @@ function UserDropdown({ user, profile, onClose, onSignOut, open, wrapperRef, dro
       style={{
         position: "fixed", right: dropdownPos.right, top: dropdownPos.top,
         width: 272,
-        background: "#0B0D10",
-        border: "1px solid rgba(43,168,224,0.18)",
+        background: "#0A1526",
+        border: "1px solid rgba(16,196,195,0.18)",
         borderRadius: 14,
-        boxShadow: "0 20px 60px rgba(0,0,0,0.55), 0 0 0 1px rgba(43,168,224,0.06)",
+        boxShadow: "0 20px 60px rgba(0,0,0,0.55), 0 0 0 1px rgba(16,196,195,0.06)",
         overflow: "hidden",
         zIndex: 9999,
         animation: "ddFadeIn 0.15s ease",
@@ -233,23 +233,23 @@ function UserDropdown({ user, profile, onClose, onSignOut, open, wrapperRef, dro
       {/* Profile header */}
       <div style={{
         padding: "16px 16px 14px",
-        background: "linear-gradient(135deg, #121519 0%, #0B0D10 100%)",
-        borderBottom: "1px solid rgba(43,168,224,0.14)",
+        background: "linear-gradient(135deg, #111F33 0%, #0A1526 100%)",
+        borderBottom: "1px solid rgba(16,196,195,0.14)",
         display: "flex", alignItems: "center", gap: 12,
       }}>
         <Avatar initial={initial} size={42} ring />
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{
             color: "#FFFFFF", fontWeight: 600, fontSize: 14,
-            fontFamily: "'DM Sans', sans-serif",
+            fontFamily: "'Cal Sans', sans-serif",
             whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis",
           }}>
             {displayName}
           </div>
           {city && (
             <div style={{
-              color: "rgba(43,168,224,0.75)", fontSize: 11.5,
-              fontFamily: "'DM Sans', sans-serif", marginTop: 1,
+              color: "rgba(16,196,195,0.75)", fontSize: 11.5,
+              fontFamily: "'Cal Sans', sans-serif", marginTop: 1,
               display: "flex", alignItems: "center", gap: 4,
             }}>
               <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
@@ -263,9 +263,9 @@ function UserDropdown({ user, profile, onClose, onSignOut, open, wrapperRef, dro
           href="/profile/edit"
           onClick={onClose}
           style={{
-            fontSize: 11, fontWeight: 600, color: "#2BA8E0",
-            fontFamily: "'DM Sans', sans-serif",
-            background: "rgba(43,168,224,0.1)", border: "1px solid rgba(43,168,224,0.25)",
+            fontSize: 11, fontWeight: 600, color: "#10C4C3",
+            fontFamily: "'Cal Sans', sans-serif",
+            background: "rgba(16,196,195,0.1)", border: "1px solid rgba(16,196,195,0.25)",
             borderRadius: 6, padding: "4px 9px",
             textDecoration: "none", flexShrink: 0,
             transition: "background 0.15s",
@@ -308,11 +308,11 @@ function UserDropdown({ user, profile, onClose, onSignOut, open, wrapperRef, dro
             style={{
               display: "flex", alignItems: "center", gap: 10,
               padding: "9px 8px",
-              color: "#2BA8E0",
-              background: "rgba(43,168,224,0.07)",
+              color: "#10C4C3",
+              background: "rgba(16,196,195,0.07)",
               borderRadius: 8,
               textDecoration: "none", fontSize: 13, fontWeight: 600,
-              fontFamily: "'DM Sans', sans-serif",
+              fontFamily: "'Cal Sans', sans-serif",
               letterSpacing: "0.02em",
             }}
           >
@@ -333,7 +333,7 @@ function UserDropdown({ user, profile, onClose, onSignOut, open, wrapperRef, dro
             padding: "9px 10px", borderRadius: 8,
             background: "transparent", border: "none", cursor: "pointer",
             color: "#e05555", fontSize: 13, fontWeight: 500,
-            fontFamily: "'DM Sans', sans-serif",
+            fontFamily: "'Cal Sans', sans-serif",
             transition: "background 0.15s",
           }}
           onMouseEnter={e => (e.currentTarget.style.background = "rgba(224,85,85,0.08)")}
@@ -362,13 +362,13 @@ function DropdownLink({
         display: "flex", alignItems: "center", gap: 10,
         padding: "9px 16px",
         color: hovered ? "#FFFFFF" : "rgba(255,255,255,0.65)",
-        background: hovered ? "rgba(43,168,224,0.07)" : "transparent",
+        background: hovered ? "rgba(16,196,195,0.07)" : "transparent",
         textDecoration: "none", fontSize: 13, fontWeight: 450,
-        fontFamily: "'DM Sans', sans-serif",
+        fontFamily: "'Cal Sans', sans-serif",
         transition: "background 0.12s, color 0.12s",
       }}
     >
-      <span style={{ color: hovered ? "#2BA8E0" : "rgba(43,168,224,0.55)", transition: "color 0.12s" }}>
+      <span style={{ color: hovered ? "#10C4C3" : "rgba(16,196,195,0.55)", transition: "color 0.12s" }}>
         {icon}
       </span>
       {label}
@@ -398,11 +398,11 @@ function MegaLink({
         padding: featured ? "6px 0" : "4px 0",
         fontSize: 13,
         fontWeight: featured ? 500 : 400,
-        fontFamily: "'DM Sans', sans-serif",
+        fontFamily: "'Cal Sans', sans-serif",
         textDecoration: "none",
         lineHeight: 1.55,
         color: hovered
-          ? "#2BA8E0"
+          ? "#10C4C3"
           : featured
             ? "rgba(255,255,255,0.82)"
             : "rgba(255,255,255,0.48)",
@@ -434,9 +434,9 @@ function MegaPanel({
         top: "100%",
         left: 0,
         right: 0,
-        background: "#000000",
-        borderTop: "1px solid rgba(43,168,224,0.12)",
-        borderBottom: "1px solid rgba(43,168,224,0.18)",
+        background: "#020C1C",
+        borderTop: "1px solid rgba(16,196,195,0.12)",
+        borderBottom: "1px solid rgba(16,196,195,0.18)",
         boxShadow: "0 28px 72px rgba(0,0,0,0.55)",
         zIndex: 999,
         animation: "megaFadeIn 0.18s ease",
@@ -454,16 +454,16 @@ function MegaPanel({
           width: 210,
           flexShrink: 0,
           padding: "28px 28px 28px 0",
-          borderRight: "1px solid rgba(43,168,224,0.1)",
+          borderRight: "1px solid rgba(16,196,195,0.1)",
         }}>
           <div style={{
             fontSize: 10,
             fontWeight: 700,
-            color: "#2BA8E0",
+            color: "#10C4C3",
             letterSpacing: "0.12em",
             textTransform: "uppercase",
             marginBottom: 14,
-            fontFamily: "'DM Sans', sans-serif",
+            fontFamily: "'Cal Sans', sans-serif",
           }}>
             {menu.leftColumn.heading}
           </div>
@@ -499,13 +499,13 @@ function MegaPanel({
               <div style={{
                 fontSize: 10,
                 fontWeight: 700,
-                color: "#2BA8E0",
+                color: "#10C4C3",
                 letterSpacing: "0.12em",
                 textTransform: "uppercase",
                 marginBottom: 12,
-                fontFamily: "'DM Sans', sans-serif",
+                fontFamily: "'Cal Sans', sans-serif",
                 paddingBottom: 8,
-                borderBottom: "1px solid rgba(43,168,224,0.15)",
+                borderBottom: "1px solid rgba(16,196,195,0.15)",
                 whiteSpace: "nowrap",
               }}>
                 {col.heading}
@@ -560,7 +560,7 @@ function NavItem({
           borderRadius: 6,
           fontSize: 13,
           fontWeight: 500,
-          fontFamily: "'DM Sans', sans-serif",
+          fontFamily: "'Cal Sans', sans-serif",
           textDecoration: "none",
           display: "flex",
           alignItems: "center",
@@ -569,13 +569,13 @@ function NavItem({
             isActive || isOpen
               ? "#ffffff"
               : hovered
-                ? "#2BA8E0"
+                ? "#10C4C3"
                 : "rgba(255,255,255,0.6)",
           background:
             isActive || isOpen
               ? "rgba(255,255,255,0.09)"
               : hovered
-                ? "rgba(43,168,224,0.06)"
+                ? "rgba(16,196,195,0.06)"
                 : "transparent",
           transition: "color 0.15s, background 0.15s",
         }}
@@ -689,7 +689,7 @@ export function Navbar() {
 
   const headerBg = scrolled || !isHome
     ? "rgba(11, 13, 16, 0.97)"
-    : "#000000"
+    : "#020C1C"
 
   const currentMenu = openMenu !== null ? NAV_MENUS[openMenu] ?? null : null
 
@@ -706,8 +706,8 @@ export function Navbar() {
         }
         @media (max-width: 1023px) { .nvl-desktop { display: none !important; } }
         @media (min-width: 1024px) { .nvl-mobile  { display: none !important; } }
-        .nvl-sign-in:hover  { color: #ffffff !important; border-color: #3DBEF5 !important; }
-        .nvl-list-btn:hover { background: #3DBEF5 !important; }
+        .nvl-sign-in:hover  { color: #ffffff !important; border-color: #3DDAD9 !important; }
+        .nvl-list-btn:hover { background: #3DDAD9 !important; }
       `}</style>
 
       <header style={{
@@ -718,7 +718,7 @@ export function Navbar() {
         background: headerBg,
         backdropFilter: "blur(14px)",
         WebkitBackdropFilter: "blur(14px)",
-        borderBottom: "1px solid rgba(43,168,224,0.12)",
+        borderBottom: "1px solid rgba(16,196,195,0.12)",
         boxShadow: scrolled ? "0 2px 24px rgba(0,0,0,0.35)" : "none",
         transition: "background 0.3s, box-shadow 0.3s",
         overflow: "visible",
@@ -731,7 +731,7 @@ export function Navbar() {
           {/* Logo — flush left, outside max-width constraint */}
           <Link href="/" style={{ textDecoration: "none", display: "flex", alignItems: "center", flexShrink: 0, paddingLeft: 24 }}>
             <img
-              src="/nilay_logo_final.png"
+              src="/brand/nilay360_logo_horizontal_dark-bg.png"
               alt="Nilay 360"
               style={{ height: 44, width: "auto", objectFit: "contain" }}
             />
@@ -784,11 +784,11 @@ export function Navbar() {
                 padding: "8px 18px",
                 fontSize: 13, fontWeight: 600,
                 color: "#0a0a0a",
-                background: "#2BA8E0",
+                background: "#10C4C3",
                 border: "none",
                 borderRadius: 6,
                 cursor: "pointer",
-                fontFamily: "'DM Sans', sans-serif",
+                fontFamily: "'Cal Sans', sans-serif",
                 letterSpacing: "0.01em",
                 transition: "background 0.15s",
               }}
@@ -804,20 +804,20 @@ export function Navbar() {
                   aria-label="Open user menu"
                   style={{
                     display: "flex", alignItems: "center", gap: 8,
-                    background: dropdown ? "rgba(43,168,224,0.1)" : "transparent",
-                    border: `1px solid ${dropdown ? "rgba(43,168,224,0.5)" : "rgba(43,168,224,0.25)"}`,
+                    background: dropdown ? "rgba(16,196,195,0.1)" : "transparent",
+                    border: `1px solid ${dropdown ? "rgba(16,196,195,0.5)" : "rgba(16,196,195,0.25)"}`,
                     borderRadius: 8, padding: "4px 10px 4px 5px",
                     cursor: "pointer",
                     transition: "all 0.15s",
                   }}
-                  onMouseEnter={e => { if (!dropdown) e.currentTarget.style.borderColor = "rgba(43,168,224,0.5)" }}
-                  onMouseLeave={e => { if (!dropdown) e.currentTarget.style.borderColor = "rgba(43,168,224,0.25)" }}
+                  onMouseEnter={e => { if (!dropdown) e.currentTarget.style.borderColor = "rgba(16,196,195,0.5)" }}
+                  onMouseLeave={e => { if (!dropdown) e.currentTarget.style.borderColor = "rgba(16,196,195,0.25)" }}
                 >
                   <Avatar initial={avatarInitial} size={28} ring />
                   <span style={{
                     fontSize: 13, fontWeight: 500,
                     color: "rgba(255,255,255,0.85)",
-                    fontFamily: "'DM Sans', sans-serif",
+                    fontFamily: "'Cal Sans', sans-serif",
                     maxWidth: 110, overflow: "hidden",
                     textOverflow: "ellipsis", whiteSpace: "nowrap",
                   }}>
@@ -825,7 +825,7 @@ export function Navbar() {
                   </span>
                   <svg
                     width="11" height="11" viewBox="0 0 24 24"
-                    fill="none" stroke="rgba(43,168,224,0.6)" strokeWidth="2.5"
+                    fill="none" stroke="rgba(16,196,195,0.6)" strokeWidth="2.5"
                     style={{ transition: "transform 0.2s", transform: dropdown ? "rotate(180deg)" : "rotate(0deg)", flexShrink: 0 }}
                   >
                     <path d="M6 9l6 6 6-6" />
@@ -856,7 +856,7 @@ export function Navbar() {
                   background: "transparent",
                   borderRadius: 6,
                   cursor: "pointer",
-                  fontFamily: "'DM Sans', sans-serif",
+                  fontFamily: "'Cal Sans', sans-serif",
                   transition: "color 0.15s, border-color 0.15s",
                 }}
               >
@@ -924,7 +924,7 @@ export function Navbar() {
           style={{
             position: "fixed",
             top: 0, left: 0, right: 0, bottom: 0,
-            background: "#000000",
+            background: "#020C1C",
             zIndex: 99999,
             overflowY: "auto",
             display: "flex",
@@ -935,10 +935,10 @@ export function Navbar() {
           <div style={{
             display: "flex", alignItems: "center", justifyContent: "space-between",
             padding: "0 20px", height: 64, borderBottom: "1px solid rgba(255,255,255,0.06)",
-            background: "#000000", flexShrink: 0,
+            background: "#020C1C", flexShrink: 0,
           }}>
             <Link href="/" onClick={() => setMenuOpen(false)}>
-              <img src="/nilay_logo_final.png" alt="Nilay 360" style={{ height: 46, width: "auto" }} />
+              <img src="/brand/nilay360_logo_horizontal_dark-bg.png" alt="Nilay 360" style={{ height: 46, width: "auto" }} />
             </Link>
             <button onClick={() => setMenuOpen(false)} style={{
               background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)",
@@ -965,10 +965,10 @@ export function Navbar() {
                         style={{
                           width: "100%", display: "flex", alignItems: "center",
                           justifyContent: "space-between", padding: "14px 12px",
-                          background: currentMenu === link.label ? "rgba(43,168,224,0.08)" : "transparent",
+                          background: currentMenu === link.label ? "rgba(16,196,195,0.08)" : "transparent",
                           border: "none", borderRadius: 10, cursor: "pointer",
-                          color: currentMenu === link.label ? "#2BA8E0" : "rgba(255,255,255,0.85)",
-                          fontSize: 15, fontWeight: 500, fontFamily: "'DM Sans', sans-serif",
+                          color: currentMenu === link.label ? "#10C4C3" : "rgba(255,255,255,0.85)",
+                          fontSize: 15, fontWeight: 500, fontFamily: "'Cal Sans', sans-serif",
                           transition: "all 0.15s",
                         }}
                       >
@@ -985,7 +985,7 @@ export function Navbar() {
                               style={{
                                 padding: "10px 12px", borderRadius: 8, color: "rgba(255,255,255,0.6)",
                                 fontSize: 14, display: "block", textDecoration: "none",
-                                borderLeft: "2px solid rgba(43,168,224,0.3)",
+                                borderLeft: "2px solid rgba(16,196,195,0.3)",
                                 paddingLeft: 16, transition: "all 0.15s",
                               }}>
                               {item.label}
@@ -999,7 +999,7 @@ export function Navbar() {
                       style={{
                         display: "block", padding: "14px 12px", borderRadius: 10,
                         color: "rgba(255,255,255,0.85)", fontSize: 15, fontWeight: 500,
-                        textDecoration: "none", fontFamily: "'DM Sans', sans-serif",
+                        textDecoration: "none", fontFamily: "'Cal Sans', sans-serif",
                       }}>
                       {link.label}
                     </Link>
@@ -1018,12 +1018,12 @@ export function Navbar() {
                   {/* Profile card */}
                   <div style={{
                     display: "flex", alignItems: "center", gap: 12, padding: "14px 16px",
-                    background: "linear-gradient(135deg, rgba(43,168,224,0.08) 0%, rgba(43,168,224,0.03) 100%)",
-                    borderRadius: 12, border: "1px solid rgba(43,168,224,0.2)", marginBottom: 12,
+                    background: "linear-gradient(135deg, rgba(16,196,195,0.08) 0%, rgba(16,196,195,0.03) 100%)",
+                    borderRadius: 12, border: "1px solid rgba(16,196,195,0.2)", marginBottom: 12,
                   }}>
                     <div style={{
                       width: 44, height: 44, borderRadius: "50%", flexShrink: 0,
-                      background: "linear-gradient(135deg, #2BA8E0, #1577B8)",
+                      background: "linear-gradient(135deg, #10C4C3, #0B9C9B)",
                       display: "flex", alignItems: "center", justifyContent: "center",
                       fontSize: 18, fontWeight: 700, color: "#fff",
                     }}>
@@ -1033,15 +1033,15 @@ export function Navbar() {
                       <div style={{ color: "#fff", fontWeight: 600, fontSize: 15, marginBottom: 2 }}>
                         {profile?.full_name ?? user.email?.split("@")[0]}
                       </div>
-                      <div style={{ color: "rgba(43,168,224,0.8)", fontSize: 12 }}>
+                      <div style={{ color: "rgba(16,196,195,0.8)", fontSize: 12 }}>
                         {profile?.city ?? user.email}
                       </div>
                     </div>
                     <Link href="/profile/edit" onClick={() => setMenuOpen(false)}
                       style={{
-                        padding: "6px 12px", borderRadius: 7, border: "1px solid rgba(43,168,224,0.4)",
-                        color: "#2BA8E0", fontSize: 12, fontWeight: 600, textDecoration: "none",
-                        background: "rgba(43,168,224,0.08)",
+                        padding: "6px 12px", borderRadius: 7, border: "1px solid rgba(16,196,195,0.4)",
+                        color: "#10C4C3", fontSize: 12, fontWeight: 600, textDecoration: "none",
+                        background: "rgba(16,196,195,0.08)",
                       }}>
                       Edit
                     </Link>
@@ -1069,7 +1069,7 @@ export function Navbar() {
                           color: "rgba(255,255,255,0.75)", fontSize: 13, fontWeight: 500,
                           textDecoration: "none", transition: "all 0.15s",
                         }}>
-                        <span style={{ color: "#2BA8E0", fontSize: 16 }}>{item.icon}</span>
+                        <span style={{ color: "#10C4C3", fontSize: 16 }}>{item.icon}</span>
                         {item.label}
                       </Link>
                     ))}
@@ -1080,9 +1080,9 @@ export function Navbar() {
                     <Link href="/admin" onClick={() => setMenuOpen(false)}
                       style={{
                         display: "flex", alignItems: "center", gap: 10, padding: "12px 16px",
-                        borderRadius: 10, background: "rgba(43,168,224,0.1)",
-                        border: "1px solid rgba(43,168,224,0.3)",
-                        color: "#2BA8E0", fontSize: 14, fontWeight: 600,
+                        borderRadius: 10, background: "rgba(16,196,195,0.1)",
+                        border: "1px solid rgba(16,196,195,0.3)",
+                        color: "#10C4C3", fontSize: 14, fontWeight: 600,
                         textDecoration: "none", marginBottom: 12,
                       }}>
                       <span>⚙</span> Admin Panel
@@ -1095,7 +1095,7 @@ export function Navbar() {
                       width: "100%", padding: "12px 16px", borderRadius: 10,
                       background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.2)",
                       color: "#EF4444", fontSize: 14, fontWeight: 600, cursor: "pointer",
-                      fontFamily: "'DM Sans', sans-serif",
+                      fontFamily: "'Cal Sans', sans-serif",
                     }}>
                     Sign Out
                   </button>
@@ -1107,16 +1107,16 @@ export function Navbar() {
                       width: "100%", padding: "13px 16px", borderRadius: 10,
                       background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.12)",
                       color: "#fff", fontSize: 15, fontWeight: 600, cursor: "pointer",
-                      fontFamily: "'DM Sans', sans-serif",
+                      fontFamily: "'Cal Sans', sans-serif",
                     }}>
                     Sign In
                   </button>
                   <button onClick={() => { handleListProperty(); setMenuOpen(false); }}
                     style={{
                       width: "100%", padding: "13px 16px", borderRadius: 10,
-                      background: "linear-gradient(135deg, #2BA8E0, #1577B8)",
+                      background: "linear-gradient(135deg, #10C4C3, #0B9C9B)",
                       border: "none", color: "#fff", fontSize: 15, fontWeight: 600,
-                      cursor: "pointer", fontFamily: "'DM Sans', sans-serif",
+                      cursor: "pointer", fontFamily: "'Cal Sans', sans-serif",
                     }}>
                     List Property
                   </button>

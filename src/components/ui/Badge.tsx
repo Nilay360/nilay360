@@ -1,4 +1,4 @@
-import * as React from "react"
+﻿import * as React from "react"
 import { cn } from "@/lib/utils"
 
 export interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
@@ -6,14 +6,14 @@ export interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
 }
 
 const variantStyles = {
-  verified: "bg-[#121519] text-[#0B0D10] border border-[#0B0D10]",
-  premium:  "bg-[#FBF5E6] text-[#1577B8] border border-[rgba(201,168,76,0.3)]",
-  new:      "bg-[#0B0D10] text-[#3DBEF5]",
+  verified: "bg-[#111F33] text-[#0A1526] border border-[#0A1526]",
+  premium:  "bg-[#FBF5E6] text-[#0B9C9B] border border-[rgba(201,168,76,0.3)]",
+  new:      "bg-[#0A1526] text-[#3DDAD9]",
   sold:     "bg-red-50 text-red-800 border border-red-100",
   rented:   "bg-blue-50 text-blue-800 border border-blue-100",
-  rera:     "bg-[#121519] text-[#121519] border border-[#0B0D10]",
-  ready:    "bg-[#FBF5E6] text-[#1577B8] border border-[rgba(201,168,76,0.3)]",
-  featured: "bg-[#2BA8E0] text-[#000000]",
+  rera:     "bg-[#111F33] text-[#111F33] border border-[#0A1526]",
+  ready:    "bg-[#FBF5E6] text-[#0B9C9B] border border-[rgba(201,168,76,0.3)]",
+  featured: "bg-[#10C4C3] text-[#020C1C]",
 }
 
 const variantIcons: Record<string, string> = {
