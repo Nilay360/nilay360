@@ -430,7 +430,16 @@ export default function AgentsPage() {
             <div className="ag-footer-grid" style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1fr", gap: "48px", paddingBottom: "56px", borderBottom: "1px solid rgba(245,242,236,0.06)" }}>
               <div>
                 <div style={{ fontFamily: "'Cal Sans', sans-serif", fontSize: "18px", fontWeight: 600, color: "#fff", letterSpacing: "0.16em", marginBottom: "14px" }}>Nilay 360 <span style={{ color: "#10C4C3" }}>·</span></div>
-                <p style={{ fontSize: "13px", color: "rgba(245,242,236,0.35)", lineHeight: 1.75, maxWidth: "280px" }}>India's most trusted premium real estate platform. Every listing verified, every agent certified.</p>
+                <p style={{ fontSize: "13px", color: "rgba(245,242,236,0.35)", lineHeight: 1.75, maxWidth: "280px", marginBottom: "20px" }}>India's most trusted premium real estate platform. Every listing verified, every agent certified.</p>
+                <div style={{ display: "flex", gap: "10px" }}>
+                  {[
+                    { s: "IN", href: "https://www.instagram.com/nilay360_/" },
+                    { s: "LI", href: "https://linkedin.com/company/nilay360" },
+                    { s: "YT", href: "https://www.youtube.com/@nilay360.digital" },
+                  ].map(({ s, href }) => (
+                    <a key={s} href={href} target="_blank" rel="noopener noreferrer" aria-label={s} style={{ width: "34px", height: "34px", borderRadius: "8px", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.07)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "10px", color: "rgba(255,255,255,0.35)", fontWeight: 700, textDecoration: "none" }}>{s}</a>
+                  ))}
+                </div>
               </div>
               {[
                 { heading: "Find Agents", links: [["Hyderabad Agents","/agents?city=Hyderabad"],["Mumbai Agents","/agents?city=Mumbai"],["Bengaluru Agents","/agents?city=Bengaluru"],["Join as Agent","/agent-register"]] },

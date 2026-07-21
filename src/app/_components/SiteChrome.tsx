@@ -15,7 +15,7 @@ export function Navbar() {
   return (
     <nav className="sc-nav" style={{ position:"fixed", top:0, left:0, right:0, zIndex:200, height:60, display:"flex", alignItems:"center", justifyContent:"space-between", padding:"0 40px", background:"rgba(0,0,0,0.96)", backdropFilter:"blur(20px)", borderBottom:"0.5px solid rgba(16,196,195,0.15)" }}>
       <a href="/" style={{ display:"flex", alignItems:"center" }}>
-        <img src="/brand/nilay360_logo_horizontal_dark-bg.png" alt="Nilay 360" style={{ height: 36, width: 'auto', objectFit: 'contain' }} />
+        <img src="/brand/Nilay360-09-Photoroom%20(1).png" alt="Nilay 360" style={{ height: 36, width: 'auto', objectFit: 'contain' }} />
       </a>
       <div style={{ display:"flex", alignItems:"center", gap:4 }} className="nv-center">
         {NAV.map(([l,h]) => (
@@ -46,9 +46,22 @@ export function Footer() {
         <div className="sc-footer-grid" style={{ display:"grid", gridTemplateColumns:"2fr 1fr 1fr 1fr 1fr", gap:40, marginBottom:48 }}>
           <div>
             <a href="/" style={{ display:"inline-block", marginBottom:12 }}>
-              <img src="/brand/nilay360_logo_horizontal_dark-bg.png" alt="Nilay 360" style={{ height: 32, width: 'auto', objectFit: 'contain' }} />
+              <img src="/brand/Nilay360-09-Photoroom%20(1).png" alt="Nilay 360" style={{ height: 32, width: 'auto', objectFit: 'contain' }} />
             </a>
-            <p style={{ fontSize:13, lineHeight:1.75, maxWidth:240 }}>India&apos;s premium real estate platform connecting discerning buyers with exceptional properties.</p>
+            <p style={{ fontSize:13, lineHeight:1.75, maxWidth:240, marginBottom:20 }}>India&apos;s premium real estate platform connecting discerning buyers with exceptional properties.</p>
+            <div style={{ display:"flex", gap:10 }}>
+              {[
+                { label:"Instagram", icon:"IG", href:"https://www.instagram.com/nilay360_/" },
+                { label:"LinkedIn",  icon:"LI", href:"https://linkedin.com/company/nilay360" },
+                { label:"Facebook",  icon:"FB", href:"https://facebook.com/nilay360" },
+                { label:"YouTube",   icon:"YT", href:"https://www.youtube.com/@nilay360.digital" },
+              ].map(s => (
+                <a key={s.label} href={s.href} aria-label={s.label} target="_blank" rel="noopener noreferrer"
+                  style={{ width:32, height:32, borderRadius:8, border:"1px solid rgba(255,255,255,0.1)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:10, fontWeight:700, color:"rgba(255,255,255,0.5)", textDecoration:"none" }}>
+                  {s.icon}
+                </a>
+              ))}
+            </div>
           </div>
           {cols.map(col => (
             <div key={col.heading}>

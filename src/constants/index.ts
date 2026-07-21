@@ -8,10 +8,10 @@ export const BRAND = {
   whatsapp: "+917075792497",
   address: "Hyderabad, Telangana, India",
   social: {
-    instagram: "https://instagram.com/nilay360",
+    instagram: "https://www.instagram.com/nilay360_/",
     linkedin:  "https://linkedin.com/company/nilay360",
     facebook:  "https://facebook.com/nilay360",
-    youtube:   "https://youtube.com/@nilay360",
+    youtube:   "https://www.youtube.com/@nilay360.digital",
   },
 } as const
 

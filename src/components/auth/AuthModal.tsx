@@ -22,7 +22,7 @@ type AccountType = "individual" | "agent";
 
 const GOLD = "#10C4C3";
 const GREEN = "#0A1526";
-const CARD_BG = "#0a0a0a";
+const CARD_BG = "#0A1526";
 
 // ─── Small shared bits ─────────────────────────────────────────────────────────
 
@@ -408,7 +408,7 @@ function AuthModalInner({
 
           {/* Brand */}
           <div className="am-brand">
-            <img src="/brand/nilay360_logo_horizontal_dark-bg.png" alt="Nilay 360" style={{ height: 36, width: "auto", objectFit: "contain" }} />
+            <img src="/brand/Nilay360-09-Photoroom%20(1).png" alt="Nilay 360" style={{ height: 36, width: "auto", objectFit: "contain" }} />
           </div>
 
           {/* Tabs */}
@@ -670,7 +670,7 @@ function SuccessState({ title, message }: { title: string; message: string }) {
   return (
     <div className="am-success">
       <div className="am-success-check">
-        <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#0a0a0a" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+        <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#0A1526" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
           <polyline points="20 6 9 17 4 12" />
         </svg>
       </div>
@@ -703,9 +703,9 @@ const styles = `
     max-height: 90vh;
     overflow-y: auto;
     background: ${CARD_BG};
-    border: 1px solid rgba(201,168,76,0.32);
+    border: 1px solid rgba(16,196,195,0.32);
     border-radius: 16px;
-    box-shadow: 0 30px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(201,168,76,0.05);
+    box-shadow: 0 30px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(16,196,195,0.05);
     padding: clamp(20px, 5vw, 40px);
     animation: amCardIn 0.26s cubic-bezier(0.16,1,0.3,1);
   }
@@ -717,7 +717,7 @@ const styles = `
     color: rgba(245,242,236,0.55); cursor: pointer;
     transition: color 0.15s, background 0.15s;
   }
-  .am-close:hover { color: ${GOLD}; background: rgba(201,168,76,0.1); }
+  .am-close:hover { color: ${GOLD}; background: rgba(16,196,195,0.1); }
 
   .am-brand { display: flex; align-items: center; margin-bottom: 18px; }
 
@@ -734,7 +734,7 @@ const styles = `
     letter-spacing: 0.04em; color: rgba(245,242,236,0.5);
     transition: background 0.18s, color 0.18s;
   }
-  .am-tab.sel { background: ${GOLD}; color: #0a0a0a; }
+  .am-tab.sel { background: ${GOLD}; color: #0A1526; }
 
   .am-body { position: relative; }
   .am-step { animation: amStepIn 0.22s ease; }
@@ -764,9 +764,9 @@ const styles = `
     -webkit-appearance: none;
   }
   .am-input::placeholder { color: rgba(245,242,236,0.3); }
-  .am-input:focus { border-color: ${GOLD}; box-shadow: 0 0 0 3px rgba(201,168,76,0.14); }
+  .am-input:focus { border-color: ${GOLD}; box-shadow: 0 0 0 3px rgba(16,196,195,0.14); }
   .am-select { cursor: pointer; }
-  .am-select option { background: #0a0a0a; color: #F5F2EC; }
+  .am-select option { background: #0A1526; color: #F5F2EC; }
 
   .am-phone-wrap { position: relative; display: flex; align-items: center; }
   .am-phone-prefix {
@@ -784,16 +784,16 @@ const styles = `
     outline: none; font-family: 'Cal Sans', sans-serif;
     transition: border-color 0.15s, box-shadow 0.15s;
   }
-  .am-otp-box:focus { border-color: ${GOLD}; box-shadow: 0 0 0 3px rgba(201,168,76,0.16); }
+  .am-otp-box:focus { border-color: ${GOLD}; box-shadow: 0 0 0 3px rgba(16,196,195,0.16); }
 
   .am-btn-gold {
     width: 100%; padding: 13px 24px; margin-top: 4px;
     background: ${GOLD}; border: none; border-radius: 9px;
     font-family: 'Cal Sans', sans-serif; font-size: 14px; font-weight: 700;
-    letter-spacing: 0.04em; color: #0a0a0a; cursor: pointer;
+    letter-spacing: 0.04em; color: #0A1526; cursor: pointer;
     transition: background 0.18s, transform 0.12s, box-shadow 0.18s;
   }
-  .am-btn-gold:hover:not(:disabled) { background: #3DDAD9; box-shadow: 0 6px 22px rgba(201,168,76,0.32); transform: translateY(-1px); }
+  .am-btn-gold:hover:not(:disabled) { background: #3DDAD9; box-shadow: 0 6px 22px rgba(16,196,195,0.32); transform: translateY(-1px); }
   .am-btn-gold:disabled { opacity: 0.6; cursor: not-allowed; }
 
   .am-or { display: flex; align-items: center; gap: 12px; margin: 18px 0; }
@@ -828,8 +828,8 @@ const styles = `
     border: 2px solid rgba(255,255,255,0.1); border-radius: 12px;
     transition: border-color 0.18s, background 0.18s, box-shadow 0.18s;
   }
-  .am-role:hover { border-color: rgba(201,168,76,0.45); }
-  .am-role.sel { border-color: ${GOLD}; background: rgba(201,168,76,0.08); box-shadow: 0 0 0 3px rgba(201,168,76,0.12); }
+  .am-role:hover { border-color: rgba(16,196,195,0.45); }
+  .am-role.sel { border-color: ${GOLD}; background: rgba(16,196,195,0.08); box-shadow: 0 0 0 3px rgba(16,196,195,0.12); }
   .am-role-radio {
     width: 19px; height: 19px; border-radius: 50%; flex-shrink: 0; margin-top: 2px;
     border: 2px solid rgba(255,255,255,0.25);
@@ -860,7 +860,7 @@ const styles = `
     width: 64px; height: 64px; margin: 0 auto; border-radius: 50%;
     background: ${GOLD}; display: flex; align-items: center; justify-content: center;
     animation: amPop 0.4s cubic-bezier(0.16,1,0.3,1);
-    box-shadow: 0 8px 30px rgba(201,168,76,0.35);
+    box-shadow: 0 8px 30px rgba(16,196,195,0.35);
   }
 
   @media (max-width: 520px) {

@@ -386,10 +386,10 @@ export default function ContactPage() {
               <p style={{ fontSize: "11px", fontWeight: 700, letterSpacing: "0.16em", color: "#9CA3AF", textTransform: "uppercase", marginBottom: "16px" }}>Follow Us</p>
               <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
                 {[
-                  { label: "Instagram", handle: "@nilay360.com",   icon: "IG", color: "#E1306C", href: "https://www.instagram.com/nilay360" },
+                  { label: "Instagram", handle: "@nilay360_",   icon: "IG", color: "#E1306C", href: "https://www.instagram.com/nilay360_/" },
                   { label: "LinkedIn",  handle: "Nilay 360",       icon: "IN", color: "#0A66C2", href: "https://www.linkedin.com/company/nilay360" },
                   { label: "Twitter",   handle: "@Nilay 360India", icon: "TW", color: "#1DA1F2", href: "https://twitter.com/Nilay 360India" },
-                  { label: "YouTube",   handle: "Nilay 360 TV",    icon: "YT", color: "#FF0000", href: "https://www.youtube.com/@nilay360" },
+                  { label: "YouTube",   handle: "Nilay 360",    icon: "YT", color: "#FF0000", href: "https://www.youtube.com/@nilay360.digital" },
                 ].map(s => (
                   <a key={s.label} href={s.href} target="_blank" rel="noopener noreferrer" style={{ display: "flex", alignItems: "center", gap: "8px", padding: "8px 14px", background: "#F8F6F1", borderRadius: "8px", textDecoration: "none", border: "1px solid rgba(13,43,31,0.06)", flex: "1 1 calc(50% - 5px)" }}
                     onMouseEnter={e => (e.currentTarget.style.borderColor = "rgba(201,168,76,0.3)")}

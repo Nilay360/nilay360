@@ -714,7 +714,7 @@ export function Navbar() {
         position: "fixed",
         top: 0, left: 0, right: 0,
         zIndex: 1000,
-        height: 52,
+        height: 64,
         background: headerBg,
         backdropFilter: "blur(14px)",
         WebkitBackdropFilter: "blur(14px)",
@@ -731,9 +731,9 @@ export function Navbar() {
           {/* Logo — flush left, outside max-width constraint */}
           <Link href="/" style={{ textDecoration: "none", display: "flex", alignItems: "center", flexShrink: 0, paddingLeft: 24 }}>
             <img
-              src="/brand/nilay360_logo_horizontal_dark-bg.png"
+              src="/brand/Nilay360-09-Photoroom%20(1).png"
               alt="Nilay 360"
-              style={{ height: 44, width: "auto", objectFit: "contain" }}
+              style={{ height: 58, width: "auto", objectFit: "contain" }}
             />
           </Link>
 
@@ -938,7 +938,7 @@ export function Navbar() {
             background: "#020C1C", flexShrink: 0,
           }}>
             <Link href="/" onClick={() => setMenuOpen(false)}>
-              <img src="/brand/nilay360_logo_horizontal_dark-bg.png" alt="Nilay 360" style={{ height: 46, width: "auto" }} />
+              <img src="/brand/Nilay360-09-Photoroom%20(1).png" alt="Nilay 360" style={{ height: 56, width: "auto" }} />
             </Link>
             <button onClick={() => setMenuOpen(false)} style={{
               background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)",
