@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { motion, useScroll, useTransform } from "framer-motion";
@@ -8,17 +8,17 @@ import { useSavedProperties } from "@/hooks/useSavedProperties";
 
 /* ─── Palette ─────────────────────────────────────────────── */
 const G = {
-  dark:      "#000000",
-  elevated:  "#0B0D10",
-  surface:   "#121519",
-  card:      "#161A1F",
-  mid:       "#0B0D10",
-  gold:      "#2BA8E0",
-  goldLt:    "#3DBEF5",
-  ivory:     "#0B0D10",
+  dark:      "#020C1C",
+  elevated:  "#0A1526",
+  surface:   "#111F33",
+  card:      "#182B3F",
+  mid:       "#0A1526",
+  gold:      "#10C4C3",
+  goldLt:    "#3DDAD9",
+  ivory:     "#0A1526",
   black:     "#05080C",
   border:    "rgba(255,255,255,0.07)",
-  borderBlue:"rgba(43,168,224,0.20)",
+  borderBlue:"rgba(16,196,195,0.20)",
 };
 
 const CITIES = ["Hyderabad","Mumbai","Bengaluru","Delhi NCR","Chennai","Pune","Kolkata","Ahmedabad"];
@@ -83,7 +83,7 @@ const PROPERTIES = [
 ];
 
 const LOCATIONS = [
-  { city:"Hyderabad", area:"Kokapet", listings:124, avg:"₹6,800/sqft", grad:"linear-gradient(135deg,#000000,#0B0D10)", img:"https://images.unsplash.com/photo-1590577976322-3d2d6e2130d5?w=800&q=80" },
+  { city:"Hyderabad", area:"Kokapet", listings:124, avg:"₹6,800/sqft", grad:"linear-gradient(135deg,#020C1C,#0A1526)", img:"https://images.unsplash.com/photo-1590577976322-3d2d6e2130d5?w=800&q=80" },
   { city:"Mumbai", area:"Bandra West", listings:89, avg:"₹42,000/sqft", grad:"linear-gradient(135deg,#0d1f3c,#1a3a6e)", img:"https://images.unsplash.com/photo-1570168007204-dfb528c6958f?w=800&q=80" },
   { city:"Bengaluru", area:"Whitefield", listings:156, avg:"₹8,200/sqft", grad:"linear-gradient(135deg,#1a1040,#3020a0)", img:"https://images.unsplash.com/photo-1596176530529-78163a4f7af2?w=800&q=80" },
   { city:"Delhi NCR", area:"Golf Course Rd", listings:72, avg:"₹18,500/sqft", grad:"linear-gradient(135deg,#2c1810,#5a3020)", img:"https://images.unsplash.com/photo-1587474260584-136574528ed5?w=800&q=80" },
@@ -339,24 +339,23 @@ export default function HomePage() {
         }) }}
       />
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,600&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap');
         *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
         html { scroll-behavior:smooth; }
-        body { font-family:'DM Sans',system-ui,sans-serif; background:#000000; color:#E8EAED; overflow-x:hidden; }
+        body { font-family:'Cal Sans',system-ui,sans-serif; background:#020C1C; color:#FFFFFF; overflow-x:hidden; }
         html, body { max-width: 100vw; overflow-x: hidden !important; }
         #__next, main { max-width: 100vw; overflow-x: hidden; }
         section { max-width: 100vw; overflow-x: clip; }
         .hero-section { overflow: visible !important; }
         * { max-width: 100%; }
         a { color:inherit; text-decoration:none; }
-        button { font-family:'DM Sans',system-ui,sans-serif; }
+        button { font-family:'Cal Sans',system-ui,sans-serif; }
 
         .hide-scroll::-webkit-scrollbar { display:none; }
         .hide-scroll { -ms-overflow-style:none; scrollbar-width:none; }
 
         /* ── Card hover / image-zoom — unified shadow system ── */
         .card-hover { transition:transform 0.4s cubic-bezier(0.16,1,0.3,1), box-shadow 0.4s cubic-bezier(0.16,1,0.3,1); will-change:transform; }
-        .card-hover:hover { transform:translateY(-8px); box-shadow:0 20px 60px rgba(0,0,0,0.45), 0 0 0 1px rgba(43,168,224,0.22) !important; }
+        .card-hover:hover { transform:translateY(-8px); box-shadow:0 20px 60px rgba(0,0,0,0.45), 0 0 0 1px rgba(16,196,195,0.22) !important; }
         .card-img { transition:transform 0.55s cubic-bezier(0.16,1,0.3,1); will-change:transform; }
         .card-hover:hover .card-img { transform:scale(1.07); }
 
@@ -365,51 +364,51 @@ export default function HomePage() {
 
         .city-tab { padding:8px 18px; border-radius:999px; font-size:13px; font-weight:500; cursor:pointer; border:1px solid rgba(255,255,255,0.10); transition:all 0.2s; background:transparent; color:rgba(255,255,255,0.45); }
         .city-tab.active { background:${G.gold}; color:#fff; border-color:${G.gold}; }
-        .city-tab:not(.active):hover { border-color:rgba(43,168,224,0.35); color:rgba(255,255,255,0.80); box-shadow:0 0 12px rgba(43,168,224,0.10); }
+        .city-tab:not(.active):hover { border-color:rgba(16,196,195,0.35); color:rgba(255,255,255,0.80); box-shadow:0 0 12px rgba(16,196,195,0.10); }
 
         /* ── Glass service cards ── */
         .svc-card { display:flex; flex-direction:column; align-items:center; gap:12px; padding:22px 14px; border-radius:16px; border:1px solid rgba(255,255,255,0.08); background:rgba(255,255,255,0.04); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px); cursor:pointer; transition:transform 0.35s cubic-bezier(0.16,1,0.3,1), box-shadow 0.35s cubic-bezier(0.16,1,0.3,1), border-color 0.35s ease; min-width:110px; will-change:transform; }
-        .svc-card:hover { border-color:rgba(43,168,224,0.45); box-shadow:0 20px 60px rgba(0,0,0,0.45), 0 0 24px rgba(43,168,224,0.12); transform:translateY(-6px); }
+        .svc-card:hover { border-color:rgba(16,196,195,0.45); box-shadow:0 20px 60px rgba(0,0,0,0.45), 0 0 24px rgba(16,196,195,0.12); transform:translateY(-6px); }
 
         .search-tab { padding:9px 20px; font-size:13px; font-weight:500; cursor:pointer; border:none; background:transparent; color:rgba(255,255,255,0.55); border-bottom:2px solid transparent; transition:all 0.15s; white-space:nowrap; }
         .search-tab.active { color:#fff; border-bottom-color:${G.gold}; }
         .search-tab:not(.active):hover { color:rgba(255,255,255,0.85); }
 
         .badge-free { background:${G.gold}; color:#000; font-size:9px; font-weight:700; padding:1px 5px; border-radius:6px; letter-spacing:0.5px; margin-left:5px; vertical-align:middle; }
-        .badge-tag { display:inline-block; background:rgba(43,168,224,0.15); color:${G.gold}; font-size:10px; font-weight:600; padding:3px 8px; border-radius:6px; letter-spacing:0.5px; }
+        .badge-tag { display:inline-block; background:rgba(16,196,195,0.15); color:${G.gold}; font-size:10px; font-weight:600; padding:3px 8px; border-radius:6px; letter-spacing:0.5px; }
 
         .insight-bar { height:6px; border-radius:6px; background:${G.gold}; transition:width 0.5s ease; }
 
         /* ── Stats as glass pills ── */
-        .hero-stat { flex:1; padding:9px 14px; border-left:1px solid rgba(43,168,224,0.15); position:relative; box-sizing:border-box; }
+        .hero-stat { flex:1; padding:9px 14px; border-left:1px solid rgba(16,196,195,0.15); position:relative; box-sizing:border-box; }
         .hero-stat:first-child { border-left:none; }
 
-        .section-divider { height: 1px; background: linear-gradient(90deg, transparent 0%, rgba(43,168,224,0.20) 50%, transparent 100%); margin: 0; }
+        .section-divider { height: 1px; background: linear-gradient(90deg, transparent 0%, rgba(16,196,195,0.20) 50%, transparent 100%); margin: 0; }
 
         /* ── Premium glass cards — unified system ── */
         .premium-card { background:rgba(255,255,255,0.04); backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px); border:1px solid rgba(255,255,255,0.08); box-shadow:0 4px 24px rgba(0,0,0,0.18); transition:transform 0.4s cubic-bezier(0.16,1,0.3,1), box-shadow 0.4s cubic-bezier(0.16,1,0.3,1), border-color 0.4s ease; will-change:transform; }
-        .premium-card:hover { transform:translateY(-8px); box-shadow:0 20px 60px rgba(0,0,0,0.45), 0 0 0 1px rgba(43,168,224,0.22), 0 0 30px rgba(43,168,224,0.08); border-color:rgba(43,168,224,0.25); }
+        .premium-card:hover { transform:translateY(-8px); box-shadow:0 20px 60px rgba(0,0,0,0.45), 0 0 0 1px rgba(16,196,195,0.22), 0 0 30px rgba(16,196,195,0.08); border-color:rgba(16,196,195,0.25); }
 
         /* ── Icon wrap + glow on hover ── */
-        .svc-icon-wrap { width:52px; height:52px; border-radius:14px; background:linear-gradient(135deg, rgba(43,168,224,0.14) 0%, rgba(43,168,224,0.04) 100%); border:1px solid rgba(43,168,224,0.18); display:flex; align-items:center; justify-content:center; transition:all 0.3s ease; will-change:box-shadow; }
-        .svc-card:hover .svc-icon-wrap { background:linear-gradient(135deg, rgba(43,168,224,0.30) 0%, rgba(43,168,224,0.10) 100%); box-shadow:0 0 28px rgba(43,168,224,0.32), 0 0 8px rgba(43,168,224,0.16); border-color:rgba(43,168,224,0.42); }
+        .svc-icon-wrap { width:52px; height:52px; border-radius:14px; background:linear-gradient(135deg, rgba(16,196,195,0.14) 0%, rgba(16,196,195,0.04) 100%); border:1px solid rgba(16,196,195,0.18); display:flex; align-items:center; justify-content:center; transition:all 0.3s ease; will-change:box-shadow; }
+        .svc-card:hover .svc-icon-wrap { background:linear-gradient(135deg, rgba(16,196,195,0.30) 0%, rgba(16,196,195,0.10) 100%); box-shadow:0 0 28px rgba(16,196,195,0.32), 0 0 8px rgba(16,196,195,0.16); border-color:rgba(16,196,195,0.42); }
 
         /* ── Category cards ── */
         .cat-card { position:relative; border-radius:24px; overflow:hidden; min-height:280px; cursor:pointer; display:flex; flex-direction:column; justify-content:flex-end; transition:transform 0.4s cubic-bezier(0.16,1,0.3,1), box-shadow 0.4s; will-change:transform; }
-        .cat-card:hover { transform:translateY(-8px); box-shadow:0 20px 60px rgba(0,0,0,0.45), 0 0 0 1px rgba(43,168,224,0.22), 0 0 28px rgba(43,168,224,0.10); }
+        .cat-card:hover { transform:translateY(-8px); box-shadow:0 20px 60px rgba(0,0,0,0.45), 0 0 0 1px rgba(16,196,195,0.22), 0 0 28px rgba(16,196,195,0.10); }
         .cat-card:hover .cat-img { transform:scale(1.07); }
         .cat-img { position:absolute; inset:0; background-size:cover; background-position:center; transition:transform 0.6s cubic-bezier(0.16,1,0.3,1); will-change:transform; }
 
         /* ── Location cards ── */
         .loc-card { position:relative; border-radius:20px; overflow:hidden; height:240px; cursor:pointer; flex-shrink:0; width:240px; transition:transform 0.4s cubic-bezier(0.16,1,0.3,1), box-shadow 0.4s; will-change:transform; }
-        .loc-card:hover { transform:translateY(-8px); box-shadow:0 20px 60px rgba(0,0,0,0.45), 0 0 0 1px rgba(43,168,224,0.18), 0 0 20px rgba(43,168,224,0.08); }
+        .loc-card:hover { transform:translateY(-8px); box-shadow:0 20px 60px rgba(0,0,0,0.45), 0 0 0 1px rgba(16,196,195,0.18), 0 0 20px rgba(16,196,195,0.08); }
 
-        .glow-dot { width:6px; height:6px; border-radius:50%; background:#2BA8E0; box-shadow:0 0 8px rgba(43,168,224,0.8), 0 0 16px rgba(43,168,224,0.4); animation:pulse-dot 2s ease-in-out infinite; flex-shrink:0; }
+        .glow-dot { width:6px; height:6px; border-radius:50%; background:#10C4C3; box-shadow:0 0 8px rgba(16,196,195,0.8), 0 0 16px rgba(16,196,195,0.4); animation:pulse-dot 2s ease-in-out infinite; flex-shrink:0; }
         @keyframes pulse-dot { 0%,100% { opacity:1; transform:scale(1); } 50% { opacity:0.6; transform:scale(1.3); } }
         @keyframes mic-pulse { 0%,100% { opacity:1; transform:scale(1); } 50% { opacity:0.5; transform:scale(1.2); } }
-        .mic-listening { animation:mic-pulse 1s ease-in-out infinite; color:#2BA8E0 !important; }
+        .mic-listening { animation:mic-pulse 1s ease-in-out infinite; color:#10C4C3 !important; }
 
-        .blue-line { height:1px; background:linear-gradient(90deg, #2BA8E0 0%, #3DBEF5 50%, #2BA8E0 100%); box-shadow:0 0 8px rgba(43,168,224,0.5); }
+        .blue-line { height:1px; background:linear-gradient(90deg, #10C4C3 0%, #3DDAD9 50%, #10C4C3 100%); box-shadow:0 0 8px rgba(16,196,195,0.5); }
 
         /* ── Stat reveal animation ── */
         @keyframes stat-reveal { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
@@ -531,46 +530,46 @@ export default function HomePage() {
       <section ref={heroRef} className="hero-section" style={{
         position:"relative", minHeight:"100vh", paddingTop:"64px",
         display:"flex", flexDirection:"column", justifyContent:"center",
-        background:"radial-gradient(ellipse 130% 65% at 50% 0%, rgba(43,168,224,0.13) 0%, transparent 52%), radial-gradient(ellipse 80% 80% at 88% 100%, rgba(43,168,224,0.08) 0%, transparent 50%), radial-gradient(ellipse 60% 55% at 12% 55%, rgba(43,168,224,0.06) 0%, transparent 58%), linear-gradient(180deg, #000000 0%, #050810 50%, #000000 100%)",
+        background:"radial-gradient(ellipse 130% 65% at 50% 0%, rgba(16,196,195,0.13) 0%, transparent 52%), radial-gradient(ellipse 80% 80% at 88% 100%, rgba(16,196,195,0.08) 0%, transparent 50%), radial-gradient(ellipse 60% 55% at 12% 55%, rgba(16,196,195,0.06) 0%, transparent 58%), linear-gradient(180deg, #020C1C 0%, #050810 50%, #020C1C 100%)",
         overflow:"visible",
       }}>
         {/* Silk texture overlay */}
         <div style={{ position:"absolute", inset:0, zIndex:0, backgroundImage:"url('https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&q=40')", backgroundSize:"cover", opacity:0.04, mixBlendMode:"overlay", pointerEvents:"none" }} />
         {/* Cursor glow */}
-        <div ref={glowRef} aria-hidden style={{position:"absolute", top:0, left:0, width:600, height:600, borderRadius:"50%", background:"radial-gradient(circle, rgba(43,168,224,0.14) 0%, transparent 70%)", pointerEvents:"none", opacity:0, transition:"opacity 0.3s ease", zIndex:0, willChange:"transform, opacity"}} />
-        <div style={{position:"absolute", inset:0, background:"radial-gradient(ellipse 80% 60% at 65% 40%, rgba(11,13,16,0.65) 0%, transparent 65%), radial-gradient(ellipse 60% 80% at 30% 60%, rgba(43,168,224,0.08) 0%, transparent 60%), rgba(5,8,12,0.72)"}} />
+        <div ref={glowRef} aria-hidden style={{position:"absolute", top:0, left:0, width:600, height:600, borderRadius:"50%", background:"radial-gradient(circle, rgba(16,196,195,0.14) 0%, transparent 70%)", pointerEvents:"none", opacity:0, transition:"opacity 0.3s ease", zIndex:0, willChange:"transform, opacity"}} />
+        <div style={{position:"absolute", inset:0, background:"radial-gradient(ellipse 80% 60% at 65% 40%, rgba(11,13,16,0.65) 0%, transparent 65%), radial-gradient(ellipse 60% 80% at 30% 60%, rgba(16,196,195,0.08) 0%, transparent 60%), rgba(5,8,12,0.72)"}} />
 
         {/* Animated premium SVG city skyline */}
         <svg style={{position:"absolute", bottom:0, left:0, right:0, width:"100%"}} viewBox="0 0 1440 380" preserveAspectRatio="xMidYMax meet">
           <defs>
             <linearGradient id="bld-a" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#3DBEF5" stopOpacity="0.9"/>
-              <stop offset="100%" stopColor="#0B0D10" stopOpacity="0.95"/>
+              <stop offset="0%" stopColor="#3DDAD9" stopOpacity="0.9"/>
+              <stop offset="100%" stopColor="#0A1526" stopOpacity="0.95"/>
             </linearGradient>
             <linearGradient id="bld-b" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#2BA8E0" stopOpacity="0.85"/>
+              <stop offset="0%" stopColor="#10C4C3" stopOpacity="0.85"/>
               <stop offset="100%" stopColor="#050810" stopOpacity="0.98"/>
             </linearGradient>
             <linearGradient id="bld-c" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#5DD4F8" stopOpacity="0.95"/>
-              <stop offset="100%" stopColor="#0B1A2A" stopOpacity="1"/>
+              <stop offset="0%" stopColor="#5DE8E7" stopOpacity="0.95"/>
+              <stop offset="100%" stopColor="#0A1526" stopOpacity="1"/>
             </linearGradient>
             <linearGradient id="glow-a" x1="0" y1="0" x2="1" y2="0">
               <stop offset="0%" stopColor="transparent"/>
-              <stop offset="50%" stopColor="rgba(43,168,224,0.15)"/>
+              <stop offset="50%" stopColor="rgba(16,196,195,0.15)"/>
               <stop offset="100%" stopColor="transparent"/>
             </linearGradient>
             <pattern id="win-a" x="0" y="0" width="12" height="16" patternUnits="userSpaceOnUse">
               <rect x="2" y="2" width="7" height="10" rx="1" fill="rgba(255,255,255,0.18)"/>
             </pattern>
             <pattern id="win-b" x="0" y="0" width="10" height="14" patternUnits="userSpaceOnUse">
-              <rect x="2" y="2" width="6" height="9" rx="1" fill="rgba(43,168,224,0.35)"/>
+              <rect x="2" y="2" width="6" height="9" rx="1" fill="rgba(16,196,195,0.35)"/>
             </pattern>
             <pattern id="win-c" x="0" y="0" width="8" height="12" patternUnits="userSpaceOnUse">
               <rect x="1" y="2" width="5" height="7" rx="1" fill="rgba(255,255,255,0.12)"/>
             </pattern>
             <linearGradient id="reflect" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="rgba(43,168,224,0.08)"/>
+              <stop offset="0%" stopColor="rgba(16,196,195,0.08)"/>
               <stop offset="100%" stopColor="transparent"/>
             </linearGradient>
             <filter id="glow-filter">
@@ -764,7 +763,7 @@ export default function HomePage() {
           </g>
 
           {/* Ground line + reflection */}
-          <rect x="0" y="378" width="1440" height="2" fill="rgba(43,168,224,0.3)"/>
+          <rect x="0" y="378" width="1440" height="2" fill="rgba(16,196,195,0.3)"/>
           <rect x="0" y="380" width="1440" height="40" fill="url(#reflect)" opacity="0.4"/>
         </svg>
 
@@ -780,7 +779,7 @@ export default function HomePage() {
           style={{position:"relative", zIndex:2, padding:"0 16px 48px", maxWidth:"min(860px, 100%)", margin:"0 auto", textAlign:"center", width:"100%", boxSizing:"border-box"}}
         >
           {/* 2 — Search bar */}
-          <div className="hero-searchbox" style={{background:"rgba(255,255,255,0.06)", backdropFilter:"blur(30px)", WebkitBackdropFilter:"blur(30px)", border:"1px solid rgba(255,255,255,0.10)", borderRadius:24, overflow:"visible", maxWidth:"min(820px, 100%)", marginBottom:36, margin:"0 auto 36px", width:"100%", boxSizing:"border-box", boxShadow:"0 20px 60px rgba(0,0,0,0.45), 0 0 0 1px rgba(43,168,224,0.08), inset 0 1px 0 rgba(255,255,255,0.06)", position:"relative", zIndex:10}}>
+          <div className="hero-searchbox" style={{background:"rgba(255,255,255,0.06)", backdropFilter:"blur(30px)", WebkitBackdropFilter:"blur(30px)", border:"1px solid rgba(255,255,255,0.10)", borderRadius:24, overflow:"visible", maxWidth:"min(820px, 100%)", marginBottom:36, margin:"0 auto 36px", width:"100%", boxSizing:"border-box", boxShadow:"0 20px 60px rgba(0,0,0,0.45), 0 0 0 1px rgba(16,196,195,0.08), inset 0 1px 0 rgba(255,255,255,0.06)", position:"relative", zIndex:10}}>
             <div style={{display:"flex", borderBottom:"1px solid rgba(255,255,255,0.08)", paddingLeft:4, overflowX:"auto"}} className="hide-scroll">
               {["Buy","Rent","New Projects","Valuation","List Property","Agents"].map(t=>(
                 <button key={t} onClick={()=>setSearchTab(t)} className={`search-tab${searchTab===t?" active":""}`}>
@@ -794,7 +793,7 @@ export default function HomePage() {
                 <button
                   type="button"
                   onClick={()=>setCityOpen(o=>!o)}
-                  style={{width:"100%", height:"100%", minHeight:44, background:"transparent", border:"none", padding:"0 14px 0 16px", display:"flex", alignItems:"center", justifyContent:"space-between", gap:6, cursor:"pointer", fontFamily:"'DM Sans',sans-serif", fontSize:13, color: searchCity ? "#fff" : "rgba(255,255,255,0.45)", outline:"none"}}
+                  style={{width:"100%", height:"100%", minHeight:44, background:"transparent", border:"none", padding:"0 14px 0 16px", display:"flex", alignItems:"center", justifyContent:"space-between", gap:6, cursor:"pointer", fontFamily:"'Cal Sans',sans-serif", fontSize:13, color: searchCity ? "#fff" : "rgba(255,255,255,0.45)", outline:"none"}}
                 >
                   <span style={{overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap"}}>{searchCity || "Select City"}</span>
                   <svg width="12" height="12" viewBox="0 0 12 12" fill="none" style={{flexShrink:0, transition:"transform 0.2s", transform: cityOpen ? "rotate(180deg)" : "rotate(0deg)"}}>
@@ -802,13 +801,13 @@ export default function HomePage() {
                   </svg>
                 </button>
                 {cityOpen && (
-                  <div style={{position:"absolute", top:"calc(100% + 8px)", left:0, minWidth:180, background:"#0b0d10", border:"1px solid rgba(43,168,224,0.22)", borderRadius:14, boxShadow:"0 24px 64px rgba(0,0,0,0.7), 0 0 0 1px rgba(43,168,224,0.10)", zIndex:9999, overflowY:"auto", overflowX:"hidden", maxHeight:320, padding:"6px"}}>
+                  <div style={{position:"absolute", top:"calc(100% + 8px)", left:0, minWidth:180, background:"#0A1526", border:"1px solid rgba(16,196,195,0.22)", borderRadius:14, boxShadow:"0 24px 64px rgba(0,0,0,0.7), 0 0 0 1px rgba(16,196,195,0.10)", zIndex:9999, overflowY:"auto", overflowX:"hidden", maxHeight:320, padding:"6px"}}>
                     {["", ...CITIES].map((c,i)=>(
                       <button key={i} type="button"
                         onClick={()=>{ setSearchCity(c); setCityOpen(false); }}
-                        style={{width:"100%", padding:"9px 14px", background: searchCity===c ? "rgba(43,168,224,0.12)" : "transparent", border:"none", borderRadius:9, textAlign:"left", fontFamily:"'DM Sans',sans-serif", fontSize:13, color: c ? "#fff" : "rgba(255,255,255,0.35)", cursor:"pointer", transition:"background 0.15s", display:"block"}}
-                        onMouseOver={e=>(e.currentTarget.style.background="rgba(43,168,224,0.10)")}
-                        onMouseOut={e=>(e.currentTarget.style.background= searchCity===c ? "rgba(43,168,224,0.12)" : "transparent")}
+                        style={{width:"100%", padding:"9px 14px", background: searchCity===c ? "rgba(16,196,195,0.12)" : "transparent", border:"none", borderRadius:9, textAlign:"left", fontFamily:"'Cal Sans',sans-serif", fontSize:13, color: c ? "#fff" : "rgba(255,255,255,0.35)", cursor:"pointer", transition:"background 0.15s", display:"block"}}
+                        onMouseOver={e=>(e.currentTarget.style.background="rgba(16,196,195,0.10)")}
+                        onMouseOut={e=>(e.currentTarget.style.background= searchCity===c ? "rgba(16,196,195,0.12)" : "transparent")}
                       >{c || "All Cities"}</button>
                     ))}
                   </div>
@@ -818,7 +817,7 @@ export default function HomePage() {
                 <SvgIcon d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" size={16} color="rgba(255,255,255,0.4)" />
                 <input value={searchQuery} onChange={e=>setSearchQuery(e.target.value)}
                   placeholder="Search by Locality, Project or Builder"
-                  style={{flex:1, background:"transparent", border:"none", color:"#fff", fontSize:14, outline:"none", fontFamily:"'DM Sans',sans-serif"}}
+                  style={{flex:1, background:"transparent", border:"none", color:"#fff", fontSize:14, outline:"none", fontFamily:"'Cal Sans',sans-serif"}}
                   onKeyDown={e => {
                     if (e.key === 'Enter') {
                       router.push(`/search?q=${encodeURIComponent(searchQuery)}&city=${encodeURIComponent(searchCity)}&tab=${searchTab.toLowerCase().replace(/ /g, '-')}`);
@@ -830,12 +829,12 @@ export default function HomePage() {
                   onClick={startVoiceSearch}
                   style={{background:"none", border:"none", cursor:"pointer", display:"flex", padding:4, transition:"all 0.2s", animation: isListening ? "mic-pulse 1s ease-in-out infinite" : "none"}}
                 >
-                  <SvgIcon d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4M12 3a4 4 0 014 4v4a4 4 0 01-8 0V7a4 4 0 014-4z" size={16} color={isListening ? "#2BA8E0" : "rgba(255,255,255,0.4)"} />
+                  <SvgIcon d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4M12 3a4 4 0 014 4v4a4 4 0 01-8 0V7a4 4 0 014-4z" size={16} color={isListening ? "#10C4C3" : "rgba(255,255,255,0.4)"} />
                 </button>
               </div>
               <button
                 onClick={() => router.push(`/search?tab=${searchTab.toLowerCase().replace(/ /g, '-')}&city=${encodeURIComponent(searchCity)}&q=${encodeURIComponent(searchQuery)}`)}
-                style={{padding:"0 28px", background:G.gold, borderRadius:10, color:"#000", fontSize:14, fontWeight:700, display:"flex", alignItems:"center", gap:8, whiteSpace:"nowrap", transition:"background 0.15s, box-shadow 0.15s", border:"none", cursor:"pointer", height:"100%", minHeight:44, boxShadow:"0 10px 30px rgba(43,168,224,0.35)"}}
+                style={{padding:"0 28px", background:G.gold, borderRadius:10, color:"#000", fontSize:14, fontWeight:700, display:"flex", alignItems:"center", gap:8, whiteSpace:"nowrap", transition:"background 0.15s, box-shadow 0.15s", border:"none", cursor:"pointer", height:"100%", minHeight:44, boxShadow:"0 10px 30px rgba(16,196,195,0.35)"}}
                 onMouseOver={e=>(e.currentTarget.style.background=G.goldLt)}
                 onMouseOut={e=>(e.currentTarget.style.background=G.gold)}>
                 <SvgIcon d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" size={15} color="#000" />
@@ -845,10 +844,10 @@ export default function HomePage() {
           </div>
 
           {/* 3 — Stats strip */}
-          <div className="hero-stats" style={{display:"flex", flexWrap:"wrap", justifyContent:"center", gap:"12px", width:"100%", maxWidth:"100%", boxSizing:"border-box", marginBottom:40, paddingBottom:32, borderBottom:"1px solid rgba(43,168,224,0.12)", position:"relative", zIndex:2}}>
+          <div className="hero-stats" style={{display:"flex", flexWrap:"wrap", justifyContent:"center", gap:"12px", width:"100%", maxWidth:"100%", boxSizing:"border-box", marginBottom:40, paddingBottom:32, borderBottom:"1px solid rgba(16,196,195,0.12)", position:"relative", zIndex:2}}>
             {[[liveStats.listings.toLocaleString("en-IN"),"Listings"],[liveStats.agents.toLocaleString("en-IN"),"Agents"],[String(liveStats.cities),"Cities"]].map(([v,l])=>(
-              <div key={l} className="hero-stat" style={{background:"rgba(255,255,255,0.04)", backdropFilter:"blur(12px)", WebkitBackdropFilter:"blur(12px)", border:"1px solid rgba(43,168,224,0.12)", borderRadius:12, flex:"1 1 auto"}}>
-                <div className="stat-value" style={{fontFamily:"'Cormorant Garamond',Georgia,serif", fontSize:19, fontWeight:600, background:"linear-gradient(135deg, #E8EAED 0%, #2BA8E0 100%)", WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent"}}>{v}</div>
+              <div key={l} className="hero-stat" style={{background:"rgba(255,255,255,0.04)", backdropFilter:"blur(12px)", WebkitBackdropFilter:"blur(12px)", border:"1px solid rgba(16,196,195,0.12)", borderRadius:12, flex:"1 1 auto"}}>
+                <div className="stat-value" style={{fontFamily:"'Cal Sans',Georgia,serif", fontSize:19, fontWeight:600, background:"linear-gradient(135deg, #FFFFFF 0%, #10C4C3 100%)", WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent"}}>{v}</div>
                 <div style={{fontSize:9.5, color:"rgba(255,255,255,0.50)", marginTop:2, letterSpacing:"0.06em", textTransform:"uppercase"}}>{l}</div>
               </div>
             ))}
@@ -858,7 +857,7 @@ export default function HomePage() {
           )}
 
           {/* 4 — Headline */}
-          <h1 className="hero-h1" style={{fontFamily:"'Cormorant Garamond',Georgia,serif", fontSize:"clamp(32px,7vw,72px)", fontWeight:300, color:"#fff", lineHeight:1.05, marginBottom:16, letterSpacing:"-0.01em", wordBreak:"break-word", maxWidth:"100%"}}>
+          <h1 className="hero-h1" style={{fontFamily:"'Cal Sans',Georgia,serif", fontSize:"clamp(32px,7vw,72px)", fontWeight:300, color:"#fff", lineHeight:1.05, marginBottom:16, letterSpacing:"-0.01em", wordBreak:"break-word", maxWidth:"100%"}}>
             {siteContent.hero_line1}
             <em style={{display:"block", color:G.goldLt, fontStyle:"italic", fontWeight:400}}>{siteContent.hero_line2}</em>
           </h1>
@@ -872,14 +871,14 @@ export default function HomePage() {
 
       {/* ══════════ SECTION 2 — TRUST BAR ══════════ */}
       <div className="section-divider" />
-      <section style={{ background:"#0B0D10", padding:"0 56px" }}>
+      <section style={{ background:"#0A1526", padding:"0 56px" }}>
         <div style={{ maxWidth:"min(1280px, 100%)", margin:"0 auto", width:"100%", boxSizing:"border-box", display:"flex", alignItems:"center", justifyContent:"space-between", height:64, gap:24 }}>
           <div className="glow-dot" />
           <span style={{ fontSize:12, color:"rgba(255,255,255,0.5)", fontWeight:500, letterSpacing:"0.05em", whiteSpace:"nowrap" }}>INDIA'S PREMIUM REAL ESTATE PLATFORM</span>
           <div style={{ flex:1, height:1, background:"rgba(255,255,255,0.06)" }} />
           {["RERA Verified Listings", `${liveStats.agents}+ Expert Agents`, `${liveStats.cities} Cities`].map((t,i) => (
             <div key={i} style={{ display:"flex", alignItems:"center", gap:8, flexShrink:0 }}>
-              <div style={{ width:4, height:4, borderRadius:"50%", background:"#2BA8E0" }} />
+              <div style={{ width:4, height:4, borderRadius:"50%", background:"#10C4C3" }} />
               <span style={{ fontSize:12, color:"rgba(255,255,255,0.45)", whiteSpace:"nowrap" }}>{t}</span>
             </div>
           ))}
@@ -889,13 +888,13 @@ export default function HomePage() {
       <div className="section-divider" />
 
       {/* ══════════ SECTION 3 — EVERYTHING AT ONE PLACE ══════════ */}
-      <section className="services-section" style={{background:"#000000", padding:"clamp(48px, 8vw, 96px) clamp(16px, 4vw, 40px)", borderTop:"1px solid rgba(43,168,224,0.08)"}}>
+      <section className="services-section" style={{background:"#020C1C", padding:"clamp(48px, 8vw, 96px) clamp(16px, 4vw, 40px)", borderTop:"1px solid rgba(16,196,195,0.08)"}}>
         <div style={{maxWidth:"min(1280px, 100%)", margin:"0 auto", width:"100%", boxSizing:"border-box"}}>
           <Reveal>
           <div style={{display:"flex", justifyContent:"space-between", alignItems:"flex-end", marginBottom:28, flexWrap:"wrap", gap:16}}>
             <div>
               <div style={{fontSize:11, color:G.gold, fontWeight:700, letterSpacing:2, textTransform:"uppercase", marginBottom:8}}>Our Services</div>
-              <h2 className="services-h2" style={{fontFamily:"'Cormorant Garamond',Georgia,serif", fontSize:32, fontWeight:700, color:"#fff", wordBreak:"break-word", maxWidth:"100%"}}>Everything You Need at One Place</h2>
+              <h2 className="services-h2" style={{fontFamily:"'Cal Sans',Georgia,serif", fontSize:32, fontWeight:700, color:"#fff", wordBreak:"break-word", maxWidth:"100%"}}>Everything You Need at One Place</h2>
             </div>
             <div className="services-tabs" style={{display:"flex", gap:6, background:"rgba(255,255,255,0.04)", borderRadius:12, padding:4, border:"1px solid rgba(255,255,255,0.06)"}}>
               {Object.keys(SERVICES).map(t=>(
@@ -915,7 +914,7 @@ export default function HomePage() {
                 <div className="svc-icon-wrap">
                   <SvgIcon d={svc.icon} size={22} color={G.gold} />
                 </div>
-                <span style={{fontSize:12, fontWeight:600, color:"#AEB4BC", textAlign:"center", lineHeight:1.3}}>{svc.label}</span>
+                <span style={{fontSize:12, fontWeight:600, color:"#A9B4C2", textAlign:"center", lineHeight:1.3}}>{svc.label}</span>
               </a>
               </motion.div>
               </Reveal>
@@ -927,13 +926,13 @@ export default function HomePage() {
       <div className="section-divider" />
 
       {/* ══════════ SECTION 4 — FEATURED PROPERTIES CAROUSEL ══════════ */}
-      <section className="featured-section" style={{background:"#0B0D10", padding:"96px 0 96px 56px"}}>
+      <section className="featured-section" style={{background:"#0A1526", padding:"96px 0 96px 56px"}}>
         <div style={{maxWidth:1280+56, paddingRight:0, margin:"0 auto"}}>
           <Reveal>
           <div style={{display:"flex", justifyContent:"space-between", alignItems:"flex-end", marginBottom:20, paddingRight:56, flexWrap:"wrap", gap:12}}>
             <div>
               <div style={{fontSize:11, color:G.gold, fontWeight:700, letterSpacing:2, textTransform:"uppercase", marginBottom:8}}>Featured Listings</div>
-              <h2 className="featured-heading" style={{fontFamily:"'Cormorant Garamond',Georgia,serif", fontSize:32, fontWeight:700, color:"#fff", wordBreak:"break-word", maxWidth:"100%"}}>Premium Properties</h2>
+              <h2 className="featured-heading" style={{fontFamily:"'Cal Sans',Georgia,serif", fontSize:32, fontWeight:700, color:"#fff", wordBreak:"break-word", maxWidth:"100%"}}>Premium Properties</h2>
             </div>
             <div style={{display:"flex", alignItems:"center", gap:16}}>
               <a href="/properties" style={{fontSize:14, color:G.gold, fontWeight:600, display:"flex", alignItems:"center", gap:4}}>
@@ -942,9 +941,9 @@ export default function HomePage() {
               <div style={{display:"flex", gap:8}}>
                 {[-1,1].map(d=>(
                   <button key={d} onClick={()=>scrollCarousel(d)}
-                    style={{width:40, height:40, borderRadius:"50%", border:`1px solid rgba(43,168,224,0.25)`, background:"rgba(11,13,16,0.8)", backdropFilter:"blur(8px)", cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", transition:"all 0.15s", color:"#FFFFFF"}}
-                    onMouseOver={e=>{(e.currentTarget as HTMLElement).style.background="rgba(43,168,224,0.2)";(e.currentTarget as HTMLElement).style.borderColor="rgba(43,168,224,0.6)";}}
-                    onMouseOut={e=>{(e.currentTarget as HTMLElement).style.background="rgba(11,13,16,0.8)";(e.currentTarget as HTMLElement).style.borderColor="rgba(43,168,224,0.25)";}}>
+                    style={{width:40, height:40, borderRadius:"50%", border:`1px solid rgba(16,196,195,0.25)`, background:"rgba(11,13,16,0.8)", backdropFilter:"blur(8px)", cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", transition:"all 0.15s", color:"#FFFFFF"}}
+                    onMouseOver={e=>{(e.currentTarget as HTMLElement).style.background="rgba(16,196,195,0.2)";(e.currentTarget as HTMLElement).style.borderColor="rgba(16,196,195,0.6)";}}
+                    onMouseOut={e=>{(e.currentTarget as HTMLElement).style.background="rgba(11,13,16,0.8)";(e.currentTarget as HTMLElement).style.borderColor="rgba(16,196,195,0.25)";}}>
                     <SvgIcon d={d<0 ? "M15 19l-7-7 7-7" : "M9 5l7 7-7 7"} size={14} color="currentColor" />
                   </button>
                 ))}
@@ -975,18 +974,18 @@ export default function HomePage() {
                     onClick={(e) => { e.preventDefault(); toggleSave(p.id) }}
                     style={{position:"absolute", top:12, right:12, zIndex:2, background:"rgba(0,0,0,0.5)", backdropFilter:"blur(6px)", border:"1px solid rgba(255,255,255,0.15)", borderRadius:"50%", width:34, height:34, display:"flex", alignItems:"center", justifyContent:"center", cursor:"pointer", transition:"all 0.2s"}}
                   >
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill={savedIds.has(p.id) ? "#2BA8E0" : "none"} stroke={savedIds.has(p.id) ? "#2BA8E0" : "rgba(255,255,255,0.8)"} strokeWidth="2">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill={savedIds.has(p.id) ? "#10C4C3" : "none"} stroke={savedIds.has(p.id) ? "#10C4C3" : "rgba(255,255,255,0.8)"} strokeWidth="2">
                       <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
                     </svg>
                   </button>
                   <div style={{position:"absolute", bottom:12, right:12, zIndex:1, background:"rgba(0,0,0,0.5)", backdropFilter:"blur(6px)", borderRadius:6, padding:"4px 10px"}}>
-                    <span style={{fontFamily:"'Cormorant Garamond',Georgia,serif", fontSize:18, fontWeight:700, color:"#fff"}}>{p.price}</span>
+                    <span style={{fontFamily:"'Cal Sans',Georgia,serif", fontSize:18, fontWeight:700, color:"#fff"}}>{p.price}</span>
                   </div>
                 </div>
                 {/* Info */}
                 <div style={{padding:"18px", background:"rgba(11,13,16,0.96)"}}>
                   <div style={{fontSize:11, color:"rgba(255,255,255,0.45)", fontWeight:500, letterSpacing:"0.05em", marginBottom:4}}>{p.city} · {p.type}</div>
-                  <h3 style={{fontFamily:"'Cormorant Garamond',Georgia,serif", fontSize:18, fontWeight:700, color:"#fff", marginBottom:10}}>{p.title}</h3>
+                  <h3 style={{fontFamily:"'Cal Sans',Georgia,serif", fontSize:18, fontWeight:700, color:"#fff", marginBottom:10}}>{p.title}</h3>
                   <div style={{display:"flex", gap:14, fontSize:12, color:"rgba(255,255,255,0.45)"}}>
                     <span style={{display:"flex", alignItems:"center", gap:4}}>
                       <SvgIcon d="M3 12l9-9 9 9M5 10v10h5v-6h4v6h5V10" size={12} color="rgba(255,255,255,0.35)" /> {p.beds} Beds
@@ -1007,13 +1006,13 @@ export default function HomePage() {
       <div className="section-divider" />
 
       {/* ══════════ SECTION 5 — PROPERTY CATEGORIES ══════════ */}
-      <section className="discover-section" style={{background:"#000000", padding:"clamp(48px, 8vw, 96px) clamp(16px, 4vw, 40px)"}}>
+      <section className="discover-section" style={{background:"#020C1C", padding:"clamp(48px, 8vw, 96px) clamp(16px, 4vw, 40px)"}}>
         <div style={{maxWidth:"min(1280px, 100%)", margin:"0 auto", width:"100%", boxSizing:"border-box"}}>
           <Reveal>
           <div style={{display:"flex", justifyContent:"space-between", alignItems:"flex-end", marginBottom:24, flexWrap:"wrap", gap:12}}>
             <div>
               <div style={{fontSize:11, color:G.gold, fontWeight:700, letterSpacing:2, textTransform:"uppercase", marginBottom:8}}>Browse by Type</div>
-              <h2 className="discover-heading" style={{fontFamily:"'Cormorant Garamond',Georgia,serif", fontSize:32, fontWeight:700, color:"#fff", wordBreak:"break-word", maxWidth:"100%"}}>Discover Properties Across India</h2>
+              <h2 className="discover-heading" style={{fontFamily:"'Cal Sans',Georgia,serif", fontSize:32, fontWeight:700, color:"#fff", wordBreak:"break-word", maxWidth:"100%"}}>Discover Properties Across India</h2>
             </div>
             <div style={{display:"flex", gap:6, flexWrap:"wrap"}}>
               {CITIES.slice(0,6).map(c=>(
@@ -1025,9 +1024,9 @@ export default function HomePage() {
 
           <div className="discover-grid" style={{display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:16}}>
             {[
-              {type:"Apartments", count:142, grad:"linear-gradient(135deg, rgba(43,168,224,0.6) 0%, rgba(11,13,16,0.8) 100%)", img:"https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=800&q=80", d:"M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-2 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"},
+              {type:"Apartments", count:142, grad:"linear-gradient(135deg, rgba(16,196,195,0.6) 0%, rgba(11,13,16,0.8) 100%)", img:"https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=800&q=80", d:"M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-2 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"},
               {type:"Villas", count:48, grad:"linear-gradient(135deg, rgba(61,190,245,0.5) 0%, rgba(11,13,16,0.8) 100%)", img:"https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=800&q=80", d:"M3 12l9-9 9 9M5 10v10h5v-6h4v6h5V10"},
-              {type:"Plots & Land", count:76, grad:"linear-gradient(135deg, rgba(43,168,224,0.4) 0%, rgba(11,13,16,0.8) 100%)", img:"https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=800&q=80", d:"M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"},
+              {type:"Plots & Land", count:76, grad:"linear-gradient(135deg, rgba(16,196,195,0.4) 0%, rgba(11,13,16,0.8) 100%)", img:"https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=800&q=80", d:"M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"},
             ].map((cat,i)=>(
               <Reveal key={cat.type} delay={i*0.08}>
               <a href={`/search?city=${catCity.toLowerCase().replace(" ","-")}&type=${cat.type.toLowerCase().split(" ")[0]}`}
@@ -1037,8 +1036,8 @@ export default function HomePage() {
                 <div style={{position:"absolute", inset:0, background:"linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.20) 60%, transparent 100%)"}} />
                 <div style={{position:"absolute", inset:0, background:cat.grad, opacity:0.3}} />
                 <div style={{position:"relative", zIndex:2, padding:"0 28px 28px"}}>
-                  <span style={{display:"inline-block", background:"rgba(43,168,224,0.15)", border:"1px solid rgba(43,168,224,0.30)", color:G.goldLt, borderRadius:8, padding:"4px 12px", fontSize:11, fontWeight:600, marginBottom:8}}>{cat.count} properties</span>
-                  <h3 style={{fontFamily:"'Cormorant Garamond',Georgia,serif", fontSize:32, fontWeight:700, color:"#fff", marginBottom:6}}>{cat.type}</h3>
+                  <span style={{display:"inline-block", background:"rgba(16,196,195,0.15)", border:"1px solid rgba(16,196,195,0.30)", color:G.goldLt, borderRadius:8, padding:"4px 12px", fontSize:11, fontWeight:600, marginBottom:8}}>{cat.count} properties</span>
+                  <h3 style={{fontFamily:"'Cal Sans',Georgia,serif", fontSize:32, fontWeight:700, color:"#fff", marginBottom:6}}>{cat.type}</h3>
                   <p style={{fontSize:12, color:"rgba(255,255,255,0.6)", marginBottom:0}}>for Sale in {catCity}</p>
                   <div style={{color:G.gold, fontSize:13, marginTop:8, opacity:0.8}}>→</div>
                 </div>
@@ -1052,13 +1051,13 @@ export default function HomePage() {
       <div className="section-divider" />
 
       {/* ══════════ SECTION 6 — MARKET INSIGHTS ══════════ */}
-      <section className="market-section" style={{background:"#0B0D10", padding:"clamp(48px, 8vw, 96px) clamp(16px, 4vw, 40px)"}}>
+      <section className="market-section" style={{background:"#0A1526", padding:"clamp(48px, 8vw, 96px) clamp(16px, 4vw, 40px)"}}>
         <div style={{maxWidth:"min(1280px, 100%)", margin:"0 auto", width:"100%", boxSizing:"border-box"}}>
           <Reveal>
           <div style={{display:"flex", justifyContent:"space-between", alignItems:"flex-end", marginBottom:24, flexWrap:"wrap", gap:12}}>
             <div>
               <div style={{fontSize:11, color:G.gold, fontWeight:700, letterSpacing:2, textTransform:"uppercase", marginBottom:8}}>Market Intelligence</div>
-              <h2 className="market-heading" style={{fontFamily:"'Cormorant Garamond',Georgia,serif", fontSize:32, fontWeight:700, color:"#fff", wordBreak:"break-word", maxWidth:"100%"}}>Property Price Insights</h2>
+              <h2 className="market-heading" style={{fontFamily:"'Cal Sans',Georgia,serif", fontSize:32, fontWeight:700, color:"#fff", wordBreak:"break-word", maxWidth:"100%"}}>Property Price Insights</h2>
             </div>
             <div style={{display:"flex", gap:6, flexWrap:"wrap"}}>
               {Object.keys(MARKET).map(c=>(
@@ -1075,7 +1074,7 @@ export default function HomePage() {
               <div style={{fontSize:11, color:"rgba(255,255,255,0.4)", fontWeight:600, letterSpacing:1, textTransform:"uppercase", marginBottom:16}}>Price Trend (₹/sqft)</div>
               <div style={{display:"flex", alignItems:"flex-end", gap:6, height:80, marginBottom:12}}>
                 {md.trend.map((v,i)=>(
-                  <div key={i} style={{flex:1, background: i===md.trend.length-1 ? G.gold : "rgba(43,168,224,0.12)", borderRadius:"3px 3px 0 0", height:`${(v/maxTrend)*100}%`, transition:"height 0.5s ease", position:"relative"}}>
+                  <div key={i} style={{flex:1, background: i===md.trend.length-1 ? G.gold : "rgba(16,196,195,0.12)", borderRadius:"3px 3px 0 0", height:`${(v/maxTrend)*100}%`, transition:"height 0.5s ease", position:"relative"}}>
                     {i===md.trend.length-1 && <div style={{position:"absolute", top:-18, left:"50%", transform:"translateX(-50%)", fontSize:9, color:G.gold, fontWeight:700, whiteSpace:"nowrap"}}>{v.toLocaleString()}</div>}
                   </div>
                 ))}
@@ -1090,7 +1089,7 @@ export default function HomePage() {
             <Reveal delay={0.08}>
             <div style={{background:"rgba(255,255,255,0.03)", backdropFilter:"blur(16px)", WebkitBackdropFilter:"blur(16px)", borderRadius:16, padding:24, border:"1px solid rgba(255,255,255,0.07)", boxShadow:"0 4px 24px rgba(0,0,0,0.2)", height:"100%"}}>
               <div style={{fontSize:11, color:"rgba(255,255,255,0.4)", fontWeight:600, letterSpacing:1, textTransform:"uppercase", marginBottom:16}}>Avg Price / Sqft</div>
-              <div style={{fontFamily:"'Cormorant Garamond',Georgia,serif", fontSize:40, fontWeight:700, color:"#fff", lineHeight:1, marginBottom:8}}>{md.price}</div>
+              <div style={{fontFamily:"'Cal Sans',Georgia,serif", fontSize:40, fontWeight:700, color:"#fff", lineHeight:1, marginBottom:8}}>{md.price}</div>
               <span style={{display:"inline-block", background:"rgba(26,122,60,0.15)", color:"#4ade80", fontSize:12, fontWeight:700, padding:"4px 10px", borderRadius:6, border:"1px solid rgba(74,222,128,0.2)"}}>
                 {md.growth} YoY
               </span>
@@ -1105,7 +1104,7 @@ export default function HomePage() {
               {md.localities.map((loc,i)=>(
                 <div key={loc.name} style={{display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:10}}>
                   <div style={{display:"flex", alignItems:"center", gap:8}}>
-                    <span style={{width:18, height:18, borderRadius:"50%", background:i===0?G.gold:"rgba(43,168,224,0.10)", color: i===0 ? "#000" : "rgba(255,255,255,0.5)", fontSize:10, fontWeight:700, display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0}}>{i+1}</span>
+                    <span style={{width:18, height:18, borderRadius:"50%", background:i===0?G.gold:"rgba(16,196,195,0.10)", color: i===0 ? "#000" : "rgba(255,255,255,0.5)", fontSize:10, fontWeight:700, display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0}}>{i+1}</span>
                     <span style={{fontSize:13, color:"rgba(255,255,255,0.75)", fontWeight:500}}>{loc.name}</span>
                   </div>
                   <span style={{fontSize:11, color: loc.demand==="Very High" ? "#4ade80" : "rgba(255,255,255,0.4)", fontWeight:600}}>{loc.demand}</span>
@@ -1118,7 +1117,7 @@ export default function HomePage() {
             <Reveal delay={0.24}>
             <div style={{background:"rgba(255,255,255,0.03)", backdropFilter:"blur(16px)", WebkitBackdropFilter:"blur(16px)", borderRadius:16, padding:24, border:"1px solid rgba(255,255,255,0.07)", boxShadow:"0 4px 24px rgba(0,0,0,0.2)", height:"100%"}}>
               <div style={{fontSize:11, color:"rgba(255,255,255,0.4)", fontWeight:600, letterSpacing:1, textTransform:"uppercase", marginBottom:16}}>New Listings This Month</div>
-              <div style={{fontFamily:"'Cormorant Garamond',Georgia,serif", fontSize:40, fontWeight:700, color:"#fff", lineHeight:1, marginBottom:8}}>{md.newListings}</div>
+              <div style={{fontFamily:"'Cal Sans',Georgia,serif", fontSize:40, fontWeight:700, color:"#fff", lineHeight:1, marginBottom:8}}>{md.newListings}</div>
               <div style={{display:"flex", alignItems:"center", gap:6, marginBottom:16}}>
                 <span style={{fontSize:18, color:"#4ade80"}}>↑</span>
                 <span style={{fontSize:13, color:"#4ade80", fontWeight:600}}>+12% vs last month</span>
@@ -1135,13 +1134,13 @@ export default function HomePage() {
       <div className="section-divider" />
 
       {/* ══════════ SECTION 7 — WHY Nilay 360 ══════════ */}
-      <section className="why-section" style={{background:"linear-gradient(180deg, #000000 0%, #0B0D10 100%)", padding:"clamp(48px, 8vw, 96px) clamp(16px, 4vw, 40px)", position:"relative"}}>
+      <section className="why-section" style={{background:"linear-gradient(180deg, #020C1C 0%, #0A1526 100%)", padding:"clamp(48px, 8vw, 96px) clamp(16px, 4vw, 40px)", position:"relative"}}>
         <div style={{ position:"absolute", inset:0, pointerEvents:"none", zIndex:0, backgroundImage:"url('https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&q=30')", backgroundSize:"cover", opacity:0.03, mixBlendMode:"overlay" }} />
         <div style={{maxWidth:"min(1280px, 100%)", margin:"0 auto", width:"100%", boxSizing:"border-box", position:"relative", zIndex:1}}>
           <Reveal>
           <div style={{textAlign:"center", marginBottom:28}}>
             <div style={{fontSize:11, color:G.gold, fontWeight:700, letterSpacing:2, textTransform:"uppercase", marginBottom:8}}>Why Choose Us</div>
-            <h2 className="why-heading" style={{fontFamily:"'Cormorant Garamond',Georgia,serif", fontSize:32, fontWeight:700, color:"#fff", wordBreak:"break-word", maxWidth:"100%"}}>The Nilay 360 Difference</h2>
+            <h2 className="why-heading" style={{fontFamily:"'Cal Sans',Georgia,serif", fontSize:32, fontWeight:700, color:"#fff", wordBreak:"break-word", maxWidth:"100%"}}>The Nilay 360 Difference</h2>
           </div>
           </Reveal>
 
@@ -1173,13 +1172,13 @@ export default function HomePage() {
       <div className="section-divider" />
 
       {/* ══════════ SECTION 8 — TRENDING LOCATIONS ══════════ */}
-      <section className="trending-section" style={{background:"#000000", padding:"96px 0 96px 56px"}}>
+      <section className="trending-section" style={{background:"#020C1C", padding:"96px 0 96px 56px"}}>
         <div style={{maxWidth:1280+56, margin:"0 auto"}}>
           <Reveal>
           <div style={{display:"flex", justifyContent:"space-between", alignItems:"flex-end", marginBottom:28, paddingRight:56}}>
             <div>
               <div style={{fontSize:11, color:G.gold, fontWeight:700, letterSpacing:2, textTransform:"uppercase", marginBottom:8}}>Hot Markets</div>
-              <h2 className="trending-heading" style={{fontFamily:"'Cormorant Garamond',Georgia,serif", fontSize:32, fontWeight:700, color:"#fff", wordBreak:"break-word", maxWidth:"100%"}}>Trending Locations</h2>
+              <h2 className="trending-heading" style={{fontFamily:"'Cal Sans',Georgia,serif", fontSize:32, fontWeight:700, color:"#fff", wordBreak:"break-word", maxWidth:"100%"}}>Trending Locations</h2>
             </div>
             <a href="/locations" style={{fontSize:14, color:G.gold, fontWeight:600}}>View all cities →</a>
           </div>
@@ -1196,7 +1195,7 @@ export default function HomePage() {
                 <div style={{position:"absolute", inset:0, background:"linear-gradient(to top, rgba(0,0,0,0.90) 0%, rgba(0,0,0,0.20) 60%, transparent 100%)"}} />
                 <div style={{position:"absolute", bottom:16, left:16, right:16}}>
                   <div style={{fontSize:10, color:"rgba(255,255,255,0.6)", letterSpacing:"0.05em", marginBottom:2}}>{loc.city}</div>
-                  <div style={{fontFamily:"'Cormorant Garamond',Georgia,serif", fontSize:20, fontWeight:700, color:"#fff"}}>{loc.area}</div>
+                  <div style={{fontFamily:"'Cal Sans',Georgia,serif", fontSize:20, fontWeight:700, color:"#fff"}}>{loc.area}</div>
                   <div style={{display:"flex", gap:12, marginTop:6}}>
                     <span style={{fontSize:11, color:G.goldLt}}>{loc.listings} listings</span>
                     <span style={{fontSize:11, color:"rgba(255,255,255,0.6)"}}>{loc.avg}</span>
@@ -1212,19 +1211,19 @@ export default function HomePage() {
       <div className="section-divider" />
 
       {/* ══════════ SECTION 9 — TESTIMONIALS ══════════ */}
-      <section className="testimonials-section" style={{background:"#0B0D10", padding:"clamp(48px, 8vw, 96px) clamp(16px, 4vw, 40px)"}}>
+      <section className="testimonials-section" style={{background:"#0A1526", padding:"clamp(48px, 8vw, 96px) clamp(16px, 4vw, 40px)"}}>
         <div style={{maxWidth:"min(1280px, 100%)", margin:"0 auto", width:"100%", boxSizing:"border-box"}}>
           <Reveal>
           <div style={{textAlign:"center", marginBottom:28}}>
             <div style={{fontSize:11, color:G.gold, fontWeight:700, letterSpacing:2, textTransform:"uppercase", marginBottom:8}}>Client Stories</div>
-            <h2 className="testimonials-heading" style={{fontFamily:"'Cormorant Garamond',Georgia,serif", fontSize:32, fontWeight:700, color:"#fff", marginBottom:8, wordBreak:"break-word", maxWidth:"100%"}}>What Our Clients Say</h2>
+            <h2 className="testimonials-heading" style={{fontFamily:"'Cal Sans',Georgia,serif", fontSize:32, fontWeight:700, color:"#fff", marginBottom:8, wordBreak:"break-word", maxWidth:"100%"}}>What Our Clients Say</h2>
           </div>
           </Reveal>
 
           {testimonials.length === 0 ? (
             <Reveal>
-              <div className="premium-card" style={{borderRadius:20, padding:"48px 32px", textAlign:"center", borderTop:"2px solid rgba(43,168,224,0.25)", maxWidth:560, margin:"0 auto"}}>
-                <p style={{fontFamily:"'Cormorant Garamond',Georgia,serif", fontSize:20, color:"rgba(255,255,255,0.8)", marginBottom:8}}>Be the First to Share Your Experience</p>
+              <div className="premium-card" style={{borderRadius:20, padding:"48px 32px", textAlign:"center", borderTop:"2px solid rgba(16,196,195,0.25)", maxWidth:560, margin:"0 auto"}}>
+                <p style={{fontFamily:"'Cal Sans',Georgia,serif", fontSize:20, color:"rgba(255,255,255,0.8)", marginBottom:8}}>Be the First to Share Your Experience</p>
                 <p style={{fontSize:13, color:"rgba(255,255,255,0.45)"}}>We're just getting started — client reviews will appear here as they come in.</p>
               </div>
             </Reveal>
@@ -1234,11 +1233,11 @@ export default function HomePage() {
               <div className="testimonials-grid" style={{display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:16, marginBottom:24}}>
                 {Array.from({length: Math.min(3, testimonials.length)}, (_,k) => testimonials[(reviewIdx+k)%testimonials.length]).map((r,pos)=>(
                   <Reveal key={r.id} delay={pos*0.08}>
-                  <div className="premium-card" style={{borderRadius:20, padding:"32px", borderTop:"2px solid rgba(43,168,224,0.25)", transition:"opacity 0.3s", height:"100%"}}>
+                  <div className="premium-card" style={{borderRadius:20, padding:"32px", borderTop:"2px solid rgba(16,196,195,0.25)", transition:"opacity 0.3s", height:"100%"}}>
                     <StarRow n={r.rating} />
-                    <p style={{fontFamily:"'Cormorant Garamond',Georgia,serif", fontSize:17, color:"rgba(255,255,255,0.85)", lineHeight:1.65, margin:"14px 0 20px", fontStyle:"italic"}}>{`"${r.text}"`}</p>
+                    <p style={{fontFamily:"'Cal Sans',Georgia,serif", fontSize:17, color:"rgba(255,255,255,0.85)", lineHeight:1.65, margin:"14px 0 20px", fontStyle:"italic"}}>{`"${r.text}"`}</p>
                     <div style={{display:"flex", alignItems:"center", gap:12}}>
-                      <div style={{width:38, height:38, borderRadius:"50%", background:"linear-gradient(135deg, #2BA8E0 0%, #1577B8 100%)", display:"flex", alignItems:"center", justifyContent:"center"}}>
+                      <div style={{width:38, height:38, borderRadius:"50%", background:"linear-gradient(135deg, #10C4C3 0%, #0B9C9B 100%)", display:"flex", alignItems:"center", justifyContent:"center"}}>
                         <span style={{fontSize:14, fontWeight:700, color:"#fff"}}>{r.name[0]}</span>
                       </div>
                       <div>
@@ -1269,20 +1268,20 @@ export default function HomePage() {
       {/* ══════════ SECTION 10 — CTA BANNER ══════════ */}
       <section className="cta-section" style={{background:`linear-gradient(135deg, ${G.dark} 0%, ${G.mid} 100%)`, padding:"clamp(48px, 8vw, 96px) clamp(16px, 4vw, 40px)", position:"relative", overflow:"hidden"}}>
         {/* Decorative circles */}
-        <div style={{position:"absolute", left:-150, top:-150, width:500, height:500, borderRadius:"50%", background:"radial-gradient(circle, rgba(43,168,224,0.12) 0%, transparent 70%)", pointerEvents:"none"}} />
-        <div style={{position:"absolute", right:-150, bottom:-150, width:500, height:500, borderRadius:"50%", background:"radial-gradient(circle, rgba(43,168,224,0.10) 0%, transparent 70%)", pointerEvents:"none"}} />
-        <div style={{position:"absolute", inset:0, backgroundImage:"radial-gradient(ellipse 50% 80% at 80% 50%, rgba(43,168,224,0.1) 0%, transparent 60%)", pointerEvents:"none"}} />
+        <div style={{position:"absolute", left:-150, top:-150, width:500, height:500, borderRadius:"50%", background:"radial-gradient(circle, rgba(16,196,195,0.12) 0%, transparent 70%)", pointerEvents:"none"}} />
+        <div style={{position:"absolute", right:-150, bottom:-150, width:500, height:500, borderRadius:"50%", background:"radial-gradient(circle, rgba(16,196,195,0.10) 0%, transparent 70%)", pointerEvents:"none"}} />
+        <div style={{position:"absolute", inset:0, backgroundImage:"radial-gradient(ellipse 50% 80% at 80% 50%, rgba(16,196,195,0.1) 0%, transparent 60%)", pointerEvents:"none"}} />
         <Reveal style={{maxWidth:720, margin:"0 auto", position:"relative", zIndex:1}}>
-        <div style={{textAlign:"center", background:"rgba(255,255,255,0.04)", backdropFilter:"blur(24px)", WebkitBackdropFilter:"blur(24px)", border:"1px solid rgba(255,255,255,0.10)", borderRadius:32, padding:"clamp(32px,5vw,56px) clamp(24px,4vw,48px)", boxShadow:"0 20px 60px rgba(0,0,0,0.45), 0 0 0 1px rgba(43,168,224,0.08)"}}>
-          <h2 className="cta-heading" style={{fontFamily:"'Cormorant Garamond',Georgia,serif", fontSize:"clamp(26px,5vw,40px)", fontWeight:300, color:"#fff", marginBottom:14, wordBreak:"break-word", maxWidth:"100%"}}>
+        <div style={{textAlign:"center", background:"rgba(255,255,255,0.04)", backdropFilter:"blur(24px)", WebkitBackdropFilter:"blur(24px)", border:"1px solid rgba(255,255,255,0.10)", borderRadius:32, padding:"clamp(32px,5vw,56px) clamp(24px,4vw,48px)", boxShadow:"0 20px 60px rgba(0,0,0,0.45), 0 0 0 1px rgba(16,196,195,0.08)"}}>
+          <h2 className="cta-heading" style={{fontFamily:"'Cal Sans',Georgia,serif", fontSize:"clamp(26px,5vw,40px)", fontWeight:300, color:"#fff", marginBottom:14, wordBreak:"break-word", maxWidth:"100%"}}>
             Ready to Find Your<br /><em style={{fontStyle:"italic", color:G.goldLt}}>Perfect Property?</em>
           </h2>
           <p style={{fontSize:15, color:"rgba(255,255,255,0.65)", marginBottom:32, lineHeight:1.7}}>
             Join 50,000+ buyers and investors who found their dream property through Nilay 360.
           </p>
           <div className="cta-buttons" style={{display:"flex", gap:14, justifyContent:"center", flexWrap:"wrap"}}>
-            <a href="/search" style={{padding:"14px 32px", background:G.gold, borderRadius:10, color:"#000", fontSize:15, fontWeight:700, transition:"background 0.15s, box-shadow 0.15s", boxShadow:"0 10px 30px rgba(43,168,224,0.35)"}}
-              onMouseOver={e=>{e.currentTarget.style.background=G.goldLt; e.currentTarget.style.boxShadow="0 10px 30px rgba(61,190,245,0.45)";}} onMouseOut={e=>{e.currentTarget.style.background=G.gold; e.currentTarget.style.boxShadow="0 10px 30px rgba(43,168,224,0.35)";}}>Browse Properties</a>
+            <a href="/search" style={{padding:"14px 32px", background:G.gold, borderRadius:10, color:"#000", fontSize:15, fontWeight:700, transition:"background 0.15s, box-shadow 0.15s", boxShadow:"0 10px 30px rgba(16,196,195,0.35)"}}
+              onMouseOver={e=>{e.currentTarget.style.background=G.goldLt; e.currentTarget.style.boxShadow="0 10px 30px rgba(61,190,245,0.45)";}} onMouseOut={e=>{e.currentTarget.style.background=G.gold; e.currentTarget.style.boxShadow="0 10px 30px rgba(16,196,195,0.35)";}}>Browse Properties</a>
             <a href="/contact" style={{padding:"14px 32px", border:"1px solid rgba(255,255,255,0.25)", borderRadius:10, color:"#fff", fontSize:15, fontWeight:500, transition:"all 0.15s"}}
               onMouseOver={e=>{e.currentTarget.style.borderColor=G.gold;e.currentTarget.style.color=G.gold;}}
               onMouseOut={e=>{e.currentTarget.style.borderColor="rgba(255,255,255,0.25)";e.currentTarget.style.color="#fff";}}>Contact an Expert</a>
@@ -1298,14 +1297,14 @@ export default function HomePage() {
             {/* Brand */}
             <div>
               <a href="/" style={{display:"inline-block", marginBottom:12}}>
-                <img src="/nilay_logo_final.png" alt="Nilay 360" style={{ height: 32, width: 'auto', objectFit: 'contain' }} />
+                <img src="/brand/Nilay360-09-Photoroom%20(1).png" alt="Nilay 360" style={{ height: 32, width: 'auto', objectFit: 'contain' }} />
               </a>
               <p style={{fontSize:13, lineHeight:1.75, maxWidth:240, marginBottom:20}}>India's premium real estate platform connecting discerning buyers with exceptional properties.</p>
               <div style={{display:"flex", gap:10}}>
                 {[
-                  {href:"https://www.instagram.com/nilay360", title:"Follow on Instagram", hoverBg:"rgba(225,48,108,0.15)", d:"M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"},
+                  {href:"https://www.instagram.com/nilay360_/", title:"Follow on Instagram", hoverBg:"rgba(225,48,108,0.15)", d:"M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"},
                   {href:"https://www.linkedin.com/company/nilay360", title:"Connect on LinkedIn", hoverBg:"rgba(0,119,181,0.15)", d:"M4.98 3.5c0 1.381-1.11 2.5-2.48 2.5s-2.48-1.119-2.48-2.5c0-1.38 1.11-2.5 2.48-2.5s2.48 1.12 2.48 2.5zm.02 4.5h-5v16h5v-16zm7.982 0h-4.968v16h4.969v-8.399c0-4.67 6.029-5.052 6.029 0v8.399h4.988v-10.131c0-7.88-8.922-7.593-11.018-3.714v-2.155z"},
-                  {href:"https://www.youtube.com/@nilay360", title:"Watch on YouTube", hoverBg:"rgba(255,0,0,0.15)", d:"M23.498 6.186a3.016 3.016 0 00-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 002.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 002.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"},
+                  {href:"https://www.youtube.com/@nilay360.digital", title:"Watch on YouTube", hoverBg:"rgba(255,0,0,0.15)", d:"M23.498 6.186a3.016 3.016 0 00-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 002.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 002.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"},
                 ].map(s=>(
                   <a key={s.href} href={s.href} title={s.title} target="_blank" rel="noopener noreferrer"
                     style={{width:36, height:36, borderRadius:10, background:"rgba(255,255,255,0.07)", display:"flex", alignItems:"center", justifyContent:"center", transition:"background 0.15s"}}

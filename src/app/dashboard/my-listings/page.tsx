@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
@@ -7,7 +7,7 @@ import type { Session } from "@supabase/supabase-js";
 import { MyListingsList } from "@/components/dashboard/MyListingsList";
 import type { Listing } from "@/components/dashboard/MyListingsList";
 
-const G = { ivory: "#000000", gold: "#2BA8E0" };
+const G = { ivory: "#020C1C", gold: "#10C4C3" };
 
 export default function MyListingsPage() {
   const [listings, setListings] = useState<Listing[]>([]);
@@ -46,7 +46,7 @@ export default function MyListingsPage() {
   if (loading) {
     return (
       <div style={{ minHeight: "100vh", background: G.ivory, display: "flex", alignItems: "center", justifyContent: "center" }}>
-        <span style={{ color: "#AEB4BC", fontFamily: "'DM Sans', sans-serif", fontSize: 14 }}>Loading…</span>
+        <span style={{ color: "#A9B4C2", fontFamily: "'Cal Sans', sans-serif", fontSize: 14 }}>Loading…</span>
       </div>
     );
   }
@@ -54,8 +54,8 @@ export default function MyListingsPage() {
   if (!email) {
     return (
       <div style={{ minHeight: "100vh", background: G.ivory, paddingTop: 64, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 16 }}>
-        <p style={{ color: "#E8EAED", fontFamily: "'DM Sans', sans-serif", fontSize: 16 }}>Please sign in to view your listings.</p>
-        <Link href="/login" style={{ color: G.gold, fontWeight: 600, fontFamily: "'DM Sans', sans-serif", textDecoration: "none" }}>Sign In →</Link>
+        <p style={{ color: "#FFFFFF", fontFamily: "'Cal Sans', sans-serif", fontSize: 16 }}>Please sign in to view your listings.</p>
+        <Link href="/login" style={{ color: G.gold, fontWeight: 600, fontFamily: "'Cal Sans', sans-serif", textDecoration: "none" }}>Sign In →</Link>
       </div>
     );
   }
@@ -68,13 +68,13 @@ export default function MyListingsPage() {
         <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 36, flexWrap: "wrap", gap: 16 }}>
           <div>
             <h1 style={{
-              fontFamily: "'Cormorant Garamond', Georgia, serif",
-              fontSize: 34, fontWeight: 600, color: "#E8EAED",
+              fontFamily: "'Cal Sans', Georgia, serif",
+              fontSize: 34, fontWeight: 600, color: "#FFFFFF",
               margin: 0, lineHeight: 1.15,
             }}>
               My Listings
             </h1>
-            <p style={{ color: "#AEB4BC", fontFamily: "'DM Sans', sans-serif", fontSize: 14, margin: "6px 0 0" }}>
+            <p style={{ color: "#A9B4C2", fontFamily: "'Cal Sans', sans-serif", fontSize: 14, margin: "6px 0 0" }}>
               {listings.length} {listings.length === 1 ? "property" : "properties"} · {email}
             </p>
           </div>
@@ -82,18 +82,18 @@ export default function MyListingsPage() {
             <Link href="/dashboard" style={{ textDecoration: "none" }}>
               <button style={{
                 padding: "9px 16px", fontSize: 13, fontWeight: 500,
-                color: "#E8EAED", background: "rgba(255,255,255,0.05)",
+                color: "#FFFFFF", background: "rgba(255,255,255,0.05)",
                 border: "1px solid rgba(255,255,255,0.15)", borderRadius: 8,
-                cursor: "pointer", fontFamily: "'DM Sans', sans-serif",
+                cursor: "pointer", fontFamily: "'Cal Sans', sans-serif",
               }}>← Dashboard</button>
             </Link>
             <Link href="/post-property" style={{ textDecoration: "none" }}>
               <button style={{
                 padding: "9px 18px", fontSize: 13, fontWeight: 600,
-                color: "#000000", background: G.gold,
+                color: "#020C1C", background: G.gold,
                 border: "none", borderRadius: 999,
                 boxShadow: "0 10px 30px rgba(30,167,255,.35)",
-                cursor: "pointer", fontFamily: "'DM Sans', sans-serif",
+                cursor: "pointer", fontFamily: "'Cal Sans', sans-serif",
               }}>+ New Listing</button>
             </Link>
           </div>

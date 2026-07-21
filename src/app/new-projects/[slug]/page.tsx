@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import { useParams } from "next/navigation";
 import { PageShell } from "../../_components/SiteChrome";
 
@@ -25,13 +25,13 @@ export default function ProjectDetailPage() {
       ]}
     >
       <div style={{ textAlign:"center", maxWidth:600, margin:"0 auto 8px" }}>
-        <h2 style={{ fontFamily:"'Cormorant Garamond',Georgia,serif", fontSize:32, fontWeight:700, color:"#000000", marginBottom:14 }}>Register your interest</h2>
+        <h2 style={{ fontFamily:"'Cal Sans',Georgia,serif", fontSize:32, fontWeight:700, color:"#020C1C", marginBottom:14 }}>Register your interest</h2>
         <p style={{ fontSize:15, color:"#666", lineHeight:1.7, marginBottom:24 }}>
           Be the first to receive floor plans, pricing and launch offers for this project.
         </p>
         <div style={{ display:"flex", gap:12, justifyContent:"center", flexWrap:"wrap" }}>
-          <a href="/contact" style={{ padding:"13px 30px", background:"#2BA8E0", borderRadius:8, color:"#000000", fontSize:14, fontWeight:700 }}>Request Details</a>
-          <a href="/new-projects" style={{ padding:"13px 30px", border:"1px solid rgba(13,43,31,0.2)", borderRadius:8, color:"#000000", fontSize:14, fontWeight:500 }}>← All New Projects</a>
+          <a href="/contact" style={{ padding:"13px 30px", background:"#10C4C3", borderRadius:8, color:"#020C1C", fontSize:14, fontWeight:700 }}>Request Details</a>
+          <a href="/new-projects" style={{ padding:"13px 30px", border:"1px solid rgba(13,43,31,0.2)", borderRadius:8, color:"#020C1C", fontSize:14, fontWeight:500 }}>← All New Projects</a>
         </div>
       </div>
     </PageShell>

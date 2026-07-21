@@ -1,8 +1,7 @@
-export default function PrivacyPage() {
+﻿export default function PrivacyPage() {
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,600&family=DM+Sans:wght@300;400;500;600&display=swap');
 
         * {
           margin: 0;
@@ -11,7 +10,7 @@ export default function PrivacyPage() {
         }
 
         body {
-          font-family: 'DM Sans', sans-serif;
+          font-family: 'Cal Sans', sans-serif;
         }
       `}</style>
 
@@ -37,10 +36,10 @@ export default function PrivacyPage() {
         <a
           href="/"
           style={{
-            fontFamily: "'Cormorant Garamond', serif",
+            fontFamily: "'Cal Sans', serif",
             fontSize: '24px',
             fontWeight: 600,
-            color: '#2BA8E0',
+            color: '#10C4C3',
             textDecoration: 'none',
             letterSpacing: '2px',
           }}
@@ -68,7 +67,7 @@ export default function PrivacyPage() {
               key={link.href}
               href={link.href}
               style={{
-                fontFamily: "'DM Sans', sans-serif",
+                fontFamily: "'Cal Sans', sans-serif",
                 fontSize: '14px',
                 fontWeight: 400,
                 color: 'rgba(255,255,255,0.8)',
@@ -86,11 +85,11 @@ export default function PrivacyPage() {
           <a
             href="/login"
             style={{
-              fontFamily: "'DM Sans', sans-serif",
+              fontFamily: "'Cal Sans', sans-serif",
               fontSize: '14px',
               fontWeight: 500,
-              color: '#2BA8E0',
-              border: '1px solid #2BA8E0',
+              color: '#10C4C3',
+              border: '1px solid #10C4C3',
               padding: '8px 20px',
               textDecoration: 'none',
               borderRadius: '2px',
@@ -102,11 +101,11 @@ export default function PrivacyPage() {
           <a
             href="/post-property"
             style={{
-              fontFamily: "'DM Sans', sans-serif",
+              fontFamily: "'Cal Sans', sans-serif",
               fontSize: '14px',
               fontWeight: 500,
               color: '#05080C',
-              background: '#2BA8E0',
+              background: '#10C4C3',
               padding: '8px 20px',
               textDecoration: 'none',
               borderRadius: '2px',
@@ -120,7 +119,7 @@ export default function PrivacyPage() {
       {/* HERO */}
       <section
         style={{
-          background: '#000000',
+          background: '#020C1C',
           paddingTop: '140px',
           paddingBottom: '72px',
           textAlign: 'center',
@@ -128,10 +127,10 @@ export default function PrivacyPage() {
       >
         <p
           style={{
-            fontFamily: "'DM Sans', sans-serif",
+            fontFamily: "'Cal Sans', sans-serif",
             fontSize: '12px',
             fontWeight: 500,
-            color: '#2BA8E0',
+            color: '#10C4C3',
             letterSpacing: '4px',
             textTransform: 'uppercase',
             marginBottom: '20px',
@@ -141,7 +140,7 @@ export default function PrivacyPage() {
         </p>
         <h1
           style={{
-            fontFamily: "'Cormorant Garamond', serif",
+            fontFamily: "'Cal Sans', serif",
             fontSize: '64px',
             fontWeight: 600,
             color: '#ffffff',
@@ -153,7 +152,7 @@ export default function PrivacyPage() {
         </h1>
         <p
           style={{
-            fontFamily: "'DM Sans', sans-serif",
+            fontFamily: "'Cal Sans', sans-serif",
             fontSize: '15px',
             fontWeight: 400,
             color: 'rgba(255,255,255,0.6)',
@@ -167,7 +166,7 @@ export default function PrivacyPage() {
       {/* CONTENT */}
       <section
         style={{
-          background: '#000000',
+          background: '#020C1C',
           padding: '72px 24px',
         }}
       >
@@ -185,11 +184,11 @@ export default function PrivacyPage() {
           <div style={{ marginBottom: '48px' }}>
             <h2
               style={{
-                fontFamily: "'Cormorant Garamond', serif",
+                fontFamily: "'Cal Sans', serif",
                 fontSize: '36px',
                 fontWeight: 600,
-                color: '#000000',
-                borderBottom: '2px solid #2BA8E0',
+                color: '#020C1C',
+                borderBottom: '2px solid #10C4C3',
                 paddingBottom: '12px',
                 marginBottom: '20px',
               }}
@@ -198,7 +197,7 @@ export default function PrivacyPage() {
             </h2>
             <p
               style={{
-                fontFamily: "'DM Sans', sans-serif",
+                fontFamily: "'Cal Sans', sans-serif",
                 fontSize: '16px',
                 fontWeight: 400,
                 color: '#333333',
@@ -220,11 +219,11 @@ export default function PrivacyPage() {
           <div style={{ marginBottom: '48px' }}>
             <h2
               style={{
-                fontFamily: "'Cormorant Garamond', serif",
+                fontFamily: "'Cal Sans', serif",
                 fontSize: '36px',
                 fontWeight: 600,
-                color: '#000000',
-                borderBottom: '2px solid #2BA8E0',
+                color: '#020C1C',
+                borderBottom: '2px solid #10C4C3',
                 paddingBottom: '12px',
                 marginBottom: '20px',
               }}
@@ -233,7 +232,7 @@ export default function PrivacyPage() {
             </h2>
             <p
               style={{
-                fontFamily: "'DM Sans', sans-serif",
+                fontFamily: "'Cal Sans', sans-serif",
                 fontSize: '16px',
                 fontWeight: 400,
                 color: '#333333',
@@ -245,7 +244,7 @@ export default function PrivacyPage() {
             </p>
             <ul
               style={{
-                fontFamily: "'DM Sans', sans-serif",
+                fontFamily: "'Cal Sans', sans-serif",
                 fontSize: '16px',
                 fontWeight: 400,
                 color: '#333333',
@@ -284,11 +283,11 @@ export default function PrivacyPage() {
           <div style={{ marginBottom: '48px' }}>
             <h2
               style={{
-                fontFamily: "'Cormorant Garamond', serif",
+                fontFamily: "'Cal Sans', serif",
                 fontSize: '36px',
                 fontWeight: 600,
-                color: '#000000',
-                borderBottom: '2px solid #2BA8E0',
+                color: '#020C1C',
+                borderBottom: '2px solid #10C4C3',
                 paddingBottom: '12px',
                 marginBottom: '20px',
               }}
@@ -297,7 +296,7 @@ export default function PrivacyPage() {
             </h2>
             <p
               style={{
-                fontFamily: "'DM Sans', sans-serif",
+                fontFamily: "'Cal Sans', sans-serif",
                 fontSize: '16px',
                 fontWeight: 400,
                 color: '#333333',
@@ -309,7 +308,7 @@ export default function PrivacyPage() {
             </p>
             <ul
               style={{
-                fontFamily: "'DM Sans', sans-serif",
+                fontFamily: "'Cal Sans', sans-serif",
                 fontSize: '16px',
                 fontWeight: 400,
                 color: '#333333',
@@ -348,11 +347,11 @@ export default function PrivacyPage() {
           <div style={{ marginBottom: '48px' }}>
             <h2
               style={{
-                fontFamily: "'Cormorant Garamond', serif",
+                fontFamily: "'Cal Sans', serif",
                 fontSize: '36px',
                 fontWeight: 600,
-                color: '#000000',
-                borderBottom: '2px solid #2BA8E0',
+                color: '#020C1C',
+                borderBottom: '2px solid #10C4C3',
                 paddingBottom: '12px',
                 marginBottom: '20px',
               }}
@@ -361,7 +360,7 @@ export default function PrivacyPage() {
             </h2>
             <p
               style={{
-                fontFamily: "'DM Sans', sans-serif",
+                fontFamily: "'Cal Sans', sans-serif",
                 fontSize: '16px',
                 fontWeight: 400,
                 color: '#333333',
@@ -373,7 +372,7 @@ export default function PrivacyPage() {
             </p>
             <ul
               style={{
-                fontFamily: "'DM Sans', sans-serif",
+                fontFamily: "'Cal Sans', sans-serif",
                 fontSize: '16px',
                 fontWeight: 400,
                 color: '#333333',
@@ -405,11 +404,11 @@ export default function PrivacyPage() {
           <div style={{ marginBottom: '48px' }}>
             <h2
               style={{
-                fontFamily: "'Cormorant Garamond', serif",
+                fontFamily: "'Cal Sans', serif",
                 fontSize: '36px',
                 fontWeight: 600,
-                color: '#000000',
-                borderBottom: '2px solid #2BA8E0',
+                color: '#020C1C',
+                borderBottom: '2px solid #10C4C3',
                 paddingBottom: '12px',
                 marginBottom: '20px',
               }}
@@ -418,7 +417,7 @@ export default function PrivacyPage() {
             </h2>
             <p
               style={{
-                fontFamily: "'DM Sans', sans-serif",
+                fontFamily: "'Cal Sans', sans-serif",
                 fontSize: '16px',
                 fontWeight: 400,
                 color: '#333333',
@@ -430,7 +429,7 @@ export default function PrivacyPage() {
             </p>
             <ul
               style={{
-                fontFamily: "'DM Sans', sans-serif",
+                fontFamily: "'Cal Sans', sans-serif",
                 fontSize: '16px',
                 fontWeight: 400,
                 color: '#333333',
@@ -464,7 +463,7 @@ export default function PrivacyPage() {
             </ul>
             <p
               style={{
-                fontFamily: "'DM Sans', sans-serif",
+                fontFamily: "'Cal Sans', sans-serif",
                 fontSize: '16px',
                 fontWeight: 400,
                 color: '#333333',
@@ -473,7 +472,7 @@ export default function PrivacyPage() {
               }}
             >
               To exercise any of these rights, email{' '}
-              <a href="mailto:privacy@nilay360.com" style={{ color: '#2BA8E0', textDecoration: 'none' }}>
+              <a href="mailto:privacy@nilay360.com" style={{ color: '#10C4C3', textDecoration: 'none' }}>
                 privacy@nilay360.com
               </a>{' '}
               with the subject line &ldquo;DPDP Rights Request&rdquo; and your registered email address. We will
@@ -485,11 +484,11 @@ export default function PrivacyPage() {
           <div style={{ marginBottom: '48px' }}>
             <h2
               style={{
-                fontFamily: "'Cormorant Garamond', serif",
+                fontFamily: "'Cal Sans', serif",
                 fontSize: '36px',
                 fontWeight: 600,
-                color: '#000000',
-                borderBottom: '2px solid #2BA8E0',
+                color: '#020C1C',
+                borderBottom: '2px solid #10C4C3',
                 paddingBottom: '12px',
                 marginBottom: '20px',
               }}
@@ -498,7 +497,7 @@ export default function PrivacyPage() {
             </h2>
             <p
               style={{
-                fontFamily: "'DM Sans', sans-serif",
+                fontFamily: "'Cal Sans', sans-serif",
                 fontSize: '16px',
                 fontWeight: 400,
                 color: '#333333',
@@ -509,7 +508,7 @@ export default function PrivacyPage() {
               personalise content. Essential cookies are necessary for the Platform to function. Analytics and marketing
               cookies are used only with your consent. For detailed information on the types of cookies we use and how
               to manage your preferences, please read our Cookie Policy at{' '}
-              <a href="/cookies" style={{ color: '#2BA8E0', textDecoration: 'none' }}>
+              <a href="/cookies" style={{ color: '#10C4C3', textDecoration: 'none' }}>
                 www.nilay360.com/cookies
               </a>
               .
@@ -520,11 +519,11 @@ export default function PrivacyPage() {
           <div style={{ marginBottom: '48px' }}>
             <h2
               style={{
-                fontFamily: "'Cormorant Garamond', serif",
+                fontFamily: "'Cal Sans', serif",
                 fontSize: '36px',
                 fontWeight: 600,
-                color: '#000000',
-                borderBottom: '2px solid #2BA8E0',
+                color: '#020C1C',
+                borderBottom: '2px solid #10C4C3',
                 paddingBottom: '12px',
                 marginBottom: '20px',
               }}
@@ -533,7 +532,7 @@ export default function PrivacyPage() {
             </h2>
             <p
               style={{
-                fontFamily: "'DM Sans', sans-serif",
+                fontFamily: "'Cal Sans', sans-serif",
                 fontSize: '16px',
                 fontWeight: 400,
                 color: '#333333',
@@ -545,7 +544,7 @@ export default function PrivacyPage() {
             </p>
             <ul
               style={{
-                fontFamily: "'DM Sans', sans-serif",
+                fontFamily: "'Cal Sans', sans-serif",
                 fontSize: '16px',
                 fontWeight: 400,
                 color: '#333333',
@@ -564,7 +563,7 @@ export default function PrivacyPage() {
             </ul>
             <p
               style={{
-                fontFamily: "'DM Sans', sans-serif",
+                fontFamily: "'Cal Sans', sans-serif",
                 fontSize: '16px',
                 fontWeight: 400,
                 color: '#333333',
@@ -581,11 +580,11 @@ export default function PrivacyPage() {
           <div style={{ marginBottom: '0' }}>
             <h2
               style={{
-                fontFamily: "'Cormorant Garamond', serif",
+                fontFamily: "'Cal Sans', serif",
                 fontSize: '36px',
                 fontWeight: 600,
-                color: '#000000',
-                borderBottom: '2px solid #2BA8E0',
+                color: '#020C1C',
+                borderBottom: '2px solid #10C4C3',
                 paddingBottom: '12px',
                 marginBottom: '20px',
               }}
@@ -594,7 +593,7 @@ export default function PrivacyPage() {
             </h2>
             <p
               style={{
-                fontFamily: "'DM Sans', sans-serif",
+                fontFamily: "'Cal Sans', sans-serif",
                 fontSize: '16px',
                 fontWeight: 400,
                 color: '#333333',
@@ -606,7 +605,7 @@ export default function PrivacyPage() {
             </p>
             <div
               style={{
-                background: '#000000',
+                background: '#020C1C',
                 border: '1px solid rgba(201,168,76,0.25)',
                 borderRadius: '2px',
                 padding: '24px 28px',
@@ -615,7 +614,7 @@ export default function PrivacyPage() {
             >
               <p
                 style={{
-                  fontFamily: "'DM Sans', sans-serif",
+                  fontFamily: "'Cal Sans', sans-serif",
                   fontSize: '16px',
                   fontWeight: 400,
                   color: '#333333',
@@ -627,7 +626,7 @@ export default function PrivacyPage() {
                 <strong>Organisation:</strong> Nilay 360 Real Estate Technologies Pvt. Ltd.
                 <br />
                 <strong>Email:</strong>{' '}
-                <a href="mailto:privacy@nilay360.com" style={{ color: '#2BA8E0', textDecoration: 'none' }}>
+                <a href="mailto:privacy@nilay360.com" style={{ color: '#10C4C3', textDecoration: 'none' }}>
                   privacy@nilay360.com
                 </a>
                 <br />
@@ -637,7 +636,7 @@ export default function PrivacyPage() {
             </div>
             <p
               style={{
-                fontFamily: "'DM Sans', sans-serif",
+                fontFamily: "'Cal Sans', sans-serif",
                 fontSize: '16px',
                 fontWeight: 400,
                 color: '#333333',
@@ -650,7 +649,7 @@ export default function PrivacyPage() {
                 href="https://www.dataprotection.gov.in"
                 target="_blank"
                 rel="noopener noreferrer"
-                style={{ color: '#2BA8E0', textDecoration: 'none' }}
+                style={{ color: '#10C4C3', textDecoration: 'none' }}
               >
                 www.dataprotection.gov.in
               </a>
@@ -683,10 +682,10 @@ export default function PrivacyPage() {
           <div>
             <h4
               style={{
-                fontFamily: "'Cormorant Garamond', serif",
+                fontFamily: "'Cal Sans', serif",
                 fontSize: '18px',
                 fontWeight: 600,
-                color: '#2BA8E0',
+                color: '#10C4C3',
                 marginBottom: '20px',
                 letterSpacing: '0.5px',
               }}
@@ -704,7 +703,7 @@ export default function PrivacyPage() {
                   <a
                     href={link.href}
                     style={{
-                      fontFamily: "'DM Sans', sans-serif",
+                      fontFamily: "'Cal Sans', sans-serif",
                       fontSize: '13px',
                       fontWeight: 400,
                       color: 'rgba(255,255,255,0.55)',
@@ -722,10 +721,10 @@ export default function PrivacyPage() {
           <div>
             <h4
               style={{
-                fontFamily: "'Cormorant Garamond', serif",
+                fontFamily: "'Cal Sans', serif",
                 fontSize: '18px',
                 fontWeight: 600,
-                color: '#2BA8E0',
+                color: '#10C4C3',
                 marginBottom: '20px',
                 letterSpacing: '0.5px',
               }}
@@ -743,7 +742,7 @@ export default function PrivacyPage() {
                   <a
                     href={link.href}
                     style={{
-                      fontFamily: "'DM Sans', sans-serif",
+                      fontFamily: "'Cal Sans', sans-serif",
                       fontSize: '13px',
                       fontWeight: 400,
                       color: 'rgba(255,255,255,0.55)',
@@ -761,10 +760,10 @@ export default function PrivacyPage() {
           <div>
             <h4
               style={{
-                fontFamily: "'Cormorant Garamond', serif",
+                fontFamily: "'Cal Sans', serif",
                 fontSize: '18px',
                 fontWeight: 600,
-                color: '#2BA8E0',
+                color: '#10C4C3',
                 marginBottom: '20px',
                 letterSpacing: '0.5px',
               }}
@@ -782,7 +781,7 @@ export default function PrivacyPage() {
                   <a
                     href={link.href}
                     style={{
-                      fontFamily: "'DM Sans', sans-serif",
+                      fontFamily: "'Cal Sans', sans-serif",
                       fontSize: '13px',
                       fontWeight: 400,
                       color: 'rgba(255,255,255,0.55)',
@@ -800,10 +799,10 @@ export default function PrivacyPage() {
           <div>
             <h4
               style={{
-                fontFamily: "'Cormorant Garamond', serif",
+                fontFamily: "'Cal Sans', serif",
                 fontSize: '18px',
                 fontWeight: 600,
-                color: '#2BA8E0',
+                color: '#10C4C3',
                 marginBottom: '20px',
                 letterSpacing: '0.5px',
               }}
@@ -821,7 +820,7 @@ export default function PrivacyPage() {
                   <a
                     href={link.href}
                     style={{
-                      fontFamily: "'DM Sans', sans-serif",
+                      fontFamily: "'Cal Sans', sans-serif",
                       fontSize: '13px',
                       fontWeight: 400,
                       color: 'rgba(255,255,255,0.55)',
@@ -847,7 +846,7 @@ export default function PrivacyPage() {
         >
           <p
             style={{
-              fontFamily: "'DM Sans', sans-serif",
+              fontFamily: "'Cal Sans', sans-serif",
               fontSize: '12px',
               fontWeight: 400,
               color: 'rgba(255,255,255,0.3)',

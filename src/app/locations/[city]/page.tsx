@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import { useState, useEffect, useMemo } from "react";
 import { useParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
@@ -166,7 +166,7 @@ function Eyebrow({ label }: { label: string }) {
   return (
     <div style={{ display: "inline-flex", alignItems: "center", gap: "8px", marginBottom: "14px" }}>
       <div style={{ width: "26px", height: "1px", background: "rgba(201,168,76,0.55)" }} />
-      <span style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.22em", color: "#2BA8E0", textTransform: "uppercase" }}>{label}</span>
+      <span style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.22em", color: "#10C4C3", textTransform: "uppercase" }}>{label}</span>
       <div style={{ width: "26px", height: "1px", background: "rgba(201,168,76,0.55)" }} />
     </div>
   );
@@ -176,12 +176,12 @@ function FaqItem({ q, a, idx }: { q: string; a: string; idx: number }) {
   const [open, setOpen] = useState(false);
   return (
     <div style={{ borderBottom: "1px solid rgba(13,43,31,0.08)" }}>
-      <button onClick={() => setOpen(o => !o)} style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between", gap: "16px", padding: "20px 0", background: "transparent", border: "none", cursor: "pointer", fontFamily: "'DM Sans', sans-serif", textAlign: "left" }}>
+      <button onClick={() => setOpen(o => !o)} style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between", gap: "16px", padding: "20px 0", background: "transparent", border: "none", cursor: "pointer", fontFamily: "'Cal Sans', sans-serif", textAlign: "left" }}>
         <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-          <span style={{ width: "26px", height: "26px", borderRadius: "7px", background: open ? "#000000" : "rgba(201,168,76,0.1)", border: `1px solid ${open ? "transparent" : "rgba(201,168,76,0.25)"}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "10px", fontWeight: 700, color: "#2BA8E0", flexShrink: 0 }}>{String(idx + 1).padStart(2, "0")}</span>
-          <span style={{ fontSize: "14px", fontWeight: 600, color: "#000000", lineHeight: 1.4 }}>{q}</span>
+          <span style={{ width: "26px", height: "26px", borderRadius: "7px", background: open ? "#020C1C" : "rgba(201,168,76,0.1)", border: `1px solid ${open ? "transparent" : "rgba(201,168,76,0.25)"}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "10px", fontWeight: 700, color: "#10C4C3", flexShrink: 0 }}>{String(idx + 1).padStart(2, "0")}</span>
+          <span style={{ fontSize: "14px", fontWeight: 600, color: "#020C1C", lineHeight: 1.4 }}>{q}</span>
         </div>
-        <span style={{ fontSize: "20px", color: "#2BA8E0", flexShrink: 0, transform: open ? "rotate(45deg)" : "none", transition: "transform 0.2s", lineHeight: 1 }}>+</span>
+        <span style={{ fontSize: "20px", color: "#10C4C3", flexShrink: 0, transform: open ? "rotate(45deg)" : "none", transition: "transform 0.2s", lineHeight: 1 }}>+</span>
       </button>
       <div style={{ maxHeight: open ? "300px" : "0", overflow: "hidden", transition: "max-height 0.3s ease" }}>
         <p style={{ fontSize: "13.5px", color: "#6B7C72", lineHeight: 1.8, padding: "0 0 20px 38px" }}>{a}</p>
@@ -203,12 +203,12 @@ function PropCard({ p }: { p: Property }) {
       onMouseEnter={() => setHover(true)} onMouseLeave={() => setHover(false)}>
       <div style={{ height: "200px", overflow: "hidden", position: "relative" }}>
         <img src={optimizedImageUrl(img, 500)} alt={p.title} loading="lazy" style={{ width: "100%", height: "100%", objectFit: "cover", transform: hover ? "scale(1.05)" : "scale(1)", transition: "transform 0.3s" }} />
-        <span style={{ position: "absolute", top: "12px", left: "12px", padding: "3px 10px", borderRadius: "100px", fontSize: "9px", fontWeight: 800, letterSpacing: "0.1em", textTransform: "uppercase", background: p.listing_type === "sale" ? "#2BA8E0" : "#4A90D9", color: p.listing_type === "sale" ? "#000000" : "#fff" }}>{p.listing_type === "sale" ? "For Sale" : "For Rent"}</span>
+        <span style={{ position: "absolute", top: "12px", left: "12px", padding: "3px 10px", borderRadius: "100px", fontSize: "9px", fontWeight: 800, letterSpacing: "0.1em", textTransform: "uppercase", background: p.listing_type === "sale" ? "#10C4C3" : "#4A90D9", color: p.listing_type === "sale" ? "#020C1C" : "#fff" }}>{p.listing_type === "sale" ? "For Sale" : "For Rent"}</span>
       </div>
       <div style={{ padding: "16px 18px" }}>
-        <p style={{ fontSize: "9px", fontWeight: 700, letterSpacing: "0.1em", color: "#2BA8E0", textTransform: "uppercase", marginBottom: "4px" }}>{p.property_type}{p.neighbourhood ? ` · ${p.neighbourhood}` : ""}</p>
-        <h4 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "17px", fontWeight: 600, color: "#000000", marginBottom: "8px", lineHeight: 1.3, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{p.title}</h4>
-        <p style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "19px", fontWeight: 600, color: "#2BA8E0", marginBottom: "10px" }}>{fmtINR(p.price, true)}{p.listing_type === "rent" ? "/mo" : ""}</p>
+        <p style={{ fontSize: "9px", fontWeight: 700, letterSpacing: "0.1em", color: "#10C4C3", textTransform: "uppercase", marginBottom: "4px" }}>{p.property_type}{p.neighbourhood ? ` · ${p.neighbourhood}` : ""}</p>
+        <h4 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "17px", fontWeight: 600, color: "#020C1C", marginBottom: "8px", lineHeight: 1.3, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{p.title}</h4>
+        <p style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "19px", fontWeight: 600, color: "#10C4C3", marginBottom: "10px" }}>{fmtINR(p.price, true)}{p.listing_type === "rent" ? "/mo" : ""}</p>
         {(p.bedrooms || p.bathrooms || p.area_sqft) && (
           <div style={{ display: "flex", gap: "12px" }}>
             {p.bedrooms    && <span style={{ fontSize: "11px", color: "#6B7C72" }}>🛏 {p.bedrooms} {COMMERCIAL_CATEGORIES.includes(p.property_type?.toLowerCase()) ? "Rooms" : "BHK"}</span>}
@@ -294,10 +294,9 @@ export default function CityPage() {
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,600&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap');
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
         html { scroll-behavior: smooth; }
-        body { font-family: 'DM Sans', system-ui, sans-serif; background: #000000; overflow-x: hidden; }
+        body { font-family: 'Cal Sans', system-ui, sans-serif; background: #020C1C; overflow-x: hidden; }
         ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-thumb { background: rgba(201,168,76,0.3); border-radius: 2px; }
         @keyframes fadeUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
@@ -323,12 +322,12 @@ export default function CityPage() {
         }
       `}</style>
 
-      <div style={{ minHeight: "100vh", background: "#000000" }}>
+      <div style={{ minHeight: "100vh", background: "#020C1C" }}>
 
         {/* ── NAVBAR ─────────────────────────────────────────── */}
         <nav className="loc-nav" style={{ position: "fixed", top: 0, left: 0, right: 0, zIndex: 200, height: "68px", display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 48px", background: "rgba(5,8,12,0.88)", backdropFilter: "blur(20px) saturate(180%)", borderBottom: "0.5px solid rgba(201,168,76,0.18)" }}>
-          <a href="/" style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "19px", fontWeight: 600, color: "#fff", letterSpacing: "0.16em", textDecoration: "none" }}>
-            Nilay 360 <span style={{ color: "#2BA8E0" }}>·</span>
+          <a href="/" style={{ fontFamily: "'Cal Sans', sans-serif", fontSize: "19px", fontWeight: 600, color: "#fff", letterSpacing: "0.16em", textDecoration: "none" }}>
+            Nilay 360 <span style={{ color: "#10C4C3" }}>·</span>
           </a>
           <div className="loc-nav-links" style={{ display: "flex", gap: "2px" }}>
             {[["Home", "/"], ["Properties", "/properties"], ["Search", "/search"], ["Locations", "/locations"], ["Blog", "/blog"], ["Contact", "/contact"]].map(([l, h]) => (
@@ -337,7 +336,7 @@ export default function CityPage() {
           </div>
           <div style={{ display: "flex", gap: "10px" }}>
             <a href="/login"    style={{ padding: "8px 18px", borderRadius: "7px", border: "0.5px solid rgba(255,255,255,0.22)", color: "rgba(255,255,255,0.75)", fontSize: "13px", fontWeight: 500, textDecoration: "none" }}>Sign In</a>
-            <a href="/register" style={{ padding: "8px 22px", borderRadius: "7px", background: "#2BA8E0", color: "#000000", fontSize: "13px", fontWeight: 600, textDecoration: "none" }}>List Property</a>
+            <a href="/register" style={{ padding: "8px 22px", borderRadius: "7px", background: "#10C4C3", color: "#020C1C", fontSize: "13px", fontWeight: 600, textDecoration: "none" }}>List Property</a>
           </div>
         </nav>
 
@@ -357,7 +356,7 @@ export default function CityPage() {
                 </span>
               ))}
             </div>
-            <h1 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "clamp(48px, 7vw, 80px)", fontWeight: 300, color: "#000000", lineHeight: 1.05, marginBottom: "10px", animation: "fadeUp 0.5s ease-out both" }}>
+            <h1 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "clamp(48px, 7vw, 80px)", fontWeight: 300, color: "#020C1C", lineHeight: 1.05, marginBottom: "10px", animation: "fadeUp 0.5s ease-out both" }}>
               {cfg.name}
             </h1>
             <p style={{ fontSize: "14px", color: "rgba(245,242,236,0.5)", marginBottom: "24px" }}>{cfg.state}, {cfg.country}</p>
@@ -369,7 +368,7 @@ export default function CityPage() {
                 { label: `Avg rent ₹${(cfg.avgRent / 1000).toFixed(0)}K/mo`, icon: "🔑" },
                 { label: `+${cfg.growth}% YoY`, icon: "📈" },
               ].map(p => (
-                <span key={p.label} style={{ display: "inline-flex", alignItems: "center", gap: "6px", padding: "7px 16px", background: "rgba(245,242,236,0.08)", border: "1px solid rgba(245,242,236,0.15)", borderRadius: "100px", fontSize: "12px", fontWeight: 600, color: "#000000", backdropFilter: "blur(8px)" }}>
+                <span key={p.label} style={{ display: "inline-flex", alignItems: "center", gap: "6px", padding: "7px 16px", background: "rgba(245,242,236,0.08)", border: "1px solid rgba(245,242,236,0.15)", borderRadius: "100px", fontSize: "12px", fontWeight: 600, color: "#020C1C", backdropFilter: "blur(8px)" }}>
                   {p.icon} {p.label}
                 </span>
               ))}
@@ -383,8 +382,8 @@ export default function CityPage() {
             {/* Text */}
             <div>
               <Eyebrow label="About the City" />
-              <h2 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "clamp(28px, 3.5vw, 44px)", fontWeight: 400, color: "#000000", lineHeight: 1.2, marginBottom: "22px" }}>
-                Living in <em style={{ fontStyle: "italic", color: "#2BA8E0" }}>{cfg.name}</em>
+              <h2 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "clamp(28px, 3.5vw, 44px)", fontWeight: 400, color: "#020C1C", lineHeight: 1.2, marginBottom: "22px" }}>
+                Living in <em style={{ fontStyle: "italic", color: "#10C4C3" }}>{cfg.name}</em>
               </h2>
               <p style={{ fontSize: "14px", color: "#4B5563", lineHeight: 1.85, marginBottom: "24px" }}>{cfg.lifestyle}</p>
               <div className="loc-stats-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
@@ -397,18 +396,18 @@ export default function CityPage() {
                   <div key={item.label} style={{ background: "#fff", border: "1px solid rgba(13,43,31,0.07)", borderRadius: "12px", padding: "16px 16px" }}>
                     <div style={{ fontSize: "18px", marginBottom: "6px" }}>{item.icon}</div>
                     <p style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.1em", color: "#9CA3AF", textTransform: "uppercase", marginBottom: "3px" }}>{item.label}</p>
-                    <p style={{ fontSize: "13px", fontWeight: 600, color: "#000000", lineHeight: 1.4 }}>{item.value}</p>
+                    <p style={{ fontSize: "13px", fontWeight: 600, color: "#020C1C", lineHeight: 1.4 }}>{item.value}</p>
                   </div>
                 ))}
               </div>
             </div>
             {/* Stats card */}
-            <div style={{ background: "#000000", borderRadius: "18px", padding: "32px 28px", position: "relative", overflow: "hidden" }}>
+            <div style={{ background: "#020C1C", borderRadius: "18px", padding: "32px 28px", position: "relative", overflow: "hidden" }}>
               <div style={{ position: "absolute", inset: 0, backgroundImage: "linear-gradient(rgba(201,168,76,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(201,168,76,0.04) 1px, transparent 1px)", backgroundSize: "36px 36px", pointerEvents: "none" }} />
               <div style={{ position: "relative", zIndex: 2 }}>
                 <div style={{ display: "flex", alignItems: "center", gap: "7px", marginBottom: "22px" }}>
-                  <div style={{ width: "5px", height: "5px", borderRadius: "50%", background: "#2BA8E0" }} />
-                  <span style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.2em", color: "#2BA8E0", textTransform: "uppercase" }}>Market Stats · {cfg.name}</span>
+                  <div style={{ width: "5px", height: "5px", borderRadius: "50%", background: "#10C4C3" }} />
+                  <span style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.2em", color: "#10C4C3", textTransform: "uppercase" }}>Market Stats · {cfg.name}</span>
                 </div>
                 {[
                   { label: "Avg Sale Price",   value: `₹${(cfg.ppsf / 1000).toFixed(0)}K/sqft` },
@@ -418,10 +417,10 @@ export default function CityPage() {
                 ].map(row => (
                   <div key={row.label} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "13px 0", borderBottom: "1px solid rgba(245,242,236,0.07)" }}>
                     <span style={{ fontSize: "12px", color: "rgba(245,242,236,0.45)" }}>{row.label}</span>
-                    <span style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "20px", fontWeight: 600, color: "#2BA8E0" }}>{row.value}</span>
+                    <span style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "20px", fontWeight: 600, color: "#10C4C3" }}>{row.value}</span>
                   </div>
                 ))}
-                <a href={`/search?city=${encodeURIComponent(cfg.name)}`} style={{ display: "block", marginTop: "20px", padding: "12px", background: "#2BA8E0", borderRadius: "9px", color: "#000000", fontSize: "12px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", textDecoration: "none", textAlign: "center" }}>
+                <a href={`/search?city=${encodeURIComponent(cfg.name)}`} style={{ display: "block", marginTop: "20px", padding: "12px", background: "#10C4C3", borderRadius: "9px", color: "#020C1C", fontSize: "12px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", textDecoration: "none", textAlign: "center" }}>
                   View All {cfg.name} Properties →
                 </a>
               </div>
@@ -435,18 +434,18 @@ export default function CityPage() {
             <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", flexWrap: "wrap", gap: "16px", marginBottom: "28px" }}>
               <div>
                 <Eyebrow label="Available Now" />
-                <h2 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "clamp(28px, 3.5vw, 44px)", fontWeight: 400, color: "#000000" }}>
+                <h2 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "clamp(28px, 3.5vw, 44px)", fontWeight: 400, color: "#020C1C" }}>
                   Properties in {cfg.name}
                 </h2>
               </div>
               {/* Filters */}
               <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
                 {[["all", "All"], ["sale", "For Sale"], ["rent", "For Rent"]].map(([v, l]) => (
-                  <button key={v} onClick={() => setTypeFilter(v)} style={{ padding: "7px 16px", borderRadius: "100px", fontSize: "12px", fontWeight: 600, background: typeFilter === v ? "#000000" : "#fff", border: typeFilter === v ? "none" : "1.5px solid rgba(13,43,31,0.12)", color: typeFilter === v ? "#2BA8E0" : "#6B7C72", cursor: "pointer", fontFamily: "'DM Sans', sans-serif" }}>{l}</button>
+                  <button key={v} onClick={() => setTypeFilter(v)} style={{ padding: "7px 16px", borderRadius: "100px", fontSize: "12px", fontWeight: 600, background: typeFilter === v ? "#020C1C" : "#fff", border: typeFilter === v ? "none" : "1.5px solid rgba(13,43,31,0.12)", color: typeFilter === v ? "#10C4C3" : "#6B7C72", cursor: "pointer", fontFamily: "'Cal Sans', sans-serif" }}>{l}</button>
                 ))}
                 <div style={{ width: "1px", background: "rgba(13,43,31,0.1)", margin: "0 4px" }} />
                 {[["all", "Any Price"], ["under1", "Under ₹1Cr"], ["1-3", "₹1–3Cr"], ["above3", "₹3Cr+"]].map(([v, l]) => (
-                  <button key={v} onClick={() => setPriceFilter(v)} style={{ padding: "7px 16px", borderRadius: "100px", fontSize: "12px", fontWeight: 600, background: priceFilter === v ? "#2BA8E0" : "#fff", border: priceFilter === v ? "none" : "1.5px solid rgba(13,43,31,0.12)", color: priceFilter === v ? "#000000" : "#6B7C72", cursor: "pointer", fontFamily: "'DM Sans', sans-serif" }}>{l}</button>
+                  <button key={v} onClick={() => setPriceFilter(v)} style={{ padding: "7px 16px", borderRadius: "100px", fontSize: "12px", fontWeight: 600, background: priceFilter === v ? "#10C4C3" : "#fff", border: priceFilter === v ? "none" : "1.5px solid rgba(13,43,31,0.12)", color: priceFilter === v ? "#020C1C" : "#6B7C72", cursor: "pointer", fontFamily: "'Cal Sans', sans-serif" }}>{l}</button>
                 ))}
               </div>
             </div>
@@ -464,8 +463,8 @@ export default function CityPage() {
               </div>
             ) : filtered.length === 0 ? (
               <div style={{ padding: "60px", textAlign: "center", background: "#fff", borderRadius: "16px", border: "1px solid rgba(13,43,31,0.07)" }}>
-                <p style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "24px", color: "#000000", marginBottom: "8px" }}>No properties match this filter</p>
-                <button onClick={() => { setTypeFilter("all"); setPriceFilter("all"); }} style={{ fontSize: "13px", fontWeight: 600, color: "#2BA8E0", background: "transparent", border: "none", cursor: "pointer", fontFamily: "'DM Sans', sans-serif" }}>Clear filters</button>
+                <p style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "24px", color: "#020C1C", marginBottom: "8px" }}>No properties match this filter</p>
+                <button onClick={() => { setTypeFilter("all"); setPriceFilter("all"); }} style={{ fontSize: "13px", fontWeight: 600, color: "#10C4C3", background: "transparent", border: "none", cursor: "pointer", fontFamily: "'Cal Sans', sans-serif" }}>Clear filters</button>
               </div>
             ) : (
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: "20px" }}>
@@ -475,7 +474,7 @@ export default function CityPage() {
 
             {filtered.length > 0 && (
               <div style={{ textAlign: "center", marginTop: "36px" }}>
-                <a href={`/search?city=${encodeURIComponent(cfg.name)}`} style={{ padding: "12px 32px", background: "transparent", border: "1.5px solid rgba(13,43,31,0.18)", borderRadius: "9px", color: "#000000", fontSize: "13px", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", textDecoration: "none", display: "inline-flex", alignItems: "center", gap: "8px" }}>
+                <a href={`/search?city=${encodeURIComponent(cfg.name)}`} style={{ padding: "12px 32px", background: "transparent", border: "1.5px solid rgba(13,43,31,0.18)", borderRadius: "9px", color: "#020C1C", fontSize: "13px", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", textDecoration: "none", display: "inline-flex", alignItems: "center", gap: "8px" }}>
                   View All {cfg.name} Properties
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" /></svg>
                 </a>
@@ -488,15 +487,15 @@ export default function CityPage() {
         <section style={{ maxWidth: "1280px", margin: "0 auto", padding: "72px 48px" }}>
           <div style={{ textAlign: "center", marginBottom: "44px" }}>
             <Eyebrow label="Price History" />
-            <h2 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "clamp(28px, 3.5vw, 44px)", fontWeight: 400, color: "#000000" }}>
-              {cfg.name} Market<br /><em style={{ fontStyle: "italic", color: "#2BA8E0" }}>Trends</em>
+            <h2 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "clamp(28px, 3.5vw, 44px)", fontWeight: 400, color: "#020C1C" }}>
+              {cfg.name} Market<br /><em style={{ fontStyle: "italic", color: "#10C4C3" }}>Trends</em>
             </h2>
           </div>
           <div style={{ background: "#fff", borderRadius: "18px", padding: "36px 36px", border: "1px solid rgba(13,43,31,0.07)" }}>
             {/* Legend */}
             <div style={{ display: "flex", gap: "20px", marginBottom: "28px", flexWrap: "wrap" }}>
               <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                <div style={{ width: "24px", height: "3px", background: "#2BA8E0", borderRadius: "2px" }} />
+                <div style={{ width: "24px", height: "3px", background: "#10C4C3", borderRadius: "2px" }} />
                 <span style={{ fontSize: "12px", fontWeight: 600, color: "#6B7C72" }}>Avg Sale Price (₹/sqft)</span>
               </div>
               <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
@@ -513,7 +512,7 @@ export default function CityPage() {
               {cfg.trends.map(t => (
                 <div key={t.year} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: "4px" }}>
                   <div style={{ width: "100%", display: "flex", gap: "4px", alignItems: "flex-end" }}>
-                    <div style={{ flex: 1, height: `${(t.sale / maxSale) * 160}px`, background: "linear-gradient(to top, #2BA8E0, rgba(201,168,76,0.6))", borderRadius: "4px 4px 0 0", minHeight: "8px", transition: "height 0.4s" }} title={`₹${(t.sale / 1000).toFixed(0)}K/sqft`} />
+                    <div style={{ flex: 1, height: `${(t.sale / maxSale) * 160}px`, background: "linear-gradient(to top, #10C4C3, rgba(201,168,76,0.6))", borderRadius: "4px 4px 0 0", minHeight: "8px", transition: "height 0.4s" }} title={`₹${(t.sale / 1000).toFixed(0)}K/sqft`} />
                     <div style={{ flex: 1, height: `${(t.rent / maxRent) * 160}px`, background: "linear-gradient(to top, #4A90D9, rgba(74,144,217,0.5))", borderRadius: "4px 4px 0 0", minHeight: "8px", transition: "height 0.4s" }} title={`₹${(t.rent / 1000).toFixed(0)}K/mo`} />
                   </div>
                 </div>
@@ -530,13 +529,13 @@ export default function CityPage() {
             {/* Key numbers */}
             <div style={{ display: "flex", gap: "16px", marginTop: "24px", flexWrap: "wrap" }}>
               {[
-                { label: "2025 Avg Sale",  value: `₹${(cfg.ppsf / 1000).toFixed(0)}K/sqft`, color: "#2BA8E0" },
+                { label: "2025 Avg Sale",  value: `₹${(cfg.ppsf / 1000).toFixed(0)}K/sqft`, color: "#10C4C3" },
                 { label: "2025 Avg Rent",  value: `₹${(cfg.avgRent / 1000).toFixed(0)}K/mo`, color: "#4A90D9" },
                 { label: "5-Year Growth",  value: `+${(((cfg.ppsf / cfg.trends[0].sale) - 1) * 100).toFixed(0)}%`,  color: "#059669" },
               ].map(s => (
                 <div key={s.label} style={{ flex: 1, background: "#F8F6F1", borderRadius: "10px", padding: "14px 18px" }}>
                   <p style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.1em", color: "#9CA3AF", textTransform: "uppercase", marginBottom: "4px" }}>{s.label}</p>
-                  <p style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "22px", fontWeight: 600, color: s.color }}>{s.value}</p>
+                  <p style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "22px", fontWeight: 600, color: s.color }}>{s.value}</p>
                 </div>
               ))}
             </div>
@@ -549,27 +548,27 @@ export default function CityPage() {
             <div style={{ maxWidth: "1280px", margin: "0 auto" }}>
               <div style={{ textAlign: "center", marginBottom: "44px" }}>
                 <Eyebrow label="Local Areas" />
-                <h2 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "clamp(28px, 3.5vw, 44px)", fontWeight: 400, color: "#000000" }}>
-                  Popular Neighbourhoods<br /><em style={{ fontStyle: "italic", color: "#2BA8E0" }}>in {cfg.name}</em>
+                <h2 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "clamp(28px, 3.5vw, 44px)", fontWeight: 400, color: "#020C1C" }}>
+                  Popular Neighbourhoods<br /><em style={{ fontStyle: "italic", color: "#10C4C3" }}>in {cfg.name}</em>
                 </h2>
               </div>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))", gap: "18px" }}>
                 {cfg.neighbourhoods.map((n, i) => {
                   const [hover, setHover] = useState(false);
                   return (
-                    <a key={n.name} href={`/search?city=${encodeURIComponent(cfg.name)}&neighbourhood=${encodeURIComponent(n.name)}`} style={{ textDecoration: "none", display: "block", background: hover ? "#000000" : "#fff", border: "1px solid rgba(13,43,31,0.07)", borderRadius: "14px", padding: "24px 22px", transition: "all 0.2s", boxShadow: hover ? "0 16px 48px rgba(13,43,31,0.14)" : "0 1px 5px rgba(13,43,31,0.04)", transform: hover ? "translateY(-3px)" : "none" }}
+                    <a key={n.name} href={`/search?city=${encodeURIComponent(cfg.name)}&neighbourhood=${encodeURIComponent(n.name)}`} style={{ textDecoration: "none", display: "block", background: hover ? "#020C1C" : "#fff", border: "1px solid rgba(13,43,31,0.07)", borderRadius: "14px", padding: "24px 22px", transition: "all 0.2s", boxShadow: hover ? "0 16px 48px rgba(13,43,31,0.14)" : "0 1px 5px rgba(13,43,31,0.04)", transform: hover ? "translateY(-3px)" : "none" }}
                       onMouseEnter={() => setHover(true)} onMouseLeave={() => setHover(false)}>
                       <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "12px" }}>
                         <div>
-                          <h3 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "20px", fontWeight: 600, color: hover ? "#000000" : "#000000", transition: "color 0.2s" }}>{n.name}</h3>
-                          <span style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.1em", color: "#2BA8E0", textTransform: "uppercase" }}>{n.type}</span>
+                          <h3 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "20px", fontWeight: 600, color: hover ? "#020C1C" : "#020C1C", transition: "color 0.2s" }}>{n.name}</h3>
+                          <span style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.1em", color: "#10C4C3", textTransform: "uppercase" }}>{n.type}</span>
                         </div>
                         <span style={{ fontSize: "22px", opacity: 0.5 }}>{["🏡", "🏙", "🌆", "🏘", "🏗", "🌇"][i % 6]}</span>
                       </div>
                       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                         <div>
                           <p style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.08em", color: hover ? "rgba(201,168,76,0.5)" : "#9CA3AF", textTransform: "uppercase", marginBottom: "2px" }}>Avg Price</p>
-                          <p style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "17px", fontWeight: 600, color: hover ? "#2BA8E0" : "#000000", transition: "color 0.2s" }}>₹{(n.ppsf / 1000).toFixed(0)}K/sqft</p>
+                          <p style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "17px", fontWeight: 600, color: hover ? "#10C4C3" : "#020C1C", transition: "color 0.2s" }}>₹{(n.ppsf / 1000).toFixed(0)}K/sqft</p>
                         </div>
                         <span style={{ fontSize: "12px", color: hover ? "rgba(245,242,236,0.4)" : "#9CA3AF" }}>{n.count} listings</span>
                       </div>
@@ -585,7 +584,7 @@ export default function CityPage() {
         <section style={{ maxWidth: "1280px", margin: "0 auto", padding: "72px 48px" }}>
           <div style={{ textAlign: "center", marginBottom: "44px" }}>
             <Eyebrow label="Infrastructure" />
-            <h2 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "clamp(28px, 3.5vw, 44px)", fontWeight: 400, color: "#000000" }}>
+            <h2 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "clamp(28px, 3.5vw, 44px)", fontWeight: 400, color: "#020C1C" }}>
               Amenities & Infrastructure
             </h2>
           </div>
@@ -593,12 +592,12 @@ export default function CityPage() {
             {AMENITY_CATS.map(cat => (
               <div key={cat.label} style={{ background: "#fff", border: "1px solid rgba(13,43,31,0.07)", borderRadius: "16px", padding: "24px 20px" }}>
                 <div style={{ fontSize: "26px", marginBottom: "12px" }}>{cat.icon}</div>
-                <h4 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "19px", fontWeight: 600, color: "#000000", marginBottom: "14px" }}>{cat.label}</h4>
+                <h4 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "19px", fontWeight: 600, color: "#020C1C", marginBottom: "14px" }}>{cat.label}</h4>
                 {cat.items.length > 0 ? (
                   <ul style={{ listStyle: "none", display: "flex", flexDirection: "column", gap: "8px" }}>
                     {cat.items.map(item => (
                       <li key={item} style={{ display: "flex", alignItems: "flex-start", gap: "8px", fontSize: "12px", color: "#6B7C72", lineHeight: 1.5 }}>
-                        <span style={{ color: "#2BA8E0", fontWeight: 700, flexShrink: 0, marginTop: "1px" }}>›</span>
+                        <span style={{ color: "#10C4C3", fontWeight: 700, flexShrink: 0, marginTop: "1px" }}>›</span>
                         {item}
                       </li>
                     ))}
@@ -614,8 +613,8 @@ export default function CityPage() {
           <div style={{ maxWidth: "820px", margin: "0 auto" }}>
             <div style={{ textAlign: "center", marginBottom: "44px" }}>
               <Eyebrow label="Common Questions" />
-              <h2 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "clamp(28px, 3.5vw, 44px)", fontWeight: 400, color: "#000000" }}>
-                {cfg.name} Property<br /><em style={{ fontStyle: "italic", color: "#2BA8E0" }}>FAQs</em>
+              <h2 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "clamp(28px, 3.5vw, 44px)", fontWeight: 400, color: "#020C1C" }}>
+                {cfg.name} Property<br /><em style={{ fontStyle: "italic", color: "#10C4C3" }}>FAQs</em>
               </h2>
             </div>
             <div style={{ background: "#fff", borderRadius: "18px", padding: "8px 36px", border: "1px solid rgba(13,43,31,0.07)", boxShadow: "0 2px 14px rgba(13,43,31,0.04)" }}>
@@ -625,18 +624,18 @@ export default function CityPage() {
         </section>
 
         {/* ── CTA ────────────────────────────────────────────── */}
-        <section className="loc-cta" style={{ background: "#000000", padding: "90px 48px", position: "relative", overflow: "hidden" }}>
+        <section className="loc-cta" style={{ background: "#020C1C", padding: "90px 48px", position: "relative", overflow: "hidden" }}>
           <div style={{ position: "absolute", inset: 0, backgroundImage: "linear-gradient(rgba(201,168,76,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(201,168,76,0.04) 1px, transparent 1px)", backgroundSize: "52px 52px", pointerEvents: "none" }} />
           <div style={{ position: "absolute", inset: 0, background: "radial-gradient(ellipse 60% 55% at 50% 110%, rgba(201,168,76,0.1) 0%, transparent 55%)", pointerEvents: "none" }} />
           <div style={{ position: "relative", zIndex: 2, maxWidth: "660px", margin: "0 auto", textAlign: "center" }}>
-            <h2 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "clamp(34px, 5vw, 56px)", fontWeight: 300, color: "#000000", lineHeight: 1.15, marginBottom: "16px" }}>
-              Find Your Home<br /><em style={{ fontStyle: "italic", color: "#2BA8E0" }}>in {cfg.name}</em>
+            <h2 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "clamp(34px, 5vw, 56px)", fontWeight: 300, color: "#020C1C", lineHeight: 1.15, marginBottom: "16px" }}>
+              Find Your Home<br /><em style={{ fontStyle: "italic", color: "#10C4C3" }}>in {cfg.name}</em>
             </h2>
             <p style={{ fontSize: "15px", color: "rgba(245,242,236,0.5)", lineHeight: 1.75, marginBottom: "36px" }}>
               Talk to a {cfg.name} property expert today. Schedule viewings, get price insights, and buy with complete confidence.
             </p>
             <div style={{ display: "flex", gap: "14px", justifyContent: "center", flexWrap: "wrap" }}>
-              <a href={`/search?city=${encodeURIComponent(cfg.name)}`} style={{ padding: "14px 36px", background: "#2BA8E0", borderRadius: "9px", color: "#000000", fontSize: "13px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", textDecoration: "none", display: "inline-flex", alignItems: "center", gap: "8px" }}>
+              <a href={`/search?city=${encodeURIComponent(cfg.name)}`} style={{ padding: "14px 36px", background: "#10C4C3", borderRadius: "9px", color: "#020C1C", fontSize: "13px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", textDecoration: "none", display: "inline-flex", alignItems: "center", gap: "8px" }}>
                 Browse {cfg.name} Properties
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" /></svg>
               </a>
@@ -652,8 +651,17 @@ export default function CityPage() {
           <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
             <div className="loc-footer-grid" style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1fr 1fr", gap: "48px", paddingBottom: "56px", borderBottom: "1px solid rgba(245,242,236,0.06)" }}>
               <div>
-                <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "18px", fontWeight: 600, color: "#fff", letterSpacing: "0.16em", marginBottom: "14px" }}>Nilay 360 <span style={{ color: "#2BA8E0" }}>·</span></div>
+                <div style={{ fontFamily: "'Cal Sans', sans-serif", fontSize: "18px", fontWeight: 600, color: "#fff", letterSpacing: "0.16em", marginBottom: "14px" }}>Nilay 360 <span style={{ color: "#10C4C3" }}>·</span></div>
                 <p style={{ fontSize: "13px", color: "rgba(245,242,236,0.35)", lineHeight: 1.75, maxWidth: "280px", marginBottom: "22px" }}>India's most trusted premium real estate platform.</p>
+                <div style={{ display: "flex", gap: "10px" }}>
+                  {[
+                    { s: "IN", href: "https://www.instagram.com/nilay360_/" },
+                    { s: "LI", href: "https://linkedin.com/company/nilay360" },
+                    { s: "YT", href: "https://www.youtube.com/@nilay360.digital" },
+                  ].map(({ s, href }) => (
+                    <a key={s} href={href} target="_blank" rel="noopener noreferrer" aria-label={s} style={{ width: "34px", height: "34px", borderRadius: "8px", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.07)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "10px", color: "rgba(255,255,255,0.35)", fontWeight: 700, textDecoration: "none" }}>{s}</a>
+                  ))}
+                </div>
               </div>
               {[
                 { heading: "Properties", links: [["Buy","/buy"],["Rent","/rent"],["New Projects","/new-projects"],["Commercial","/commercial"],["Builders","/builders"],["Blog","/blog"]] },

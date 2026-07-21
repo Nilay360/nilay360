@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
@@ -32,7 +32,7 @@ const AGENTS: Record<string, Agent> = {
     specialisation: "Luxury Apartments", specialisations: ["Luxury Apartments", "Penthouse Sales", "NRI Investments", "Builder Tie-ups"],
     languages: ["English", "Hindi", "Telugu"], experience_years: 12,
     rating: 0, reviews_count: 0, properties_sold: 318, properties_listed: 42,
-    rera_number: "A02400001234", verified: true, featured: true, avatar_color: "#000000",
+    rera_number: "A02400001234", verified: true, featured: true, avatar_color: "#020C1C",
     bio: "Arjun Mehta is one of Hyderabad's most decorated luxury real estate consultants, with over 12 years of deep expertise across the Jubilee Hills, Banjara Hills, Kokapet, and Financial District corridors.\n\nHis client portfolio spans C-suite executives, NRI professionals in the Gulf and USA, and institutional investors. Arjun is known for his meticulous due diligence, transparent advisory, and ability to negotiate complex high-value transactions with grace.\n\nHe holds certifications from RERA Telangana, the National Association of Realtors (NAR India), and the Nilay 360 Certified Advisor programme. In 2024, he was recognised as Nilay 360's Top Performer of the Year — an honour voted on by verified client reviews.",
     phone: "+919876543210", email: "arjun.mehta@nilay360.com", whatsapp: "+919876543210",
   },
@@ -59,7 +59,7 @@ const AGENTS: Record<string, Agent> = {
 };
 
 // ── Real agent_profiles row → Agent (used once a slug matches a live, approved agent) ──
-const AVATAR_COLORS = ["#000000", "#1E3A5F", "#3B1F5F", "#4A2A0F", "#0F3D2E"];
+const AVATAR_COLORS = ["#020C1C", "#1E3A5F", "#3B1F5F", "#4A2A0F", "#0F3D2E"];
 function colorForName(name: string): string {
   let hash = 0;
   for (let i = 0; i < name.length; i++) hash = (hash * 31 + name.charCodeAt(i)) | 0;
@@ -103,7 +103,7 @@ function buildFallback(slug: string): Agent {
     specialisation: "Residential Properties", specialisations: ["Residential Properties", "Investment Advisory"],
     languages: ["English", "Hindi"], experience_years: 5,
     rating: 0, reviews_count: 0, properties_sold: 88, properties_listed: 14,
-    rera_number: "A00000000000", verified: true, featured: false, avatar_color: "#000000",
+    rera_number: "A00000000000", verified: true, featured: false, avatar_color: "#020C1C",
     bio: `${name} is a certified real estate professional at Nilay 360, specialising in residential properties across India's premium markets. With a focus on transparency and client-first advisory, they bring deep market knowledge and a commitment to helping buyers and investors make confident decisions.`,
     phone: "+919999999999", email: "contact@nilay360.com", whatsapp: "+919999999999",
   };
@@ -133,7 +133,7 @@ function Stars({ rating, size = 13 }: { rating: number; size?: number }) {
   return (
     <span style={{ display: "inline-flex", gap: "2px" }}>
       {[1,2,3,4,5].map(i => (
-        <svg key={i} width={size} height={size} viewBox="0 0 24 24" fill={i <= Math.round(rating) ? "#2BA8E0" : "none"} stroke="#2BA8E0" strokeWidth="1.5">
+        <svg key={i} width={size} height={size} viewBox="0 0 24 24" fill={i <= Math.round(rating) ? "#10C4C3" : "none"} stroke="#10C4C3" strokeWidth="1.5">
           <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
         </svg>
       ))}
@@ -145,7 +145,7 @@ function Eyebrow({ label, light = false }: { label: string; light?: boolean }) {
   return (
     <div style={{ display: "inline-flex", alignItems: "center", gap: "8px", marginBottom: "14px" }}>
       <div style={{ width: "26px", height: "1px", background: "rgba(201,168,76,0.55)" }} />
-      <span style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.22em", color: "#2BA8E0", textTransform: "uppercase" }}>{label}</span>
+      <span style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.22em", color: "#10C4C3", textTransform: "uppercase" }}>{label}</span>
       <div style={{ width: "26px", height: "1px", background: "rgba(201,168,76,0.55)" }} />
     </div>
   );
@@ -157,7 +157,7 @@ function ReviewCard({ r }: { r: Review }) {
     <div style={{ background: "#fff", border: "1px solid rgba(13,43,31,0.07)", borderRadius: "14px", padding: "22px 20px" }}>
       <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "10px" }}>
         <div>
-          <p style={{ fontSize: "13px", fontWeight: 700, color: "#000000", marginBottom: "2px" }}>{r.name}</p>
+          <p style={{ fontSize: "13px", fontWeight: 700, color: "#020C1C", marginBottom: "2px" }}>{r.name}</p>
           <p style={{ fontSize: "10px", color: "#9CA3AF" }}>{r.property} · {r.date}</p>
         </div>
         <Stars rating={r.rating} size={11} />
@@ -179,14 +179,14 @@ function PropCard({ p }: { p: Property }) {
       onMouseEnter={() => setHover(true)} onMouseLeave={() => setHover(false)}>
       <div style={{ height: "170px", overflow: "hidden", position: "relative" }}>
         <img src={optimizedImageUrl(p.image, 400)} alt={p.title} loading="lazy" style={{ width: "100%", height: "100%", objectFit: "cover", transform: hover ? "scale(1.05)" : "scale(1)", transition: "transform 0.3s" }} />
-        <span style={{ position: "absolute", top: "10px", left: "10px", padding: "3px 9px", borderRadius: "100px", fontSize: "9px", fontWeight: 800, letterSpacing: "0.1em", textTransform: "uppercase", background: p.listing_type === "sale" ? "#2BA8E0" : "#3B82F6", color: p.listing_type === "sale" ? "#000000" : "#fff" }}>
+        <span style={{ position: "absolute", top: "10px", left: "10px", padding: "3px 9px", borderRadius: "100px", fontSize: "9px", fontWeight: 800, letterSpacing: "0.1em", textTransform: "uppercase", background: p.listing_type === "sale" ? "#10C4C3" : "#3B82F6", color: p.listing_type === "sale" ? "#020C1C" : "#fff" }}>
           {p.listing_type === "sale" ? "For Sale" : "For Rent"}
         </span>
       </div>
       <div style={{ padding: "14px 14px" }}>
-        <p style={{ fontSize: "9px", fontWeight: 700, letterSpacing: "0.1em", color: "#2BA8E0", textTransform: "uppercase", marginBottom: "3px" }}>{p.type}</p>
-        <h4 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "14px", fontWeight: 600, color: "#000000", marginBottom: "6px", lineHeight: 1.3, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{p.title}</h4>
-        <p style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "16px", fontWeight: 600, color: "#2BA8E0", marginBottom: "6px" }}>{fmtINR(p.price)}{p.listing_type === "rent" ? "/mo" : ""}</p>
+        <p style={{ fontSize: "9px", fontWeight: 700, letterSpacing: "0.1em", color: "#10C4C3", textTransform: "uppercase", marginBottom: "3px" }}>{p.type}</p>
+        <h4 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "14px", fontWeight: 600, color: "#020C1C", marginBottom: "6px", lineHeight: 1.3, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{p.title}</h4>
+        <p style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "16px", fontWeight: 600, color: "#10C4C3", marginBottom: "6px" }}>{fmtINR(p.price)}{p.listing_type === "rent" ? "/mo" : ""}</p>
         <p style={{ fontSize: "11px", color: "#9CA3AF" }}>🛏 {p.bedrooms} {COMMERCIAL_CATEGORIES.includes(p.type) ? "Rooms" : "BHK"} · 📐 {p.area.toLocaleString("en-IN")} sqft</p>
       </div>
     </a>
@@ -214,7 +214,7 @@ function ContactForm({ agent }: { agent: Agent }) {
     return (
       <div style={{ padding: "32px", textAlign: "center", background: "rgba(16,185,129,0.04)", border: "1px solid rgba(16,185,129,0.15)", borderRadius: "14px" }}>
         <div style={{ fontSize: "40px", marginBottom: "10px" }}>✅</div>
-        <p style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "22px", color: "#000000", marginBottom: "8px" }}>Message Sent!</p>
+        <p style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "22px", color: "#020C1C", marginBottom: "8px" }}>Message Sent!</p>
         <p style={{ fontSize: "12px", color: "#6B7C72", lineHeight: 1.7 }}>{agent.full_name} will respond within 2 hours during business hours.</p>
       </div>
     );
@@ -230,15 +230,15 @@ function ContactForm({ agent }: { agent: Agent }) {
         <div key={f.key}>
           <label style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.1em", color: "#6B7C72", textTransform: "uppercase", display: "block", marginBottom: "4px" }}>{f.label}</label>
           <input type={f.type} placeholder={f.placeholder} required value={(form as any)[f.key]} onChange={e => setForm(p => ({ ...p, [f.key]: e.target.value }))}
-            style={{ width: "100%", padding: "10px 13px", background: "#F8F6F1", border: "1.5px solid rgba(13,43,31,0.08)", borderRadius: "8px", fontSize: "13px", color: "#000000", fontFamily: "'DM Sans', sans-serif", outline: "none" }} />
+            style={{ width: "100%", padding: "10px 13px", background: "#F8F6F1", border: "1.5px solid rgba(13,43,31,0.08)", borderRadius: "8px", fontSize: "13px", color: "#020C1C", fontFamily: "'Cal Sans', sans-serif", outline: "none" }} />
         </div>
       ))}
       <div>
         <label style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.1em", color: "#6B7C72", textTransform: "uppercase", display: "block", marginBottom: "4px" }}>Message</label>
         <textarea placeholder="I'm looking for a 3BHK in Kokapet under ₹2.5Cr…" rows={4} required value={form.message} onChange={e => setForm(p => ({ ...p, message: e.target.value }))}
-          style={{ width: "100%", padding: "10px 13px", background: "#F8F6F1", border: "1.5px solid rgba(13,43,31,0.08)", borderRadius: "8px", fontSize: "13px", color: "#000000", fontFamily: "'DM Sans', sans-serif", outline: "none", resize: "vertical" }} />
+          style={{ width: "100%", padding: "10px 13px", background: "#F8F6F1", border: "1.5px solid rgba(13,43,31,0.08)", borderRadius: "8px", fontSize: "13px", color: "#020C1C", fontFamily: "'Cal Sans', sans-serif", outline: "none", resize: "vertical" }} />
       </div>
-      <button type="submit" style={{ padding: "13px", background: "#2BA8E0", border: "none", borderRadius: "9px", color: "#000000", fontSize: "12px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", cursor: "pointer", fontFamily: "'DM Sans', sans-serif" }}>
+      <button type="submit" style={{ padding: "13px", background: "#10C4C3", border: "none", borderRadius: "9px", color: "#020C1C", fontSize: "12px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", cursor: "pointer", fontFamily: "'Cal Sans', sans-serif" }}>
         Send Message →
       </button>
     </form>
@@ -333,8 +333,8 @@ export default function AgentProfilePage() {
 
   if (agentLoading || !agent) {
     return (
-      <div style={{ minHeight: "100vh", background: "#000000", display: "flex", alignItems: "center", justifyContent: "center" }}>
-        <span style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "20px", color: "rgba(245,242,236,0.5)" }}>Loading agent…</span>
+      <div style={{ minHeight: "100vh", background: "#020C1C", display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <span style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "20px", color: "rgba(245,242,236,0.5)" }}>Loading agent…</span>
       </div>
     );
   }
@@ -342,10 +342,9 @@ export default function AgentProfilePage() {
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,600&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap');
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
         html { scroll-behavior: smooth; }
-        body { font-family: 'DM Sans', system-ui, sans-serif; background: #000000; overflow-x: hidden; }
+        body { font-family: 'Cal Sans', system-ui, sans-serif; background: #020C1C; overflow-x: hidden; }
         ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-thumb { background: rgba(201,168,76,0.3); border-radius: 2px; }
         @keyframes fadeUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
@@ -372,26 +371,26 @@ export default function AgentProfilePage() {
         }
       `}</style>
 
-      <div style={{ minHeight: "100vh", background: "#000000" }}>
+      <div style={{ minHeight: "100vh", background: "#020C1C" }}>
 
         {/* ── NAVBAR ─────────────────────────────────────────── */}
         <nav className="as-nav" style={{ position: "fixed", top: 0, left: 0, right: 0, zIndex: 200, height: "68px", display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 48px", background: "rgba(5,8,12,0.9)", backdropFilter: "blur(20px) saturate(180%)", borderBottom: "0.5px solid rgba(201,168,76,0.18)" }}>
-          <a href="/" style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "19px", fontWeight: 600, color: "#fff", letterSpacing: "0.16em", textDecoration: "none" }}>
-            Nilay 360 <span style={{ color: "#2BA8E0" }}>·</span>
+          <a href="/" style={{ fontFamily: "'Cal Sans', sans-serif", fontSize: "19px", fontWeight: 600, color: "#fff", letterSpacing: "0.16em", textDecoration: "none" }}>
+            Nilay 360 <span style={{ color: "#10C4C3" }}>·</span>
           </a>
           <div className="as-nav-links" style={{ display: "flex", gap: "2px" }}>
             {[["Home","/"],["Properties","/properties"],["New Projects","/new-projects"],["Agents","/agents"],["Locations","/locations"],["Contact","/contact"]].map(([l,h]) => (
-              <a key={l} href={h} style={{ padding: "7px 14px", borderRadius: "6px", fontSize: "13px", fontWeight: 500, color: l === "Agents" ? "#2BA8E0" : "rgba(255,255,255,0.5)", textDecoration: "none", background: l === "Agents" ? "rgba(201,168,76,0.08)" : "transparent" }}>{l}</a>
+              <a key={l} href={h} style={{ padding: "7px 14px", borderRadius: "6px", fontSize: "13px", fontWeight: 500, color: l === "Agents" ? "#10C4C3" : "rgba(255,255,255,0.5)", textDecoration: "none", background: l === "Agents" ? "rgba(201,168,76,0.08)" : "transparent" }}>{l}</a>
             ))}
           </div>
           <div style={{ display: "flex", gap: "10px" }}>
             <a href="/login"    style={{ padding: "8px 18px", borderRadius: "7px", border: "0.5px solid rgba(255,255,255,0.22)", color: "rgba(255,255,255,0.75)", fontSize: "13px", fontWeight: 500, textDecoration: "none" }}>Sign In</a>
-            <a href="/register" style={{ padding: "8px 22px", borderRadius: "7px", background: "#2BA8E0", color: "#000000", fontSize: "13px", fontWeight: 600, textDecoration: "none" }}>List Property</a>
+            <a href="/register" style={{ padding: "8px 22px", borderRadius: "7px", background: "#10C4C3", color: "#020C1C", fontSize: "13px", fontWeight: 600, textDecoration: "none" }}>List Property</a>
           </div>
         </nav>
 
         {/* ── AGENT HERO ─────────────────────────────────────── */}
-        <section className="as-hero" style={{ paddingTop: "68px", background: "#000000", position: "relative", overflow: "hidden" }}>
+        <section className="as-hero" style={{ paddingTop: "68px", background: "#020C1C", position: "relative", overflow: "hidden" }}>
           <div style={{ position: "absolute", inset: 0, backgroundImage: "linear-gradient(rgba(201,168,76,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(201,168,76,0.04) 1px, transparent 1px)", backgroundSize: "60px 60px", pointerEvents: "none" }} />
           <div style={{ position: "absolute", inset: 0, background: "radial-gradient(ellipse 70% 55% at 30% 120%, rgba(201,168,76,0.1) 0%, transparent 55%)", pointerEvents: "none" }} />
           <div style={{ position: "relative", zIndex: 2, maxWidth: "1280px", margin: "0 auto", padding: "60px 48px 0" }}>
@@ -410,22 +409,22 @@ export default function AgentProfilePage() {
               {/* Avatar */}
               <div style={{ position: "relative" }}>
                 <div style={{ width: "120px", height: "120px", borderRadius: "50%", background: agent.avatar_color, border: "3px solid rgba(201,168,76,0.35)", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 12px 40px rgba(5,8,12,0.4)" }}>
-                  <span style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "40px", fontWeight: 600, color: "#2BA8E0" }}>{initials(agent.full_name)}</span>
+                  <span style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "40px", fontWeight: 600, color: "#10C4C3" }}>{initials(agent.full_name)}</span>
                 </div>
                 {agent.verified && (
-                  <div style={{ position: "absolute", bottom: "4px", right: "4px", width: "30px", height: "30px", background: "#10B981", borderRadius: "50%", border: "3px solid #000000", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "14px" }}>✓</div>
+                  <div style={{ position: "absolute", bottom: "4px", right: "4px", width: "30px", height: "30px", background: "#10B981", borderRadius: "50%", border: "3px solid #020C1C", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "14px" }}>✓</div>
                 )}
               </div>
 
               {/* Info */}
               <div>
                 <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "6px" }}>
-                  <h1 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "clamp(32px, 4vw, 52px)", fontWeight: 400, color: "#000000", lineHeight: 1.1 }}>{agent.full_name}</h1>
+                  <h1 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "clamp(32px, 4vw, 52px)", fontWeight: 400, color: "#020C1C", lineHeight: 1.1 }}>{agent.full_name}</h1>
                   {agent.verified && (
                     <span style={{ padding: "4px 12px", background: "rgba(16,185,129,0.1)", border: "1px solid rgba(16,185,129,0.25)", borderRadius: "100px", fontSize: "9px", fontWeight: 800, letterSpacing: "0.12em", color: "#10B981", textTransform: "uppercase", whiteSpace: "nowrap", flexShrink: 0 }}>✓ RERA Verified</span>
                   )}
                 </div>
-                <p style={{ fontSize: "14px", fontWeight: 600, color: "#2BA8E0", marginBottom: "8px" }}>{agent.title} · {agent.agency}</p>
+                <p style={{ fontSize: "14px", fontWeight: 600, color: "#10C4C3", marginBottom: "8px" }}>{agent.title} · {agent.agency}</p>
 
                 <div style={{ display: "flex", flexWrap: "wrap", gap: "16px", marginBottom: "14px" }}>
                   {[
@@ -445,7 +444,7 @@ export default function AgentProfilePage() {
                   {agent.reviews_count > 0 ? (
                     <>
                       <Stars rating={agent.rating} size={16} />
-                      <span style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "22px", fontWeight: 600, color: "#2BA8E0" }}>{agent.rating}</span>
+                      <span style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "22px", fontWeight: 600, color: "#10C4C3" }}>{agent.rating}</span>
                       <span style={{ fontSize: "12px", color: "rgba(245,242,236,0.35)" }}>({agent.reviews_count} verified reviews)</span>
                     </>
                   ) : (
@@ -456,7 +455,7 @@ export default function AgentProfilePage() {
 
               {/* Action buttons */}
               <div className="as-hero-actions" style={{ display: "flex", flexDirection: "column", gap: "10px", minWidth: "200px" }}>
-                <a href={`tel:${agent.phone}`} style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", padding: "13px 22px", background: "#2BA8E0", borderRadius: "10px", color: "#000000", fontSize: "13px", fontWeight: 700, textDecoration: "none" }}>
+                <a href={`tel:${agent.phone}`} style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", padding: "13px 22px", background: "#10C4C3", borderRadius: "10px", color: "#020C1C", fontSize: "13px", fontWeight: 700, textDecoration: "none" }}>
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.71 3.53 2 2 0 0 1 3.71 1.35h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9.91a16 16 0 0 0 6.13 6.13l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
                   Call Agent
                 </a>
@@ -475,7 +474,7 @@ export default function AgentProfilePage() {
         </section>
 
         {/* ── STATS ROW ──────────────────────────────────────── */}
-        <section style={{ background: "#000000" }}>
+        <section style={{ background: "#020C1C" }}>
           <div style={{ maxWidth: "1280px", margin: "0 auto", padding: "0 48px" }}>
             <div className="as-stats" style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", borderTop: "1px solid rgba(245,242,236,0.06)" }}>
               {[
@@ -485,7 +484,7 @@ export default function AgentProfilePage() {
                 { label: "Client Rating",     value: agent.reviews_count > 0 ? agent.rating : "—", suffix: agent.reviews_count > 0 ? "/5" : "" },
               ].map((s, i) => (
                 <div key={s.label} style={{ padding: "28px 20px", borderRight: i < 3 ? "1px solid rgba(245,242,236,0.06)" : "none", textAlign: "center" }}>
-                  <p style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "38px", fontWeight: 600, color: "#2BA8E0", lineHeight: 1 }}>{s.value}<span style={{ fontSize: "20px" }}>{s.suffix}</span></p>
+                  <p style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "38px", fontWeight: 600, color: "#10C4C3", lineHeight: 1 }}>{s.value}<span style={{ fontSize: "20px" }}>{s.suffix}</span></p>
                   <p style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.14em", color: "rgba(245,242,236,0.3)", textTransform: "uppercase", marginTop: "6px" }}>{s.label}</p>
                 </div>
               ))}
@@ -501,7 +500,7 @@ export default function AgentProfilePage() {
             {/* ── About ─── */}
             <div style={{ background: "#fff", border: "1px solid rgba(13,43,31,0.07)", borderRadius: "18px", padding: "32px 28px", marginBottom: "24px" }}>
               <div style={{ marginBottom: "20px" }}><Eyebrow label="About" /></div>
-              <h2 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "28px", fontWeight: 400, color: "#000000", marginBottom: "18px" }}>About {agent.full_name.split(" ")[0]}</h2>
+              <h2 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "28px", fontWeight: 400, color: "#020C1C", marginBottom: "18px" }}>About {agent.full_name.split(" ")[0]}</h2>
               {agent.bio.split("\n\n").map((para, i) => (
                 <p key={i} style={{ fontSize: "14px", color: "#4B5563", lineHeight: 1.85, marginBottom: "14px" }}>{para}</p>
               ))}
@@ -511,7 +510,7 @@ export default function AgentProfilePage() {
                 <p style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.14em", color: "#9CA3AF", textTransform: "uppercase", marginBottom: "12px" }}>Specialisations</p>
                 <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
                   {agent.specialisations.map(s => (
-                    <span key={s} style={{ padding: "6px 14px", background: "rgba(201,168,76,0.08)", border: "1px solid rgba(201,168,76,0.2)", borderRadius: "100px", fontSize: "11px", fontWeight: 700, color: "#2BA8E0" }}>{s}</span>
+                    <span key={s} style={{ padding: "6px 14px", background: "rgba(201,168,76,0.08)", border: "1px solid rgba(201,168,76,0.2)", borderRadius: "100px", fontSize: "11px", fontWeight: 700, color: "#10C4C3" }}>{s}</span>
                   ))}
                 </div>
               </div>
@@ -536,7 +535,7 @@ export default function AgentProfilePage() {
               <div style={{ display: "flex", borderBottom: "1px solid rgba(13,43,31,0.06)" }}>
                 {(["listings", "reviews"] as const).map(tab => (
                   <button key={tab} onClick={() => setActiveTab(tab)}
-                    style={{ flex: 1, padding: "16px", background: "transparent", border: "none", borderBottom: activeTab === tab ? "2.5px solid #2BA8E0" : "2.5px solid transparent", fontSize: "13px", fontWeight: 700, color: activeTab === tab ? "#000000" : "#9CA3AF", cursor: "pointer", fontFamily: "'DM Sans', sans-serif", textTransform: "capitalize", letterSpacing: "0.05em", transition: "color 0.15s" }}>
+                    style={{ flex: 1, padding: "16px", background: "transparent", border: "none", borderBottom: activeTab === tab ? "2.5px solid #10C4C3" : "2.5px solid transparent", fontSize: "13px", fontWeight: 700, color: activeTab === tab ? "#020C1C" : "#9CA3AF", cursor: "pointer", fontFamily: "'Cal Sans', sans-serif", textTransform: "capitalize", letterSpacing: "0.05em", transition: "color 0.15s" }}>
                     {tab === "listings" ? `Active Listings (${properties.length})` : `Reviews (${reviews.length})`}
                   </button>
                 ))}
@@ -558,7 +557,7 @@ export default function AgentProfilePage() {
                     {/* Rating summary */}
                     <div style={{ display: "flex", gap: "28px", alignItems: "center", padding: "20px", background: "#F8F6F1", borderRadius: "14px", marginBottom: "22px" }}>
                       <div style={{ textAlign: "center" }}>
-                        <p style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "52px", fontWeight: 600, color: "#2BA8E0", lineHeight: 1 }}>{avgRating.toFixed(1)}</p>
+                        <p style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "52px", fontWeight: 600, color: "#10C4C3", lineHeight: 1 }}>{avgRating.toFixed(1)}</p>
                         <Stars rating={avgRating} size={14} />
                         <p style={{ fontSize: "11px", color: "#9CA3AF", marginTop: "4px" }}>{reviews.length} reviews</p>
                       </div>
@@ -578,12 +577,12 @@ export default function AgentProfilePage() {
             {/* Contact card */}
             <div id="send-message" style={{ background: "#fff", border: "1px solid rgba(13,43,31,0.07)", borderRadius: "18px", padding: "26px 22px", boxShadow: "0 4px 20px rgba(13,43,31,0.06)" }}>
               <div style={{ marginBottom: "16px" }}><Eyebrow label="Get in Touch" /></div>
-              <h3 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "22px", fontWeight: 600, color: "#000000", marginBottom: "18px" }}>Message {agent.full_name.split(" ")[0]}</h3>
+              <h3 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "22px", fontWeight: 600, color: "#020C1C", marginBottom: "18px" }}>Message {agent.full_name.split(" ")[0]}</h3>
               <ContactForm agent={agent} />
             </div>
 
             {/* Quick contact */}
-            <div style={{ background: "#000000", borderRadius: "14px", padding: "20px 18px" }}>
+            <div style={{ background: "#020C1C", borderRadius: "14px", padding: "20px 18px" }}>
               <p style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.14em", color: "rgba(201,168,76,0.55)", textTransform: "uppercase", marginBottom: "14px" }}>Quick Contact</p>
               {[
                 { icon: "📞", label: "Call directly", value: agent.phone, href: `tel:${agent.phone}` },
@@ -601,7 +600,7 @@ export default function AgentProfilePage() {
 
             {/* Share */}
             <button onClick={() => typeof navigator !== "undefined" && navigator.clipboard?.writeText(window.location.href)}
-              style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", padding: "12px", background: "#fff", border: "1.5px solid rgba(13,43,31,0.1)", borderRadius: "10px", fontSize: "12px", fontWeight: 600, color: "#6B7C72", cursor: "pointer", fontFamily: "'DM Sans', sans-serif" }}>
+              style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", padding: "12px", background: "#fff", border: "1.5px solid rgba(13,43,31,0.1)", borderRadius: "10px", fontSize: "12px", fontWeight: 600, color: "#6B7C72", cursor: "pointer", fontFamily: "'Cal Sans', sans-serif" }}>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
               Share Profile
             </button>
@@ -615,8 +614,17 @@ export default function AgentProfilePage() {
           <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
             <div className="as-footer-grid" style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1fr", gap: "48px", paddingBottom: "56px", borderBottom: "1px solid rgba(245,242,236,0.06)" }}>
               <div>
-                <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "18px", fontWeight: 600, color: "#fff", letterSpacing: "0.16em", marginBottom: "14px" }}>Nilay 360 <span style={{ color: "#2BA8E0" }}>·</span></div>
-                <p style={{ fontSize: "13px", color: "rgba(245,242,236,0.35)", lineHeight: 1.75, maxWidth: "280px" }}>India's most trusted premium real estate platform. Every agent RERA verified.</p>
+                <div style={{ fontFamily: "'Cal Sans', sans-serif", fontSize: "18px", fontWeight: 600, color: "#fff", letterSpacing: "0.16em", marginBottom: "14px" }}>Nilay 360 <span style={{ color: "#10C4C3" }}>·</span></div>
+                <p style={{ fontSize: "13px", color: "rgba(245,242,236,0.35)", lineHeight: 1.75, maxWidth: "280px", marginBottom: "20px" }}>India's most trusted premium real estate platform. Every agent RERA verified.</p>
+                <div style={{ display: "flex", gap: "10px" }}>
+                  {[
+                    { s: "IN", href: "https://www.instagram.com/nilay360_/" },
+                    { s: "LI", href: "https://linkedin.com/company/nilay360" },
+                    { s: "YT", href: "https://www.youtube.com/@nilay360.digital" },
+                  ].map(({ s, href }) => (
+                    <a key={s} href={href} target="_blank" rel="noopener noreferrer" aria-label={s} style={{ width: "34px", height: "34px", borderRadius: "8px", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.07)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "10px", color: "rgba(255,255,255,0.35)", fontWeight: 700, textDecoration: "none" }}>{s}</a>
+                  ))}
+                </div>
               </div>
               {[
                 { heading: "Find Agents", links: [["All Agents","/agents"],["Hyderabad","/agents?city=Hyderabad"],["Mumbai","/agents?city=Mumbai"],["Join Network","/agent-register"]] },

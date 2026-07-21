@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { optimizedImageUrl } from "@/lib/image-url";
@@ -69,7 +69,7 @@ function Eyebrow({ label }: { label: string }) {
   return (
     <div style={{ display: "inline-flex", alignItems: "center", gap: "8px", marginBottom: "14px" }}>
       <div style={{ width: "26px", height: "1px", background: "rgba(201,168,76,0.55)" }} />
-      <span style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.22em", color: "#2BA8E0", textTransform: "uppercase" }}>{label}</span>
+      <span style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.22em", color: "#10C4C3", textTransform: "uppercase" }}>{label}</span>
       <div style={{ width: "26px", height: "1px", background: "rgba(201,168,76,0.55)" }} />
     </div>
   );
@@ -83,35 +83,35 @@ function PropertyCard({ p }: { p: Property }) {
     <div
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
-      style={{ background: "#161A1F", borderRadius: "16px", overflow: "hidden", border: "1px solid rgba(255,255,255,0.07)", boxShadow: hover ? "0 20px 52px rgba(43,168,224,0.1)" : "0 2px 8px rgba(0,0,0,0.3)", transform: hover ? "translateY(-5px)" : "none", transition: "all 0.25s" }}
+      style={{ background: "#182B3F", borderRadius: "16px", overflow: "hidden", border: "1px solid rgba(255,255,255,0.07)", boxShadow: hover ? "0 20px 52px rgba(16,196,195,0.1)" : "0 2px 8px rgba(0,0,0,0.3)", transform: hover ? "translateY(-5px)" : "none", transition: "all 0.25s" }}
     >
       <div style={{ position: "relative", height: "215px", overflow: "hidden" }}>
         <img src={optimizedImageUrl(img, 600)} alt={p.title} loading="lazy" style={{ width: "100%", height: "100%", objectFit: "cover", transform: hover ? "scale(1.06)" : "scale(1)", transition: "transform 0.35s" }} />
         <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(5,8,12,0.5) 0%, transparent 55%)" }} />
-        <span style={{ position: "absolute", top: "12px", left: "12px", padding: "4px 11px", borderRadius: "100px", fontSize: "9px", fontWeight: 800, letterSpacing: "0.1em", textTransform: "uppercase", background: "rgba(201,168,76,0.9)", color: "#000000" }}>For Sale</span>
+        <span style={{ position: "absolute", top: "12px", left: "12px", padding: "4px 11px", borderRadius: "100px", fontSize: "9px", fontWeight: 800, letterSpacing: "0.1em", textTransform: "uppercase", background: "rgba(201,168,76,0.9)", color: "#020C1C" }}>For Sale</span>
         {p.is_featured && (
-          <span style={{ position: "absolute", top: "12px", right: "12px", padding: "4px 10px", borderRadius: "100px", fontSize: "9px", fontWeight: 800, letterSpacing: "0.08em", textTransform: "uppercase", background: "rgba(13,43,31,0.85)", color: "#2BA8E0", border: "1px solid rgba(201,168,76,0.3)", backdropFilter: "blur(8px)" }}>Premium</span>
+          <span style={{ position: "absolute", top: "12px", right: "12px", padding: "4px 10px", borderRadius: "100px", fontSize: "9px", fontWeight: 800, letterSpacing: "0.08em", textTransform: "uppercase", background: "rgba(13,43,31,0.85)", color: "#10C4C3", border: "1px solid rgba(201,168,76,0.3)", backdropFilter: "blur(8px)" }}>Premium</span>
         )}
         <div style={{ position: "absolute", bottom: "12px", left: "14px" }}>
-          <span style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "22px", fontWeight: 600, color: "#2BA8E0" }}>{fmtINR(p.price)}</span>
+          <span style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "22px", fontWeight: 600, color: "#10C4C3" }}>{fmtINR(p.price)}</span>
           {p.price_per_sqft && <span style={{ fontSize: "10px", color: "rgba(245,242,236,0.6)", marginLeft: "7px" }}>₹{p.price_per_sqft.toLocaleString("en-IN")}/sqft</span>}
         </div>
       </div>
       <div style={{ padding: "18px 20px 20px" }}>
-        <h3 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "18px", fontWeight: 600, color: "#E8EAED", lineHeight: 1.3, marginBottom: "6px" }}>{p.title}</h3>
+        <h3 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "18px", fontWeight: 600, color: "#FFFFFF", lineHeight: 1.3, marginBottom: "6px" }}>{p.title}</h3>
         <p style={{ display: "flex", alignItems: "center", gap: "4px", fontSize: "11.5px", color: "rgba(255,255,255,0.45)", marginBottom: "14px" }}>
-          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#2BA8E0" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#10C4C3" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
           {p.neighbourhood ? `${p.neighbourhood}, ` : ""}{p.city}
         </p>
         <div style={{ display: "flex", borderTop: "1px solid rgba(255,255,255,0.07)", paddingTop: "14px", gap: "0" }}>
           {[{ v: p.bedrooms, l: COMMERCIAL_CATEGORIES.includes(p.type) ? "Rooms" : "Beds" }, { v: p.bathrooms, l: COMMERCIAL_CATEGORIES.includes(p.type) ? "Wash" : "Baths" }, { v: p.area_sqft?.toLocaleString("en-IN"), l: "sqft" }].map((s, i) => s.v != null && (
             <div key={i} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: "3px", borderRight: i < 2 ? "1px solid rgba(255,255,255,0.07)" : "none" }}>
-              <span style={{ fontSize: "13px", fontWeight: 700, color: "#E8EAED" }}>{s.v}</span>
+              <span style={{ fontSize: "13px", fontWeight: 700, color: "#FFFFFF" }}>{s.v}</span>
               <span style={{ fontSize: "9px", color: "#9CA3AF", textTransform: "uppercase", letterSpacing: "0.08em" }}>{s.l}</span>
             </div>
           ))}
         </div>
-        <a href={`/property/${p.slug}`} style={{ display: "block", marginTop: "14px", padding: "10px", background: "#000000", borderRadius: "8px", color: "#2BA8E0", fontSize: "11px", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", textDecoration: "none", textAlign: "center" }}>
+        <a href={`/property/${p.slug}`} style={{ display: "block", marginTop: "14px", padding: "10px", background: "#020C1C", borderRadius: "8px", color: "#10C4C3", fontSize: "11px", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", textDecoration: "none", textAlign: "center" }}>
           View Details →
         </a>
       </div>
@@ -177,20 +177,19 @@ export default function BuyPage() {
     return true;
   });
 
-  const SEL_STYLE = { padding: "9px 32px 9px 14px", background: "#0B0D10", border: "1.5px solid rgba(255,255,255,0.1)", borderRadius: "9px", fontSize: "12px", fontWeight: 600 as const, fontFamily: "'DM Sans', sans-serif", cursor: "pointer" as const, outline: "none", appearance: "none" as const, color: "#FFFFFF" as const, backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%23AEB4BC' stroke-width='2.5'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E")`, backgroundRepeat: "no-repeat" as const, backgroundPosition: "right 12px center" as const };
+  const SEL_STYLE = { padding: "9px 32px 9px 14px", background: "#0A1526", border: "1.5px solid rgba(255,255,255,0.1)", borderRadius: "9px", fontSize: "12px", fontWeight: 600 as const, fontFamily: "'Cal Sans', sans-serif", cursor: "pointer" as const, outline: "none", appearance: "none" as const, color: "#FFFFFF" as const, backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%23AEB4BC' stroke-width='2.5'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E")`, backgroundRepeat: "no-repeat" as const, backgroundPosition: "right 12px center" as const };
 
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,600&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap');
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
         html { scroll-behavior: smooth; }
-        body { font-family: 'DM Sans', system-ui, sans-serif; background: #000000; overflow-x: hidden; }
+        body { font-family: 'Cal Sans', system-ui, sans-serif; background: #020C1C; overflow-x: hidden; }
         ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-thumb { background: rgba(201,168,76,0.3); border-radius: 2px; }
         @keyframes fadeUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
         input[type=range] { -webkit-appearance: none; appearance: none; height: 4px; border-radius: 2px; outline: none; cursor: pointer; }
-        input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%; background: #2BA8E0; border: 2.5px solid #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.18); cursor: pointer; }
+        input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%; background: #10C4C3; border: 2.5px solid #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.18); cursor: pointer; }
         @media (max-width: 768px) {
           .buy-hero { padding: 80px 16px 48px !important; }
           .buy-steps { padding: 48px 16px !important; }
@@ -211,10 +210,10 @@ export default function BuyPage() {
         }
       `}</style>
 
-      <div style={{ minHeight: "100vh", background: "#000000" }}>
+      <div style={{ minHeight: "100vh", background: "#020C1C" }}>
 
         {/* ── HERO ─────────────────────────────────────────────── */}
-        <section className="buy-hero" style={{ paddingTop: "64px", background: "#000000", minHeight: "520px", display: "flex", alignItems: "center", position: "relative", overflow: "hidden" }}>
+        <section className="buy-hero" style={{ paddingTop: "64px", background: "#020C1C", minHeight: "520px", display: "flex", alignItems: "center", position: "relative", overflow: "hidden" }}>
           <div style={{ position: "absolute", inset: 0, backgroundImage: "linear-gradient(rgba(201,168,76,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(201,168,76,0.04) 1px, transparent 1px)", backgroundSize: "60px 60px", pointerEvents: "none" }} />
           <div style={{ position: "absolute", inset: 0, background: "radial-gradient(ellipse 65% 65% at 50% 130%, rgba(201,168,76,0.12) 0%, transparent 55%)", pointerEvents: "none" }} />
           <div style={{ position: "absolute", right: 0, top: 0, bottom: 0, width: "40%", backgroundImage: "radial-gradient(circle, rgba(201,168,76,0.1) 1px, transparent 1px)", backgroundSize: "24px 24px", pointerEvents: "none", maskImage: "linear-gradient(to left, rgba(0,0,0,0.4), transparent)" }} />
@@ -222,8 +221,8 @@ export default function BuyPage() {
             <div style={{ animation: "fadeUp 0.5s ease-out both" }}>
               <Eyebrow label="Verified Listings" />
             </div>
-            <h1 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "clamp(44px, 6.5vw, 80px)", fontWeight: 300, color: "#E8EAED", lineHeight: 1.08, marginBottom: "16px", animation: "fadeUp 0.5s 0.1s ease-out both" }}>
-              Buy Your Dream Property<br /><em style={{ fontStyle: "italic", color: "#2BA8E0" }}>in India's Finest Addresses</em>
+            <h1 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "clamp(44px, 6.5vw, 80px)", fontWeight: 300, color: "#FFFFFF", lineHeight: 1.08, marginBottom: "16px", animation: "fadeUp 0.5s 0.1s ease-out both" }}>
+              Buy Your Dream Property<br /><em style={{ fontStyle: "italic", color: "#10C4C3" }}>in India's Finest Addresses</em>
             </h1>
             <p style={{ fontSize: "16px", color: "rgba(245,242,236,0.5)", marginBottom: "48px", animation: "fadeUp 0.5s 0.18s ease-out both" }}>
               Curated for-sale listings with full legal due diligence, RERA verification, and expert guidance.
@@ -231,7 +230,7 @@ export default function BuyPage() {
             <div style={{ display: "flex", justifyContent: "center", gap: "48px", paddingTop: "28px", borderTop: "1px solid rgba(245,242,236,0.06)", animation: "fadeUp 0.5s 0.26s ease-out both" }}>
               {[["2,400+", "For Sale"], ["14", "Cities"], ["RERA", "Verified"]].map(([v, l]) => (
                 <div key={l} style={{ textAlign: "center" }}>
-                  <p style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "30px", fontWeight: 600, color: "#2BA8E0" }}>{v}</p>
+                  <p style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "30px", fontWeight: 600, color: "#10C4C3" }}>{v}</p>
                   <p style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.14em", color: "rgba(245,242,236,0.3)", textTransform: "uppercase" }}>{l}</p>
                 </div>
               ))}
@@ -240,12 +239,12 @@ export default function BuyPage() {
         </section>
 
         {/* ── BUYING PROCESS ───────────────────────────────────── */}
-        <section className="buy-steps" style={{ background: "#000000", padding: "72px 48px", borderTop: "1px solid rgba(201,168,76,0.1)" }}>
+        <section className="buy-steps" style={{ background: "#020C1C", padding: "72px 48px", borderTop: "1px solid rgba(201,168,76,0.1)" }}>
           <div style={{ maxWidth: "1280px", margin: "0 auto" }}>
             <div style={{ textAlign: "center", marginBottom: "52px" }}>
               <Eyebrow label="How It Works" />
-              <h2 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "clamp(28px, 3.5vw, 44px)", fontWeight: 300, color: "#E8EAED", lineHeight: 1.15 }}>
-                Your Path to<br /><em style={{ fontStyle: "italic", color: "#2BA8E0" }}>Home Ownership</em>
+              <h2 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "clamp(28px, 3.5vw, 44px)", fontWeight: 300, color: "#FFFFFF", lineHeight: 1.15 }}>
+                Your Path to<br /><em style={{ fontStyle: "italic", color: "#10C4C3" }}>Home Ownership</em>
               </h2>
             </div>
             <div style={{ position: "relative" }}>
@@ -260,10 +259,10 @@ export default function BuyPage() {
                   { n: "05", title: "Registration & Possession", desc: "We handle stamp duty, registration, and coordinate builder handover for a seamless move-in." },
                 ].map((step, i) => (
                   <div key={step.n} style={{ position: "relative", textAlign: "center", padding: "0 10px" }}>
-                    <div style={{ width: "52px", height: "52px", borderRadius: "50%", background: "#2BA8E0", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 18px", boxShadow: "0 0 0 6px rgba(201,168,76,0.12)", position: "relative", zIndex: 1 }}>
-                      <span style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "18px", fontWeight: 700, color: "#000000" }}>{step.n}</span>
+                    <div style={{ width: "52px", height: "52px", borderRadius: "50%", background: "#10C4C3", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 18px", boxShadow: "0 0 0 6px rgba(201,168,76,0.12)", position: "relative", zIndex: 1 }}>
+                      <span style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "18px", fontWeight: 700, color: "#020C1C" }}>{step.n}</span>
                     </div>
-                    <h3 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "17px", fontWeight: 600, color: "#E8EAED", marginBottom: "8px", lineHeight: 1.3 }}>{step.title}</h3>
+                    <h3 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "17px", fontWeight: 600, color: "#FFFFFF", marginBottom: "8px", lineHeight: 1.3 }}>{step.title}</h3>
                     <p style={{ fontSize: "12px", color: "rgba(245,242,236,0.38)", lineHeight: 1.7 }}>{step.desc}</p>
                   </div>
                 ))}
@@ -277,27 +276,27 @@ export default function BuyPage() {
           <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "22px" }}>
             <Eyebrow label="Browse Properties" />
           </div>
-          <div style={{ background: "#121519", border: "1px solid rgba(255,255,255,0.07)", borderRadius: "14px", padding: "18px 22px", display: "flex", gap: "12px", alignItems: "center", flexWrap: "wrap", boxShadow: "0 2px 12px rgba(0,0,0,0.3)" }}>
+          <div style={{ background: "#111F33", border: "1px solid rgba(255,255,255,0.07)", borderRadius: "14px", padding: "18px 22px", display: "flex", gap: "12px", alignItems: "center", flexWrap: "wrap", boxShadow: "0 2px 12px rgba(0,0,0,0.3)" }}>
             <select value={cityFilter} onChange={e => setCityFilter(e.target.value)} style={{ ...SEL_STYLE, color: cityFilter === "All" ? "rgba(255,255,255,0.4)" : "#FFFFFF" }}>
-              <option value="All" style={{ background: "#0B0D10" }}>All Cities</option>
-              {["Hyderabad", "Mumbai", "Bengaluru", "Gurugram", "Noida", "Chennai", "Pune"].map(c => <option key={c} value={c} style={{ background: "#0B0D10" }}>{c}</option>)}
+              <option value="All" style={{ background: "#0A1526" }}>All Cities</option>
+              {["Hyderabad", "Mumbai", "Bengaluru", "Gurugram", "Noida", "Chennai", "Pune"].map(c => <option key={c} value={c} style={{ background: "#0A1526" }}>{c}</option>)}
             </select>
             <select value={typeFilter} onChange={e => setTypeFilter(e.target.value)} style={{ ...SEL_STYLE, color: typeFilter === "All" ? "rgba(255,255,255,0.4)" : "#FFFFFF" }}>
-              <option value="All" style={{ background: "#0B0D10" }}>All Types</option>
-              {["Apartment", "Villa", "Penthouse", "Plot", "Office"].map(t => <option key={t} value={t} style={{ background: "#0B0D10" }}>{t}</option>)}
+              <option value="All" style={{ background: "#0A1526" }}>All Types</option>
+              {["Apartment", "Villa", "Penthouse", "Plot", "Office"].map(t => <option key={t} value={t} style={{ background: "#0A1526" }}>{t}</option>)}
             </select>
             <select value={bhkFilter} onChange={e => setBhkFilter(e.target.value)} style={{ ...SEL_STYLE, color: bhkFilter === "All" ? "rgba(255,255,255,0.4)" : "#FFFFFF" }}>
-              <option value="All" style={{ background: "#0B0D10" }}>All BHK</option>
-              {["1 BHK", "2 BHK", "3 BHK", "4 BHK", "5 BHK"].map((b, i) => <option key={b} value={String(i + 1)} style={{ background: "#0B0D10" }}>{b}</option>)}
+              <option value="All" style={{ background: "#0A1526" }}>All BHK</option>
+              {["1 BHK", "2 BHK", "3 BHK", "4 BHK", "5 BHK"].map((b, i) => <option key={b} value={String(i + 1)} style={{ background: "#0A1526" }}>{b}</option>)}
             </select>
             <select value={budgetFilter} onChange={e => setBudgetFilter(e.target.value)} style={{ ...SEL_STYLE, color: budgetFilter === "all" ? "rgba(255,255,255,0.4)" : "#FFFFFF" }}>
-              <option value="all" style={{ background: "#0B0D10" }}>Any Budget</option>
-              <option value="under1" style={{ background: "#0B0D10" }}>Under ₹1 Cr</option>
-              <option value="1-3" style={{ background: "#0B0D10" }}>₹1 – 3 Cr</option>
-              <option value="3-10" style={{ background: "#0B0D10" }}>₹3 – 10 Cr</option>
-              <option value="above10" style={{ background: "#0B0D10" }}>Above ₹10 Cr</option>
+              <option value="all" style={{ background: "#0A1526" }}>Any Budget</option>
+              <option value="under1" style={{ background: "#0A1526" }}>Under ₹1 Cr</option>
+              <option value="1-3" style={{ background: "#0A1526" }}>₹1 – 3 Cr</option>
+              <option value="3-10" style={{ background: "#0A1526" }}>₹3 – 10 Cr</option>
+              <option value="above10" style={{ background: "#0A1526" }}>Above ₹10 Cr</option>
             </select>
-            <button onClick={() => { setCityFilter("All"); setTypeFilter("All"); setBhkFilter("All"); setBudgetFilter("all"); }} style={{ padding: "9px 18px", borderRadius: "9px", border: "1.5px solid rgba(255,255,255,0.1)", background: "transparent", color: "rgba(255,255,255,0.55)", fontSize: "12px", fontWeight: 600, cursor: "pointer", fontFamily: "'DM Sans', sans-serif" }}>Reset</button>
+            <button onClick={() => { setCityFilter("All"); setTypeFilter("All"); setBhkFilter("All"); setBudgetFilter("all"); }} style={{ padding: "9px 18px", borderRadius: "9px", border: "1.5px solid rgba(255,255,255,0.1)", background: "transparent", color: "rgba(255,255,255,0.55)", fontSize: "12px", fontWeight: 600, cursor: "pointer", fontFamily: "'Cal Sans', sans-serif" }}>Reset</button>
             <span style={{ marginLeft: "auto", fontSize: "12px", fontWeight: 700, color: "rgba(255,255,255,0.45)" }}>{filtered.length} properties</span>
           </div>
         </div>
@@ -305,20 +304,20 @@ export default function BuyPage() {
         {/* ── LISTINGS GRID ────────────────────────────────────── */}
         <section style={{ maxWidth: "1280px", margin: "0 auto", padding: "28px 48px 72px" }}>
           {filtered.length === 0 ? (
-            <div style={{ padding: "80px", textAlign: "center", background: "#161A1F", borderRadius: "18px", border: "1px solid rgba(255,255,255,0.07)" }}>
+            <div style={{ padding: "80px", textAlign: "center", background: "#182B3F", borderRadius: "18px", border: "1px solid rgba(255,255,255,0.07)" }}>
               {properties.length === 0 ? (
                 <>
-                  <div style={{ width: "56px", height: "56px", borderRadius: "50%", background: "rgba(43,168,224,0.08)", border: "1.5px solid rgba(43,168,224,0.2)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 20px" }}>
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2BA8E0" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                  <div style={{ width: "56px", height: "56px", borderRadius: "50%", background: "rgba(16,196,195,0.08)", border: "1.5px solid rgba(16,196,195,0.2)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 20px" }}>
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#10C4C3" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
                   </div>
-                  <p style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "28px", color: "#E8EAED", marginBottom: "10px" }}>No properties found</p>
+                  <p style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "28px", color: "#FFFFFF", marginBottom: "10px" }}>No properties found</p>
                   <p style={{ fontSize: "13px", color: "rgba(255,255,255,0.45)", marginBottom: "20px" }}>We don't have any sale listings at the moment. Check back soon or explore our rental options.</p>
-                  <a href="/rent" style={{ display: "inline-flex", alignItems: "center", gap: "8px", padding: "11px 24px", background: "#0B0D10", borderRadius: "8px", color: "#2BA8E0", fontSize: "12px", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", textDecoration: "none" }}>Browse Rentals →</a>
+                  <a href="/rent" style={{ display: "inline-flex", alignItems: "center", gap: "8px", padding: "11px 24px", background: "#0A1526", borderRadius: "8px", color: "#10C4C3", fontSize: "12px", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", textDecoration: "none" }}>Browse Rentals →</a>
                 </>
               ) : (
                 <>
-                  <p style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "28px", color: "#E8EAED", marginBottom: "10px" }}>No properties match your filters</p>
-                  <button onClick={() => { setCityFilter("All"); setTypeFilter("All"); setBhkFilter("All"); setBudgetFilter("all"); }} style={{ fontSize: "13px", fontWeight: 600, color: "#2BA8E0", background: "transparent", border: "none", cursor: "pointer", fontFamily: "'DM Sans', sans-serif" }}>Clear all filters →</button>
+                  <p style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "28px", color: "#FFFFFF", marginBottom: "10px" }}>No properties match your filters</p>
+                  <button onClick={() => { setCityFilter("All"); setTypeFilter("All"); setBhkFilter("All"); setBudgetFilter("all"); }} style={{ fontSize: "13px", fontWeight: 600, color: "#10C4C3", background: "transparent", border: "none", cursor: "pointer", fontFamily: "'Cal Sans', sans-serif" }}>Clear all filters →</button>
                 </>
               )}
             </div>
@@ -330,50 +329,50 @@ export default function BuyPage() {
         </section>
 
         {/* ── MORTGAGE CALCULATOR TEASER ───────────────────────── */}
-        <section className="buy-emi" style={{ background: "#0B0D10", padding: "72px 48px", borderTop: "1px solid rgba(255,255,255,0.06)" }}>
+        <section className="buy-emi" style={{ background: "#0A1526", padding: "72px 48px", borderTop: "1px solid rgba(255,255,255,0.06)" }}>
           <div style={{ maxWidth: "1280px", margin: "0 auto", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "52px", alignItems: "center" }}>
             {/* Left text */}
             <div>
               <Eyebrow label="EMI Calculator" />
-              <h2 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "clamp(28px, 3.5vw, 46px)", fontWeight: 400, color: "#E8EAED", lineHeight: 1.2, marginBottom: "16px" }}>
-                Estimate Your<br /><em style={{ fontStyle: "italic", color: "#2BA8E0" }}>Monthly EMI</em>
+              <h2 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "clamp(28px, 3.5vw, 46px)", fontWeight: 400, color: "#FFFFFF", lineHeight: 1.2, marginBottom: "16px" }}>
+                Estimate Your<br /><em style={{ fontStyle: "italic", color: "#10C4C3" }}>Monthly EMI</em>
               </h2>
               <p style={{ fontSize: "14px", color: "rgba(255,255,255,0.45)", lineHeight: 1.75, marginBottom: "28px" }}>
                 Use our quick EMI estimator to understand your monthly outgo before you commit. Adjust loan amount, interest rate, and tenure to see real-time results.
               </p>
-              <a href="/calculator" style={{ display: "inline-flex", alignItems: "center", gap: "8px", padding: "13px 28px", background: "#2BA8E0", borderRadius: "9px", color: "#000000", fontSize: "12px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", textDecoration: "none" }}>
+              <a href="/calculator" style={{ display: "inline-flex", alignItems: "center", gap: "8px", padding: "13px 28px", background: "#10C4C3", borderRadius: "9px", color: "#020C1C", fontSize: "12px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", textDecoration: "none" }}>
                 Use Full Calculator
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
               </a>
             </div>
             {/* Right dark card */}
-            <div style={{ background: "#000000", borderRadius: "20px", padding: "36px 32px", position: "relative", overflow: "hidden" }}>
+            <div style={{ background: "#020C1C", borderRadius: "20px", padding: "36px 32px", position: "relative", overflow: "hidden" }}>
               <div style={{ position: "absolute", inset: 0, backgroundImage: "linear-gradient(rgba(201,168,76,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(201,168,76,0.04) 1px, transparent 1px)", backgroundSize: "32px 32px", pointerEvents: "none" }} />
               <div style={{ position: "relative", zIndex: 2 }}>
                 <div style={{ marginBottom: "22px" }}>
                   <label style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: "10px", fontWeight: 700, letterSpacing: "0.12em", color: "rgba(201,168,76,0.6)", textTransform: "uppercase", marginBottom: "8px" }}>
-                    <span>Loan Amount</span><span style={{ color: "#2BA8E0" }}>{fmtINR(loanAmt)}</span>
+                    <span>Loan Amount</span><span style={{ color: "#10C4C3" }}>{fmtINR(loanAmt)}</span>
                   </label>
                   <input type="range" min={1000000} max={50000000} step={500000} value={loanAmt} onChange={e => setLoanAmt(Number(e.target.value))}
-                    style={{ width: "100%", background: `linear-gradient(to right, #2BA8E0 ${((loanAmt - 1000000) / 49000000) * 100}%, rgba(245,242,236,0.12) ${((loanAmt - 1000000) / 49000000) * 100}%)` }} />
+                    style={{ width: "100%", background: `linear-gradient(to right, #10C4C3 ${((loanAmt - 1000000) / 49000000) * 100}%, rgba(245,242,236,0.12) ${((loanAmt - 1000000) / 49000000) * 100}%)` }} />
                 </div>
                 <div style={{ marginBottom: "22px" }}>
                   <label style={{ display: "flex", justifyContent: "space-between", fontSize: "10px", fontWeight: 700, letterSpacing: "0.12em", color: "rgba(201,168,76,0.6)", textTransform: "uppercase", marginBottom: "8px" }}>
-                    <span>Interest Rate</span><span style={{ color: "#2BA8E0" }}>{rate}%</span>
+                    <span>Interest Rate</span><span style={{ color: "#10C4C3" }}>{rate}%</span>
                   </label>
                   <input type="range" min={6} max={14} step={0.1} value={rate} onChange={e => setRate(Number(e.target.value))}
-                    style={{ width: "100%", background: `linear-gradient(to right, #2BA8E0 ${((rate - 6) / 8) * 100}%, rgba(245,242,236,0.12) ${((rate - 6) / 8) * 100}%)` }} />
+                    style={{ width: "100%", background: `linear-gradient(to right, #10C4C3 ${((rate - 6) / 8) * 100}%, rgba(245,242,236,0.12) ${((rate - 6) / 8) * 100}%)` }} />
                 </div>
                 <div style={{ marginBottom: "28px" }}>
                   <label style={{ display: "flex", justifyContent: "space-between", fontSize: "10px", fontWeight: 700, letterSpacing: "0.12em", color: "rgba(201,168,76,0.6)", textTransform: "uppercase", marginBottom: "8px" }}>
-                    <span>Tenure</span><span style={{ color: "#2BA8E0" }}>{tenure} yrs</span>
+                    <span>Tenure</span><span style={{ color: "#10C4C3" }}>{tenure} yrs</span>
                   </label>
                   <input type="range" min={5} max={30} step={1} value={tenure} onChange={e => setTenure(Number(e.target.value))}
-                    style={{ width: "100%", background: `linear-gradient(to right, #2BA8E0 ${((tenure - 5) / 25) * 100}%, rgba(245,242,236,0.12) ${((tenure - 5) / 25) * 100}%)` }} />
+                    style={{ width: "100%", background: `linear-gradient(to right, #10C4C3 ${((tenure - 5) / 25) * 100}%, rgba(245,242,236,0.12) ${((tenure - 5) / 25) * 100}%)` }} />
                 </div>
                 <div style={{ padding: "20px 22px", background: "rgba(201,168,76,0.07)", border: "1px solid rgba(201,168,76,0.18)", borderRadius: "12px", textAlign: "center" }}>
                   <p style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.14em", color: "rgba(245,242,236,0.4)", textTransform: "uppercase", marginBottom: "6px" }}>Monthly EMI</p>
-                  <p style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "38px", fontWeight: 600, color: "#2BA8E0" }}>
+                  <p style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "38px", fontWeight: 600, color: "#10C4C3" }}>
                     ₹{Math.round(emi).toLocaleString("en-IN")}
                   </p>
                   <p style={{ fontSize: "11px", color: "rgba(245,242,236,0.3)", marginTop: "4px" }}>
@@ -389,20 +388,20 @@ export default function BuyPage() {
         <section className="buy-why" style={{ maxWidth: "1280px", margin: "0 auto", padding: "72px 48px" }}>
           <div style={{ textAlign: "center", marginBottom: "44px" }}>
             <Eyebrow label="Why Nilay 360" />
-            <h2 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "clamp(28px, 3.5vw, 44px)", fontWeight: 400, color: "#E8EAED" }}>
-              Buy with<br /><em style={{ fontStyle: "italic", color: "#2BA8E0" }}>Complete Confidence</em>
+            <h2 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "clamp(28px, 3.5vw, 44px)", fontWeight: 400, color: "#FFFFFF" }}>
+              Buy with<br /><em style={{ fontStyle: "italic", color: "#10C4C3" }}>Complete Confidence</em>
             </h2>
           </div>
           <div className="buy-why-grid" style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "20px" }}>
             {[
               { icon: "🛡", color: "#059669", bg: "rgba(5,150,105,0.06)", border: "rgba(5,150,105,0.12)", title: "RERA Protected", desc: "Every listed property is verified under RERA. Builder obligations, delivery timelines, and your investment are legally safeguarded.", pts: ["Mandatory RERA number", "Escrow-protected funds", "Penalty clauses enforced"] },
-              { icon: "⚖️", color: "#2BA8E0", bg: "rgba(201,168,76,0.06)", border: "rgba(201,168,76,0.18)", title: "Legal Clarity", desc: "Our in-house legal team reviews title deeds, encumbrance certificates, and ownership documents before you sign anything.", pts: ["Title deed verification", "Encumbrance check", "OC/CC reviewed"] },
+              { icon: "⚖️", color: "#10C4C3", bg: "rgba(201,168,76,0.06)", border: "rgba(201,168,76,0.18)", title: "Legal Clarity", desc: "Our in-house legal team reviews title deeds, encumbrance certificates, and ownership documents before you sign anything.", pts: ["Title deed verification", "Encumbrance check", "OC/CC reviewed"] },
               { icon: "👤", color: "#3B82F6", bg: "rgba(59,130,246,0.06)", border: "rgba(59,130,246,0.15)", title: "Expert Agents", desc: "Work with RERA-certified agents who know the local micro-market, pricing trends, and negotiate on your behalf.", pts: ["RERA certified agents", "Local market expertise", "Negotiation support"] },
               { icon: "💎", color: "#8B5CF6", bg: "rgba(139,92,246,0.06)", border: "rgba(139,92,246,0.15)", title: "Transparent Pricing", desc: "No hidden charges, no inflated quotes. Our pricing is straightforward with a detailed cost breakup before any commitment.", pts: ["No brokerage surprise", "Detailed cost sheet", "Zero hidden charges"] },
             ].map(b => (
               <div key={b.title} style={{ background: b.bg, border: `1.5px solid ${b.border}`, borderRadius: "18px", padding: "28px 24px" }}>
                 <div style={{ fontSize: "28px", marginBottom: "14px" }}>{b.icon}</div>
-                <h3 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "20px", fontWeight: 600, color: "#E8EAED", marginBottom: "10px" }}>{b.title}</h3>
+                <h3 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "20px", fontWeight: 600, color: "#FFFFFF", marginBottom: "10px" }}>{b.title}</h3>
                 <p style={{ fontSize: "12.5px", color: "rgba(255,255,255,0.45)", lineHeight: 1.75, marginBottom: "16px" }}>{b.desc}</p>
                 <ul style={{ listStyle: "none", display: "flex", flexDirection: "column", gap: "6px" }}>
                   {b.pts.map(pt => (
@@ -418,19 +417,19 @@ export default function BuyPage() {
         </section>
 
         {/* ── CTA ──────────────────────────────────────────────── */}
-        <section className="buy-cta" style={{ background: "#000000", padding: "90px 48px", position: "relative", overflow: "hidden" }}>
+        <section className="buy-cta" style={{ background: "#020C1C", padding: "90px 48px", position: "relative", overflow: "hidden" }}>
           <div style={{ position: "absolute", inset: 0, backgroundImage: "linear-gradient(rgba(201,168,76,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(201,168,76,0.04) 1px, transparent 1px)", backgroundSize: "52px 52px", pointerEvents: "none" }} />
           <div style={{ position: "absolute", inset: 0, background: "radial-gradient(ellipse 60% 55% at 50% 110%, rgba(201,168,76,0.1) 0%, transparent 55%)", pointerEvents: "none" }} />
           <div style={{ position: "relative", zIndex: 2, maxWidth: "680px", margin: "0 auto", textAlign: "center" }}>
             <Eyebrow label="Get Started" />
-            <h2 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "clamp(34px, 5vw, 56px)", fontWeight: 300, color: "#E8EAED", lineHeight: 1.15, marginBottom: "14px" }}>
-              Start Your Property<br /><em style={{ fontStyle: "italic", color: "#2BA8E0" }}>Search Today</em>
+            <h2 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "clamp(34px, 5vw, 56px)", fontWeight: 300, color: "#FFFFFF", lineHeight: 1.15, marginBottom: "14px" }}>
+              Start Your Property<br /><em style={{ fontStyle: "italic", color: "#10C4C3" }}>Search Today</em>
             </h2>
             <p style={{ fontSize: "15px", color: "rgba(245,242,236,0.45)", lineHeight: 1.75, marginBottom: "36px" }}>
               Over 2,400 verified properties across 14 Indian cities. Our experts guide you from search to registration.
             </p>
             <div style={{ display: "flex", gap: "14px", justifyContent: "center", flexWrap: "wrap" }}>
-              <a href="/properties" style={{ padding: "14px 36px", background: "#2BA8E0", borderRadius: "9px", color: "#000000", fontSize: "13px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", textDecoration: "none", display: "inline-flex", alignItems: "center", gap: "8px" }}>
+              <a href="/properties" style={{ padding: "14px 36px", background: "#10C4C3", borderRadius: "9px", color: "#020C1C", fontSize: "13px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", textDecoration: "none", display: "inline-flex", alignItems: "center", gap: "8px" }}>
                 Browse All
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
               </a>
@@ -446,8 +445,17 @@ export default function BuyPage() {
           <div style={{ maxWidth: "1280px", margin: "0 auto" }}>
             <div className="buy-footer-grid" style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1fr 1fr", gap: "40px", paddingBottom: "56px", borderBottom: "1px solid rgba(245,242,236,0.06)" }}>
               <div>
-                <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "18px", fontWeight: 600, color: "#fff", letterSpacing: "0.16em", marginBottom: "14px" }}>Nilay 360 <span style={{ color: "#2BA8E0" }}>·</span></div>
-                <p style={{ fontSize: "13px", color: "rgba(245,242,236,0.35)", lineHeight: 1.75, maxWidth: "260px" }}>India's most trusted premium real estate platform. Every listing verified, every project curated.</p>
+                <div style={{ fontFamily: "'Cal Sans', sans-serif", fontSize: "18px", fontWeight: 600, color: "#fff", letterSpacing: "0.16em", marginBottom: "14px" }}>Nilay 360 <span style={{ color: "#10C4C3" }}>·</span></div>
+                <p style={{ fontSize: "13px", color: "rgba(245,242,236,0.35)", lineHeight: 1.75, maxWidth: "260px", marginBottom: "20px" }}>India's most trusted premium real estate platform. Every listing verified, every project curated.</p>
+                <div style={{ display: "flex", gap: "10px" }}>
+                  {[
+                    { s: "IN", href: "https://www.instagram.com/nilay360_/" },
+                    { s: "LI", href: "https://linkedin.com/company/nilay360" },
+                    { s: "YT", href: "https://www.youtube.com/@nilay360.digital" },
+                  ].map(({ s, href }) => (
+                    <a key={s} href={href} target="_blank" rel="noopener noreferrer" aria-label={s} style={{ width: "34px", height: "34px", borderRadius: "8px", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.07)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "10px", color: "rgba(255,255,255,0.35)", fontWeight: 700, textDecoration: "none" }}>{s}</a>
+                  ))}
+                </div>
               </div>
               {FOOTER_COLS.map(col => (
                 <div key={col.heading}>

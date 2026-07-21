@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import React, { useState, useEffect, useRef } from "react"
 import Link from "next/link"
@@ -11,11 +11,11 @@ interface MiniListing {
 }
 
 const STATUS_MAP: Record<string, { text: string; bg: string; label: string }> = {
-  active:         { text: "#2BA8E0", bg: "rgba(43,168,224,0.15)",  label: "Active"   },
-  pending_review: { text: "#AEB4BC", bg: "rgba(255,255,255,0.10)", label: "Pending"  },
-  pending:        { text: "#AEB4BC", bg: "rgba(255,255,255,0.10)", label: "Pending"  },
+  active:         { text: "#10C4C3", bg: "rgba(16,196,195,0.15)",  label: "Active"   },
+  pending_review: { text: "#A9B4C2", bg: "rgba(255,255,255,0.10)", label: "Pending"  },
+  pending:        { text: "#A9B4C2", bg: "rgba(255,255,255,0.10)", label: "Pending"  },
   rejected:       { text: "#F87171", bg: "rgba(248,113,113,0.15)", label: "Rejected" },
-  inactive:       { text: "#AEB4BC", bg: "rgba(255,255,255,0.10)", label: "Inactive" },
+  inactive:       { text: "#A9B4C2", bg: "rgba(255,255,255,0.10)", label: "Inactive" },
   sold:           { text: "#C4B5FD", bg: "rgba(139,92,246,0.15)",  label: "Sold"     },
 }
 
@@ -64,23 +64,23 @@ function ListingsPanel({ listings, loading, onNavClose, onMouseEnter, onMouseLea
           background: "rgba(255,255,255,0.08)",
           border: "1px solid rgba(255,255,255,0.18)",
           borderRadius: 6, fontSize: 12,
-          color: "#E8EAED", outline: "none",
-          fontFamily: "'DM Sans', sans-serif",
+          color: "#FFFFFF", outline: "none",
+          fontFamily: "'Cal Sans', sans-serif",
         }}
       />
 
       {loading ? (
-        <p style={{ fontSize: 12, color: "rgba(255,255,255,0.35)", padding: "4px 2px", margin: 0, fontFamily: "'DM Sans', sans-serif" }}>
+        <p style={{ fontSize: 12, color: "rgba(255,255,255,0.35)", padding: "4px 2px", margin: 0, fontFamily: "'Cal Sans', sans-serif" }}>
           Loading…
         </p>
       ) : visible.length === 0 ? (
-        <p style={{ fontSize: 12, color: "rgba(255,255,255,0.35)", padding: "4px 2px", margin: 0, fontFamily: "'DM Sans', sans-serif" }}>
+        <p style={{ fontSize: 12, color: "rgba(255,255,255,0.35)", padding: "4px 2px", margin: 0, fontFamily: "'Cal Sans', sans-serif" }}>
           {search ? "No match" : "No listings yet"}
         </p>
       ) : (
         <div style={{ display: "flex", flexDirection: "column" }}>
           {visible.map(l => {
-            const sc = STATUS_MAP[l.status] ?? { text: "#AEB4BC", bg: "rgba(255,255,255,0.10)", label: l.status }
+            const sc = STATUS_MAP[l.status] ?? { text: "#A9B4C2", bg: "rgba(255,255,255,0.10)", label: l.status }
             return (
               <Link
                 key={l.id}
@@ -90,10 +90,10 @@ function ListingsPanel({ listings, loading, onNavClose, onMouseEnter, onMouseLea
                 onMouseEnter={e => (e.currentTarget.style.background = "rgba(255,255,255,0.05)")}
                 onMouseLeave={e => (e.currentTarget.style.background = "transparent")}
               >
-                <span style={{ fontSize: 12, fontWeight: 500, color: "#E8EAED", fontFamily: "'DM Sans', sans-serif", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", flex: 1, minWidth: 0 }}>
+                <span style={{ fontSize: 12, fontWeight: 500, color: "#FFFFFF", fontFamily: "'Cal Sans', sans-serif", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", flex: 1, minWidth: 0 }}>
                   {l.title ?? "Untitled"}
                 </span>
-                <span style={{ fontSize: 10, fontWeight: 600, padding: "2px 6px", borderRadius: 4, flexShrink: 0, color: sc.text, background: sc.bg, fontFamily: "'DM Sans', sans-serif" }}>
+                <span style={{ fontSize: 10, fontWeight: 600, padding: "2px 6px", borderRadius: 4, flexShrink: 0, color: sc.text, background: sc.bg, fontFamily: "'Cal Sans', sans-serif" }}>
                   {sc.label}
                 </span>
               </Link>
@@ -106,7 +106,7 @@ function ListingsPanel({ listings, loading, onNavClose, onMouseEnter, onMouseLea
         <Link
           href="/dashboard/my-listings"
           onClick={onNavClose}
-          style={{ display: "block", textAlign: "center", fontSize: 11, fontWeight: 600, color: "#2BA8E0", fontFamily: "'DM Sans', sans-serif", padding: "4px 0", textDecoration: "none" }}
+          style={{ display: "block", textAlign: "center", fontSize: 11, fontWeight: 600, color: "#10C4C3", fontFamily: "'Cal Sans', sans-serif", padding: "4px 0", textDecoration: "none" }}
           onMouseEnter={e => (e.currentTarget.style.opacity = "0.7")}
           onMouseLeave={e => (e.currentTarget.style.opacity = "1")}
         >
@@ -163,20 +163,20 @@ export function MyListingsDropdown({ onNavClose, mobile = false }: Props) {
   if (mobile) {
     return (
       <div>
-        <div style={{ display: "flex", alignItems: "center", borderRadius: 10, overflow: "hidden", border: open ? "1px solid rgba(43,168,224,0.25)" : "1px solid rgba(255,255,255,0.07)" }}>
+        <div style={{ display: "flex", alignItems: "center", borderRadius: 10, overflow: "hidden", border: open ? "1px solid rgba(16,196,195,0.25)" : "1px solid rgba(255,255,255,0.07)" }}>
           <Link
             href="/dashboard/my-listings"
             onClick={onNavClose}
             style={{
               flex: 1, display: "flex", alignItems: "center", gap: 8,
               padding: "11px 12px",
-              background: open ? "rgba(43,168,224,0.06)" : "rgba(255,255,255,0.04)",
-              color: open ? "#2BA8E0" : "rgba(255,255,255,0.75)",
+              background: open ? "rgba(16,196,195,0.06)" : "rgba(255,255,255,0.04)",
+              color: open ? "#10C4C3" : "rgba(255,255,255,0.75)",
               fontSize: 13, fontWeight: 500, textDecoration: "none",
-              fontFamily: "'DM Sans', sans-serif",
+              fontFamily: "'Cal Sans', sans-serif",
             }}
           >
-            <span style={{ fontSize: 15, color: "#2BA8E0" }}>🏠</span>
+            <span style={{ fontSize: 15, color: "#10C4C3" }}>🏠</span>
             My Listings
           </Link>
           <button
@@ -184,9 +184,9 @@ export function MyListingsDropdown({ onNavClose, mobile = false }: Props) {
             aria-label="Expand My Listings preview"
             style={{
               padding: "11px 14px",
-              background: open ? "rgba(43,168,224,0.08)" : "rgba(255,255,255,0.04)",
+              background: open ? "rgba(16,196,195,0.08)" : "rgba(255,255,255,0.04)",
               border: "none", borderLeft: "1px solid rgba(255,255,255,0.06)",
-              cursor: "pointer", color: open ? "#2BA8E0" : "rgba(255,255,255,0.45)",
+              cursor: "pointer", color: open ? "#10C4C3" : "rgba(255,255,255,0.45)",
             }}
           >
             <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"
@@ -210,10 +210,10 @@ export function MyListingsDropdown({ onNavClose, mobile = false }: Props) {
       {/* Trigger row — label is a real link, chevron is visual only */}
       <div style={{
         display: "flex", alignItems: "center", gap: 10, padding: "9px 16px",
-        background: open ? "rgba(43,168,224,0.07)" : "transparent",
+        background: open ? "rgba(16,196,195,0.07)" : "transparent",
         transition: "background 0.12s",
       }}>
-        <span style={{ color: open ? "#2BA8E0" : "rgba(43,168,224,0.55)", transition: "color 0.12s", flexShrink: 0 }}>
+        <span style={{ color: open ? "#10C4C3" : "rgba(16,196,195,0.55)", transition: "color 0.12s", flexShrink: 0 }}>
           <HouseIcon />
         </span>
         <Link
@@ -222,7 +222,7 @@ export function MyListingsDropdown({ onNavClose, mobile = false }: Props) {
           style={{
             flex: 1, fontSize: 13, fontWeight: 450,
             color: open ? "#FFFFFF" : "rgba(255,255,255,0.65)",
-            fontFamily: "'DM Sans', sans-serif",
+            fontFamily: "'Cal Sans', sans-serif",
             textDecoration: "none", transition: "color 0.12s",
           }}
         >

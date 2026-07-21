@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+﻿import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { Resend } from "resend";
 
@@ -75,41 +75,41 @@ function buildAlertEmail(listing: Listing, searchName: string | null, userEmail:
   return `<!DOCTYPE html>
 <html lang="en">
 <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
-<body style="margin:0;padding:0;background:#000000;font-family:'DM Sans',Arial,sans-serif;">
-  <table width="100%" cellpadding="0" cellspacing="0" style="background:#000000;padding:40px 0;">
+<body style="margin:0;padding:0;background:#020C1C;font-family:-apple-system,'Segoe UI',Roboto,Arial,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#020C1C;padding:40px 0;">
     <tr><td align="center">
       <table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;background:#ffffff;border-radius:8px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,0.15);">
 
         <tr>
-          <td style="background:#000000;padding:32px 40px;text-align:center;">
-            <p style="margin:0;font-family:Georgia,serif;font-size:28px;font-weight:400;letter-spacing:4px;color:#2BA8E0;text-transform:uppercase;">Nilay 360</p>
+          <td style="background:#020C1C;padding:32px 40px;text-align:center;">
+            <p style="margin:0;font-family:Georgia,serif;font-size:28px;font-weight:400;letter-spacing:4px;color:#10C4C3;text-transform:uppercase;">Nilay 360</p>
             <p style="margin:6px 0 0;font-size:12px;color:#9CA3AF;letter-spacing:2px;text-transform:uppercase;">Premium Real Estate</p>
           </td>
         </tr>
 
         <tr>
-          <td style="background:#121519;padding:14px 40px;">
+          <td style="background:#111F33;padding:14px 40px;">
             <p style="margin:0;font-size:12px;color:#9CA3AF;letter-spacing:1px;text-transform:uppercase;">New Listing Alert — ${name}</p>
           </td>
         </tr>
 
         <tr>
           <td style="padding:36px 40px 28px;">
-            <p style="margin:0 0 6px;font-size:13px;color:#6B7280;text-transform:uppercase;letter-spacing:1px;">New Listing</p>
-            <p style="margin:0 0 24px;font-size:22px;font-family:Georgia,serif;color:#000000;font-weight:500;line-height:1.3;">${title}</p>
+            <p style="margin:0 0 6px;font-size:13px;color:#6B7686;text-transform:uppercase;letter-spacing:1px;">New Listing</p>
+            <p style="margin:0 0 24px;font-size:22px;font-family:Georgia,serif;color:#020C1C;font-weight:500;line-height:1.3;">${title}</p>
 
             <table width="100%" cellpadding="0" cellspacing="0">
               ${city ? `<tr><td style="padding-bottom:14px;">
-                <p style="margin:0 0 3px;font-size:11px;color:#6B7280;text-transform:uppercase;letter-spacing:1px;">City</p>
-                <p style="margin:0;font-size:15px;color:#000000;">${city}</p>
+                <p style="margin:0 0 3px;font-size:11px;color:#6B7686;text-transform:uppercase;letter-spacing:1px;">City</p>
+                <p style="margin:0;font-size:15px;color:#020C1C;">${city}</p>
               </td></tr>` : ""}
               ${cat ? `<tr><td style="padding-bottom:14px;">
-                <p style="margin:0 0 3px;font-size:11px;color:#6B7280;text-transform:uppercase;letter-spacing:1px;">Type</p>
-                <p style="margin:0;font-size:15px;color:#000000;text-transform:capitalize;">${cat}</p>
+                <p style="margin:0 0 3px;font-size:11px;color:#6B7686;text-transform:uppercase;letter-spacing:1px;">Type</p>
+                <p style="margin:0;font-size:15px;color:#020C1C;text-transform:capitalize;">${cat}</p>
               </td></tr>` : ""}
               ${price ? `<tr><td style="padding-bottom:14px;">
-                <p style="margin:0 0 3px;font-size:11px;color:#6B7280;text-transform:uppercase;letter-spacing:1px;">Price</p>
-                <p style="margin:0;font-size:15px;color:#000000;font-weight:600;">${price}</p>
+                <p style="margin:0 0 3px;font-size:11px;color:#6B7686;text-transform:uppercase;letter-spacing:1px;">Price</p>
+                <p style="margin:0;font-size:15px;color:#020C1C;font-weight:600;">${price}</p>
               </td></tr>` : ""}
             </table>
           </td>
@@ -119,8 +119,8 @@ function buildAlertEmail(listing: Listing, searchName: string | null, userEmail:
           <td style="padding:0 40px 36px;">
             <table cellpadding="0" cellspacing="0">
               <tr>
-                <td style="background:#2BA8E0;border-radius:4px;padding:12px 28px;">
-                  <a href="${url}" style="color:#000000;font-size:14px;font-weight:600;text-decoration:none;letter-spacing:0.5px;">View Property →</a>
+                <td style="background:#10C4C3;border-radius:4px;padding:12px 28px;">
+                  <a href="${url}" style="color:#020C1C;font-size:14px;font-weight:600;text-decoration:none;letter-spacing:0.5px;">View Property →</a>
                 </td>
               </tr>
             </table>
@@ -128,10 +128,10 @@ function buildAlertEmail(listing: Listing, searchName: string | null, userEmail:
         </tr>
 
         <tr>
-          <td style="background:#000000;padding:20px 40px;border-top:1px solid #1f2937;">
+          <td style="background:#020C1C;padding:20px 40px;border-top:1px solid #1f2937;">
             <p style="margin:0;font-size:12px;color:#9CA3AF;text-align:center;">
               You're receiving this because you saved a search on Nilay 360.<br>
-              To stop alerts, visit your <a href="https://nilay360.com/dashboard/searches" style="color:#2BA8E0;text-decoration:none;">saved searches</a> and delete the search.<br>
+              To stop alerts, visit your <a href="https://nilay360.com/dashboard/searches" style="color:#10C4C3;text-decoration:none;">saved searches</a> and delete the search.<br>
               © Nilay 360 Premium Real Estate
             </p>
           </td>

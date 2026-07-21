@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
@@ -95,12 +95,12 @@ export default function RegisterPage() {
     width: "100%",
     padding: "11px 14px",
     background: "#fff",
-    border: `1.5px solid ${focused === id ? "#0B0D10" : "rgba(13,43,31,0.18)"}`,
+    border: `1.5px solid ${focused === id ? "#0A1526" : "rgba(13,43,31,0.18)"}`,
     borderRadius: "8px",
-    fontFamily: "'DM Sans', sans-serif",
+    fontFamily: "'Cal Sans', sans-serif",
     fontSize: "14px",
     fontWeight: 400,
-    color: "#000000",
+    color: "#020C1C",
     outline: "none",
     boxShadow: focused === id ? "0 0 0 3px rgba(27,67,50,0.10)" : "none",
     transition: "border-color 0.18s, box-shadow 0.18s",
@@ -113,11 +113,10 @@ export default function RegisterPage() {
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,600&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap');
 
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
         html { scroll-behavior: smooth; }
-        body { font-family: 'DM Sans', system-ui, sans-serif; background: #000000; overflow-x: hidden; }
+        body { font-family: 'Cal Sans', system-ui, sans-serif; background: #020C1C; overflow-x: hidden; }
 
         .rp-root {
           display: flex;
@@ -128,7 +127,7 @@ export default function RegisterPage() {
         .rp-left {
           flex: 0 0 420px;
           min-height: 100vh;
-          background: #000000;
+          background: #020C1C;
           display: flex;
           flex-direction: column;
           padding: 48px 52px;
@@ -160,27 +159,27 @@ export default function RegisterPage() {
           text-decoration: none; margin-bottom: 64px;
         }
         .rp-logo-text {
-          font-family: 'DM Sans', sans-serif;
+          font-family: 'Cal Sans', sans-serif;
           font-size: 17px; font-weight: 600;
           color: #fff; letter-spacing: 0.22em;
         }
-        .rp-logo-dot { color: #2BA8E0; font-size: 22px; line-height: 1; }
+        .rp-logo-dot { color: #10C4C3; font-size: 22px; line-height: 1; }
 
         /* headline */
         .rp-eyebrow {
           display: flex; align-items: center; gap: 10px; margin-bottom: 18px;
         }
-        .rp-eyebrow-line { width: 26px; height: 1px; background: #2BA8E0; flex-shrink: 0; }
+        .rp-eyebrow-line { width: 26px; height: 1px; background: #10C4C3; flex-shrink: 0; }
         .rp-eyebrow-text {
           font-size: 10px; font-weight: 600; letter-spacing: 0.22em;
-          color: #2BA8E0; text-transform: uppercase;
+          color: #10C4C3; text-transform: uppercase;
         }
         .rp-heading {
-          font-family: 'Cormorant Garamond', Georgia, serif;
+          font-family: 'Cal Sans', Georgia, serif;
           font-size: 42px; font-weight: 300; line-height: 1.13;
-          color: #000000; margin-bottom: 14px;
+          color: #020C1C; margin-bottom: 14px;
         }
-        .rp-heading em { font-style: italic; color: #2BA8E0; font-weight: 300; }
+        .rp-heading em { font-style: italic; color: #10C4C3; font-weight: 300; }
         .rp-tagline {
           font-size: 13px; font-weight: 500; letter-spacing: 0.1em;
           color: rgba(201,168,76,0.65); text-transform: uppercase;
@@ -211,12 +210,12 @@ export default function RegisterPage() {
           font-size: 11px; color: rgba(245,242,236,0.22); line-height: 1.65;
         }
         .rp-left-foot a { color: rgba(201,168,76,0.55); text-decoration: none; }
-        .rp-left-foot a:hover { color: #2BA8E0; }
+        .rp-left-foot a:hover { color: #10C4C3; }
 
         /* ─── RIGHT PANEL ─── */
         .rp-right {
           flex: 1;
-          background: #000000;
+          background: #020C1C;
           display: flex;
           align-items: flex-start;
           justify-content: center;
@@ -236,14 +235,14 @@ export default function RegisterPage() {
 
         /* form header */
         .rp-form-title {
-          font-family: 'Cormorant Garamond', Georgia, serif;
+          font-family: 'Cal Sans', Georgia, serif;
           font-size: 32px; font-weight: 500; line-height: 1.1;
-          color: #000000; margin-bottom: 6px;
+          color: #020C1C; margin-bottom: 6px;
         }
         .rp-form-sub {
           font-size: 13.5px; color: #6B7C72; margin-bottom: 28px;
         }
-        .rp-form-sub a { color: #2BA8E0; text-decoration: none; font-weight: 500; }
+        .rp-form-sub a { color: #10C4C3; text-decoration: none; font-weight: 500; }
         .rp-form-sub a:hover { text-decoration: underline; }
 
         /* google btn */
@@ -253,8 +252,8 @@ export default function RegisterPage() {
           border: 1.5px solid rgba(13,43,31,0.16);
           border-radius: 8px; cursor: pointer;
           display: flex; align-items: center; justify-content: center; gap: 10px;
-          font-family: 'DM Sans', sans-serif;
-          font-size: 13.5px; font-weight: 500; color: #000000;
+          font-family: 'Cal Sans', sans-serif;
+          font-size: 13.5px; font-weight: 500; color: #020C1C;
           transition: border-color 0.18s, box-shadow 0.18s;
           margin-bottom: 22px;
         }
@@ -276,7 +275,7 @@ export default function RegisterPage() {
         /* account type cards */
         .rp-type-label {
           font-size: 11px; font-weight: 600; letter-spacing: 0.1em;
-          color: #000000; text-transform: uppercase; margin-bottom: 10px;
+          color: #020C1C; text-transform: uppercase; margin-bottom: 10px;
           display: block;
         }
         .rp-type-grid {
@@ -297,7 +296,7 @@ export default function RegisterPage() {
           border-color: rgba(201,168,76,0.45);
         }
         .rp-type-card.sel {
-          border-color: #2BA8E0;
+          border-color: #10C4C3;
           background: rgba(201,168,76,0.07);
           box-shadow: 0 0 0 3px rgba(201,168,76,0.13);
         }
@@ -320,11 +319,11 @@ export default function RegisterPage() {
           flex-shrink: 0; transition: border-color 0.18s;
         }
         .rp-type-card.sel .rp-type-radio {
-          border-color: #2BA8E0;
+          border-color: #10C4C3;
         }
         .rp-type-radio-dot {
           width: 7px; height: 7px; border-radius: 50%;
-          background: #2BA8E0;
+          background: #10C4C3;
           opacity: 0; transform: scale(0.4);
           transition: opacity 0.15s, transform 0.15s;
         }
@@ -332,7 +331,7 @@ export default function RegisterPage() {
           opacity: 1; transform: scale(1);
         }
         .rp-type-name {
-          font-size: 14px; font-weight: 600; color: #000000; line-height: 1.2;
+          font-size: 14px; font-weight: 600; color: #020C1C; line-height: 1.2;
         }
         .rp-type-subtitle {
           font-size: 11.5px; font-weight: 500; color: #6B7C72; line-height: 1.3;
@@ -346,7 +345,7 @@ export default function RegisterPage() {
           background: rgba(201,168,76,0.12);
           border: 1px solid rgba(201,168,76,0.3);
           font-size: 9.5px; font-weight: 700;
-          color: #1577B8; letter-spacing: 0.08em;
+          color: #0B9C9B; letter-spacing: 0.08em;
           text-transform: uppercase;
           align-self: flex-start;
         }
@@ -356,7 +355,7 @@ export default function RegisterPage() {
         .rp-field-label {
           display: block; margin-bottom: 6px;
           font-size: 11px; font-weight: 600; letter-spacing: 0.09em;
-          color: #000000; text-transform: uppercase;
+          color: #020C1C; text-transform: uppercase;
         }
         .rp-field-row { display: flex; gap: 12px; }
         .rp-field-row .rp-field { flex: 1; margin-bottom: 0; }
@@ -372,7 +371,7 @@ export default function RegisterPage() {
           color: #aab5ae; display: flex; align-items: center;
           transition: color 0.15s;
         }
-        .rp-input-suffix-btn:hover { color: #0B0D10; }
+        .rp-input-suffix-btn:hover { color: #0A1526; }
         input::placeholder { color: #bbc5be; }
 
         /* section divider */
@@ -393,26 +392,26 @@ export default function RegisterPage() {
         }
         .rp-checkbox-label input[type="checkbox"] {
           width: 16px; height: 16px; margin-top: 1px; flex-shrink: 0;
-          accent-color: #0B0D10; cursor: pointer;
+          accent-color: #0A1526; cursor: pointer;
         }
         .rp-checkbox-text {
           font-size: 12.5px; color: #6B7C72; line-height: 1.55;
         }
-        .rp-checkbox-text a { color: #2BA8E0; text-decoration: none; font-weight: 500; }
+        .rp-checkbox-text a { color: #10C4C3; text-decoration: none; font-weight: 500; }
         .rp-checkbox-text a:hover { text-decoration: underline; }
 
         /* submit */
         .rp-submit {
           width: 100%; padding: 13px 24px;
-          background: #2BA8E0; border: none; border-radius: 8px;
-          font-family: 'DM Sans', sans-serif;
+          background: #10C4C3; border: none; border-radius: 8px;
+          font-family: 'Cal Sans', sans-serif;
           font-size: 13.5px; font-weight: 700; letter-spacing: 0.1em;
-          color: #000000; cursor: pointer; text-transform: uppercase;
+          color: #020C1C; cursor: pointer; text-transform: uppercase;
           transition: background 0.18s, transform 0.12s, box-shadow 0.18s;
           margin-bottom: 16px;
         }
         .rp-submit:hover {
-          background: #3DBEF5;
+          background: #3DDAD9;
           box-shadow: 0 4px 20px rgba(201,168,76,0.38);
           transform: translateY(-1px);
         }
@@ -423,7 +422,7 @@ export default function RegisterPage() {
           text-align: center;
           font-size: 13px; color: #6B7C72;
         }
-        .rp-signin-link a { color: #2BA8E0; text-decoration: none; font-weight: 500; }
+        .rp-signin-link a { color: #10C4C3; text-decoration: none; font-weight: 500; }
         .rp-signin-link a:hover { text-decoration: underline; }
 
         /* ─── RESPONSIVE ─── */
@@ -477,7 +476,7 @@ export default function RegisterPage() {
                     title: "Verified Listings Only",
                     desc: "Every property is manually reviewed and authenticated before going live.",
                     icon: (
-                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#2BA8E0" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#10C4C3" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                         <polyline points="20 6 9 17 4 12" />
                       </svg>
                     ),
@@ -486,7 +485,7 @@ export default function RegisterPage() {
                     title: "RERA-Compliant Agents",
                     desc: "All agents on Nilay 360 are verified, licensed, and RERA registered.",
                     icon: (
-                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#2BA8E0" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#10C4C3" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                         <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
                       </svg>
                     ),
@@ -495,7 +494,7 @@ export default function RegisterPage() {
                     title: "Concierge Support",
                     desc: "Dedicated relationship managers for high-value property transactions.",
                     icon: (
-                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#2BA8E0" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#10C4C3" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                         <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
                         <circle cx="9" cy="7" r="4" />
                         <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
@@ -507,7 +506,7 @@ export default function RegisterPage() {
                     title: "Smart Property Matching",
                     desc: "AI-powered recommendations based on your preferences and budget.",
                     icon: (
-                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#2BA8E0" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#10C4C3" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                         <circle cx="11" cy="11" r="8" />
                         <line x1="21" y1="21" x2="16.65" y2="16.65" />
                       </svg>
@@ -574,7 +573,7 @@ export default function RegisterPage() {
                 <div className="rp-type-card-top">
                   <div className="rp-type-icon">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
-                      stroke={accountType === "individual" ? "#2BA8E0" : "#000000"}
+                      stroke={accountType === "individual" ? "#10C4C3" : "#020C1C"}
                       strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                       <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
                       <polyline points="9 22 9 12 15 12 15 22" />
@@ -600,7 +599,7 @@ export default function RegisterPage() {
                 <div className="rp-type-card-top">
                   <div className="rp-type-icon">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
-                      stroke={accountType === "agent" ? "#2BA8E0" : "#000000"}
+                      stroke={accountType === "agent" ? "#10C4C3" : "#020C1C"}
                       strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                       <rect x="2" y="7" width="20" height="14" rx="2" ry="2" />
                       <path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2" />

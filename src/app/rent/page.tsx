@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { optimizedImageUrl } from "@/lib/image-url";
@@ -63,7 +63,7 @@ function Eyebrow({ label }: { label: string }) {
   return (
     <div style={{ display: "inline-flex", alignItems: "center", gap: "8px", marginBottom: "14px" }}>
       <div style={{ width: "26px", height: "1px", background: "rgba(201,168,76,0.55)" }} />
-      <span style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.22em", color: "#2BA8E0", textTransform: "uppercase" }}>{label}</span>
+      <span style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.22em", color: "#10C4C3", textTransform: "uppercase" }}>{label}</span>
       <div style={{ width: "26px", height: "1px", background: "rgba(201,168,76,0.55)" }} />
     </div>
   );
@@ -77,34 +77,34 @@ function RentalCard({ p }: { p: Property }) {
     <div
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
-      style={{ background: "#161A1F", borderRadius: "16px", overflow: "hidden", border: "1px solid rgba(255,255,255,0.07)", boxShadow: hover ? "0 20px 52px rgba(43,168,224,0.1)" : "0 2px 8px rgba(0,0,0,0.3)", transform: hover ? "translateY(-5px)" : "none", transition: "all 0.25s" }}
+      style={{ background: "#182B3F", borderRadius: "16px", overflow: "hidden", border: "1px solid rgba(255,255,255,0.07)", boxShadow: hover ? "0 20px 52px rgba(16,196,195,0.1)" : "0 2px 8px rgba(0,0,0,0.3)", transform: hover ? "translateY(-5px)" : "none", transition: "all 0.25s" }}
     >
       <div style={{ position: "relative", height: "215px", overflow: "hidden" }}>
         <img src={optimizedImageUrl(img, 600)} alt={p.title} loading="lazy" style={{ width: "100%", height: "100%", objectFit: "cover", transform: hover ? "scale(1.06)" : "scale(1)", transition: "transform 0.35s" }} />
         <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(5,8,12,0.5) 0%, transparent 55%)" }} />
-        <span style={{ position: "absolute", top: "12px", left: "12px", padding: "4px 11px", borderRadius: "100px", fontSize: "9px", fontWeight: 800, letterSpacing: "0.1em", textTransform: "uppercase", background: "rgba(45,106,79,0.9)", color: "#0B0D10" }}>For Rent</span>
+        <span style={{ position: "absolute", top: "12px", left: "12px", padding: "4px 11px", borderRadius: "100px", fontSize: "9px", fontWeight: 800, letterSpacing: "0.1em", textTransform: "uppercase", background: "rgba(45,106,79,0.9)", color: "#0A1526" }}>For Rent</span>
         {p.is_furnished && (
-          <span style={{ position: "absolute", top: "12px", right: "12px", padding: "4px 10px", borderRadius: "100px", fontSize: "9px", fontWeight: 800, letterSpacing: "0.08em", textTransform: "uppercase", background: "rgba(13,43,31,0.85)", color: "#2BA8E0", border: "1px solid rgba(201,168,76,0.3)", backdropFilter: "blur(8px)" }}>Furnished</span>
+          <span style={{ position: "absolute", top: "12px", right: "12px", padding: "4px 10px", borderRadius: "100px", fontSize: "9px", fontWeight: 800, letterSpacing: "0.08em", textTransform: "uppercase", background: "rgba(13,43,31,0.85)", color: "#10C4C3", border: "1px solid rgba(201,168,76,0.3)", backdropFilter: "blur(8px)" }}>Furnished</span>
         )}
         <div style={{ position: "absolute", bottom: "12px", left: "14px" }}>
-          <span style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "22px", fontWeight: 600, color: "#2BA8E0" }}>{fmtRent(p.price)}</span>
+          <span style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "22px", fontWeight: 600, color: "#10C4C3" }}>{fmtRent(p.price)}</span>
         </div>
       </div>
       <div style={{ padding: "18px 20px 20px" }}>
-        <h3 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "18px", fontWeight: 600, color: "#E8EAED", lineHeight: 1.3, marginBottom: "6px" }}>{p.title}</h3>
+        <h3 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "18px", fontWeight: 600, color: "#FFFFFF", lineHeight: 1.3, marginBottom: "6px" }}>{p.title}</h3>
         <p style={{ display: "flex", alignItems: "center", gap: "4px", fontSize: "11.5px", color: "rgba(255,255,255,0.45)", marginBottom: "14px" }}>
-          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#2BA8E0" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#10C4C3" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
           {p.neighbourhood ? `${p.neighbourhood}, ` : ""}{p.city}
         </p>
         <div style={{ display: "flex", borderTop: "1px solid rgba(255,255,255,0.07)", paddingTop: "14px" }}>
           {[{ v: p.bedrooms, l: COMMERCIAL_CATEGORIES.includes(p.type) ? "Rooms" : "Beds" }, { v: p.bathrooms, l: COMMERCIAL_CATEGORIES.includes(p.type) ? "Wash" : "Baths" }, { v: p.area_sqft?.toLocaleString("en-IN"), l: "sqft" }].map((s, i) => s.v != null && (
             <div key={i} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: "3px", borderRight: i < 2 ? "1px solid rgba(255,255,255,0.07)" : "none" }}>
-              <span style={{ fontSize: "13px", fontWeight: 700, color: "#E8EAED" }}>{s.v}</span>
+              <span style={{ fontSize: "13px", fontWeight: 700, color: "#FFFFFF" }}>{s.v}</span>
               <span style={{ fontSize: "9px", color: "#9CA3AF", textTransform: "uppercase", letterSpacing: "0.08em" }}>{s.l}</span>
             </div>
           ))}
         </div>
-        <a href={`/property/${p.slug}`} style={{ display: "block", marginTop: "14px", padding: "10px", background: "#000000", borderRadius: "8px", color: "#2BA8E0", fontSize: "11px", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", textDecoration: "none", textAlign: "center" }}>
+        <a href={`/property/${p.slug}`} style={{ display: "block", marginTop: "14px", padding: "10px", background: "#020C1C", borderRadius: "8px", color: "#10C4C3", fontSize: "11px", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", textDecoration: "none", textAlign: "center" }}>
           View Details →
         </a>
       </div>
@@ -174,15 +174,14 @@ export default function RentPage() {
     return true;
   });
 
-  const SEL_STYLE = { padding: "9px 32px 9px 14px", background: "#0B0D10", border: "1.5px solid rgba(255,255,255,0.1)", borderRadius: "9px", fontSize: "12px", fontWeight: 600 as const, fontFamily: "'DM Sans', sans-serif", cursor: "pointer" as const, outline: "none", appearance: "none" as const, color: "#FFFFFF" as const, backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%23AEB4BC' stroke-width='2.5'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E")`, backgroundRepeat: "no-repeat" as const, backgroundPosition: "right 12px center" as const };
+  const SEL_STYLE = { padding: "9px 32px 9px 14px", background: "#0A1526", border: "1.5px solid rgba(255,255,255,0.1)", borderRadius: "9px", fontSize: "12px", fontWeight: 600 as const, fontFamily: "'Cal Sans', sans-serif", cursor: "pointer" as const, outline: "none", appearance: "none" as const, color: "#FFFFFF" as const, backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%23AEB4BC' stroke-width='2.5'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E")`, backgroundRepeat: "no-repeat" as const, backgroundPosition: "right 12px center" as const };
 
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,600&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap');
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
         html { scroll-behavior: smooth; }
-        body { font-family: 'DM Sans', system-ui, sans-serif; background: #000000; overflow-x: hidden; }
+        body { font-family: 'Cal Sans', system-ui, sans-serif; background: #020C1C; overflow-x: hidden; }
         ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-thumb { background: rgba(201,168,76,0.3); border-radius: 2px; }
         @keyframes fadeUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
@@ -209,10 +208,10 @@ export default function RentPage() {
         }
       `}</style>
 
-      <div style={{ minHeight: "100vh", background: "#000000" }}>
+      <div style={{ minHeight: "100vh", background: "#020C1C" }}>
 
         {/* ── HERO ─────────────────────────────────────────────── */}
-        <section className="rn-hero" style={{ paddingTop: "64px", background: "#000000", minHeight: "520px", display: "flex", alignItems: "center", position: "relative", overflow: "hidden" }}>
+        <section className="rn-hero" style={{ paddingTop: "64px", background: "#020C1C", minHeight: "520px", display: "flex", alignItems: "center", position: "relative", overflow: "hidden" }}>
           <div style={{ position: "absolute", inset: 0, backgroundImage: "linear-gradient(rgba(201,168,76,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(201,168,76,0.04) 1px, transparent 1px)", backgroundSize: "60px 60px", pointerEvents: "none" }} />
           <div style={{ position: "absolute", inset: 0, background: "radial-gradient(ellipse 65% 65% at 50% 130%, rgba(201,168,76,0.12) 0%, transparent 55%)", pointerEvents: "none" }} />
           <div style={{ position: "absolute", right: 0, top: 0, bottom: 0, width: "40%", backgroundImage: "radial-gradient(circle, rgba(201,168,76,0.1) 1px, transparent 1px)", backgroundSize: "24px 24px", pointerEvents: "none", maskImage: "linear-gradient(to left, rgba(0,0,0,0.4), transparent)" }} />
@@ -220,8 +219,8 @@ export default function RentPage() {
             <div style={{ animation: "fadeUp 0.5s ease-out both" }}>
               <Eyebrow label="Premium Rentals" />
             </div>
-            <h1 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "clamp(44px, 6.5vw, 80px)", fontWeight: 300, color: "#E8EAED", lineHeight: 1.08, marginBottom: "16px", animation: "fadeUp 0.5s 0.1s ease-out both" }}>
-              Find Your Perfect Rental<br /><em style={{ fontStyle: "italic", color: "#2BA8E0" }}>Home</em>
+            <h1 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "clamp(44px, 6.5vw, 80px)", fontWeight: 300, color: "#FFFFFF", lineHeight: 1.08, marginBottom: "16px", animation: "fadeUp 0.5s 0.1s ease-out both" }}>
+              Find Your Perfect Rental<br /><em style={{ fontStyle: "italic", color: "#10C4C3" }}>Home</em>
             </h1>
             <p style={{ fontSize: "16px", color: "rgba(245,242,236,0.5)", marginBottom: "48px", animation: "fadeUp 0.5s 0.18s ease-out both" }}>
               Zero brokerage, verified landlords, flexible tenures — premium rentals across India's finest neighbourhoods.
@@ -229,7 +228,7 @@ export default function RentPage() {
             <div style={{ display: "flex", justifyContent: "center", gap: "48px", paddingTop: "28px", borderTop: "1px solid rgba(245,242,236,0.06)", animation: "fadeUp 0.5s 0.26s ease-out both" }}>
               {[["800+", "Rentals"], ["Zero", "Brokerage"], ["Verified", "Landlords"]].map(([v, l]) => (
                 <div key={l} style={{ textAlign: "center" }}>
-                  <p style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "30px", fontWeight: 600, color: "#2BA8E0" }}>{v}</p>
+                  <p style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "30px", fontWeight: 600, color: "#10C4C3" }}>{v}</p>
                   <p style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.14em", color: "rgba(245,242,236,0.3)", textTransform: "uppercase" }}>{l}</p>
                 </div>
               ))}
@@ -238,12 +237,12 @@ export default function RentPage() {
         </section>
 
         {/* ── RENTING GUIDE ────────────────────────────────────── */}
-        <section className="rn-guide" style={{ background: "#000000", padding: "72px 48px" }}>
+        <section className="rn-guide" style={{ background: "#020C1C", padding: "72px 48px" }}>
           <div style={{ maxWidth: "1280px", margin: "0 auto" }}>
             <div style={{ textAlign: "center", marginBottom: "48px" }}>
               <Eyebrow label="How To Rent" />
-              <h2 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "clamp(28px, 3.5vw, 44px)", fontWeight: 400, color: "#E8EAED", lineHeight: 1.15 }}>
-                Renting Made<br /><em style={{ fontStyle: "italic", color: "#2BA8E0" }}>Effortless</em>
+              <h2 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "clamp(28px, 3.5vw, 44px)", fontWeight: 400, color: "#FFFFFF", lineHeight: 1.15 }}>
+                Renting Made<br /><em style={{ fontStyle: "italic", color: "#10C4C3" }}>Effortless</em>
               </h2>
             </div>
             <div className="rn-guide-grid" style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "22px" }}>
@@ -253,10 +252,10 @@ export default function RentPage() {
                 { n: "03", icon: "🤝", title: "Negotiate & Agree", desc: "We help you negotiate rent, security deposit, and maintenance charges to get the best deal from verified landlords." },
                 { n: "04", icon: "🏡", title: "Move In", desc: "Digital rental agreement, key handover, and post-move-in support — all handled by our team for a smooth transition." },
               ].map(step => (
-                <div key={step.n} style={{ background: "#161A1F", border: "1px solid rgba(255,255,255,0.07)", borderRadius: "18px", padding: "30px 24px", boxShadow: "0 2px 12px rgba(0,0,0,0.2)", position: "relative", overflow: "hidden" }}>
-                  <div style={{ position: "absolute", top: "16px", right: "18px", fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "48px", fontWeight: 700, color: "rgba(255,255,255,0.04)", lineHeight: 1 }}>{step.n}</div>
+                <div key={step.n} style={{ background: "#182B3F", border: "1px solid rgba(255,255,255,0.07)", borderRadius: "18px", padding: "30px 24px", boxShadow: "0 2px 12px rgba(0,0,0,0.2)", position: "relative", overflow: "hidden" }}>
+                  <div style={{ position: "absolute", top: "16px", right: "18px", fontFamily: "'Cal Sans', Georgia, serif", fontSize: "48px", fontWeight: 700, color: "rgba(255,255,255,0.04)", lineHeight: 1 }}>{step.n}</div>
                   <div style={{ fontSize: "28px", marginBottom: "14px" }}>{step.icon}</div>
-                  <h3 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "20px", fontWeight: 600, color: "#E8EAED", marginBottom: "10px" }}>{step.title}</h3>
+                  <h3 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "20px", fontWeight: 600, color: "#FFFFFF", marginBottom: "10px" }}>{step.title}</h3>
                   <p style={{ fontSize: "13px", color: "rgba(255,255,255,0.45)", lineHeight: 1.75 }}>{step.desc}</p>
                 </div>
               ))}
@@ -269,27 +268,27 @@ export default function RentPage() {
           <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "22px" }}>
             <Eyebrow label="Browse Rentals" />
           </div>
-          <div style={{ background: "#121519", border: "1px solid rgba(255,255,255,0.07)", borderRadius: "14px", padding: "18px 22px", display: "flex", gap: "12px", alignItems: "center", flexWrap: "wrap", boxShadow: "0 2px 12px rgba(0,0,0,0.3)" }}>
+          <div style={{ background: "#111F33", border: "1px solid rgba(255,255,255,0.07)", borderRadius: "14px", padding: "18px 22px", display: "flex", gap: "12px", alignItems: "center", flexWrap: "wrap", boxShadow: "0 2px 12px rgba(0,0,0,0.3)" }}>
             <select value={cityFilter} onChange={e => setCityFilter(e.target.value)} style={{ ...SEL_STYLE, color: cityFilter === "All" ? "rgba(255,255,255,0.4)" : "#FFFFFF" }}>
-              <option value="All" style={{ background: "#0B0D10" }}>All Cities</option>
-              {["Hyderabad", "Mumbai", "Bengaluru", "Gurugram", "Noida", "Chennai", "Pune"].map(c => <option key={c} value={c} style={{ background: "#0B0D10" }}>{c}</option>)}
+              <option value="All" style={{ background: "#0A1526" }}>All Cities</option>
+              {["Hyderabad", "Mumbai", "Bengaluru", "Gurugram", "Noida", "Chennai", "Pune"].map(c => <option key={c} value={c} style={{ background: "#0A1526" }}>{c}</option>)}
             </select>
             <select value={typeFilter} onChange={e => setTypeFilter(e.target.value)} style={{ ...SEL_STYLE, color: typeFilter === "All" ? "rgba(255,255,255,0.4)" : "#FFFFFF" }}>
-              <option value="All" style={{ background: "#0B0D10" }}>All Types</option>
-              {["Apartment", "Villa", "Studio"].map(t => <option key={t} value={t} style={{ background: "#0B0D10" }}>{t}</option>)}
+              <option value="All" style={{ background: "#0A1526" }}>All Types</option>
+              {["Apartment", "Villa", "Studio"].map(t => <option key={t} value={t} style={{ background: "#0A1526" }}>{t}</option>)}
             </select>
             <select value={bhkFilter} onChange={e => setBhkFilter(e.target.value)} style={{ ...SEL_STYLE, color: bhkFilter === "All" ? "rgba(255,255,255,0.4)" : "#FFFFFF" }}>
-              <option value="All" style={{ background: "#0B0D10" }}>All BHK</option>
-              {["1 BHK", "2 BHK", "3 BHK", "4 BHK"].map((b, i) => <option key={b} value={String(i + 1)} style={{ background: "#0B0D10" }}>{b}</option>)}
+              <option value="All" style={{ background: "#0A1526" }}>All BHK</option>
+              {["1 BHK", "2 BHK", "3 BHK", "4 BHK"].map((b, i) => <option key={b} value={String(i + 1)} style={{ background: "#0A1526" }}>{b}</option>)}
             </select>
             <select value={budgetFilter} onChange={e => setBudgetFilter(e.target.value)} style={{ ...SEL_STYLE, color: budgetFilter === "all" ? "rgba(255,255,255,0.4)" : "#FFFFFF" }}>
-              <option value="all" style={{ background: "#0B0D10" }}>Any Budget</option>
-              <option value="under30" style={{ background: "#0B0D10" }}>Under ₹30K/mo</option>
-              <option value="30-60" style={{ background: "#0B0D10" }}>₹30K – 60K/mo</option>
-              <option value="60-150" style={{ background: "#0B0D10" }}>₹60K – 1.5L/mo</option>
-              <option value="above150" style={{ background: "#0B0D10" }}>Above ₹1.5L/mo</option>
+              <option value="all" style={{ background: "#0A1526" }}>Any Budget</option>
+              <option value="under30" style={{ background: "#0A1526" }}>Under ₹30K/mo</option>
+              <option value="30-60" style={{ background: "#0A1526" }}>₹30K – 60K/mo</option>
+              <option value="60-150" style={{ background: "#0A1526" }}>₹60K – 1.5L/mo</option>
+              <option value="above150" style={{ background: "#0A1526" }}>Above ₹1.5L/mo</option>
             </select>
-            <button onClick={() => { setCityFilter("All"); setTypeFilter("All"); setBhkFilter("All"); setBudgetFilter("all"); }} style={{ padding: "9px 18px", borderRadius: "9px", border: "1.5px solid rgba(255,255,255,0.1)", background: "transparent", color: "rgba(255,255,255,0.55)", fontSize: "12px", fontWeight: 600, cursor: "pointer", fontFamily: "'DM Sans', sans-serif" }}>Reset</button>
+            <button onClick={() => { setCityFilter("All"); setTypeFilter("All"); setBhkFilter("All"); setBudgetFilter("all"); }} style={{ padding: "9px 18px", borderRadius: "9px", border: "1.5px solid rgba(255,255,255,0.1)", background: "transparent", color: "rgba(255,255,255,0.55)", fontSize: "12px", fontWeight: 600, cursor: "pointer", fontFamily: "'Cal Sans', sans-serif" }}>Reset</button>
             <span style={{ marginLeft: "auto", fontSize: "12px", fontWeight: 700, color: "rgba(255,255,255,0.45)" }}>{filtered.length} rentals</span>
           </div>
         </div>
@@ -297,20 +296,20 @@ export default function RentPage() {
         {/* ── LISTINGS GRID ────────────────────────────────────── */}
         <section className="rn-listings" style={{ maxWidth: "1280px", margin: "0 auto", padding: "28px 48px 72px" }}>
           {filtered.length === 0 ? (
-            <div style={{ padding: "80px", textAlign: "center", background: "#161A1F", borderRadius: "18px", border: "1px solid rgba(255,255,255,0.07)" }}>
+            <div style={{ padding: "80px", textAlign: "center", background: "#182B3F", borderRadius: "18px", border: "1px solid rgba(255,255,255,0.07)" }}>
               {properties.length === 0 ? (
                 <>
-                  <div style={{ width: "56px", height: "56px", borderRadius: "50%", background: "rgba(43,168,224,0.08)", border: "1.5px solid rgba(43,168,224,0.2)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 20px" }}>
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2BA8E0" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                  <div style={{ width: "56px", height: "56px", borderRadius: "50%", background: "rgba(16,196,195,0.08)", border: "1.5px solid rgba(16,196,195,0.2)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 20px" }}>
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#10C4C3" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
                   </div>
-                  <p style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "28px", color: "#E8EAED", marginBottom: "10px" }}>No rentals found</p>
+                  <p style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "28px", color: "#FFFFFF", marginBottom: "10px" }}>No rentals found</p>
                   <p style={{ fontSize: "13px", color: "rgba(255,255,255,0.45)", marginBottom: "20px" }}>We don't have any rental listings at the moment. Check back soon or explore properties for sale.</p>
-                  <a href="/buy" style={{ display: "inline-flex", alignItems: "center", gap: "8px", padding: "11px 24px", background: "#0B0D10", borderRadius: "8px", color: "#2BA8E0", fontSize: "12px", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", textDecoration: "none" }}>Browse Sales →</a>
+                  <a href="/buy" style={{ display: "inline-flex", alignItems: "center", gap: "8px", padding: "11px 24px", background: "#0A1526", borderRadius: "8px", color: "#10C4C3", fontSize: "12px", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", textDecoration: "none" }}>Browse Sales →</a>
                 </>
               ) : (
                 <>
-                  <p style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "28px", color: "#E8EAED", marginBottom: "10px" }}>No rentals match your filters</p>
-                  <button onClick={() => { setCityFilter("All"); setTypeFilter("All"); setBhkFilter("All"); setBudgetFilter("all"); }} style={{ fontSize: "13px", fontWeight: 600, color: "#2BA8E0", background: "transparent", border: "none", cursor: "pointer", fontFamily: "'DM Sans', sans-serif" }}>Clear all filters →</button>
+                  <p style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "28px", color: "#FFFFFF", marginBottom: "10px" }}>No rentals match your filters</p>
+                  <button onClick={() => { setCityFilter("All"); setTypeFilter("All"); setBhkFilter("All"); setBudgetFilter("all"); }} style={{ fontSize: "13px", fontWeight: 600, color: "#10C4C3", background: "transparent", border: "none", cursor: "pointer", fontFamily: "'Cal Sans', sans-serif" }}>Clear all filters →</button>
                 </>
               )}
             </div>
@@ -322,24 +321,24 @@ export default function RentPage() {
         </section>
 
         {/* ── TENANT BENEFITS ──────────────────────────────────── */}
-        <section className="rn-benefits" style={{ background: "#0B0D10", padding: "72px 48px", borderTop: "1px solid rgba(255,255,255,0.06)" }}>
+        <section className="rn-benefits" style={{ background: "#0A1526", padding: "72px 48px", borderTop: "1px solid rgba(255,255,255,0.06)" }}>
           <div style={{ maxWidth: "1280px", margin: "0 auto" }}>
             <div style={{ textAlign: "center", marginBottom: "44px" }}>
               <Eyebrow label="Tenant Advantages" />
-              <h2 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "clamp(28px, 3.5vw, 44px)", fontWeight: 400, color: "#E8EAED" }}>
-                Why Rent Through<br /><em style={{ fontStyle: "italic", color: "#2BA8E0" }}>Nilay 360?</em>
+              <h2 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "clamp(28px, 3.5vw, 44px)", fontWeight: 400, color: "#FFFFFF" }}>
+                Why Rent Through<br /><em style={{ fontStyle: "italic", color: "#10C4C3" }}>Nilay 360?</em>
               </h2>
             </div>
             <div className="rn-benefits-grid" style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "20px" }}>
               {[
                 { icon: "✦", color: "#059669", bg: "rgba(5,150,105,0.06)", border: "rgba(5,150,105,0.12)", title: "Zero Brokerage", desc: "We charge landlords, not tenants. You pay zero brokerage and no hidden platform fees — ever.", pts: ["No tenant commission", "No processing fee", "Transparent costs"] },
-                { icon: "🛡", color: "#2BA8E0", bg: "rgba(201,168,76,0.06)", border: "rgba(201,168,76,0.18)", title: "Verified Properties", desc: "Every rental is physically inspected, landlord KYC verified, and legal status confirmed before listing.", pts: ["KYC-verified landlords", "Physical inspection done", "Legal status confirmed"] },
+                { icon: "🛡", color: "#10C4C3", bg: "rgba(201,168,76,0.06)", border: "rgba(201,168,76,0.18)", title: "Verified Properties", desc: "Every rental is physically inspected, landlord KYC verified, and legal status confirmed before listing.", pts: ["KYC-verified landlords", "Physical inspection done", "Legal status confirmed"] },
                 { icon: "📆", color: "#3B82F6", bg: "rgba(59,130,246,0.06)", border: "rgba(59,130,246,0.15)", title: "Flexible Tenure", desc: "Short-term or long-term — find 3-month, 6-month, or 11-month leases with flexible lock-in clauses.", pts: ["3–11 month leases", "Flexible lock-in terms", "Early exit options"] },
                 { icon: "📄", color: "#8B5CF6", bg: "rgba(139,92,246,0.06)", border: "rgba(139,92,246,0.15)", title: "Digital Agreements", desc: "Legally valid eStamped rental agreements signed digitally. No trips to stamp paper vendors.", pts: ["Aadhaar eSign", "eStamped agreement", "Instant delivery"] },
               ].map(b => (
                 <div key={b.title} style={{ background: b.bg, border: `1.5px solid ${b.border}`, borderRadius: "18px", padding: "28px 24px" }}>
                   <div style={{ fontSize: "26px", marginBottom: "14px", color: b.color, fontWeight: 700 }}>{b.icon}</div>
-                  <h3 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "20px", fontWeight: 600, color: "#E8EAED", marginBottom: "10px" }}>{b.title}</h3>
+                  <h3 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "20px", fontWeight: 600, color: "#FFFFFF", marginBottom: "10px" }}>{b.title}</h3>
                   <p style={{ fontSize: "12.5px", color: "rgba(255,255,255,0.45)", lineHeight: 1.75, marginBottom: "16px" }}>{b.desc}</p>
                   <ul style={{ listStyle: "none", display: "flex", flexDirection: "column", gap: "6px" }}>
                     {b.pts.map(pt => (
@@ -359,8 +358,8 @@ export default function RentPage() {
         <section className="rn-zones" style={{ maxWidth: "1280px", margin: "0 auto", padding: "72px 48px" }}>
           <div style={{ textAlign: "center", marginBottom: "44px" }}>
             <Eyebrow label="Top Locations" />
-            <h2 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "clamp(28px, 3.5vw, 44px)", fontWeight: 400, color: "#E8EAED" }}>
-              Popular Rental<br /><em style={{ fontStyle: "italic", color: "#2BA8E0" }}>Neighbourhoods</em>
+            <h2 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "clamp(28px, 3.5vw, 44px)", fontWeight: 400, color: "#FFFFFF" }}>
+              Popular Rental<br /><em style={{ fontStyle: "italic", color: "#10C4C3" }}>Neighbourhoods</em>
             </h2>
           </div>
           <div className="rn-zones-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "16px" }}>
@@ -368,16 +367,16 @@ export default function RentPage() {
               const [hover, setHover] = useState(false);
               return (
                 <a key={zone.name} href={`/search?city=${zone.query}`} onMouseEnter={() => setHover(true)} onMouseLeave={() => setHover(false)}
-                  style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "22px 26px", background: hover ? "#121519" : "#161A1F", border: hover ? "1.5px solid rgba(43,168,224,0.2)" : "1.5px solid rgba(255,255,255,0.07)", borderRadius: "14px", textDecoration: "none", transition: "all 0.22s", boxShadow: hover ? "0 16px 44px rgba(43,168,224,0.08)" : "0 2px 8px rgba(0,0,0,0.3)", transform: hover ? "translateY(-3px)" : "none" }}>
+                  style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "22px 26px", background: hover ? "#111F33" : "#182B3F", border: hover ? "1.5px solid rgba(16,196,195,0.2)" : "1.5px solid rgba(255,255,255,0.07)", borderRadius: "14px", textDecoration: "none", transition: "all 0.22s", boxShadow: hover ? "0 16px 44px rgba(16,196,195,0.08)" : "0 2px 8px rgba(0,0,0,0.3)", transform: hover ? "translateY(-3px)" : "none" }}>
                   <div>
-                    <p style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "20px", fontWeight: 600, color: "#E8EAED", marginBottom: "3px", transition: "color 0.22s" }}>{zone.name}</p>
+                    <p style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "20px", fontWeight: 600, color: "#FFFFFF", marginBottom: "3px", transition: "color 0.22s" }}>{zone.name}</p>
                     <p style={{ fontSize: "11px", color: hover ? "rgba(245,242,236,0.4)" : "#9CA3AF", transition: "color 0.22s" }}>{zone.city}</p>
                   </div>
                   <div style={{ textAlign: "right" }}>
-                    <p style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "14px", fontWeight: 600, color: "#2BA8E0", marginBottom: "3px" }}>{zone.avgRent}</p>
+                    <p style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "14px", fontWeight: 600, color: "#10C4C3", marginBottom: "3px" }}>{zone.avgRent}</p>
                     <p style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.1em", color: "rgba(255,255,255,0.35)", textTransform: "uppercase", transition: "color 0.22s" }}>Avg Rent</p>
                   </div>
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={hover ? "#2BA8E0" : "rgba(255,255,255,0.25)"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginLeft: "14px", flexShrink: 0, transition: "stroke 0.22s" }}><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={hover ? "#10C4C3" : "rgba(255,255,255,0.25)"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginLeft: "14px", flexShrink: 0, transition: "stroke 0.22s" }}><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
                 </a>
               );
             })}
@@ -385,19 +384,19 @@ export default function RentPage() {
         </section>
 
         {/* ── CTA ──────────────────────────────────────────────── */}
-        <section className="rn-cta" style={{ background: "#000000", padding: "90px 48px", position: "relative", overflow: "hidden" }}>
+        <section className="rn-cta" style={{ background: "#020C1C", padding: "90px 48px", position: "relative", overflow: "hidden" }}>
           <div style={{ position: "absolute", inset: 0, backgroundImage: "linear-gradient(rgba(201,168,76,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(201,168,76,0.04) 1px, transparent 1px)", backgroundSize: "52px 52px", pointerEvents: "none" }} />
           <div style={{ position: "absolute", inset: 0, background: "radial-gradient(ellipse 60% 55% at 50% 110%, rgba(201,168,76,0.1) 0%, transparent 55%)", pointerEvents: "none" }} />
           <div style={{ position: "relative", zIndex: 2, maxWidth: "680px", margin: "0 auto", textAlign: "center" }}>
             <Eyebrow label="Move In Today" />
-            <h2 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "clamp(34px, 5vw, 56px)", fontWeight: 300, color: "#E8EAED", lineHeight: 1.15, marginBottom: "14px" }}>
-              Ready to<br /><em style={{ fontStyle: "italic", color: "#2BA8E0" }}>Move?</em>
+            <h2 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "clamp(34px, 5vw, 56px)", fontWeight: 300, color: "#FFFFFF", lineHeight: 1.15, marginBottom: "14px" }}>
+              Ready to<br /><em style={{ fontStyle: "italic", color: "#10C4C3" }}>Move?</em>
             </h2>
             <p style={{ fontSize: "15px", color: "rgba(245,242,236,0.45)", lineHeight: 1.75, marginBottom: "36px" }}>
               Browse 800+ verified rental properties with zero brokerage across India's top cities. Your next home is waiting.
             </p>
             <div style={{ display: "flex", gap: "14px", justifyContent: "center", flexWrap: "wrap" }}>
-              <a href="/search" style={{ padding: "14px 36px", background: "#2BA8E0", borderRadius: "9px", color: "#000000", fontSize: "13px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", textDecoration: "none", display: "inline-flex", alignItems: "center", gap: "8px" }}>
+              <a href="/search" style={{ padding: "14px 36px", background: "#10C4C3", borderRadius: "9px", color: "#020C1C", fontSize: "13px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", textDecoration: "none", display: "inline-flex", alignItems: "center", gap: "8px" }}>
                 Browse Rentals
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
               </a>
@@ -413,8 +412,17 @@ export default function RentPage() {
           <div style={{ maxWidth: "1280px", margin: "0 auto" }}>
             <div className="rn-footer-grid" style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1fr 1fr", gap: "40px", paddingBottom: "56px", borderBottom: "1px solid rgba(245,242,236,0.06)" }}>
               <div>
-                <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "18px", fontWeight: 600, color: "#fff", letterSpacing: "0.16em", marginBottom: "14px" }}>Nilay 360 <span style={{ color: "#2BA8E0" }}>·</span></div>
-                <p style={{ fontSize: "13px", color: "rgba(245,242,236,0.35)", lineHeight: 1.75, maxWidth: "260px" }}>India's most trusted premium real estate platform. Every listing verified, every project curated.</p>
+                <div style={{ fontFamily: "'Cal Sans', sans-serif", fontSize: "18px", fontWeight: 600, color: "#fff", letterSpacing: "0.16em", marginBottom: "14px" }}>Nilay 360 <span style={{ color: "#10C4C3" }}>·</span></div>
+                <p style={{ fontSize: "13px", color: "rgba(245,242,236,0.35)", lineHeight: 1.75, maxWidth: "260px", marginBottom: "20px" }}>India's most trusted premium real estate platform. Every listing verified, every project curated.</p>
+                <div style={{ display: "flex", gap: "10px" }}>
+                  {[
+                    { s: "IN", href: "https://www.instagram.com/nilay360_/" },
+                    { s: "LI", href: "https://linkedin.com/company/nilay360" },
+                    { s: "YT", href: "https://www.youtube.com/@nilay360.digital" },
+                  ].map(({ s, href }) => (
+                    <a key={s} href={href} target="_blank" rel="noopener noreferrer" aria-label={s} style={{ width: "34px", height: "34px", borderRadius: "8px", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.07)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "10px", color: "rgba(255,255,255,0.35)", fontWeight: 700, textDecoration: "none" }}>{s}</a>
+                  ))}
+                </div>
               </div>
               {FOOTER_COLS.map(col => (
                 <div key={col.heading}>

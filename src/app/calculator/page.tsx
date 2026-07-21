@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import { Suspense, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Reveal from "@/components/ui/Reveal";
@@ -8,13 +8,13 @@ import Reveal from "@/components/ui/Reveal";
  * Five client-side calculators (EMI · Affordability · Stamp Duty · Rent vs Buy
  * · Loan Eligibility). Every output is derived via useMemo, so results update
  * live as inputs change — no submit button.
- * Tokens: bg #0a0a0a · gold #2BA8E0 · forest green #0B0D10.
+ * Tokens: bg #0a0a0a · gold #10C4C3 · forest green #0A1526.
  * ────────────────────────────────────────────────────────────────────────── */
 
-const GOLD = "#2BA8E0";
-const GREEN = "#0B0D10";
+const GOLD = "#10C4C3";
+const GREEN = "#0A1526";
 const BG = "#0a0a0a";
-const CREAM = "#000000";
+const CREAM = "#020C1C";
 
 // ── Formatting ───────────────────────────────────────────────────────────────
 function fmtINR(val: number, compact = false): string {
@@ -146,7 +146,7 @@ function Stat({ label, value, sub, hero }: { label: string; value: string; sub?:
       borderRadius: 12, padding: "16px 18px", marginBottom: 12,
     }}>
       <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.1em", color: hero ? "rgba(201,168,76,0.65)" : "rgba(245,242,236,0.35)", textTransform: "uppercase", marginBottom: 6 }}>{label}</p>
-      <p style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: hero ? 34 : 22, fontWeight: 600, color: hero ? GOLD : CREAM, lineHeight: 1.05, marginBottom: sub ? 4 : 0 }}>{value}</p>
+      <p style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: hero ? 34 : 22, fontWeight: 600, color: hero ? GOLD : CREAM, lineHeight: 1.05, marginBottom: sub ? 4 : 0 }}>{value}</p>
       {sub && <p style={{ fontSize: 11, color: "rgba(245,242,236,0.35)" }}>{sub}</p>}
     </div>
   );
@@ -162,7 +162,7 @@ function Doughnut({ principalPct }: { principalPct: number }) {
         display: "flex", alignItems: "center", justifyContent: "center",
       }}>
         <div style={{ width: 92, height: 92, borderRadius: "50%", background: GREEN, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
-          <span style={{ fontSize: 20, fontWeight: 700, color: GOLD, fontFamily: "'Cormorant Garamond', Georgia, serif" }}>{Math.round(p)}%</span>
+          <span style={{ fontSize: 20, fontWeight: 700, color: GOLD, fontFamily: "'Cal Sans', Georgia, serif" }}>{Math.round(p)}%</span>
           <span style={{ fontSize: 9, color: "rgba(245,242,236,0.4)", letterSpacing: "0.08em", textTransform: "uppercase" }}>Principal</span>
         </div>
       </div>
@@ -222,7 +222,7 @@ function EmiTab() {
           <SectionLabel>Your Results</SectionLabel>
           <div style={{ textAlign: "center", padding: "12px 0 22px", borderBottom: "1px solid rgba(245,242,236,0.08)" }}>
             <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.16em", color: "rgba(245,242,236,0.4)", textTransform: "uppercase", marginBottom: 6 }}>Monthly EMI</p>
-            <div style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "clamp(40px, 6vw, 54px)", fontWeight: 600, color: GOLD, lineHeight: 1 }}>{fmtEMI(emi)}</div>
+            <div style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "clamp(40px, 6vw, 54px)", fontWeight: 600, color: GOLD, lineHeight: 1 }}>{fmtEMI(emi)}</div>
             <p style={{ fontSize: 11, color: "rgba(245,242,236,0.35)", marginTop: 6 }}>for {tenure} years · {rate.toFixed(1)}% p.a.</p>
           </div>
 
@@ -314,7 +314,7 @@ function AffordabilityTab() {
               <Stat label="Monthly EMI at Max Loan" value={fmtEMI(emiAtMax)} sub={`for ${tenure} years at ${rate.toFixed(1)}%`} />
               <div style={{ background: "rgba(201,168,76,0.06)", border: "1px solid rgba(201,168,76,0.2)", borderRadius: 12, padding: "16px 18px" }}>
                 <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.1em", color: "rgba(201,168,76,0.6)", textTransform: "uppercase", marginBottom: 6 }}>Recommended Budget Range</p>
-                <p style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: 22, fontWeight: 600, color: CREAM }}>
+                <p style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: 22, fontWeight: 600, color: CREAM }}>
                   {fmtINR(maxProperty * 0.85, true)} – {fmtINR(maxProperty, true)}
                 </p>
                 <p style={{ fontSize: 11, color: "rgba(245,242,236,0.35)", marginTop: 4 }}>Stay near the lower end for a comfortable margin.</p>
@@ -378,7 +378,7 @@ function StampDutyTab() {
 
   const seg = (active: boolean) => ({
     flex: 1, padding: "10px 0", borderRadius: 8, cursor: "pointer", textAlign: "center" as const,
-    fontSize: 13, fontWeight: 600, fontFamily: "'DM Sans', sans-serif",
+    fontSize: 13, fontWeight: 600, fontFamily: "'Cal Sans', sans-serif",
     border: active ? "none" : "1px solid rgba(245,242,236,0.14)",
     background: active ? GOLD : "transparent", color: active ? BG : "rgba(245,242,236,0.6)",
     transition: "all 0.15s",
@@ -419,7 +419,7 @@ function StampDutyTab() {
           <Stat label="Total Charges" value={fmtINR(result.total, true)} sub="Stamp duty + registration" />
           <div style={{ background: "rgba(201,168,76,0.06)", border: "1px solid rgba(201,168,76,0.2)", borderRadius: 12, padding: "16px 18px", marginBottom: 16 }}>
             <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.1em", color: "rgba(201,168,76,0.6)", textTransform: "uppercase", marginBottom: 6 }}>Grand Total (incl. property)</p>
-            <p style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: 28, fontWeight: 600, color: GOLD }}>{fmtINR(result.grand, true)}</p>
+            <p style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: 28, fontWeight: 600, color: GOLD }}>{fmtINR(result.grand, true)}</p>
           </div>
           <p style={{ fontSize: 11.5, color: "rgba(245,242,236,0.4)", lineHeight: 1.6, fontStyle: "italic" }}>
             Rates are approximate. Please verify with your state&apos;s registration office.
@@ -508,7 +508,7 @@ function RentVsBuyTab() {
             <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.16em", color: "rgba(245,242,236,0.4)", textTransform: "uppercase", marginBottom: 8 }}>
               {buyingWins ? "Buying Wins" : "Renting Wins"}
             </p>
-            <div style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "clamp(34px, 5vw, 46px)", fontWeight: 600, color: GOLD, lineHeight: 1 }}>
+            <div style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "clamp(34px, 5vw, 46px)", fontWeight: 600, color: GOLD, lineHeight: 1 }}>
               {fmtINR(diff, true)}
             </div>
             <p style={{ fontSize: 12, color: "rgba(245,242,236,0.4)", marginTop: 6 }}>
@@ -613,9 +613,9 @@ function CalculatorInner() {
         .nv-range { width: 100%; appearance: none; -webkit-appearance: none; height: 4px; border-radius: 2px; outline: none; cursor: pointer; }
         .nv-range::-webkit-slider-thumb { appearance: none; -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%; background: ${GOLD}; border: 2.5px solid ${BG}; box-shadow: 0 0 0 1px rgba(201,168,76,0.5); cursor: pointer; }
         .nv-range::-moz-range-thumb { width: 18px; height: 18px; border-radius: 50%; background: ${GOLD}; border: 2.5px solid ${BG}; box-shadow: 0 0 0 1px rgba(201,168,76,0.5); cursor: pointer; }
-        .nv-num { width: 110px; padding: 6px 10px; background: rgba(245,242,236,0.05); border: 1.5px solid rgba(245,242,236,0.14); border-radius: 7px; font-size: 13px; font-weight: 600; color: ${CREAM}; font-family: 'DM Sans', sans-serif; text-align: right; outline: none; }
+        .nv-num { width: 110px; padding: 6px 10px; background: rgba(245,242,236,0.05); border: 1.5px solid rgba(245,242,236,0.14); border-radius: 7px; font-size: 13px; font-weight: 600; color: ${CREAM}; font-family: 'Cal Sans', sans-serif; text-align: right; outline: none; }
         .nv-num:focus { border-color: ${GOLD}; }
-        .nv-select { width: 100%; padding: 11px 14px; background: rgba(245,242,236,0.05); border: 1.5px solid rgba(245,242,236,0.14); border-radius: 9px; font-size: 14px; color: ${CREAM}; font-family: 'DM Sans', sans-serif; outline: none; cursor: pointer; -webkit-appearance: none; appearance: none; }
+        .nv-select { width: 100%; padding: 11px 14px; background: rgba(245,242,236,0.05); border: 1.5px solid rgba(245,242,236,0.14); border-radius: 9px; font-size: 14px; color: ${CREAM}; font-family: 'Cal Sans', sans-serif; outline: none; cursor: pointer; -webkit-appearance: none; appearance: none; }
         .nv-select:focus { border-color: ${GOLD}; }
         .nv-select option { background: ${BG}; color: ${CREAM}; }
         .nv-table { width: 100%; border-collapse: collapse; }
@@ -636,7 +636,7 @@ function CalculatorInner() {
               <div style={{ width: 5, height: 5, borderRadius: "50%", background: GOLD }} />
               <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.2em", color: GOLD, textTransform: "uppercase" }}>Financial Planning</span>
             </div>
-            <h1 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "clamp(40px, 6vw, 64px)", fontWeight: 300, color: CREAM, lineHeight: 1.1, marginBottom: 14 }}>
+            <h1 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "clamp(40px, 6vw, 64px)", fontWeight: 300, color: CREAM, lineHeight: 1.1, marginBottom: 14 }}>
               Property <em style={{ fontStyle: "italic", color: GOLD }}>Calculators</em>
             </h1>
             <p style={{ fontSize: 15, color: "rgba(245,242,236,0.5)", lineHeight: 1.7 }}>
@@ -654,7 +654,7 @@ function CalculatorInner() {
                 onClick={() => setTab(t.id)}
                 style={{
                   padding: "9px 18px", borderRadius: 100, whiteSpace: "nowrap", cursor: "pointer",
-                  fontSize: 13, fontWeight: 600, fontFamily: "'DM Sans', sans-serif",
+                  fontSize: 13, fontWeight: 600, fontFamily: "'Cal Sans', sans-serif",
                   border: tab === t.id ? "none" : "1px solid rgba(245,242,236,0.14)",
                   background: tab === t.id ? GOLD : "transparent",
                   color: tab === t.id ? BG : "rgba(245,242,236,0.6)",

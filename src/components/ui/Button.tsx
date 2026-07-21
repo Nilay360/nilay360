@@ -11,9 +11,9 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
 }
 
 const variantStyles = {
-  primary: "bg-[#0B0D10] text-[#3DBEF5] hover:bg-[#000000] border border-transparent",
-  gold:    "bg-[#2BA8E0] text-[#000000] hover:bg-[#1577B8] border border-transparent font-semibold",
-  outline: "bg-transparent text-[#0B0D10] border border-[#0B0D10] hover:bg-[#121519]",
+  primary: "bg-[#0A1526] text-[#3DDAD9] hover:bg-[#020C1C] border border-transparent",
+  gold:    "bg-[#10C4C3] text-[#020C1C] hover:bg-[#0B9C9B] border border-transparent font-semibold",
+  outline: "bg-transparent text-[#0A1526] border border-[#0A1526] hover:bg-[#111F33]",
   ghost:   "bg-transparent text-[#6B7C72] border border-[rgba(27,67,50,0.15)] hover:bg-white",
   danger:  "bg-red-600 text-white hover:bg-red-700 border border-transparent",
 }
@@ -33,7 +33,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         disabled={disabled || loading}
         className={cn(
           "inline-flex items-center justify-center font-medium transition-all duration-150",
-          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2BA8E0] focus-visible:ring-offset-2",
+          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#10C4C3] focus-visible:ring-offset-2",
           "disabled:opacity-50 disabled:cursor-not-allowed",
           variantStyles[variant],
           sizeStyles[size],

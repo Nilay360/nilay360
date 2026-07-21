@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+﻿import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
@@ -21,23 +21,23 @@ export async function POST(req: NextRequest) {
 <!DOCTYPE html>
 <html lang="en">
 <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
-<body style="margin:0;padding:0;background:#000000;font-family:'DM Sans',Arial,sans-serif;">
-  <table width="100%" cellpadding="0" cellspacing="0" style="background:#000000;padding:40px 0;">
+<body style="margin:0;padding:0;background:#020C1C;font-family:-apple-system,'Segoe UI',Roboto,Arial,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#020C1C;padding:40px 0;">
     <tr><td align="center">
       <table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;background:#ffffff;border-radius:8px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,0.15);">
 
         <!-- Header -->
         <tr>
-          <td style="background:#000000;padding:32px 40px;text-align:center;">
-            <p style="margin:0;font-family:Georgia,serif;font-size:28px;font-weight:400;letter-spacing:4px;color:#2BA8E0;text-transform:uppercase;">Nilay 360</p>
+          <td style="background:#020C1C;padding:32px 40px;text-align:center;">
+            <p style="margin:0;font-family:Georgia,serif;font-size:28px;font-weight:400;letter-spacing:4px;color:#10C4C3;text-transform:uppercase;">Nilay 360</p>
             <p style="margin:6px 0 0;font-size:12px;color:rgba(255,255,255,0.4);letter-spacing:2px;text-transform:uppercase;">Callback Request</p>
           </td>
         </tr>
 
         <!-- Title bar -->
         <tr>
-          <td style="background:#2BA8E0;padding:14px 40px;">
-            <p style="margin:0;font-size:13px;color:#000000;font-weight:700;letter-spacing:1px;text-transform:uppercase;">📞 New Callback Request</p>
+          <td style="background:#10C4C3;padding:14px 40px;">
+            <p style="margin:0;font-size:13px;color:#020C1C;font-weight:700;letter-spacing:1px;text-transform:uppercase;">📞 New Callback Request</p>
           </td>
         </tr>
 
@@ -48,12 +48,12 @@ export async function POST(req: NextRequest) {
 
             <table width="100%" cellpadding="0" cellspacing="0" style="border-top:1px solid #E8E3D9;padding-top:24px;margin-top:4px;">
               <tr><td style="padding-bottom:20px;">
-                <p style="margin:0 0 4px;font-size:12px;color:#6B7280;text-transform:uppercase;letter-spacing:1px;">Name</p>
-                <p style="margin:0;font-size:18px;color:#000000;font-weight:600;">${escHtml(name ?? "")}</p>
+                <p style="margin:0 0 4px;font-size:12px;color:#6B7686;text-transform:uppercase;letter-spacing:1px;">Name</p>
+                <p style="margin:0;font-size:18px;color:#020C1C;font-weight:600;">${escHtml(name ?? "")}</p>
               </td></tr>
               <tr><td style="padding-bottom:20px;">
-                <p style="margin:0 0 4px;font-size:12px;color:#6B7280;text-transform:uppercase;letter-spacing:1px;">Phone Number</p>
-                <p style="margin:0;font-size:20px;color:#000000;font-weight:700;font-family:Georgia,serif;">+91 ${escHtml(phone ?? "")}</p>
+                <p style="margin:0 0 4px;font-size:12px;color:#6B7686;text-transform:uppercase;letter-spacing:1px;">Phone Number</p>
+                <p style="margin:0;font-size:20px;color:#020C1C;font-weight:700;font-family:Georgia,serif;">+91 ${escHtml(phone ?? "")}</p>
               </td></tr>
             </table>
           </td>
@@ -61,7 +61,7 @@ export async function POST(req: NextRequest) {
 
         <!-- Footer -->
         <tr>
-          <td style="background:#000000;padding:20px 40px;border-top:1px solid #E8E3D9;">
+          <td style="background:#020C1C;padding:20px 40px;border-top:1px solid #E8E3D9;">
             <p style="margin:0;font-size:12px;color:#9CA3AF;text-align:center;">
               Callback request from the Nilay 360 floating contact widget.<br>
               © Nilay 360 Premium Real Estate

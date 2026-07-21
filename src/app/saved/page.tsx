@@ -1,4 +1,4 @@
-import { PageShell } from "../_components/SiteChrome";
+﻿import { PageShell } from "../_components/SiteChrome";
 
 export default function SavedPage() {
   return (
@@ -15,13 +15,13 @@ export default function SavedPage() {
       ]}
     >
       <div style={{ textAlign:"center", maxWidth:600, margin:"0 auto 8px" }}>
-        <h2 style={{ fontFamily:"'Cormorant Garamond',Georgia,serif", fontSize:32, fontWeight:700, color:"#000000", marginBottom:14 }}>No saved properties yet</h2>
+        <h2 style={{ fontFamily:"'Cal Sans',Georgia,serif", fontSize:32, fontWeight:700, color:"#020C1C", marginBottom:14 }}>No saved properties yet</h2>
         <p style={{ fontSize:15, color:"#666", lineHeight:1.7, marginBottom:24 }}>
           Sign in to see your wishlist, or start browsing and tap the heart on homes you love.
         </p>
         <div style={{ display:"flex", gap:12, justifyContent:"center", flexWrap:"wrap" }}>
-          <a href="/login" style={{ padding:"13px 30px", background:"#2BA8E0", borderRadius:8, color:"#000000", fontSize:14, fontWeight:700 }}>Sign In</a>
-          <a href="/properties" style={{ padding:"13px 30px", border:"1px solid rgba(13,43,31,0.2)", borderRadius:8, color:"#000000", fontSize:14, fontWeight:500 }}>Browse Properties</a>
+          <a href="/login" style={{ padding:"13px 30px", background:"#10C4C3", borderRadius:8, color:"#020C1C", fontSize:14, fontWeight:700 }}>Sign In</a>
+          <a href="/properties" style={{ padding:"13px 30px", border:"1px solid rgba(13,43,31,0.2)", borderRadius:8, color:"#020C1C", fontSize:14, fontWeight:500 }}>Browse Properties</a>
         </div>
       </div>
     </PageShell>

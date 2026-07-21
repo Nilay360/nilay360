@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
@@ -15,7 +15,7 @@ interface ProfileForm {
 
 const EMPTY: ProfileForm = { full_name: "", phone: "", city: "", bio: "" };
 
-const G = { dark: "#000000", gold: "#2BA8E0", ivory: "#000000", mid: "#0B0D10" };
+const G = { dark: "#020C1C", gold: "#10C4C3", ivory: "#020C1C", mid: "#0A1526" };
 
 export default function ProfileEditPage() {
   const router = useRouter();
@@ -121,7 +121,7 @@ export default function ProfileEditPage() {
   if (loading) {
     return (
       <div style={{ minHeight: "100vh", background: G.ivory, paddingTop: 64, display: "flex", alignItems: "center", justifyContent: "center" }}>
-        <span style={{ color: G.dark, fontFamily: "'DM Sans', sans-serif", fontSize: 14, opacity: 0.5 }}>Loading profile…</span>
+        <span style={{ color: G.dark, fontFamily: "'Cal Sans', sans-serif", fontSize: 14, opacity: 0.5 }}>Loading profile…</span>
       </div>
     );
   }
@@ -129,8 +129,8 @@ export default function ProfileEditPage() {
   if (!userId) {
     return (
       <div style={{ minHeight: "100vh", background: G.ivory, paddingTop: 64, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 16 }}>
-        <p style={{ color: G.dark, fontFamily: "'DM Sans', sans-serif", fontSize: 16 }}>Please sign in to edit your profile.</p>
-        <Link href="/login" style={{ color: G.gold, fontWeight: 600, fontFamily: "'DM Sans', sans-serif", textDecoration: "none" }}>Sign In →</Link>
+        <p style={{ color: G.dark, fontFamily: "'Cal Sans', sans-serif", fontSize: 16 }}>Please sign in to edit your profile.</p>
+        <Link href="/login" style={{ color: G.gold, fontWeight: 600, fontFamily: "'Cal Sans', sans-serif", textDecoration: "none" }}>Sign In →</Link>
       </div>
     );
   }
@@ -147,10 +147,10 @@ export default function ProfileEditPage() {
 
         <div className="pe-header" style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 36, flexWrap: "wrap", gap: 16 }}>
           <div>
-            <h1 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: 34, fontWeight: 600, color: G.dark, margin: 0, lineHeight: 1.15 }}>
+            <h1 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: 34, fontWeight: 600, color: G.dark, margin: 0, lineHeight: 1.15 }}>
               Edit Profile
             </h1>
-            <p style={{ color: "rgba(13,43,31,0.5)", fontFamily: "'DM Sans', sans-serif", fontSize: 14, margin: "6px 0 0" }}>
+            <p style={{ color: "rgba(13,43,31,0.5)", fontFamily: "'Cal Sans', sans-serif", fontSize: 14, margin: "6px 0 0" }}>
               {email}
             </p>
           </div>
@@ -160,7 +160,7 @@ export default function ProfileEditPage() {
               padding: "9px 16px", fontSize: 13, fontWeight: 500,
               color: G.dark, background: "transparent",
               border: "1px solid rgba(13,43,31,0.2)", borderRadius: 8,
-              cursor: "pointer", fontFamily: "'DM Sans', sans-serif",
+              cursor: "pointer", fontFamily: "'Cal Sans', sans-serif",
             }}
           >
             ← Dashboard
@@ -209,7 +209,7 @@ export default function ProfileEditPage() {
               id="bio" rows={4}
               value={form.bio} onChange={handleChange("bio")}
               placeholder="A short bio about yourself"
-              style={{ ...inputStyle, resize: "vertical", minHeight: 100, fontFamily: "'DM Sans', sans-serif" }}
+              style={{ ...inputStyle, resize: "vertical", minHeight: 100, fontFamily: "'Cal Sans', sans-serif" }}
             />
           </Field>
 
@@ -223,13 +223,13 @@ export default function ProfileEditPage() {
                 color: "#0a0a0a", background: G.gold,
                 border: "none", cursor: saving ? "not-allowed" : "pointer",
                 opacity: saving ? 0.7 : 1,
-                fontFamily: "'DM Sans', sans-serif",
+                fontFamily: "'Cal Sans', sans-serif",
               }}
             >
               {saving ? "Saving…" : "Save Changes"}
             </button>
-            {saved && <span style={{ fontSize: 13, color: "#121519", fontWeight: 500, fontFamily: "'DM Sans', sans-serif" }}>✓ Profile saved</span>}
-            {error && <span style={{ fontSize: 13, color: "#B91C1C", fontWeight: 500, fontFamily: "'DM Sans', sans-serif" }}>{error}</span>}
+            {saved && <span style={{ fontSize: 13, color: "#111F33", fontWeight: 500, fontFamily: "'Cal Sans', sans-serif" }}>✓ Profile saved</span>}
+            {error && <span style={{ fontSize: 13, color: "#B91C1C", fontWeight: 500, fontFamily: "'Cal Sans', sans-serif" }}>{error}</span>}
           </div>
         </form>
       </div>
@@ -241,8 +241,8 @@ const inputStyle: React.CSSProperties = {
   width: "100%", padding: "11px 14px",
   background: "#ffffff",
   border: "1.5px solid rgba(13,43,31,0.12)",
-  borderRadius: 8, fontSize: 14, color: "#000000",
-  fontFamily: "'DM Sans', sans-serif",
+  borderRadius: 8, fontSize: 14, color: "#020C1C",
+  fontFamily: "'Cal Sans', sans-serif",
   outline: "none", boxSizing: "border-box",
 };
 
@@ -255,7 +255,7 @@ function Field({ label, htmlFor, children }: { label: string; htmlFor: string; c
           display: "block", fontSize: 11, fontWeight: 700,
           letterSpacing: "0.1em", textTransform: "uppercase",
           color: "#6B7C72", marginBottom: 7,
-          fontFamily: "'DM Sans', sans-serif",
+          fontFamily: "'Cal Sans', sans-serif",
         }}
       >
         {label}

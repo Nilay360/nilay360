@@ -1,4 +1,4 @@
-import { PageShell } from "../_components/SiteChrome";
+﻿import { PageShell } from "../_components/SiteChrome";
 
 export default function PressPage() {
   return (
@@ -15,9 +15,9 @@ export default function PressPage() {
       ]}
     >
       <div style={{ textAlign:"center", maxWidth:600, margin:"0 auto 8px" }}>
-        <h2 style={{ fontFamily:"'Cormorant Garamond',Georgia,serif", fontSize:32, fontWeight:700, color:"#000000", marginBottom:12 }}>Media Contact</h2>
+        <h2 style={{ fontFamily:"'Cal Sans',Georgia,serif", fontSize:32, fontWeight:700, color:"#020C1C", marginBottom:12 }}>Media Contact</h2>
         <p style={{ fontSize:15, color:"#666", lineHeight:1.7 }}>
-          For all media enquiries, please write to <a href="mailto:press@nilay360.com" style={{ color:"#2BA8E0", fontWeight:600 }}>press@nilay360.com</a>.
+          For all media enquiries, please write to <a href="mailto:press@nilay360.com" style={{ color:"#10C4C3", fontWeight:600 }}>press@nilay360.com</a>.
         </p>
       </div>
     </PageShell>

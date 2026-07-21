@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
@@ -159,7 +159,7 @@ function fmtDateTime(iso: string): string {
 
 function Spinner({ size = 28, pad = 80 }: { size?: number; pad?: number }) {
   return (
-    <div style={{ display: "flex", justifyContent: "center", alignItems: "center", padding: pad, color: "#2BA8E0" }}>
+    <div style={{ display: "flex", justifyContent: "center", alignItems: "center", padding: pad, color: "#10C4C3" }}>
       <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ animation: "spin 0.8s linear infinite" }}>
         <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
       </svg>
@@ -193,7 +193,7 @@ function StatusBadge({ status }: { status: string }) {
     active:         { label: "Active",   bg: "rgba(52,211,153,0.15)",  color: "#34D399", border: "rgba(52,211,153,0.3)"  },
     rejected:       { label: "Rejected", bg: "rgba(248,113,113,0.15)", color: "#F87171", border: "rgba(248,113,113,0.3)" },
   };
-  const c = cfg[status] ?? { label: status, bg: "rgba(255,255,255,0.08)", color: "#AEB4BC", border: "rgba(255,255,255,0.12)" };
+  const c = cfg[status] ?? { label: status, bg: "rgba(255,255,255,0.08)", color: "#A9B4C2", border: "rgba(255,255,255,0.12)" };
   return (
     <span style={{ display: "inline-block", padding: "3px 10px", borderRadius: "100px", fontSize: "10px", fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase" as const, background: c.bg, color: c.color, border: `1px solid ${c.border}` }}>
       {c.label}
@@ -204,7 +204,7 @@ function StatusBadge({ status }: { status: string }) {
 function RoleBadge({ role }: { role: string | null }) {
   const isAdmin = role === "admin" || role === "super_admin";
   return (
-    <span style={{ display: "inline-block", padding: "2px 8px", borderRadius: "100px", fontSize: "9px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" as const, background: isAdmin ? "rgba(43,168,224,0.15)" : "rgba(255,255,255,0.06)", color: isAdmin ? "#2BA8E0" : "#AEB4BC", border: `1px solid ${isAdmin ? "rgba(43,168,224,0.3)" : "rgba(255,255,255,0.1)"}` }}>
+    <span style={{ display: "inline-block", padding: "2px 8px", borderRadius: "100px", fontSize: "9px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" as const, background: isAdmin ? "rgba(16,196,195,0.15)" : "rgba(255,255,255,0.06)", color: isAdmin ? "#10C4C3" : "#A9B4C2", border: `1px solid ${isAdmin ? "rgba(16,196,195,0.3)" : "rgba(255,255,255,0.1)"}` }}>
       {role ?? "user"}
     </span>
   );
@@ -215,7 +215,7 @@ function StatCard({ label, value, icon, accent, note }: {
   icon: React.ReactNode; accent?: "gold" | "green" | "red" | "blue"; note?: string;
 }) {
   const map = {
-    gold:  { bg: "rgba(43,168,224,0.12)",  color: "#2BA8E0" },
+    gold:  { bg: "rgba(16,196,195,0.12)",  color: "#10C4C3" },
     green: { bg: "rgba(52,211,153,0.12)",  color: "#34D399" },
     red:   { bg: "rgba(248,113,113,0.12)", color: "#F87171" },
     blue:  { bg: "rgba(96,165,250,0.12)",  color: "#60A5FA" },
@@ -227,8 +227,8 @@ function StatCard({ label, value, icon, accent, note }: {
         {icon}
       </div>
       <div>
-        <div style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "30px", fontWeight: 600, color: "#E8EAED", lineHeight: 1.1 }}>{value}</div>
-        <div style={{ fontSize: "12px", color: "#AEB4BC", marginTop: "2px" }}>{label}</div>
+        <div style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "30px", fontWeight: 600, color: "#FFFFFF", lineHeight: 1.1 }}>{value}</div>
+        <div style={{ fontSize: "12px", color: "#A9B4C2", marginTop: "2px" }}>{label}</div>
         {note && <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.45)", marginTop: "2px" }}>{note}</div>}
       </div>
     </div>
@@ -239,11 +239,11 @@ function SectionHeading({ title, subtitle, count }: { title: string; subtitle?: 
   return (
     <div style={{ marginBottom: "24px", display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "12px", flexWrap: "wrap" }}>
       <div>
-        <h2 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "30px", fontWeight: 500, color: "#E8EAED", lineHeight: 1.2 }}>{title}</h2>
-        {subtitle && <p style={{ fontSize: "13px", color: "#AEB4BC", marginTop: "4px" }}>{subtitle}</p>}
+        <h2 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "30px", fontWeight: 500, color: "#FFFFFF", lineHeight: 1.2 }}>{title}</h2>
+        {subtitle && <p style={{ fontSize: "13px", color: "#A9B4C2", marginTop: "4px" }}>{subtitle}</p>}
       </div>
       {count != null && count > 0 && (
-        <span style={{ padding: "5px 14px", borderRadius: "100px", fontSize: "12px", fontWeight: 700, background: "rgba(43,168,224,0.12)", color: "#2BA8E0", border: "1px solid rgba(43,168,224,0.25)", flexShrink: 0 }}>
+        <span style={{ padding: "5px 14px", borderRadius: "100px", fontSize: "12px", fontWeight: 700, background: "rgba(16,196,195,0.12)", color: "#10C4C3", border: "1px solid rgba(16,196,195,0.25)", flexShrink: 0 }}>
           {count}
         </span>
       )}
@@ -279,15 +279,15 @@ function ListingCard({
     <div style={{ background: "rgba(255,255,255,0.05)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", borderRadius: "14px", border: "1px solid rgba(255,255,255,0.08)", boxShadow: "0 4px 24px rgba(0,0,0,0.18)", overflow: "hidden", opacity: inFlight ? 0.55 : 1, transition: "opacity 0.2s" }}>
       <div style={{ display: "flex", gap: 0 }}>
         {/* Thumbnail */}
-        <div style={{ width: "150px", flexShrink: 0, position: "relative", background: "#0B0D10", overflow: "hidden", minHeight: "140px" }}>
+        <div style={{ width: "150px", flexShrink: 0, position: "relative", background: "#0A1526", overflow: "hidden", minHeight: "140px" }}>
           {thumb ? (
             <img src={optimizedImageUrl(thumb, 300)} alt={listing.title ?? "Property"} loading="lazy" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
           ) : (
-            <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", color: "#2BA8E0", opacity: 0.3, minHeight: "140px" }}>
+            <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", color: "#10C4C3", opacity: 0.3, minHeight: "140px" }}>
               <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
             </div>
           )}
-          <div style={{ position: "absolute", top: "8px", left: "8px", padding: "2px 8px", borderRadius: "100px", fontSize: "8px", fontWeight: 800, letterSpacing: "0.1em", textTransform: "uppercase" as const, background: listing.listing_type === "rent" ? "rgba(52,211,153,0.85)" : "rgba(43,168,224,0.85)", color: "#000000" }}>
+          <div style={{ position: "absolute", top: "8px", left: "8px", padding: "2px 8px", borderRadius: "100px", fontSize: "8px", fontWeight: 800, letterSpacing: "0.1em", textTransform: "uppercase" as const, background: listing.listing_type === "rent" ? "rgba(52,211,153,0.85)" : "rgba(16,196,195,0.85)", color: "#020C1C" }}>
             {label}
           </div>
         </div>
@@ -299,18 +299,18 @@ function ListingCard({
                 <StatusBadge status={listing.status} />
                 <span style={{ fontSize: "11px", color: "rgba(255,255,255,0.45)" }}>{fmtDate(listing.submitted_at)}</span>
               </div>
-              <h3 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "19px", fontWeight: 600, color: "#E8EAED", lineHeight: 1.25, marginBottom: "4px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+              <h3 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "19px", fontWeight: 600, color: "#FFFFFF", lineHeight: 1.25, marginBottom: "4px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                 {listing.title ?? `${listing.property_category ?? "Property"} in ${listing.city ?? "—"}`}
               </h3>
-              <div style={{ display: "flex", gap: "12px", fontSize: "12px", color: "#AEB4BC", flexWrap: "wrap", alignItems: "center" }}>
+              <div style={{ display: "flex", gap: "12px", fontSize: "12px", color: "#A9B4C2", flexWrap: "wrap", alignItems: "center" }}>
                 {listing.property_category && <span style={{ textTransform: "capitalize" as const }}>{listing.property_category}</span>}
                 {loc && (
                   <span style={{ display: "flex", alignItems: "center", gap: "3px" }}>
-                    <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#2BA8E0" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                    <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#10C4C3" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
                     {loc}
                   </span>
                 )}
-                <span style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "15px", fontWeight: 600, color: "#E8EAED" }}>
+                <span style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "15px", fontWeight: 600, color: "#FFFFFF" }}>
                   {fmtPrice(listing.price, listing.listing_type)}
                 </span>
               </div>
@@ -320,20 +320,20 @@ function ListingCard({
           {/* Seller row */}
           <div style={{ display: "flex", gap: "16px", flexWrap: "wrap", padding: "8px 12px", background: "rgba(255,255,255,0.04)", borderRadius: "8px", border: "1px solid rgba(255,255,255,0.06)", fontSize: "12px" }}>
             {listing.seller_name && (
-              <span style={{ display: "flex", alignItems: "center", gap: "5px", color: "#AEB4BC", fontWeight: 500 }}>
-                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#2BA8E0" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              <span style={{ display: "flex", alignItems: "center", gap: "5px", color: "#A9B4C2", fontWeight: 500 }}>
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#10C4C3" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
                 {listing.seller_name}
               </span>
             )}
             {listing.seller_email && (
-              <a href={`mailto:${listing.seller_email}`} style={{ display: "flex", alignItems: "center", gap: "5px", color: "#AEB4BC", textDecoration: "none" }}>
-                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#2BA8E0" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 5L2 7"/></svg>
+              <a href={`mailto:${listing.seller_email}`} style={{ display: "flex", alignItems: "center", gap: "5px", color: "#A9B4C2", textDecoration: "none" }}>
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#10C4C3" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 5L2 7"/></svg>
                 {listing.seller_email}
               </a>
             )}
             {listing.seller_phone && (
-              <a href={`tel:${listing.seller_phone}`} style={{ display: "flex", alignItems: "center", gap: "5px", color: "#AEB4BC", textDecoration: "none" }}>
-                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#2BA8E0" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+              <a href={`tel:${listing.seller_phone}`} style={{ display: "flex", alignItems: "center", gap: "5px", color: "#A9B4C2", textDecoration: "none" }}>
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#10C4C3" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
                 {listing.seller_phone}
               </a>
             )}
@@ -358,7 +358,7 @@ function ListingCard({
                 href={`/property/${listing.slug}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                style={{ display: "flex", alignItems: "center", gap: "5px", padding: "7px 14px", borderRadius: "7px", fontSize: "11px", fontWeight: 600, color: "#E8EAED", border: "1.5px solid rgba(255,255,255,0.15)", background: "transparent", textDecoration: "none", letterSpacing: "0.04em" }}
+                style={{ display: "flex", alignItems: "center", gap: "5px", padding: "7px 14px", borderRadius: "7px", fontSize: "11px", fontWeight: 600, color: "#FFFFFF", border: "1.5px solid rgba(255,255,255,0.15)", background: "transparent", textDecoration: "none", letterSpacing: "0.04em" }}
               >
                 View Full <IconArrow />
               </a>
@@ -386,7 +386,7 @@ function AssignAgentControl({
     <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap", padding: "8px 12px", background: "rgba(255,255,255,0.03)", borderRadius: "8px", border: "1px solid rgba(255,255,255,0.06)" }}>
       <span style={{ fontSize: "11px", color: "rgba(255,255,255,0.45)" }}>
         {currentAgentId
-          ? <>Assigned to: <strong style={{ color: "#E8EAED", fontWeight: 600 }}>{currentName ?? "Unknown agent"}</strong></>
+          ? <>Assigned to: <strong style={{ color: "#FFFFFF", fontWeight: 600 }}>{currentName ?? "Unknown agent"}</strong></>
           : "Not assigned to an agent"}
       </span>
       <div style={{ position: "relative", flexShrink: 0 }}>
@@ -394,11 +394,11 @@ function AssignAgentControl({
           value={currentAgentId ?? ""}
           disabled={disabled}
           onChange={e => onAssign(e.target.value || null)}
-          style={{ padding: "6px 28px 6px 10px", background: "rgba(255,255,255,0.06)", border: "1.5px solid rgba(255,255,255,0.12)", borderRadius: "7px", fontSize: "12px", color: "#E8EAED", fontFamily: "'DM Sans', sans-serif", outline: "none", appearance: "none", cursor: disabled ? "not-allowed" : "pointer" }}
+          style={{ padding: "6px 28px 6px 10px", background: "rgba(255,255,255,0.06)", border: "1.5px solid rgba(255,255,255,0.12)", borderRadius: "7px", fontSize: "12px", color: "#FFFFFF", fontFamily: "'Cal Sans', sans-serif", outline: "none", appearance: "none", cursor: disabled ? "not-allowed" : "pointer" }}
         >
-          <option value="" style={{ background: "#0B0D10", color: "#E8EAED" }}>Unassigned</option>
+          <option value="" style={{ background: "#0A1526", color: "#FFFFFF" }}>Unassigned</option>
           {agents.map(a => (
-            <option key={a.id} value={a.id} style={{ background: "#0B0D10", color: "#E8EAED" }}>{a.name}</option>
+            <option key={a.id} value={a.id} style={{ background: "#0A1526", color: "#FFFFFF" }}>{a.name}</option>
           ))}
         </select>
         <span style={{ position: "absolute", right: 8, top: "50%", transform: "translateY(-50%)", pointerEvents: "none", color: "rgba(255,255,255,0.45)", fontSize: 9 }}>▼</span>
@@ -428,12 +428,12 @@ function KuulaTourControl({
         disabled={disabled}
         onChange={e => setValue(e.target.value)}
         placeholder="https://kuula.co/share/..."
-        style={{ flex: "1 1 220px", minWidth: "160px", padding: "6px 10px", background: "rgba(255,255,255,0.06)", border: "1.5px solid rgba(255,255,255,0.12)", borderRadius: "7px", fontSize: "12px", color: "#E8EAED", fontFamily: "'DM Sans', sans-serif", outline: "none" }}
+        style={{ flex: "1 1 220px", minWidth: "160px", padding: "6px 10px", background: "rgba(255,255,255,0.06)", border: "1.5px solid rgba(255,255,255,0.12)", borderRadius: "7px", fontSize: "12px", color: "#FFFFFF", fontFamily: "'Cal Sans', sans-serif", outline: "none" }}
       />
       <button
         onClick={() => onSave(value.trim() || null)}
         disabled={disabled || !dirty}
-        style={{ padding: "6px 14px", borderRadius: "7px", fontSize: "11px", fontWeight: 600, background: dirty ? "#2BA8E0" : "rgba(255,255,255,0.06)", color: dirty ? "#000000" : "rgba(255,255,255,0.4)", border: "none", cursor: disabled || !dirty ? "not-allowed" : "pointer", fontFamily: "'DM Sans', sans-serif", flexShrink: 0 }}
+        style={{ padding: "6px 14px", borderRadius: "7px", fontSize: "11px", fontWeight: 600, background: dirty ? "#10C4C3" : "rgba(255,255,255,0.06)", color: dirty ? "#020C1C" : "rgba(255,255,255,0.4)", border: "none", cursor: disabled || !dirty ? "not-allowed" : "pointer", fontFamily: "'Cal Sans', sans-serif", flexShrink: 0 }}
       >
         Save
       </button>
@@ -464,12 +464,12 @@ function GoogleMapsUrlControl({
           disabled={disabled}
           onChange={e => setValue(e.target.value)}
           placeholder="https://www.google.com/maps/embed?pb=... (Share → Embed a map)"
-          style={{ flex: "1 1 220px", minWidth: "160px", padding: "6px 10px", background: "rgba(255,255,255,0.06)", border: "1.5px solid rgba(255,255,255,0.12)", borderRadius: "7px", fontSize: "12px", color: "#E8EAED", fontFamily: "'DM Sans', sans-serif", outline: "none" }}
+          style={{ flex: "1 1 220px", minWidth: "160px", padding: "6px 10px", background: "rgba(255,255,255,0.06)", border: "1.5px solid rgba(255,255,255,0.12)", borderRadius: "7px", fontSize: "12px", color: "#FFFFFF", fontFamily: "'Cal Sans', sans-serif", outline: "none" }}
         />
         <button
           onClick={() => onSave(value.trim() || null)}
           disabled={disabled || !dirty}
-          style={{ padding: "6px 14px", borderRadius: "7px", fontSize: "11px", fontWeight: 600, background: dirty ? "#2BA8E0" : "rgba(255,255,255,0.06)", color: dirty ? "#000000" : "rgba(255,255,255,0.4)", border: "none", cursor: disabled || !dirty ? "not-allowed" : "pointer", fontFamily: "'DM Sans', sans-serif", flexShrink: 0 }}
+          style={{ padding: "6px 14px", borderRadius: "7px", fontSize: "11px", fontWeight: 600, background: dirty ? "#10C4C3" : "rgba(255,255,255,0.06)", color: dirty ? "#020C1C" : "rgba(255,255,255,0.4)", border: "none", cursor: disabled || !dirty ? "not-allowed" : "pointer", fontFamily: "'Cal Sans', sans-serif", flexShrink: 0 }}
         >
           Save
         </button>
@@ -497,24 +497,24 @@ function SiteContentField({
 
   return (
     <div style={{ background: "rgba(255,255,255,0.05)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", borderRadius: "14px", border: "1px solid rgba(255,255,255,0.08)", padding: "20px 22px", marginBottom: "14px" }}>
-      <label style={{ fontSize: "12px", fontWeight: 700, color: "#E8EAED", display: "block", marginBottom: "4px" }}>{label}</label>
-      {description && <p style={{ fontSize: "11px", color: "#AEB4BC", marginBottom: "10px" }}>{description}</p>}
+      <label style={{ fontSize: "12px", fontWeight: 700, color: "#FFFFFF", display: "block", marginBottom: "4px" }}>{label}</label>
+      {description && <p style={{ fontSize: "11px", color: "#A9B4C2", marginBottom: "10px" }}>{description}</p>}
       <div style={{ display: "flex", gap: "10px", alignItems: multiline ? "flex-start" : "center", flexWrap: "wrap" }}>
         {multiline ? (
           <textarea
             value={draft} disabled={disabled} onChange={e => setDraft(e.target.value)} rows={2}
-            style={{ flex: "1 1 260px", minWidth: "200px", padding: "10px 12px", background: "rgba(255,255,255,0.06)", border: "1.5px solid rgba(255,255,255,0.12)", borderRadius: "8px", fontSize: "13px", color: "#E8EAED", fontFamily: "'DM Sans', sans-serif", outline: "none", resize: "vertical" }}
+            style={{ flex: "1 1 260px", minWidth: "200px", padding: "10px 12px", background: "rgba(255,255,255,0.06)", border: "1.5px solid rgba(255,255,255,0.12)", borderRadius: "8px", fontSize: "13px", color: "#FFFFFF", fontFamily: "'Cal Sans', sans-serif", outline: "none", resize: "vertical" }}
           />
         ) : (
           <input
             type="text" value={draft} disabled={disabled} onChange={e => setDraft(e.target.value)}
-            style={{ flex: "1 1 260px", minWidth: "200px", padding: "10px 12px", background: "rgba(255,255,255,0.06)", border: "1.5px solid rgba(255,255,255,0.12)", borderRadius: "8px", fontSize: "13px", color: "#E8EAED", fontFamily: "'DM Sans', sans-serif", outline: "none" }}
+            style={{ flex: "1 1 260px", minWidth: "200px", padding: "10px 12px", background: "rgba(255,255,255,0.06)", border: "1.5px solid rgba(255,255,255,0.12)", borderRadius: "8px", fontSize: "13px", color: "#FFFFFF", fontFamily: "'Cal Sans', sans-serif", outline: "none" }}
           />
         )}
         <button
           onClick={() => onSave(draft)}
           disabled={disabled || !dirty}
-          style={{ padding: "9px 20px", borderRadius: "8px", fontSize: "12px", fontWeight: 700, background: dirty ? "#2BA8E0" : "rgba(255,255,255,0.06)", color: dirty ? "#000000" : "rgba(255,255,255,0.4)", border: "none", cursor: disabled || !dirty ? "not-allowed" : "pointer", fontFamily: "'DM Sans', sans-serif", flexShrink: 0 }}
+          style={{ padding: "9px 20px", borderRadius: "8px", fontSize: "12px", fontWeight: 700, background: dirty ? "#10C4C3" : "rgba(255,255,255,0.06)", color: dirty ? "#020C1C" : "rgba(255,255,255,0.4)", border: "none", cursor: disabled || !dirty ? "not-allowed" : "pointer", fontFamily: "'Cal Sans', sans-serif", flexShrink: 0 }}
         >
           Save
         </button>
@@ -620,7 +620,7 @@ function OverviewSection({ stats, loading }: { stats: Stats; loading: boolean })
         <div className="admin-overview-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "20px" }}>
           {/* Recent activity */}
           <div style={{ background: "rgba(255,255,255,0.05)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", borderRadius: "14px", border: "1px solid rgba(255,255,255,0.08)", padding: "24px" }}>
-            <h3 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "20px", fontWeight: 500, color: "#E8EAED", marginBottom: "18px" }}>Recent Submissions</h3>
+            <h3 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "20px", fontWeight: 500, color: "#FFFFFF", marginBottom: "18px" }}>Recent Submissions</h3>
             {recent.length === 0 ? (
               <p style={{ fontSize: "13px", color: "rgba(255,255,255,0.45)" }}>No listings yet.</p>
             ) : (
@@ -628,7 +628,7 @@ function OverviewSection({ stats, loading }: { stats: Stats; loading: boolean })
                 {recent.map(r => (
                   <div key={r.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "12px" }}>
                     <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ fontSize: "13px", fontWeight: 500, color: "#E8EAED", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                      <div style={{ fontSize: "13px", fontWeight: 500, color: "#FFFFFF", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                         {r.title ?? r.city ?? "Untitled"}
                       </div>
                       <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.45)" }}>{fmtDate(r.submitted_at)}</div>
@@ -642,7 +642,7 @@ function OverviewSection({ stats, loading }: { stats: Stats; loading: boolean })
 
           {/* City breakdown */}
           <div style={{ background: "rgba(255,255,255,0.05)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", borderRadius: "14px", border: "1px solid rgba(255,255,255,0.08)", padding: "24px" }}>
-            <h3 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "20px", fontWeight: 500, color: "#E8EAED", marginBottom: "18px" }}>Top Cities</h3>
+            <h3 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "20px", fontWeight: 500, color: "#FFFFFF", marginBottom: "18px" }}>Top Cities</h3>
             {cityBreakdown.length === 0 ? (
               <p style={{ fontSize: "13px", color: "rgba(255,255,255,0.45)" }}>No data yet.</p>
             ) : (
@@ -652,11 +652,11 @@ function OverviewSection({ stats, loading }: { stats: Stats; loading: boolean })
                   return (
                     <div key={c.city}>
                       <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "5px" }}>
-                        <span style={{ fontSize: "13px", color: i === 0 ? "#E8EAED" : "#AEB4BC", fontWeight: i === 0 ? 600 : 400 }}>{c.city}</span>
+                        <span style={{ fontSize: "13px", color: i === 0 ? "#FFFFFF" : "#A9B4C2", fontWeight: i === 0 ? 600 : 400 }}>{c.city}</span>
                         <span style={{ fontSize: "12px", color: "rgba(255,255,255,0.45)" }}>{c.count}</span>
                       </div>
                       <div style={{ height: "5px", background: "rgba(255,255,255,0.08)", borderRadius: "3px", overflow: "hidden" }}>
-                        <div style={{ height: "100%", width: `${(c.count / max) * 100}%`, background: i === 0 ? "#2BA8E0" : "rgba(43,168,224,0.35)", borderRadius: "3px" }} />
+                        <div style={{ height: "100%", width: `${(c.count / max) * 100}%`, background: i === 0 ? "#10C4C3" : "rgba(16,196,195,0.35)", borderRadius: "3px" }} />
                       </div>
                     </div>
                   );
@@ -694,7 +694,7 @@ function PendingSection({
           <div style={{ width: "52px", height: "52px", borderRadius: "50%", background: "rgba(52,211,153,0.08)", border: "1.5px solid rgba(52,211,153,0.2)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px", color: "#34D399" }}>
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75"><polyline points="20 6 9 17 4 12"/></svg>
           </div>
-          <p style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "22px", color: "#E8EAED", marginBottom: "8px" }}>All clear</p>
+          <p style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "22px", color: "#FFFFFF", marginBottom: "8px" }}>All clear</p>
           <p style={{ fontSize: "13px", color: "rgba(255,255,255,0.45)" }}>No listings pending review.</p>
         </div>
       ) : (
@@ -731,14 +731,14 @@ function PendingSection({
                   <button
                     onClick={() => onApprove(l.id)}
                     disabled={inFlight === l.id}
-                    style={{ display: "flex", alignItems: "center", gap: "6px", padding: "7px 16px", borderRadius: "7px", fontSize: "11px", fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase" as const, background: "#2BA8E0", color: "#000000", border: "none", cursor: inFlight === l.id ? "not-allowed" : "pointer", fontFamily: "'DM Sans', sans-serif", opacity: inFlight === l.id ? 0.6 : 1 }}
+                    style={{ display: "flex", alignItems: "center", gap: "6px", padding: "7px 16px", borderRadius: "7px", fontSize: "11px", fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase" as const, background: "#10C4C3", color: "#020C1C", border: "none", cursor: inFlight === l.id ? "not-allowed" : "pointer", fontFamily: "'Cal Sans', sans-serif", opacity: inFlight === l.id ? 0.6 : 1 }}
                   >
                     <IconApprove /> Approve
                   </button>
                   <button
                     onClick={() => onReject(l.id)}
                     disabled={inFlight === l.id}
-                    style={{ display: "flex", alignItems: "center", gap: "6px", padding: "7px 16px", borderRadius: "7px", fontSize: "11px", fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase" as const, background: "rgba(248,113,113,0.1)", color: "#F87171", border: "1.5px solid rgba(248,113,113,0.3)", cursor: inFlight === l.id ? "not-allowed" : "pointer", fontFamily: "'DM Sans', sans-serif", opacity: inFlight === l.id ? 0.6 : 1 }}
+                    style={{ display: "flex", alignItems: "center", gap: "6px", padding: "7px 16px", borderRadius: "7px", fontSize: "11px", fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase" as const, background: "rgba(248,113,113,0.1)", color: "#F87171", border: "1.5px solid rgba(248,113,113,0.3)", cursor: inFlight === l.id ? "not-allowed" : "pointer", fontFamily: "'Cal Sans', sans-serif", opacity: inFlight === l.id ? 0.6 : 1 }}
                   >
                     <IconReject /> Reject
                   </button>
@@ -772,7 +772,7 @@ function ApprovedSection({
       <SectionHeading title="Approved Listings" subtitle="Currently live on the platform." count={listings.length} />
       {listings.length === 0 ? (
         <div style={{ padding: "60px 24px", textAlign: "center", background: "rgba(255,255,255,0.05)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", borderRadius: "18px", border: "1px solid rgba(255,255,255,0.08)" }}>
-          <p style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "20px", color: "#E8EAED" }}>No active listings</p>
+          <p style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "20px", color: "#FFFFFF" }}>No active listings</p>
         </div>
       ) : (
         <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
@@ -809,7 +809,7 @@ function ApprovedSection({
                     if (window.confirm("Unpublish this listing? It will return to pending review.")) onUnpublish(l.id);
                   }}
                   disabled={inFlight === l.id}
-                  style={{ display: "flex", alignItems: "center", gap: "6px", padding: "7px 14px", borderRadius: "7px", fontSize: "11px", fontWeight: 600, background: "rgba(245,158,11,0.1)", color: "#F59E0B", border: "1.5px solid rgba(245,158,11,0.3)", cursor: inFlight === l.id ? "not-allowed" : "pointer", fontFamily: "'DM Sans', sans-serif", opacity: inFlight === l.id ? 0.6 : 1 }}
+                  style={{ display: "flex", alignItems: "center", gap: "6px", padding: "7px 14px", borderRadius: "7px", fontSize: "11px", fontWeight: 600, background: "rgba(245,158,11,0.1)", color: "#F59E0B", border: "1.5px solid rgba(245,158,11,0.3)", cursor: inFlight === l.id ? "not-allowed" : "pointer", fontFamily: "'Cal Sans', sans-serif", opacity: inFlight === l.id ? 0.6 : 1 }}
                 >
                   Unpublish
                 </button>
@@ -838,7 +838,7 @@ function RejectedSection({
       <SectionHeading title="Rejected Listings" subtitle="Listings that have been declined." count={listings.length} />
       {listings.length === 0 ? (
         <div style={{ padding: "60px 24px", textAlign: "center", background: "rgba(255,255,255,0.05)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", borderRadius: "18px", border: "1px solid rgba(255,255,255,0.08)" }}>
-          <p style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "20px", color: "#E8EAED" }}>No rejected listings</p>
+          <p style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "20px", color: "#FFFFFF" }}>No rejected listings</p>
         </div>
       ) : (
         <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
@@ -851,7 +851,7 @@ function RejectedSection({
                 <button
                   onClick={() => onReApprove(l.id)}
                   disabled={inFlight === l.id}
-                  style={{ display: "flex", alignItems: "center", gap: "6px", padding: "7px 14px", borderRadius: "7px", fontSize: "11px", fontWeight: 700, background: "#2BA8E0", color: "#000000", border: "none", cursor: inFlight === l.id ? "not-allowed" : "pointer", fontFamily: "'DM Sans', sans-serif", opacity: inFlight === l.id ? 0.6 : 1 }}
+                  style={{ display: "flex", alignItems: "center", gap: "6px", padding: "7px 14px", borderRadius: "7px", fontSize: "11px", fontWeight: 700, background: "#10C4C3", color: "#020C1C", border: "none", cursor: inFlight === l.id ? "not-allowed" : "pointer", fontFamily: "'Cal Sans', sans-serif", opacity: inFlight === l.id ? 0.6 : 1 }}
                 >
                   <IconApprove /> Re-approve
                 </button>
@@ -890,7 +890,7 @@ type UserEditableFields = Pick<UserRow, "full_name" | "city" | "phone" | "email"
 const userModalInputStyle: React.CSSProperties = {
   width: "100%", padding: "8px 12px", background: "#F8F6F1",
   border: "1.5px solid rgba(13,43,31,0.12)", borderRadius: "7px", fontSize: "13px",
-  color: "#000000", fontFamily: "'DM Sans', sans-serif", outlineColor: "#2BA8E0",
+  color: "#020C1C", fontFamily: "'Cal Sans', sans-serif", outlineColor: "#10C4C3",
 };
 
 function UserDetailModal({ user, onClose, onSave, onSubscriptionTierChange }: {
@@ -966,16 +966,16 @@ function UserDetailModal({ user, onClose, onSave, onSubscriptionTierChange }: {
     >
       <div
         onClick={e => e.stopPropagation()}
-        style={{ background: "#fff", borderRadius: "20px", border: "1px solid rgba(13,43,31,0.07)", boxShadow: "0 12px 48px rgba(0,0,0,0.22)", width: "100%", maxWidth: "480px", maxHeight: "85vh", overflowY: "auto", padding: "28px 30px", animation: "fadeSlide 0.18s ease-out", fontFamily: "'DM Sans', sans-serif" }}
+        style={{ background: "#fff", borderRadius: "20px", border: "1px solid rgba(13,43,31,0.07)", boxShadow: "0 12px 48px rgba(0,0,0,0.22)", width: "100%", maxWidth: "480px", maxHeight: "85vh", overflowY: "auto", padding: "28px 30px", animation: "fadeSlide 0.18s ease-out", fontFamily: "'Cal Sans', sans-serif" }}
       >
         {/* Header */}
         <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "14px", marginBottom: "20px" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "14px", minWidth: 0 }}>
-            <div style={{ width: "48px", height: "48px", borderRadius: "50%", background: "rgba(201,168,76,0.12)", border: "1.5px solid rgba(201,168,76,0.3)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, fontSize: "17px", fontWeight: 700, color: "#2BA8E0" }}>
+            <div style={{ width: "48px", height: "48px", borderRadius: "50%", background: "rgba(201,168,76,0.12)", border: "1.5px solid rgba(201,168,76,0.3)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, fontSize: "17px", fontWeight: 700, color: "#10C4C3" }}>
               {(user.full_name ?? "?").slice(0, 1).toUpperCase()}
             </div>
             <div style={{ minWidth: 0 }}>
-              <h3 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "24px", fontWeight: 600, color: "#000000", lineHeight: 1.2, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+              <h3 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "24px", fontWeight: 600, color: "#020C1C", lineHeight: 1.2, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                 {user.full_name ?? "—"}
               </h3>
               <div style={{ display: "flex", alignItems: "center", gap: "8px", marginTop: "5px", flexWrap: "wrap" }}>
@@ -1000,7 +1000,7 @@ function UserDetailModal({ user, onClose, onSave, onSubscriptionTierChange }: {
             {!editing && (
               <button
                 onClick={startEditing}
-                style={{ padding: "7px 14px", borderRadius: "8px", background: "rgba(43,168,224,0.1)", color: "#0B6E96", border: "1.5px solid rgba(43,168,224,0.3)", fontSize: "11px", fontWeight: 700, cursor: "pointer", fontFamily: "'DM Sans', sans-serif" }}
+                style={{ padding: "7px 14px", borderRadius: "8px", background: "rgba(16,196,195,0.1)", color: "#0B6E96", border: "1.5px solid rgba(16,196,195,0.3)", fontSize: "11px", fontWeight: 700, cursor: "pointer", fontFamily: "'Cal Sans', sans-serif" }}
               >
                 Edit
               </button>
@@ -1022,7 +1022,7 @@ function UserDetailModal({ user, onClose, onSave, onSubscriptionTierChange }: {
           style={{
             width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: "8px",
             padding: "10px", borderRadius: "9px", marginBottom: "18px", fontSize: "12px", fontWeight: 700,
-            letterSpacing: "0.04em", fontFamily: "'DM Sans', sans-serif", cursor: togglingActive ? "not-allowed" : "pointer",
+            letterSpacing: "0.04em", fontFamily: "'Cal Sans', sans-serif", cursor: togglingActive ? "not-allowed" : "pointer",
             opacity: togglingActive ? 0.6 : 1,
             background: isActive ? "rgba(239,68,68,0.08)" : "rgba(52,211,153,0.1)",
             color: isActive ? "#B91C1C" : "#065F46",
@@ -1039,7 +1039,7 @@ function UserDetailModal({ user, onClose, onSave, onSubscriptionTierChange }: {
             <select
               value={user.subscription_tier ?? "free"}
               onChange={e => onSubscriptionTierChange(user.id, e.target.value)}
-              style={{ padding: "6px 28px 6px 10px", background: "#fff", border: "1.5px solid rgba(13,43,31,0.15)", borderRadius: "7px", fontSize: "12px", fontWeight: 600, color: "#000000", fontFamily: "'DM Sans', sans-serif", outline: "none", appearance: "none", cursor: "pointer" }}
+              style={{ padding: "6px 28px 6px 10px", background: "#fff", border: "1.5px solid rgba(13,43,31,0.15)", borderRadius: "7px", fontSize: "12px", fontWeight: 600, color: "#020C1C", fontFamily: "'Cal Sans', sans-serif", outline: "none", appearance: "none", cursor: "pointer" }}
             >
               <option value="free">Free</option>
               <option value="premium">Premium</option>
@@ -1081,14 +1081,14 @@ function UserDetailModal({ user, onClose, onSave, onSubscriptionTierChange }: {
             <button
               onClick={() => void handleSave()}
               disabled={saving}
-              style={{ flex: 1, padding: "10px", borderRadius: "9px", background: "#2BA8E0", color: "#000000", border: "none", fontWeight: 700, fontSize: "12px", cursor: saving ? "not-allowed" : "pointer", opacity: saving ? 0.6 : 1, fontFamily: "'DM Sans', sans-serif" }}
+              style={{ flex: 1, padding: "10px", borderRadius: "9px", background: "#10C4C3", color: "#020C1C", border: "none", fontWeight: 700, fontSize: "12px", cursor: saving ? "not-allowed" : "pointer", opacity: saving ? 0.6 : 1, fontFamily: "'Cal Sans', sans-serif" }}
             >
               {saving ? "Saving…" : "Save Changes"}
             </button>
             <button
               onClick={() => setEditing(false)}
               disabled={saving}
-              style={{ flex: 1, padding: "10px", borderRadius: "9px", background: "#F8F6F1", color: "#374151", border: "1px solid rgba(13,43,31,0.1)", fontWeight: 600, fontSize: "12px", cursor: "pointer", fontFamily: "'DM Sans', sans-serif" }}
+              style={{ flex: 1, padding: "10px", borderRadius: "9px", background: "#F8F6F1", color: "#374151", border: "1px solid rgba(13,43,31,0.1)", fontWeight: 600, fontSize: "12px", cursor: "pointer", fontFamily: "'Cal Sans', sans-serif" }}
             >
               Cancel
             </button>
@@ -1158,14 +1158,14 @@ function UsersSection({
             onChange={e => setSearch(e.target.value)}
             placeholder="Search by name, phone, or email…"
             aria-label="Search users by name, phone, or email"
-            style={{ flex: "1 1 240px", padding: "10px 14px", background: "rgba(255,255,255,0.06)", border: "1.5px solid rgba(255,255,255,0.12)", borderRadius: "9px", fontSize: "13px", color: "#E8EAED", fontFamily: "'DM Sans', sans-serif", outlineColor: "#2BA8E0" }}
+            style={{ flex: "1 1 240px", padding: "10px 14px", background: "rgba(255,255,255,0.06)", border: "1.5px solid rgba(255,255,255,0.12)", borderRadius: "9px", fontSize: "13px", color: "#FFFFFF", fontFamily: "'Cal Sans', sans-serif", outlineColor: "#10C4C3" }}
           />
           <div style={{ position: "relative", flexShrink: 0 }}>
             <select
               value={sort}
               onChange={e => setSort(e.target.value as UserSort)}
               aria-label="Sort users"
-              style={{ padding: "10px 30px 10px 12px", background: "rgba(255,255,255,0.06)", border: "1.5px solid rgba(255,255,255,0.12)", borderRadius: "9px", fontSize: "12px", color: "#E8EAED", fontFamily: "'DM Sans', sans-serif", outlineColor: "#2BA8E0", appearance: "none", cursor: "pointer" }}
+              style={{ padding: "10px 30px 10px 12px", background: "rgba(255,255,255,0.06)", border: "1.5px solid rgba(255,255,255,0.12)", borderRadius: "9px", fontSize: "12px", color: "#FFFFFF", fontFamily: "'Cal Sans', sans-serif", outlineColor: "#10C4C3", appearance: "none", cursor: "pointer" }}
             >
               {(Object.keys(USER_SORT_LABELS) as UserSort[]).map(k => (
                 <option key={k} value={k}>{USER_SORT_LABELS[k]}</option>
@@ -1182,7 +1182,7 @@ function UsersSection({
               <button
                 key={r}
                 onClick={() => setRoleFilter(r)}
-                style={{ padding: "5px 12px", borderRadius: "100px", fontSize: "11px", fontWeight: on ? 700 : 500, letterSpacing: "0.03em", background: on ? "#2BA8E0" : "rgba(255,255,255,0.06)", color: on ? "#000000" : "#AEB4BC", border: on ? "1.5px solid #2BA8E0" : "1.5px solid rgba(255,255,255,0.12)", cursor: "pointer", fontFamily: "'DM Sans', sans-serif", textTransform: "capitalize" as const, transition: "all 0.14s" }}
+                style={{ padding: "5px 12px", borderRadius: "100px", fontSize: "11px", fontWeight: on ? 700 : 500, letterSpacing: "0.03em", background: on ? "#10C4C3" : "rgba(255,255,255,0.06)", color: on ? "#020C1C" : "#A9B4C2", border: on ? "1.5px solid #10C4C3" : "1.5px solid rgba(255,255,255,0.12)", cursor: "pointer", fontFamily: "'Cal Sans', sans-serif", textTransform: "capitalize" as const, transition: "all 0.14s" }}
               >
                 {r === "all" ? "All" : r.replace(/_/g, " ")}
               </button>
@@ -1190,7 +1190,7 @@ function UsersSection({
           })}
         </div>
         {filtersActive && (
-          <div style={{ fontSize: "12px", color: "#AEB4BC" }}>
+          <div style={{ fontSize: "12px", color: "#A9B4C2" }}>
             {filtered.length} of {users.length} users
           </div>
         )}
@@ -1198,12 +1198,12 @@ function UsersSection({
 
       {users.length === 0 ? (
         <div style={{ padding: "60px 24px", textAlign: "center", background: "rgba(255,255,255,0.05)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", borderRadius: "18px", border: "1px solid rgba(255,255,255,0.08)" }}>
-          <p style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "20px", color: "#E8EAED" }}>No users found</p>
+          <p style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "20px", color: "#FFFFFF" }}>No users found</p>
         </div>
       ) : filtered.length === 0 ? (
         <div style={{ padding: "60px 24px", textAlign: "center", background: "rgba(255,255,255,0.05)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", borderRadius: "18px", border: "1px solid rgba(255,255,255,0.08)" }}>
-          <p style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "20px", color: "#E8EAED", marginBottom: "6px" }}>No users match</p>
-          <p style={{ fontSize: "13px", color: "#AEB4BC" }}>Try adjusting the search or role filter.</p>
+          <p style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "20px", color: "#FFFFFF", marginBottom: "6px" }}>No users match</p>
+          <p style={{ fontSize: "13px", color: "#A9B4C2" }}>Try adjusting the search or role filter.</p>
         </div>
       ) : (
         <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
@@ -1217,12 +1217,12 @@ function UsersSection({
               style={{ background: "rgba(255,255,255,0.05)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", borderRadius: "12px", border: "1px solid rgba(255,255,255,0.08)", padding: "16px 20px", display: "flex", alignItems: "center", gap: "16px", flexWrap: "wrap", cursor: "pointer" }}
             >
               {/* Avatar */}
-              <div style={{ width: "40px", height: "40px", borderRadius: "50%", background: "rgba(43,168,224,0.12)", border: "1.5px solid rgba(43,168,224,0.25)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, fontSize: "14px", fontWeight: 700, color: "#2BA8E0", fontFamily: "'DM Sans', sans-serif" }}>
+              <div style={{ width: "40px", height: "40px", borderRadius: "50%", background: "rgba(16,196,195,0.12)", border: "1.5px solid rgba(16,196,195,0.25)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, fontSize: "14px", fontWeight: 700, color: "#10C4C3", fontFamily: "'Cal Sans', sans-serif" }}>
                 {(u.full_name ?? "?").slice(0, 1).toUpperCase()}
               </div>
               {/* Info */}
               <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontSize: "14px", fontWeight: 600, color: "#E8EAED", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                <div style={{ fontSize: "14px", fontWeight: 600, color: "#FFFFFF", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                   {u.full_name ?? "—"}
                 </div>
                 <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", marginTop: "3px" }}>
@@ -1237,10 +1237,10 @@ function UsersSection({
                   value={u.role ?? "buyer"}
                   onChange={e => onRoleChange(u.id, e.target.value)}
                   onKeyDown={e => e.stopPropagation()}
-                  style={{ padding: "6px 28px 6px 10px", background: "rgba(255,255,255,0.06)", border: "1.5px solid rgba(255,255,255,0.12)", borderRadius: "7px", fontSize: "12px", color: "#E8EAED", fontFamily: "'DM Sans', sans-serif", outline: "none", appearance: "none", cursor: "pointer" }}
+                  style={{ padding: "6px 28px 6px 10px", background: "rgba(255,255,255,0.06)", border: "1.5px solid rgba(255,255,255,0.12)", borderRadius: "7px", fontSize: "12px", color: "#FFFFFF", fontFamily: "'Cal Sans', sans-serif", outline: "none", appearance: "none", cursor: "pointer" }}
                 >
                   {ROLE_OPTIONS.map(r => (
-                    <option key={r} value={r} style={{ background: "#0B0D10", color: "#E8EAED" }}>{r}</option>
+                    <option key={r} value={r} style={{ background: "#0A1526", color: "#FFFFFF" }}>{r}</option>
                   ))}
                 </select>
                 <span style={{ position: "absolute", right: 8, top: "50%", transform: "translateY(-50%)", pointerEvents: "none", color: "rgba(255,255,255,0.45)", fontSize: 9 }}>▼</span>
@@ -1279,7 +1279,7 @@ function InquiriesSection({
       <SectionHeading title="All Inquiries" subtitle="Platform-wide buyer inquiries." count={inquiries.length} />
       {inquiries.length === 0 ? (
         <div style={{ padding: "60px 24px", textAlign: "center", background: "rgba(255,255,255,0.05)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", borderRadius: "18px", border: "1px solid rgba(255,255,255,0.08)" }}>
-          <p style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "20px", color: "#E8EAED" }}>No inquiries yet</p>
+          <p style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "20px", color: "#FFFFFF" }}>No inquiries yet</p>
         </div>
       ) : (
         <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
@@ -1291,16 +1291,16 @@ function InquiriesSection({
                 {/* Header */}
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: "12px", flexWrap: "wrap", marginBottom: "10px" }}>
                   <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
-                    <span style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "18px", fontWeight: 600, color: "#E8EAED" }}>
+                    <span style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "18px", fontWeight: 600, color: "#FFFFFF" }}>
                       {inq.inquirer_name ?? "Anonymous"}
                     </span>
                     {inq.inquiry_type && (
-                      <span style={{ display: "inline-block", padding: "2px 8px", borderRadius: "100px", fontSize: "9px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" as const, background: inq.inquiry_type === "viewing" ? "rgba(52,211,153,0.1)" : "rgba(43,168,224,0.12)", color: inq.inquiry_type === "viewing" ? "#34D399" : "#2BA8E0", border: `1px solid ${inq.inquiry_type === "viewing" ? "rgba(52,211,153,0.25)" : "rgba(43,168,224,0.3)"}` }}>
+                      <span style={{ display: "inline-block", padding: "2px 8px", borderRadius: "100px", fontSize: "9px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" as const, background: inq.inquiry_type === "viewing" ? "rgba(52,211,153,0.1)" : "rgba(16,196,195,0.12)", color: inq.inquiry_type === "viewing" ? "#34D399" : "#10C4C3", border: `1px solid ${inq.inquiry_type === "viewing" ? "rgba(52,211,153,0.25)" : "rgba(16,196,195,0.3)"}` }}>
                         {inq.inquiry_type}
                       </span>
                     )}
                     {inq.status && (
-                      <span style={{ display: "inline-block", padding: "2px 8px", borderRadius: "100px", fontSize: "9px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" as const, background: isSpam ? "rgba(248,113,113,0.12)" : "rgba(255,255,255,0.07)", color: isSpam ? "#F87171" : "#AEB4BC", border: `1px solid ${isSpam ? "rgba(248,113,113,0.3)" : "rgba(255,255,255,0.1)"}` }}>
+                      <span style={{ display: "inline-block", padding: "2px 8px", borderRadius: "100px", fontSize: "9px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" as const, background: isSpam ? "rgba(248,113,113,0.12)" : "rgba(255,255,255,0.07)", color: isSpam ? "#F87171" : "#A9B4C2", border: `1px solid ${isSpam ? "rgba(248,113,113,0.3)" : "rgba(255,255,255,0.1)"}` }}>
                         {inq.status}
                       </span>
                     )}
@@ -1309,23 +1309,23 @@ function InquiriesSection({
                 </div>
                 {/* Property */}
                 {inq.property_title && (
-                  <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "8px", fontSize: "12px", color: "#AEB4BC" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "8px", fontSize: "12px", color: "#A9B4C2" }}>
                     <IconBuilding />
                     {inq.property_slug
-                      ? <a href={`/property/${inq.property_slug}`} style={{ color: "#E8EAED", fontWeight: 500, textDecoration: "none" }}>{inq.property_title}</a>
-                      : <span style={{ color: "#E8EAED", fontWeight: 500 }}>{inq.property_title}</span>
+                      ? <a href={`/property/${inq.property_slug}`} style={{ color: "#FFFFFF", fontWeight: 500, textDecoration: "none" }}>{inq.property_title}</a>
+                      : <span style={{ color: "#FFFFFF", fontWeight: 500 }}>{inq.property_title}</span>
                     }
                     {inq.seller_email && <span style={{ color: "rgba(255,255,255,0.45)" }}>→ {inq.seller_email}</span>}
                   </div>
                 )}
                 {/* Contact */}
                 <div style={{ display: "flex", gap: "16px", flexWrap: "wrap", marginBottom: inq.message ? "10px" : 0, fontSize: "12px" }}>
-                  {inq.inquirer_phone && <a href={`tel:${inq.inquirer_phone}`} style={{ color: "#AEB4BC", textDecoration: "none" }}>{inq.inquirer_phone}</a>}
-                  {inq.inquirer_email && <a href={`mailto:${inq.inquirer_email}`} style={{ color: "#AEB4BC", textDecoration: "none" }}>{inq.inquirer_email}</a>}
+                  {inq.inquirer_phone && <a href={`tel:${inq.inquirer_phone}`} style={{ color: "#A9B4C2", textDecoration: "none" }}>{inq.inquirer_phone}</a>}
+                  {inq.inquirer_email && <a href={`mailto:${inq.inquirer_email}`} style={{ color: "#A9B4C2", textDecoration: "none" }}>{inq.inquirer_email}</a>}
                 </div>
                 {/* Message */}
                 {inq.message && (
-                  <div style={{ background: "rgba(255,255,255,0.04)", borderRadius: "8px", padding: "10px 14px", fontSize: "12px", color: "#AEB4BC", lineHeight: 1.6, borderLeft: "3px solid rgba(43,168,224,0.4)", marginBottom: "12px" }}>
+                  <div style={{ background: "rgba(255,255,255,0.04)", borderRadius: "8px", padding: "10px 14px", fontSize: "12px", color: "#A9B4C2", lineHeight: 1.6, borderLeft: "3px solid rgba(16,196,195,0.4)", marginBottom: "12px" }}>
                     {inq.message}
                   </div>
                 )}
@@ -1335,7 +1335,7 @@ function InquiriesSection({
                     <button
                       onClick={() => onMarkSpam(inq.id)}
                       disabled={busy}
-                      style={{ display: "flex", alignItems: "center", gap: "6px", padding: "7px 14px", borderRadius: "7px", fontSize: "11px", fontWeight: 600, background: "rgba(245,158,11,0.1)", color: "#F59E0B", border: "1.5px solid rgba(245,158,11,0.3)", cursor: busy ? "not-allowed" : "pointer", fontFamily: "'DM Sans', sans-serif", opacity: busy ? 0.6 : 1 }}
+                      style={{ display: "flex", alignItems: "center", gap: "6px", padding: "7px 14px", borderRadius: "7px", fontSize: "11px", fontWeight: 600, background: "rgba(245,158,11,0.1)", color: "#F59E0B", border: "1.5px solid rgba(245,158,11,0.3)", cursor: busy ? "not-allowed" : "pointer", fontFamily: "'Cal Sans', sans-serif", opacity: busy ? 0.6 : 1 }}
                     >
                       Mark as Spam
                     </button>
@@ -1345,7 +1345,7 @@ function InquiriesSection({
                       if (window.confirm("Permanently delete this inquiry? This cannot be undone.")) onDelete(inq.id);
                     }}
                     disabled={busy}
-                    style={{ display: "flex", alignItems: "center", gap: "6px", padding: "7px 14px", borderRadius: "7px", fontSize: "11px", fontWeight: 600, background: "rgba(248,113,113,0.1)", color: "#F87171", border: "1.5px solid rgba(248,113,113,0.3)", cursor: busy ? "not-allowed" : "pointer", fontFamily: "'DM Sans', sans-serif", opacity: busy ? 0.6 : 1 }}
+                    style={{ display: "flex", alignItems: "center", gap: "6px", padding: "7px 14px", borderRadius: "7px", fontSize: "11px", fontWeight: 600, background: "rgba(248,113,113,0.1)", color: "#F87171", border: "1.5px solid rgba(248,113,113,0.3)", cursor: busy ? "not-allowed" : "pointer", fontFamily: "'Cal Sans', sans-serif", opacity: busy ? 0.6 : 1 }}
                   >
                     <IconReject /> Delete
                   </button>
@@ -1380,12 +1380,12 @@ function AgentCard({
             <StatusBadge status={app.status === "approved" ? "active" : app.status === "pending" ? "pending_review" : "rejected"} />
             <span style={{ fontSize: "11px", color: "rgba(255,255,255,0.45)" }}>{fmtDate(app.created_at)}</span>
           </div>
-          <h3 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "19px", fontWeight: 600, color: "#E8EAED", lineHeight: 1.25, marginBottom: "4px" }}>
+          <h3 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "19px", fontWeight: 600, color: "#FFFFFF", lineHeight: 1.25, marginBottom: "4px" }}>
             {app.profiles?.full_name ?? "Unnamed applicant"}
           </h3>
-          <div style={{ display: "flex", gap: "14px", fontSize: "12px", color: "#AEB4BC", flexWrap: "wrap" }}>
-            {app.profiles?.phone && <a href={`tel:${app.profiles.phone}`} style={{ color: "#AEB4BC", textDecoration: "none" }}>{app.profiles.phone}</a>}
-            {app.profiles?.email && <a href={`mailto:${app.profiles.email}`} style={{ color: "#AEB4BC", textDecoration: "none" }}>{app.profiles.email}</a>}
+          <div style={{ display: "flex", gap: "14px", fontSize: "12px", color: "#A9B4C2", flexWrap: "wrap" }}>
+            {app.profiles?.phone && <a href={`tel:${app.profiles.phone}`} style={{ color: "#A9B4C2", textDecoration: "none" }}>{app.profiles.phone}</a>}
+            {app.profiles?.email && <a href={`mailto:${app.profiles.email}`} style={{ color: "#A9B4C2", textDecoration: "none" }}>{app.profiles.email}</a>}
             {app.agency_name && <span>{app.agency_name}</span>}
             {app.years_experience != null && <span>{app.years_experience} yrs experience</span>}
           </div>
@@ -1393,21 +1393,21 @@ function AgentCard({
       </div>
 
       {app.license_number && (
-        <div style={{ fontSize: "12px", color: "#AEB4BC", marginBottom: "8px" }}>
-          License: <span style={{ color: "#E8EAED" }}>{app.license_number}</span>
+        <div style={{ fontSize: "12px", color: "#A9B4C2", marginBottom: "8px" }}>
+          License: <span style={{ color: "#FFFFFF" }}>{app.license_number}</span>
         </div>
       )}
 
       {cities.length > 0 && (
         <div style={{ display: "flex", gap: "6px", flexWrap: "wrap", marginBottom: "8px" }}>
           {cities.map(c => (
-            <span key={c} style={{ padding: "3px 10px", borderRadius: "100px", fontSize: "10px", fontWeight: 600, background: "rgba(43,168,224,0.1)", color: "#2BA8E0", border: "1px solid rgba(43,168,224,0.25)" }}>{c}</span>
+            <span key={c} style={{ padding: "3px 10px", borderRadius: "100px", fontSize: "10px", fontWeight: 600, background: "rgba(16,196,195,0.1)", color: "#10C4C3", border: "1px solid rgba(16,196,195,0.25)" }}>{c}</span>
           ))}
         </div>
       )}
 
       {app.bio && (
-        <div style={{ background: "rgba(255,255,255,0.04)", borderRadius: "8px", padding: "10px 14px", fontSize: "12px", color: "#AEB4BC", lineHeight: 1.6, borderLeft: "3px solid rgba(43,168,224,0.4)", marginBottom: "8px" }}>
+        <div style={{ background: "rgba(255,255,255,0.04)", borderRadius: "8px", padding: "10px 14px", fontSize: "12px", color: "#A9B4C2", lineHeight: 1.6, borderLeft: "3px solid rgba(16,196,195,0.4)", marginBottom: "8px" }}>
           {app.bio}
         </div>
       )}
@@ -1432,7 +1432,7 @@ function CityMultiSelect({ selected, onChange }: { selected: string[]; onChange:
             type="button"
             key={city}
             onClick={() => toggle(city)}
-            style={{ padding: "6px 14px", borderRadius: "100px", fontSize: "12px", fontWeight: on ? 700 : 500, background: on ? "#2BA8E0" : "rgba(255,255,255,0.06)", color: on ? "#000000" : "#AEB4BC", border: on ? "1.5px solid #2BA8E0" : "1.5px solid rgba(255,255,255,0.12)", cursor: "pointer", fontFamily: "'DM Sans', sans-serif" }}
+            style={{ padding: "6px 14px", borderRadius: "100px", fontSize: "12px", fontWeight: on ? 700 : 500, background: on ? "#10C4C3" : "rgba(255,255,255,0.06)", color: on ? "#020C1C" : "#A9B4C2", border: on ? "1.5px solid #10C4C3" : "1.5px solid rgba(255,255,255,0.12)", cursor: "pointer", fontFamily: "'Cal Sans', sans-serif" }}
           >
             {city}
           </button>
@@ -1445,12 +1445,12 @@ function CityMultiSelect({ selected, onChange }: { selected: string[]; onChange:
 const inputStyle: React.CSSProperties = {
   width: "100%", padding: "10px 14px", background: "rgba(255,255,255,0.06)",
   border: "1.5px solid rgba(255,255,255,0.12)", borderRadius: "9px", fontSize: "13px",
-  color: "#E8EAED", fontFamily: "'DM Sans', sans-serif", outlineColor: "#2BA8E0",
+  color: "#FFFFFF", fontFamily: "'Cal Sans', sans-serif", outlineColor: "#10C4C3",
 };
 
 const labelStyle: React.CSSProperties = {
   display: "block", fontSize: "11px", fontWeight: 700, letterSpacing: "0.06em",
-  textTransform: "uppercase" as const, color: "#AEB4BC", marginBottom: "6px",
+  textTransform: "uppercase" as const, color: "#A9B4C2", marginBottom: "6px",
 };
 
 function AddAgentModal({ onClose, onSubmit }: {
@@ -1511,11 +1511,11 @@ function AddAgentModal({ onClose, onSubmit }: {
     >
       <div
         onClick={e => e.stopPropagation()}
-        style={{ background: "#0B0D10", borderRadius: "18px", border: "1px solid rgba(255,255,255,0.1)", boxShadow: "0 12px 48px rgba(0,0,0,0.5)", width: "100%", maxWidth: "520px", maxHeight: "88vh", overflowY: "auto", padding: "26px 28px", animation: "fadeSlide 0.18s ease-out", fontFamily: "'DM Sans', sans-serif" }}
+        style={{ background: "#0A1526", borderRadius: "18px", border: "1px solid rgba(255,255,255,0.1)", boxShadow: "0 12px 48px rgba(0,0,0,0.5)", width: "100%", maxWidth: "520px", maxHeight: "88vh", overflowY: "auto", padding: "26px 28px", animation: "fadeSlide 0.18s ease-out", fontFamily: "'Cal Sans', sans-serif" }}
       >
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
-          <h3 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "24px", fontWeight: 600, color: "#E8EAED" }}>Add Agent Manually</h3>
-          <button onClick={onClose} aria-label="Close" style={{ width: "30px", height: "30px", borderRadius: "8px", background: "rgba(255,255,255,0.06)", border: "none", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: "#E8EAED" }}>
+          <h3 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "24px", fontWeight: 600, color: "#FFFFFF" }}>Add Agent Manually</h3>
+          <button onClick={onClose} aria-label="Close" style={{ width: "30px", height: "30px", borderRadius: "8px", background: "rgba(255,255,255,0.06)", border: "none", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: "#FFFFFF" }}>
             <IconX />
           </button>
         </div>
@@ -1538,26 +1538,26 @@ function AddAgentModal({ onClose, onSubmit }: {
                   <button
                     key={r.id}
                     onClick={() => setSelectedUser(r)}
-                    style={{ textAlign: "left", padding: "10px 14px", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "9px", cursor: "pointer", color: "#E8EAED", fontFamily: "'DM Sans', sans-serif" }}
+                    style={{ textAlign: "left", padding: "10px 14px", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "9px", cursor: "pointer", color: "#FFFFFF", fontFamily: "'Cal Sans', sans-serif" }}
                   >
                     <div style={{ fontWeight: 600, fontSize: "13px" }}>{r.full_name ?? "—"}</div>
-                    <div style={{ fontSize: "11px", color: "#AEB4BC" }}>{[r.phone, r.email].filter(Boolean).join(" · ")} {r.role && `· ${r.role}`}</div>
+                    <div style={{ fontSize: "11px", color: "#A9B4C2" }}>{[r.phone, r.email].filter(Boolean).join(" · ")} {r.role && `· ${r.role}`}</div>
                   </button>
                 ))}
               </div>
             )}
             {!searching && search.trim().length >= 2 && results.length === 0 && (
-              <div style={{ marginTop: "10px", fontSize: "12px", color: "#AEB4BC" }}>No matching users.</div>
+              <div style={{ marginTop: "10px", fontSize: "12px", color: "#A9B4C2" }}>No matching users.</div>
             )}
           </div>
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "10px 14px", background: "rgba(43,168,224,0.08)", border: "1px solid rgba(43,168,224,0.2)", borderRadius: "9px" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "10px 14px", background: "rgba(16,196,195,0.08)", border: "1px solid rgba(16,196,195,0.2)", borderRadius: "9px" }}>
               <div>
-                <div style={{ fontWeight: 600, fontSize: "13px", color: "#E8EAED" }}>{selectedUser.full_name ?? "—"}</div>
-                <div style={{ fontSize: "11px", color: "#AEB4BC" }}>{[selectedUser.phone, selectedUser.email].filter(Boolean).join(" · ")}</div>
+                <div style={{ fontWeight: 600, fontSize: "13px", color: "#FFFFFF" }}>{selectedUser.full_name ?? "—"}</div>
+                <div style={{ fontSize: "11px", color: "#A9B4C2" }}>{[selectedUser.phone, selectedUser.email].filter(Boolean).join(" · ")}</div>
               </div>
-              <button onClick={() => setSelectedUser(null)} style={{ fontSize: "11px", color: "#2BA8E0", background: "none", border: "none", cursor: "pointer", fontFamily: "'DM Sans', sans-serif" }}>Change</button>
+              <button onClick={() => setSelectedUser(null)} style={{ fontSize: "11px", color: "#10C4C3", background: "none", border: "none", cursor: "pointer", fontFamily: "'Cal Sans', sans-serif" }}>Change</button>
             </div>
 
             <div>
@@ -1586,7 +1586,7 @@ function AddAgentModal({ onClose, onSubmit }: {
             <button
               onClick={() => void handleSubmit()}
               disabled={submitting}
-              style={{ padding: "12px", borderRadius: "9px", background: "#2BA8E0", color: "#000000", border: "none", fontWeight: 700, fontSize: "13px", letterSpacing: "0.04em", cursor: submitting ? "not-allowed" : "pointer", opacity: submitting ? 0.6 : 1, fontFamily: "'DM Sans', sans-serif" }}
+              style={{ padding: "12px", borderRadius: "9px", background: "#10C4C3", color: "#020C1C", border: "none", fontWeight: 700, fontSize: "13px", letterSpacing: "0.04em", cursor: submitting ? "not-allowed" : "pointer", opacity: submitting ? 0.6 : 1, fontFamily: "'Cal Sans', sans-serif" }}
             >
               {submitting ? "Adding…" : "Add Agent"}
             </button>
@@ -1629,7 +1629,7 @@ function AgentsSection({
               <button
                 key={f}
                 onClick={() => setFilter(f)}
-                style={{ padding: "6px 14px", borderRadius: "100px", fontSize: "11px", fontWeight: on ? 700 : 500, background: on ? "#2BA8E0" : "rgba(255,255,255,0.06)", color: on ? "#000000" : "#AEB4BC", border: on ? "1.5px solid #2BA8E0" : "1.5px solid rgba(255,255,255,0.12)", cursor: "pointer", fontFamily: "'DM Sans', sans-serif", textTransform: "capitalize" as const }}
+                style={{ padding: "6px 14px", borderRadius: "100px", fontSize: "11px", fontWeight: on ? 700 : 500, background: on ? "#10C4C3" : "rgba(255,255,255,0.06)", color: on ? "#020C1C" : "#A9B4C2", border: on ? "1.5px solid #10C4C3" : "1.5px solid rgba(255,255,255,0.12)", cursor: "pointer", fontFamily: "'Cal Sans', sans-serif", textTransform: "capitalize" as const }}
               >
                 {f} ({applications.filter(a => a.status === f).length})
               </button>
@@ -1638,7 +1638,7 @@ function AgentsSection({
         </div>
         <button
           onClick={() => setShowAddModal(true)}
-          style={{ display: "flex", alignItems: "center", gap: "6px", padding: "9px 18px", borderRadius: "8px", fontSize: "12px", fontWeight: 700, letterSpacing: "0.04em", background: "rgba(43,168,224,0.1)", color: "#2BA8E0", border: "1.5px solid rgba(43,168,224,0.3)", cursor: "pointer", fontFamily: "'DM Sans', sans-serif" }}
+          style={{ display: "flex", alignItems: "center", gap: "6px", padding: "9px 18px", borderRadius: "8px", fontSize: "12px", fontWeight: 700, letterSpacing: "0.04em", background: "rgba(16,196,195,0.1)", color: "#10C4C3", border: "1.5px solid rgba(16,196,195,0.3)", cursor: "pointer", fontFamily: "'Cal Sans', sans-serif" }}
         >
           + Add Agent Manually
         </button>
@@ -1646,7 +1646,7 @@ function AgentsSection({
 
       {filtered.length === 0 ? (
         <div style={{ padding: "60px 24px", textAlign: "center", background: "rgba(255,255,255,0.05)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", borderRadius: "18px", border: "1px solid rgba(255,255,255,0.08)" }}>
-          <p style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "20px", color: "#E8EAED" }}>No {filter} applications</p>
+          <p style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "20px", color: "#FFFFFF" }}>No {filter} applications</p>
         </div>
       ) : (
         <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
@@ -1661,14 +1661,14 @@ function AgentsSection({
                     <button
                       onClick={() => onApprove(app.id, app.user_id)}
                       disabled={inFlight === app.id}
-                      style={{ display: "flex", alignItems: "center", gap: "6px", padding: "7px 16px", borderRadius: "7px", fontSize: "11px", fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase" as const, background: "#2BA8E0", color: "#000000", border: "none", cursor: inFlight === app.id ? "not-allowed" : "pointer", fontFamily: "'DM Sans', sans-serif", opacity: inFlight === app.id ? 0.6 : 1 }}
+                      style={{ display: "flex", alignItems: "center", gap: "6px", padding: "7px 16px", borderRadius: "7px", fontSize: "11px", fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase" as const, background: "#10C4C3", color: "#020C1C", border: "none", cursor: inFlight === app.id ? "not-allowed" : "pointer", fontFamily: "'Cal Sans', sans-serif", opacity: inFlight === app.id ? 0.6 : 1 }}
                     >
                       <IconApprove /> Approve
                     </button>
                     <button
                       onClick={() => onReject(app.id)}
                       disabled={inFlight === app.id}
-                      style={{ display: "flex", alignItems: "center", gap: "6px", padding: "7px 16px", borderRadius: "7px", fontSize: "11px", fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase" as const, background: "rgba(248,113,113,0.1)", color: "#F87171", border: "1.5px solid rgba(248,113,113,0.3)", cursor: inFlight === app.id ? "not-allowed" : "pointer", fontFamily: "'DM Sans', sans-serif", opacity: inFlight === app.id ? 0.6 : 1 }}
+                      style={{ display: "flex", alignItems: "center", gap: "6px", padding: "7px 16px", borderRadius: "7px", fontSize: "11px", fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase" as const, background: "rgba(248,113,113,0.1)", color: "#F87171", border: "1.5px solid rgba(248,113,113,0.3)", cursor: inFlight === app.id ? "not-allowed" : "pointer", fontFamily: "'Cal Sans', sans-serif", opacity: inFlight === app.id ? 0.6 : 1 }}
                     >
                       <IconReject /> Reject
                     </button>
@@ -1712,29 +1712,29 @@ function ReportCard({
     <div style={{ background: "rgba(255,255,255,0.05)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", borderRadius: "14px", border: "1px solid rgba(255,255,255,0.08)", boxShadow: "0 4px 24px rgba(0,0,0,0.18)", padding: "18px 22px", opacity: busy ? 0.55 : 1, transition: "opacity 0.2s" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: "12px", flexWrap: "wrap", marginBottom: "10px" }}>
         <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
-          <span style={{ display: "inline-block", padding: "2px 8px", borderRadius: "100px", fontSize: "9px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" as const, background: report.status === "open" ? "rgba(245,158,11,0.15)" : report.status === "resolved" ? "rgba(52,211,153,0.15)" : "rgba(255,255,255,0.08)", color: report.status === "open" ? "#F59E0B" : report.status === "resolved" ? "#34D399" : "#AEB4BC", border: `1px solid ${report.status === "open" ? "rgba(245,158,11,0.3)" : report.status === "resolved" ? "rgba(52,211,153,0.3)" : "rgba(255,255,255,0.12)"}` }}>
+          <span style={{ display: "inline-block", padding: "2px 8px", borderRadius: "100px", fontSize: "9px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" as const, background: report.status === "open" ? "rgba(245,158,11,0.15)" : report.status === "resolved" ? "rgba(52,211,153,0.15)" : "rgba(255,255,255,0.08)", color: report.status === "open" ? "#F59E0B" : report.status === "resolved" ? "#34D399" : "#A9B4C2", border: `1px solid ${report.status === "open" ? "rgba(245,158,11,0.3)" : report.status === "resolved" ? "rgba(52,211,153,0.3)" : "rgba(255,255,255,0.12)"}` }}>
             {report.status}
           </span>
-          <span style={{ display: "inline-block", padding: "2px 8px", borderRadius: "100px", fontSize: "9px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" as const, background: "rgba(43,168,224,0.12)", color: "#2BA8E0", border: "1px solid rgba(43,168,224,0.25)" }}>
+          <span style={{ display: "inline-block", padding: "2px 8px", borderRadius: "100px", fontSize: "9px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" as const, background: "rgba(16,196,195,0.12)", color: "#10C4C3", border: "1px solid rgba(16,196,195,0.25)" }}>
             {report.entity_type}
           </span>
-          <span style={{ fontSize: "12px", fontWeight: 600, color: "#E8EAED" }}>{report.reason}</span>
+          <span style={{ fontSize: "12px", fontWeight: 600, color: "#FFFFFF" }}>{report.reason}</span>
         </div>
         <span style={{ fontSize: "11px", color: "rgba(255,255,255,0.45)", flexShrink: 0 }}>{fmtDateTime(report.created_at)}</span>
       </div>
 
       {/* Reported entity preview */}
-      <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "8px", fontSize: "12px", color: "#AEB4BC" }}>
+      <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "8px", fontSize: "12px", color: "#A9B4C2" }}>
         {report.entity_type === "listing" ? (
           listingPreview?.slug ? (
-            <a href={`/property/${listingPreview.slug}`} target="_blank" rel="noopener noreferrer" style={{ color: "#E8EAED", fontWeight: 500, textDecoration: "none" }}>
+            <a href={`/property/${listingPreview.slug}`} target="_blank" rel="noopener noreferrer" style={{ color: "#FFFFFF", fontWeight: 500, textDecoration: "none" }}>
               {listingPreview.title ?? "View listing"} <IconArrow />
             </a>
           ) : (
             <span>{listingPreview?.title ?? "Listing unavailable (may have been deleted)"}</span>
           )
         ) : (
-          <span style={{ color: "#E8EAED", fontWeight: 500 }}>
+          <span style={{ color: "#FFFFFF", fontWeight: 500 }}>
             {profilePreview?.full_name ?? profilePreview?.email ?? "Profile unavailable"}
             {profilePreview?.is_active === false && <span style={{ color: "#F87171", fontWeight: 700 }}> · Inactive</span>}
           </span>
@@ -1743,11 +1743,11 @@ function ReportCard({
 
       {/* Reporter */}
       <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.45)", marginBottom: report.details ? "8px" : "12px" }}>
-        Reported by <span style={{ color: "#AEB4BC", fontWeight: 600 }}>{report.profiles?.full_name ?? report.profiles?.email ?? "Unknown user"}</span>
+        Reported by <span style={{ color: "#A9B4C2", fontWeight: 600 }}>{report.profiles?.full_name ?? report.profiles?.email ?? "Unknown user"}</span>
       </div>
 
       {report.details && (
-        <div style={{ background: "rgba(255,255,255,0.04)", borderRadius: "8px", padding: "10px 14px", fontSize: "12px", color: "#AEB4BC", lineHeight: 1.6, borderLeft: "3px solid rgba(43,168,224,0.4)", marginBottom: "12px" }}>
+        <div style={{ background: "rgba(255,255,255,0.04)", borderRadius: "8px", padding: "10px 14px", fontSize: "12px", color: "#A9B4C2", lineHeight: 1.6, borderLeft: "3px solid rgba(16,196,195,0.4)", marginBottom: "12px" }}>
           {report.details}
         </div>
       )}
@@ -1763,14 +1763,14 @@ function ReportCard({
           <button
             onClick={onResolve}
             disabled={busy}
-            style={{ display: "flex", alignItems: "center", gap: "6px", padding: "7px 14px", borderRadius: "7px", fontSize: "11px", fontWeight: 700, background: "#2BA8E0", color: "#000000", border: "none", cursor: busy ? "not-allowed" : "pointer", fontFamily: "'DM Sans', sans-serif", opacity: busy ? 0.6 : 1 }}
+            style={{ display: "flex", alignItems: "center", gap: "6px", padding: "7px 14px", borderRadius: "7px", fontSize: "11px", fontWeight: 700, background: "#10C4C3", color: "#020C1C", border: "none", cursor: busy ? "not-allowed" : "pointer", fontFamily: "'Cal Sans', sans-serif", opacity: busy ? 0.6 : 1 }}
           >
             <IconApprove /> Resolve
           </button>
           <button
             onClick={onDismiss}
             disabled={busy}
-            style={{ display: "flex", alignItems: "center", gap: "6px", padding: "7px 14px", borderRadius: "7px", fontSize: "11px", fontWeight: 600, background: "rgba(255,255,255,0.06)", color: "#AEB4BC", border: "1.5px solid rgba(255,255,255,0.12)", cursor: busy ? "not-allowed" : "pointer", fontFamily: "'DM Sans', sans-serif", opacity: busy ? 0.6 : 1 }}
+            style={{ display: "flex", alignItems: "center", gap: "6px", padding: "7px 14px", borderRadius: "7px", fontSize: "11px", fontWeight: 600, background: "rgba(255,255,255,0.06)", color: "#A9B4C2", border: "1.5px solid rgba(255,255,255,0.12)", cursor: busy ? "not-allowed" : "pointer", fontFamily: "'Cal Sans', sans-serif", opacity: busy ? 0.6 : 1 }}
           >
             Dismiss
           </button>
@@ -1780,7 +1780,7 @@ function ReportCard({
                 if (window.confirm("Reject this listing and resolve the report?")) onRejectListing();
               }}
               disabled={busy}
-              style={{ display: "flex", alignItems: "center", gap: "6px", padding: "7px 14px", borderRadius: "7px", fontSize: "11px", fontWeight: 600, background: "rgba(248,113,113,0.1)", color: "#F87171", border: "1.5px solid rgba(248,113,113,0.3)", cursor: busy ? "not-allowed" : "pointer", fontFamily: "'DM Sans', sans-serif", opacity: busy ? 0.6 : 1 }}
+              style={{ display: "flex", alignItems: "center", gap: "6px", padding: "7px 14px", borderRadius: "7px", fontSize: "11px", fontWeight: 600, background: "rgba(248,113,113,0.1)", color: "#F87171", border: "1.5px solid rgba(248,113,113,0.3)", cursor: busy ? "not-allowed" : "pointer", fontFamily: "'Cal Sans', sans-serif", opacity: busy ? 0.6 : 1 }}
             >
               <IconReject /> Reject Listing
             </button>
@@ -1791,7 +1791,7 @@ function ReportCard({
                 if (window.confirm("Deactivate this user's account and resolve the report?")) onDeactivateUser();
               }}
               disabled={busy}
-              style={{ display: "flex", alignItems: "center", gap: "6px", padding: "7px 14px", borderRadius: "7px", fontSize: "11px", fontWeight: 600, background: "rgba(248,113,113,0.1)", color: "#F87171", border: "1.5px solid rgba(248,113,113,0.3)", cursor: busy ? "not-allowed" : "pointer", fontFamily: "'DM Sans', sans-serif", opacity: busy ? 0.6 : 1 }}
+              style={{ display: "flex", alignItems: "center", gap: "6px", padding: "7px 14px", borderRadius: "7px", fontSize: "11px", fontWeight: 600, background: "rgba(248,113,113,0.1)", color: "#F87171", border: "1.5px solid rgba(248,113,113,0.3)", cursor: busy ? "not-allowed" : "pointer", fontFamily: "'Cal Sans', sans-serif", opacity: busy ? 0.6 : 1 }}
             >
               Deactivate User
             </button>
@@ -1832,7 +1832,7 @@ function ReportsSection({
             <button
               key={f}
               onClick={() => setFilter(f)}
-              style={{ padding: "6px 14px", borderRadius: "100px", fontSize: "11px", fontWeight: on ? 700 : 500, background: on ? "#2BA8E0" : "rgba(255,255,255,0.06)", color: on ? "#000000" : "#AEB4BC", border: on ? "1.5px solid #2BA8E0" : "1.5px solid rgba(255,255,255,0.12)", cursor: "pointer", fontFamily: "'DM Sans', sans-serif", textTransform: "capitalize" as const }}
+              style={{ padding: "6px 14px", borderRadius: "100px", fontSize: "11px", fontWeight: on ? 700 : 500, background: on ? "#10C4C3" : "rgba(255,255,255,0.06)", color: on ? "#020C1C" : "#A9B4C2", border: on ? "1.5px solid #10C4C3" : "1.5px solid rgba(255,255,255,0.12)", cursor: "pointer", fontFamily: "'Cal Sans', sans-serif", textTransform: "capitalize" as const }}
             >
               {f} ({reports.filter(r => r.status === f).length})
             </button>
@@ -1842,7 +1842,7 @@ function ReportsSection({
 
       {filtered.length === 0 ? (
         <div style={{ padding: "60px 24px", textAlign: "center", background: "rgba(255,255,255,0.05)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", borderRadius: "18px", border: "1px solid rgba(255,255,255,0.08)" }}>
-          <p style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "20px", color: "#E8EAED" }}>No {filter} reports</p>
+          <p style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "20px", color: "#FFFFFF" }}>No {filter} reports</p>
         </div>
       ) : (
         <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
@@ -1873,7 +1873,7 @@ function DiffBlock({ label, data }: { label: string; data: Record<string, unknow
   return (
     <div style={{ flex: "1 1 200px", minWidth: 0 }}>
       <div style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: "rgba(255,255,255,0.45)", marginBottom: "6px" }}>{label}</div>
-      <pre style={{ margin: 0, fontSize: "11px", lineHeight: 1.6, color: "#AEB4BC", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: "8px", padding: "10px 12px", overflowX: "auto", fontFamily: "'DM Sans', sans-serif" }}>
+      <pre style={{ margin: 0, fontSize: "11px", lineHeight: 1.6, color: "#A9B4C2", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: "8px", padding: "10px 12px", overflowX: "auto", fontFamily: "'Cal Sans', sans-serif" }}>
         {data ? JSON.stringify(data, null, 2) : "—"}
       </pre>
     </div>
@@ -1886,11 +1886,11 @@ function AuditLogRow_({ entry }: { entry: AuditLogRow }) {
     <div style={{ background: "rgba(255,255,255,0.05)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", borderRadius: "12px", border: "1px solid rgba(255,255,255,0.08)", overflow: "hidden" }}>
       <button
         onClick={() => setOpen(v => !v)}
-        style={{ width: "100%", display: "flex", alignItems: "center", gap: "14px", padding: "14px 18px", background: "transparent", border: "none", cursor: "pointer", textAlign: "left" as const, fontFamily: "'DM Sans', sans-serif", flexWrap: "wrap" }}
+        style={{ width: "100%", display: "flex", alignItems: "center", gap: "14px", padding: "14px 18px", background: "transparent", border: "none", cursor: "pointer", textAlign: "left" as const, fontFamily: "'Cal Sans', sans-serif", flexWrap: "wrap" }}
       >
         <span style={{ fontSize: "11px", color: "rgba(255,255,255,0.45)", flexShrink: 0 }}>{fmtDateTime(entry.created_at)}</span>
-        <span style={{ fontSize: "13px", fontWeight: 600, color: "#E8EAED", flexShrink: 0 }}>{entry.profiles?.full_name ?? entry.profiles?.email ?? "Unknown admin"}</span>
-        <span style={{ padding: "2px 9px", borderRadius: "100px", fontSize: "10px", fontWeight: 700, letterSpacing: "0.04em", background: "rgba(43,168,224,0.12)", color: "#2BA8E0", border: "1px solid rgba(43,168,224,0.25)", flexShrink: 0 }}>
+        <span style={{ fontSize: "13px", fontWeight: 600, color: "#FFFFFF", flexShrink: 0 }}>{entry.profiles?.full_name ?? entry.profiles?.email ?? "Unknown admin"}</span>
+        <span style={{ padding: "2px 9px", borderRadius: "100px", fontSize: "10px", fontWeight: 700, letterSpacing: "0.04em", background: "rgba(16,196,195,0.12)", color: "#10C4C3", border: "1px solid rgba(16,196,195,0.25)", flexShrink: 0 }}>
           {entry.action}
         </span>
         <span style={{ fontSize: "11px", color: "rgba(255,255,255,0.45)", flexShrink: 0 }}>{entry.entity_type}</span>
@@ -1935,7 +1935,7 @@ function AuditLogSection({ entries, loading }: { entries: AuditLogRow[]; loading
             value={entityFilter}
             onChange={e => setEntityFilter(e.target.value)}
             aria-label="Filter by entity type"
-            style={{ padding: "9px 28px 9px 12px", background: "rgba(255,255,255,0.06)", border: "1.5px solid rgba(255,255,255,0.12)", borderRadius: "9px", fontSize: "12px", color: "#E8EAED", fontFamily: "'DM Sans', sans-serif", outline: "none", appearance: "none", cursor: "pointer" }}
+            style={{ padding: "9px 28px 9px 12px", background: "rgba(255,255,255,0.06)", border: "1.5px solid rgba(255,255,255,0.12)", borderRadius: "9px", fontSize: "12px", color: "#FFFFFF", fontFamily: "'Cal Sans', sans-serif", outline: "none", appearance: "none", cursor: "pointer" }}
           >
             <option value="all">All entity types</option>
             {AUDIT_ENTITY_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
@@ -1947,7 +1947,7 @@ function AuditLogSection({ entries, loading }: { entries: AuditLogRow[]; loading
             value={actorFilter}
             onChange={e => setActorFilter(e.target.value)}
             aria-label="Filter by actor"
-            style={{ padding: "9px 28px 9px 12px", background: "rgba(255,255,255,0.06)", border: "1.5px solid rgba(255,255,255,0.12)", borderRadius: "9px", fontSize: "12px", color: "#E8EAED", fontFamily: "'DM Sans', sans-serif", outline: "none", appearance: "none", cursor: "pointer" }}
+            style={{ padding: "9px 28px 9px 12px", background: "rgba(255,255,255,0.06)", border: "1.5px solid rgba(255,255,255,0.12)", borderRadius: "9px", fontSize: "12px", color: "#FFFFFF", fontFamily: "'Cal Sans', sans-serif", outline: "none", appearance: "none", cursor: "pointer" }}
           >
             <option value="all">All actors</option>
             {actors.map(([id, name]) => <option key={id} value={id}>{name}</option>)}
@@ -1958,7 +1958,7 @@ function AuditLogSection({ entries, loading }: { entries: AuditLogRow[]; loading
 
       {filtered.length === 0 ? (
         <div style={{ padding: "60px 24px", textAlign: "center", background: "rgba(255,255,255,0.05)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", borderRadius: "18px", border: "1px solid rgba(255,255,255,0.08)" }}>
-          <p style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "20px", color: "#E8EAED" }}>No matching audit entries</p>
+          <p style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "20px", color: "#FFFFFF" }}>No matching audit entries</p>
         </div>
       ) : (
         <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
@@ -2642,10 +2642,10 @@ export default function AdminPage() {
     return (
       <>
         <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
-        <div style={{ minHeight: "100vh", background: "#000000", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "20px" }}>
+        <div style={{ minHeight: "100vh", background: "#020C1C", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "20px" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-            <div style={{ color: "#2BA8E0" }}><IconShield /></div>
-            <span style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "22px", color: "#E8EAED", letterSpacing: "0.08em" }}>Verifying access…</span>
+            <div style={{ color: "#10C4C3" }}><IconShield /></div>
+            <span style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "22px", color: "#FFFFFF", letterSpacing: "0.08em" }}>Verifying access…</span>
           </div>
           <Spinner size={26} pad={0} />
         </div>
@@ -2753,15 +2753,14 @@ export default function AdminPage() {
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,600&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap');
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'DM Sans', system-ui, sans-serif; background: #000000; }
+        body { font-family: 'Cal Sans', system-ui, sans-serif; background: #020C1C; }
         ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 2px; }
         @keyframes spin { to { transform: rotate(360deg); } }
         @keyframes fadeSlide { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
         @keyframes toastIn { from { opacity:0; transform:translateX(20px); } to { opacity:1; transform:translateX(0); } }
-        .admin-sb-btn:hover { color: #E8EAED !important; background: rgba(255,255,255,0.06) !important; }
+        .admin-sb-btn:hover { color: #FFFFFF !important; background: rgba(255,255,255,0.06) !important; }
         @media (max-width: 840px) {
           .admin-aside {
             position: fixed !important; top: 0 !important; bottom: 0 !important; left: 0 !important;
@@ -2778,18 +2777,18 @@ export default function AdminPage() {
 
       {/* Toast */}
       {toast && (
-        <div style={{ position: "fixed", top: "88px", right: "24px", zIndex: 999, padding: "12px 20px", borderRadius: "10px", background: toast.ok ? "rgba(43,168,224,0.9)" : "rgba(248,113,113,0.9)", color: "#000000", fontSize: "13px", fontWeight: 600, boxShadow: "0 4px 24px rgba(0,0,0,0.4)", fontFamily: "'DM Sans', sans-serif", display: "flex", alignItems: "center", gap: "8px", animation: "toastIn 0.2s ease-out", backdropFilter: "blur(12px)" }}>
+        <div style={{ position: "fixed", top: "88px", right: "24px", zIndex: 999, padding: "12px 20px", borderRadius: "10px", background: toast.ok ? "rgba(16,196,195,0.9)" : "rgba(248,113,113,0.9)", color: "#020C1C", fontSize: "13px", fontWeight: 600, boxShadow: "0 4px 24px rgba(0,0,0,0.4)", fontFamily: "'Cal Sans', sans-serif", display: "flex", alignItems: "center", gap: "8px", animation: "toastIn 0.2s ease-out", backdropFilter: "blur(12px)" }}>
           {toast.ok ? "✓" : "✗"} {toast.msg}
         </div>
       )}
 
-      <div style={{ minHeight: "100dvh", background: "#000000", display: "flex", flexDirection: "column" }}>
+      <div style={{ minHeight: "100dvh", background: "#020C1C", display: "flex", flexDirection: "column" }}>
 
         {/* Mobile toggle bar */}
         <div className="admin-mob-bar" style={{ display: "none", position: "sticky", top: "64px", zIndex: 200, padding: "10px 16px", background: "rgba(0,0,0,0.85)", backdropFilter: "blur(12px)", alignItems: "center", gap: "12px", borderBottom: "1px solid rgba(255,255,255,0.07)", flexShrink: 0 }}>
           <button
             onClick={() => setSidebarOpen(v => !v)}
-            style={{ display: "flex", width: "34px", height: "34px", alignItems: "center", justifyContent: "center", background: "rgba(255,255,255,0.07)", border: "none", borderRadius: "7px", cursor: "pointer", color: "#E8EAED" }}
+            style={{ display: "flex", width: "34px", height: "34px", alignItems: "center", justifyContent: "center", background: "rgba(255,255,255,0.07)", border: "none", borderRadius: "7px", cursor: "pointer", color: "#FFFFFF" }}
           >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
           </button>
@@ -2806,10 +2805,10 @@ export default function AdminPage() {
             {/* Brand card */}
             <div style={{ padding: "26px 18px 20px", borderBottom: "1px solid rgba(255,255,255,0.07)" }}>
               <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "6px" }}>
-                <div style={{ color: "#2BA8E0" }}><IconShield /></div>
-                <span style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "18px", fontWeight: 500, color: "#E8EAED", letterSpacing: "0.04em" }}>Admin Panel</span>
+                <div style={{ color: "#10C4C3" }}><IconShield /></div>
+                <span style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "18px", fontWeight: 500, color: "#FFFFFF", letterSpacing: "0.04em" }}>Admin Panel</span>
               </div>
-              <span style={{ display: "inline-block", padding: "2px 9px", borderRadius: "100px", fontSize: "8px", fontWeight: 800, letterSpacing: "0.14em", textTransform: "uppercase" as const, background: "rgba(43,168,224,0.12)", color: "#2BA8E0", border: "1px solid rgba(43,168,224,0.25)" }}>Nilay 360</span>
+              <span style={{ display: "inline-block", padding: "2px 9px", borderRadius: "100px", fontSize: "8px", fontWeight: 800, letterSpacing: "0.14em", textTransform: "uppercase" as const, background: "rgba(16,196,195,0.12)", color: "#10C4C3", border: "1px solid rgba(16,196,195,0.25)" }}>Nilay 360</span>
             </div>
 
             {/* Nav */}
@@ -2825,12 +2824,12 @@ export default function AdminPage() {
                     key={item.id}
                     className="admin-sb-btn"
                     onClick={() => { setActive(item.id); setSidebarOpen(false); }}
-                    style={{ width: "100%", display: "flex", alignItems: "center", gap: "11px", padding: "10px 14px", borderRadius: "9px", marginBottom: "3px", background: active === item.id ? "rgba(43,168,224,0.1)" : "transparent", border: active === item.id ? "1px solid rgba(43,168,224,0.2)" : "1px solid transparent", color: active === item.id ? "#2BA8E0" : "rgba(255,255,255,0.45)", fontSize: "13px", fontWeight: active === item.id ? 600 : 400, cursor: "pointer", fontFamily: "'DM Sans', sans-serif", textAlign: "left" as const, transition: "all 0.14s" }}
+                    style={{ width: "100%", display: "flex", alignItems: "center", gap: "11px", padding: "10px 14px", borderRadius: "9px", marginBottom: "3px", background: active === item.id ? "rgba(16,196,195,0.1)" : "transparent", border: active === item.id ? "1px solid rgba(16,196,195,0.2)" : "1px solid transparent", color: active === item.id ? "#10C4C3" : "rgba(255,255,255,0.45)", fontSize: "13px", fontWeight: active === item.id ? 600 : 400, cursor: "pointer", fontFamily: "'Cal Sans', sans-serif", textAlign: "left" as const, transition: "all 0.14s" }}
                   >
                     {item.icon}
                     <span style={{ flex: 1 }}>{item.label}</span>
                     {badge > 0 && (
-                      <span style={{ padding: "1px 7px", borderRadius: "100px", fontSize: "9px", fontWeight: 700, background: active === item.id ? "rgba(43,168,224,0.2)" : "rgba(43,168,224,0.08)", color: "#2BA8E0", border: "1px solid rgba(43,168,224,0.2)" }}>
+                      <span style={{ padding: "1px 7px", borderRadius: "100px", fontSize: "9px", fontWeight: 700, background: active === item.id ? "rgba(16,196,195,0.2)" : "rgba(16,196,195,0.08)", color: "#10C4C3", border: "1px solid rgba(16,196,195,0.2)" }}>
                         {badge}
                       </span>
                     )}
@@ -2843,7 +2842,7 @@ export default function AdminPage() {
             <div style={{ padding: "12px 10px 18px", borderTop: "1px solid rgba(255,255,255,0.07)", display: "flex", flexDirection: "column", gap: "4px" }}>
               <a
                 href="/dashboard"
-                style={{ display: "flex", alignItems: "center", gap: "10px", padding: "9px 14px", borderRadius: "8px", fontSize: "12px", color: "rgba(255,255,255,0.4)", textDecoration: "none", fontFamily: "'DM Sans', sans-serif" }}
+                style={{ display: "flex", alignItems: "center", gap: "10px", padding: "9px 14px", borderRadius: "8px", fontSize: "12px", color: "rgba(255,255,255,0.4)", textDecoration: "none", fontFamily: "'Cal Sans', sans-serif" }}
               >
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
                 Back to Dashboard

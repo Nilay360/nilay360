@@ -1,8 +1,7 @@
-export default function CookiePolicyPage() {
+﻿export default function CookiePolicyPage() {
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,600&family=DM+Sans:wght@300;400;500;600&display=swap');
 
         * {
           margin: 0;
@@ -11,7 +10,7 @@ export default function CookiePolicyPage() {
         }
 
         body {
-          font-family: 'DM Sans', sans-serif;
+          font-family: 'Cal Sans', sans-serif;
         }
       `}</style>
 
@@ -37,10 +36,10 @@ export default function CookiePolicyPage() {
         <a
           href="/"
           style={{
-            fontFamily: "'Cormorant Garamond', serif",
+            fontFamily: "'Cal Sans', serif",
             fontSize: '24px',
             fontWeight: 600,
-            color: '#2BA8E0',
+            color: '#10C4C3',
             textDecoration: 'none',
             letterSpacing: '2px',
           }}
@@ -68,7 +67,7 @@ export default function CookiePolicyPage() {
               key={link.href}
               href={link.href}
               style={{
-                fontFamily: "'DM Sans', sans-serif",
+                fontFamily: "'Cal Sans', sans-serif",
                 fontSize: '14px',
                 fontWeight: 400,
                 color: 'rgba(255,255,255,0.8)',
@@ -86,11 +85,11 @@ export default function CookiePolicyPage() {
           <a
             href="/login"
             style={{
-              fontFamily: "'DM Sans', sans-serif",
+              fontFamily: "'Cal Sans', sans-serif",
               fontSize: '14px',
               fontWeight: 500,
-              color: '#2BA8E0',
-              border: '1px solid #2BA8E0',
+              color: '#10C4C3',
+              border: '1px solid #10C4C3',
               padding: '8px 20px',
               textDecoration: 'none',
               borderRadius: '2px',
@@ -102,11 +101,11 @@ export default function CookiePolicyPage() {
           <a
             href="/post-property"
             style={{
-              fontFamily: "'DM Sans', sans-serif",
+              fontFamily: "'Cal Sans', sans-serif",
               fontSize: '14px',
               fontWeight: 500,
               color: '#05080C',
-              background: '#2BA8E0',
+              background: '#10C4C3',
               padding: '8px 20px',
               textDecoration: 'none',
               borderRadius: '2px',
@@ -120,7 +119,7 @@ export default function CookiePolicyPage() {
       {/* HERO */}
       <section
         style={{
-          background: '#000000',
+          background: '#020C1C',
           paddingTop: '140px',
           paddingBottom: '72px',
           textAlign: 'center',
@@ -128,10 +127,10 @@ export default function CookiePolicyPage() {
       >
         <p
           style={{
-            fontFamily: "'DM Sans', sans-serif",
+            fontFamily: "'Cal Sans', sans-serif",
             fontSize: '12px',
             fontWeight: 500,
-            color: '#2BA8E0',
+            color: '#10C4C3',
             letterSpacing: '4px',
             textTransform: 'uppercase',
             marginBottom: '20px',
@@ -141,7 +140,7 @@ export default function CookiePolicyPage() {
         </p>
         <h1
           style={{
-            fontFamily: "'Cormorant Garamond', serif",
+            fontFamily: "'Cal Sans', serif",
             fontSize: '64px',
             fontWeight: 600,
             color: '#ffffff',
@@ -153,7 +152,7 @@ export default function CookiePolicyPage() {
         </h1>
         <p
           style={{
-            fontFamily: "'DM Sans', sans-serif",
+            fontFamily: "'Cal Sans', sans-serif",
             fontSize: '15px',
             fontWeight: 400,
             color: 'rgba(255,255,255,0.6)',
@@ -167,7 +166,7 @@ export default function CookiePolicyPage() {
       {/* CONTENT */}
       <section
         style={{
-          background: '#000000',
+          background: '#020C1C',
           padding: '72px 24px',
         }}
       >
@@ -185,11 +184,11 @@ export default function CookiePolicyPage() {
           <div>
             <h2
               style={{
-                fontFamily: "'Cormorant Garamond', serif",
+                fontFamily: "'Cal Sans', serif",
                 fontSize: '36px',
                 fontWeight: 600,
-                color: '#000000',
-                borderBottom: '2px solid #2BA8E0',
+                color: '#020C1C',
+                borderBottom: '2px solid #10C4C3',
                 paddingBottom: '12px',
                 marginBottom: '20px',
               }}
@@ -198,7 +197,7 @@ export default function CookiePolicyPage() {
             </h2>
             <p
               style={{
-                fontFamily: "'DM Sans', sans-serif",
+                fontFamily: "'Cal Sans', sans-serif",
                 fontSize: '16px',
                 fontWeight: 400,
                 color: '#333333',
@@ -217,11 +216,11 @@ export default function CookiePolicyPage() {
           <div style={{ marginTop: '48px' }}>
             <h2
               style={{
-                fontFamily: "'Cormorant Garamond', serif",
+                fontFamily: "'Cal Sans', serif",
                 fontSize: '36px',
                 fontWeight: 600,
-                color: '#000000',
-                borderBottom: '2px solid #2BA8E0',
+                color: '#020C1C',
+                borderBottom: '2px solid #10C4C3',
                 paddingBottom: '12px',
                 marginBottom: '20px',
               }}
@@ -230,7 +229,7 @@ export default function CookiePolicyPage() {
             </h2>
             <p
               style={{
-                fontFamily: "'DM Sans', sans-serif",
+                fontFamily: "'Cal Sans', sans-serif",
                 fontSize: '16px',
                 fontWeight: 400,
                 color: '#333333',
@@ -253,11 +252,11 @@ export default function CookiePolicyPage() {
                       <th
                         key={heading}
                         style={{
-                          background: '#000000',
+                          background: '#020C1C',
                           color: '#ffffff',
                           padding: '14px 16px',
                           border: '1px solid #E8E3D9',
-                          fontFamily: "'DM Sans', sans-serif",
+                          fontFamily: "'Cal Sans', sans-serif",
                           fontSize: '14px',
                           fontWeight: 500,
                           textAlign: 'left',
@@ -274,7 +273,7 @@ export default function CookiePolicyPage() {
                       style={{
                         padding: '14px 16px',
                         border: '1px solid #E8E3D9',
-                        fontFamily: "'DM Sans', sans-serif",
+                        fontFamily: "'Cal Sans', sans-serif",
                         fontSize: '14px',
                         color: '#333333',
                         background: '#ffffff',
@@ -287,7 +286,7 @@ export default function CookiePolicyPage() {
                       style={{
                         padding: '14px 16px',
                         border: '1px solid #E8E3D9',
-                        fontFamily: "'DM Sans', sans-serif",
+                        fontFamily: "'Cal Sans', sans-serif",
                         fontSize: '14px',
                         color: '#333333',
                         background: '#ffffff',
@@ -301,7 +300,7 @@ export default function CookiePolicyPage() {
                       style={{
                         padding: '14px 16px',
                         border: '1px solid #E8E3D9',
-                        fontFamily: "'DM Sans', sans-serif",
+                        fontFamily: "'Cal Sans', sans-serif",
                         fontSize: '14px',
                         color: '#333333',
                         background: '#ffffff',
@@ -314,7 +313,7 @@ export default function CookiePolicyPage() {
                       style={{
                         padding: '14px 16px',
                         border: '1px solid #E8E3D9',
-                        fontFamily: "'DM Sans', sans-serif",
+                        fontFamily: "'Cal Sans', sans-serif",
                         fontSize: '14px',
                         color: '#333333',
                         background: '#ffffff',
@@ -329,10 +328,10 @@ export default function CookiePolicyPage() {
                       style={{
                         padding: '14px 16px',
                         border: '1px solid #E8E3D9',
-                        fontFamily: "'DM Sans', sans-serif",
+                        fontFamily: "'Cal Sans', sans-serif",
                         fontSize: '14px',
                         color: '#333333',
-                        background: '#000000',
+                        background: '#020C1C',
                         verticalAlign: 'top',
                       }}
                     >
@@ -342,10 +341,10 @@ export default function CookiePolicyPage() {
                       style={{
                         padding: '14px 16px',
                         border: '1px solid #E8E3D9',
-                        fontFamily: "'DM Sans', sans-serif",
+                        fontFamily: "'Cal Sans', sans-serif",
                         fontSize: '14px',
                         color: '#333333',
-                        background: '#000000',
+                        background: '#020C1C',
                         verticalAlign: 'top',
                       }}
                     >
@@ -356,10 +355,10 @@ export default function CookiePolicyPage() {
                       style={{
                         padding: '14px 16px',
                         border: '1px solid #E8E3D9',
-                        fontFamily: "'DM Sans', sans-serif",
+                        fontFamily: "'Cal Sans', sans-serif",
                         fontSize: '14px',
                         color: '#333333',
-                        background: '#000000',
+                        background: '#020C1C',
                         verticalAlign: 'top',
                       }}
                     >
@@ -369,10 +368,10 @@ export default function CookiePolicyPage() {
                       style={{
                         padding: '14px 16px',
                         border: '1px solid #E8E3D9',
-                        fontFamily: "'DM Sans', sans-serif",
+                        fontFamily: "'Cal Sans', sans-serif",
                         fontSize: '14px',
                         color: '#333333',
-                        background: '#000000',
+                        background: '#020C1C',
                         verticalAlign: 'top',
                       }}
                     >
@@ -384,7 +383,7 @@ export default function CookiePolicyPage() {
                       style={{
                         padding: '14px 16px',
                         border: '1px solid #E8E3D9',
-                        fontFamily: "'DM Sans', sans-serif",
+                        fontFamily: "'Cal Sans', sans-serif",
                         fontSize: '14px',
                         color: '#333333',
                         background: '#ffffff',
@@ -397,7 +396,7 @@ export default function CookiePolicyPage() {
                       style={{
                         padding: '14px 16px',
                         border: '1px solid #E8E3D9',
-                        fontFamily: "'DM Sans', sans-serif",
+                        fontFamily: "'Cal Sans', sans-serif",
                         fontSize: '14px',
                         color: '#333333',
                         background: '#ffffff',
@@ -411,7 +410,7 @@ export default function CookiePolicyPage() {
                       style={{
                         padding: '14px 16px',
                         border: '1px solid #E8E3D9',
-                        fontFamily: "'DM Sans', sans-serif",
+                        fontFamily: "'Cal Sans', sans-serif",
                         fontSize: '14px',
                         color: '#333333',
                         background: '#ffffff',
@@ -424,7 +423,7 @@ export default function CookiePolicyPage() {
                       style={{
                         padding: '14px 16px',
                         border: '1px solid #E8E3D9',
-                        fontFamily: "'DM Sans', sans-serif",
+                        fontFamily: "'Cal Sans', sans-serif",
                         fontSize: '14px',
                         color: '#333333',
                         background: '#ffffff',
@@ -439,10 +438,10 @@ export default function CookiePolicyPage() {
                       style={{
                         padding: '14px 16px',
                         border: '1px solid #E8E3D9',
-                        fontFamily: "'DM Sans', sans-serif",
+                        fontFamily: "'Cal Sans', sans-serif",
                         fontSize: '14px',
                         color: '#333333',
-                        background: '#000000',
+                        background: '#020C1C',
                         verticalAlign: 'top',
                       }}
                     >
@@ -452,10 +451,10 @@ export default function CookiePolicyPage() {
                       style={{
                         padding: '14px 16px',
                         border: '1px solid #E8E3D9',
-                        fontFamily: "'DM Sans', sans-serif",
+                        fontFamily: "'Cal Sans', sans-serif",
                         fontSize: '14px',
                         color: '#333333',
-                        background: '#000000',
+                        background: '#020C1C',
                         verticalAlign: 'top',
                       }}
                     >
@@ -466,10 +465,10 @@ export default function CookiePolicyPage() {
                       style={{
                         padding: '14px 16px',
                         border: '1px solid #E8E3D9',
-                        fontFamily: "'DM Sans', sans-serif",
+                        fontFamily: "'Cal Sans', sans-serif",
                         fontSize: '14px',
                         color: '#333333',
-                        background: '#000000',
+                        background: '#020C1C',
                         verticalAlign: 'top',
                       }}
                     >
@@ -479,10 +478,10 @@ export default function CookiePolicyPage() {
                       style={{
                         padding: '14px 16px',
                         border: '1px solid #E8E3D9',
-                        fontFamily: "'DM Sans', sans-serif",
+                        fontFamily: "'Cal Sans', sans-serif",
                         fontSize: '14px',
                         color: '#333333',
-                        background: '#000000',
+                        background: '#020C1C',
                         verticalAlign: 'top',
                       }}
                     >
@@ -494,7 +493,7 @@ export default function CookiePolicyPage() {
             </div>
             <p
               style={{
-                fontFamily: "'DM Sans', sans-serif",
+                fontFamily: "'Cal Sans', sans-serif",
                 fontSize: '14px',
                 fontWeight: 400,
                 color: '#666666',
@@ -512,11 +511,11 @@ export default function CookiePolicyPage() {
           <div style={{ marginTop: '48px' }}>
             <h2
               style={{
-                fontFamily: "'Cormorant Garamond', serif",
+                fontFamily: "'Cal Sans', serif",
                 fontSize: '36px',
                 fontWeight: 600,
-                color: '#000000',
-                borderBottom: '2px solid #2BA8E0',
+                color: '#020C1C',
+                borderBottom: '2px solid #10C4C3',
                 paddingBottom: '12px',
                 marginBottom: '20px',
               }}
@@ -525,7 +524,7 @@ export default function CookiePolicyPage() {
             </h2>
             <p
               style={{
-                fontFamily: "'DM Sans', sans-serif",
+                fontFamily: "'Cal Sans', sans-serif",
                 fontSize: '16px',
                 fontWeight: 400,
                 color: '#333333',
@@ -538,7 +537,7 @@ export default function CookiePolicyPage() {
             </p>
             <ul
               style={{
-                fontFamily: "'DM Sans', sans-serif",
+                fontFamily: "'Cal Sans', sans-serif",
                 fontSize: '16px',
                 fontWeight: 400,
                 color: '#333333',
@@ -567,7 +566,7 @@ export default function CookiePolicyPage() {
             </ul>
             <p
               style={{
-                fontFamily: "'DM Sans', sans-serif",
+                fontFamily: "'Cal Sans', sans-serif",
                 fontSize: '16px',
                 fontWeight: 400,
                 color: '#333333',
@@ -584,11 +583,11 @@ export default function CookiePolicyPage() {
           <div style={{ marginTop: '48px' }}>
             <h2
               style={{
-                fontFamily: "'Cormorant Garamond', serif",
+                fontFamily: "'Cal Sans', serif",
                 fontSize: '36px',
                 fontWeight: 600,
-                color: '#000000',
-                borderBottom: '2px solid #2BA8E0',
+                color: '#020C1C',
+                borderBottom: '2px solid #10C4C3',
                 paddingBottom: '12px',
                 marginBottom: '20px',
               }}
@@ -597,7 +596,7 @@ export default function CookiePolicyPage() {
             </h2>
             <p
               style={{
-                fontFamily: "'DM Sans', sans-serif",
+                fontFamily: "'Cal Sans', sans-serif",
                 fontSize: '16px',
                 fontWeight: 400,
                 color: '#333333',
@@ -610,7 +609,7 @@ export default function CookiePolicyPage() {
             </p>
             <ul
               style={{
-                fontFamily: "'DM Sans', sans-serif",
+                fontFamily: "'Cal Sans', sans-serif",
                 fontSize: '16px',
                 fontWeight: 400,
                 color: '#333333',
@@ -625,7 +624,7 @@ export default function CookiePolicyPage() {
                   href="https://policies.google.com/privacy"
                   target="_blank"
                   rel="noopener noreferrer"
-                  style={{ color: '#2BA8E0', textDecoration: 'none' }}
+                  style={{ color: '#10C4C3', textDecoration: 'none' }}
                 >
                   policies.google.com/privacy
                 </a>
@@ -638,7 +637,7 @@ export default function CookiePolicyPage() {
                   href="https://www.facebook.com/policy.php"
                   target="_blank"
                   rel="noopener noreferrer"
-                  style={{ color: '#2BA8E0', textDecoration: 'none' }}
+                  style={{ color: '#10C4C3', textDecoration: 'none' }}
                 >
                   www.facebook.com/policy.php
                 </a>
@@ -651,7 +650,7 @@ export default function CookiePolicyPage() {
                   href="https://www.hotjar.com/legal/policies/privacy"
                   target="_blank"
                   rel="noopener noreferrer"
-                  style={{ color: '#2BA8E0', textDecoration: 'none' }}
+                  style={{ color: '#10C4C3', textDecoration: 'none' }}
                 >
                   www.hotjar.com/legal/policies/privacy
                 </a>{' '}
@@ -660,7 +659,7 @@ export default function CookiePolicyPage() {
                   href="https://www.hotjar.com/legal/compliance/opt-out"
                   target="_blank"
                   rel="noopener noreferrer"
-                  style={{ color: '#2BA8E0', textDecoration: 'none' }}
+                  style={{ color: '#10C4C3', textDecoration: 'none' }}
                 >
                   www.hotjar.com/legal/compliance/opt-out
                 </a>
@@ -672,7 +671,7 @@ export default function CookiePolicyPage() {
             </ul>
             <p
               style={{
-                fontFamily: "'DM Sans', sans-serif",
+                fontFamily: "'Cal Sans', sans-serif",
                 fontSize: '16px',
                 fontWeight: 400,
                 color: '#333333',
@@ -689,11 +688,11 @@ export default function CookiePolicyPage() {
           <div style={{ marginTop: '48px' }}>
             <h2
               style={{
-                fontFamily: "'Cormorant Garamond', serif",
+                fontFamily: "'Cal Sans', serif",
                 fontSize: '36px',
                 fontWeight: 600,
-                color: '#000000',
-                borderBottom: '2px solid #2BA8E0',
+                color: '#020C1C',
+                borderBottom: '2px solid #10C4C3',
                 paddingBottom: '12px',
                 marginBottom: '20px',
               }}
@@ -702,7 +701,7 @@ export default function CookiePolicyPage() {
             </h2>
             <p
               style={{
-                fontFamily: "'DM Sans', sans-serif",
+                fontFamily: "'Cal Sans', sans-serif",
                 fontSize: '16px',
                 fontWeight: 400,
                 color: '#333333',
@@ -720,11 +719,11 @@ export default function CookiePolicyPage() {
           <div style={{ marginTop: '48px' }}>
             <h2
               style={{
-                fontFamily: "'Cormorant Garamond', serif",
+                fontFamily: "'Cal Sans', serif",
                 fontSize: '36px',
                 fontWeight: 600,
-                color: '#000000',
-                borderBottom: '2px solid #2BA8E0',
+                color: '#020C1C',
+                borderBottom: '2px solid #10C4C3',
                 paddingBottom: '12px',
                 marginBottom: '20px',
               }}
@@ -733,7 +732,7 @@ export default function CookiePolicyPage() {
             </h2>
             <p
               style={{
-                fontFamily: "'DM Sans', sans-serif",
+                fontFamily: "'Cal Sans', sans-serif",
                 fontSize: '16px',
                 fontWeight: 400,
                 color: '#333333',
@@ -745,7 +744,7 @@ export default function CookiePolicyPage() {
             </p>
             <div
               style={{
-                background: '#000000',
+                background: '#020C1C',
                 border: '1px solid rgba(201,168,76,0.25)',
                 borderRadius: '2px',
                 padding: '24px 28px',
@@ -753,7 +752,7 @@ export default function CookiePolicyPage() {
             >
               <p
                 style={{
-                  fontFamily: "'DM Sans', sans-serif",
+                  fontFamily: "'Cal Sans', sans-serif",
                   fontSize: '16px',
                   fontWeight: 400,
                   color: '#333333',
@@ -761,7 +760,7 @@ export default function CookiePolicyPage() {
                 }}
               >
                 <strong>Email:</strong>{' '}
-                <a href="mailto:privacy@nilay360.com" style={{ color: '#2BA8E0', textDecoration: 'none' }}>
+                <a href="mailto:privacy@nilay360.com" style={{ color: '#10C4C3', textDecoration: 'none' }}>
                   privacy@nilay360.com
                 </a>
                 <br />
@@ -796,10 +795,10 @@ export default function CookiePolicyPage() {
           <div>
             <h4
               style={{
-                fontFamily: "'Cormorant Garamond', serif",
+                fontFamily: "'Cal Sans', serif",
                 fontSize: '18px',
                 fontWeight: 600,
-                color: '#2BA8E0',
+                color: '#10C4C3',
                 marginBottom: '20px',
                 letterSpacing: '0.5px',
               }}
@@ -817,7 +816,7 @@ export default function CookiePolicyPage() {
                   <a
                     href={link.href}
                     style={{
-                      fontFamily: "'DM Sans', sans-serif",
+                      fontFamily: "'Cal Sans', sans-serif",
                       fontSize: '13px',
                       fontWeight: 400,
                       color: 'rgba(255,255,255,0.55)',
@@ -835,10 +834,10 @@ export default function CookiePolicyPage() {
           <div>
             <h4
               style={{
-                fontFamily: "'Cormorant Garamond', serif",
+                fontFamily: "'Cal Sans', serif",
                 fontSize: '18px',
                 fontWeight: 600,
-                color: '#2BA8E0',
+                color: '#10C4C3',
                 marginBottom: '20px',
                 letterSpacing: '0.5px',
               }}
@@ -856,7 +855,7 @@ export default function CookiePolicyPage() {
                   <a
                     href={link.href}
                     style={{
-                      fontFamily: "'DM Sans', sans-serif",
+                      fontFamily: "'Cal Sans', sans-serif",
                       fontSize: '13px',
                       fontWeight: 400,
                       color: 'rgba(255,255,255,0.55)',
@@ -874,10 +873,10 @@ export default function CookiePolicyPage() {
           <div>
             <h4
               style={{
-                fontFamily: "'Cormorant Garamond', serif",
+                fontFamily: "'Cal Sans', serif",
                 fontSize: '18px',
                 fontWeight: 600,
-                color: '#2BA8E0',
+                color: '#10C4C3',
                 marginBottom: '20px',
                 letterSpacing: '0.5px',
               }}
@@ -895,7 +894,7 @@ export default function CookiePolicyPage() {
                   <a
                     href={link.href}
                     style={{
-                      fontFamily: "'DM Sans', sans-serif",
+                      fontFamily: "'Cal Sans', sans-serif",
                       fontSize: '13px',
                       fontWeight: 400,
                       color: 'rgba(255,255,255,0.55)',
@@ -913,10 +912,10 @@ export default function CookiePolicyPage() {
           <div>
             <h4
               style={{
-                fontFamily: "'Cormorant Garamond', serif",
+                fontFamily: "'Cal Sans', serif",
                 fontSize: '18px',
                 fontWeight: 600,
-                color: '#2BA8E0',
+                color: '#10C4C3',
                 marginBottom: '20px',
                 letterSpacing: '0.5px',
               }}
@@ -934,7 +933,7 @@ export default function CookiePolicyPage() {
                   <a
                     href={link.href}
                     style={{
-                      fontFamily: "'DM Sans', sans-serif",
+                      fontFamily: "'Cal Sans', sans-serif",
                       fontSize: '13px',
                       fontWeight: 400,
                       color: 'rgba(255,255,255,0.55)',
@@ -960,7 +959,7 @@ export default function CookiePolicyPage() {
         >
           <p
             style={{
-              fontFamily: "'DM Sans', sans-serif",
+              fontFamily: "'Cal Sans', sans-serif",
               fontSize: '12px',
               fontWeight: 400,
               color: 'rgba(255,255,255,0.3)',

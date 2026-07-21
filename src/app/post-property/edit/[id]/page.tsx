@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import React, { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
@@ -65,12 +65,12 @@ const EMPTY: EditForm = {
 
 const C = {
   bg: '#0a0a0a', surface: '#0f0f0f', surface2: '#161616', border: '#1e1e1e',
-  gold: '#2BA8E0', goldDim: 'rgba(201,168,76,0.10)', goldBorder: 'rgba(201,168,76,0.30)',
-  text: '#F5F2EC', textSub: '#AEB4BC', textMuted: '#6B7280',
+  gold: '#10C4C3', goldDim: 'rgba(201,168,76,0.10)', goldBorder: 'rgba(201,168,76,0.30)',
+  text: '#F5F2EC', textSub: '#A9B4C2', textMuted: '#6B7686',
 } as const
 
-const FB = '"DM Sans", -apple-system, BlinkMacSystemFont, sans-serif'
-const FD = '"Cormorant Garamond", Georgia, "Times New Roman", serif'
+const FB = '"Cal Sans", -apple-system, BlinkMacSystemFont, sans-serif'
+const FD = '"Cal Sans", Georgia, "Times New Roman", serif'
 
 const inp: React.CSSProperties = {
   width: '100%', background: C.surface2, border: `1px solid ${C.border}`,
@@ -316,7 +316,7 @@ export default function EditListingPage() {
       <div style={{ minHeight: '100vh', background: C.bg, paddingTop: 64 }}>
 
         {/* Header */}
-        <div className="ppe-header" style={{ background: `linear-gradient(135deg, #081c12 0%, #000000 100%)`, borderBottom: `1px solid rgba(201,168,76,0.12)`, padding: '36px 48px 32px' }}>
+        <div className="ppe-header" style={{ background: `linear-gradient(135deg, #081c12 0%, #020C1C 100%)`, borderBottom: `1px solid rgba(201,168,76,0.12)`, padding: '36px 48px 32px' }}>
           <div style={{ maxWidth: 900, margin: '0 auto' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
               <a href="/dashboard/my-listings" style={{ fontSize: 12, color: 'rgba(245,242,236,0.4)', textDecoration: 'none' }}>My Listings</a>
@@ -489,7 +489,7 @@ export default function EditListingPage() {
               Cancel
             </a>
             <button type="submit" disabled={saving}
-              style={{ background: `linear-gradient(135deg, ${C.gold} 0%, #1577B8 100%)`, color: '#0a0a0a', fontFamily: FB, fontWeight: 600, fontSize: '0.9375rem', padding: '13px 36px', borderRadius: 8, border: 'none', cursor: saving ? 'not-allowed' : 'pointer', opacity: saving ? 0.7 : 1, letterSpacing: '0.02em', transition: 'opacity 0.15s' }}>
+              style={{ background: `linear-gradient(135deg, ${C.gold} 0%, #0B9C9B 100%)`, color: '#0a0a0a', fontFamily: FB, fontWeight: 600, fontSize: '0.9375rem', padding: '13px 36px', borderRadius: 8, border: 'none', cursor: saving ? 'not-allowed' : 'pointer', opacity: saving ? 0.7 : 1, letterSpacing: '0.02em', transition: 'opacity 0.15s' }}>
               {saving ? 'Saving…' : 'Save Changes'}
             </button>
           </div>
