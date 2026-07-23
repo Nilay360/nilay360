@@ -370,7 +370,7 @@ export default function HomePage() {
         .svc-card { display:flex; flex-direction:column; align-items:center; gap:12px; padding:22px 14px; border-radius:16px; border:1px solid rgba(255,255,255,0.08); background:rgba(255,255,255,0.04); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px); cursor:pointer; transition:transform 0.35s cubic-bezier(0.16,1,0.3,1), box-shadow 0.35s cubic-bezier(0.16,1,0.3,1), border-color 0.35s ease; min-width:110px; will-change:transform; }
         .svc-card:hover { border-color:rgba(16,196,195,0.45); box-shadow:0 20px 60px rgba(0,0,0,0.45), 0 0 24px rgba(16,196,195,0.12); transform:translateY(-6px); }
 
-        .search-tab { padding:9px 20px; font-size:13px; font-weight:500; cursor:pointer; border:none; background:transparent; color:rgba(255,255,255,0.55); border-bottom:2px solid transparent; transition:all 0.15s; white-space:nowrap; }
+        .search-tab { padding:12px 22px; font-size:14px; font-weight:500; cursor:pointer; border:none; background:transparent; color:rgba(255,255,255,0.55); border-bottom:2px solid transparent; transition:all 0.15s; white-space:nowrap; }
         .search-tab.active { color:#fff; border-bottom-color:${G.gold}; }
         .search-tab:not(.active):hover { color:rgba(255,255,255,0.85); }
 
@@ -380,10 +380,12 @@ export default function HomePage() {
         .insight-bar { height:6px; border-radius:6px; background:${G.gold}; transition:width 0.5s ease; }
 
         /* ── Stats as glass pills ── */
-        .hero-stat { flex:1; padding:9px 14px; border-left:1px solid rgba(16,196,195,0.15); position:relative; box-sizing:border-box; }
+        .hero-stat { flex:0 0 auto; padding:8px 18px; border-left:1px solid rgba(16,196,195,0.15); position:relative; box-sizing:border-box; }
         .hero-stat:first-child { border-left:none; }
 
         .section-divider { height: 1px; background: linear-gradient(90deg, transparent 0%, rgba(16,196,195,0.20) 50%, transparent 100%); margin: 0; }
+
+        .hero-skyline { height: clamp(215px, 17vw, 330px); }
 
         /* ── Premium glass cards — unified system ── */
         .premium-card { background:rgba(255,255,255,0.04); backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px); border:1px solid rgba(255,255,255,0.08); box-shadow:0 4px 24px rgba(0,0,0,0.18); transition:transform 0.4s cubic-bezier(0.16,1,0.3,1), box-shadow 0.4s cubic-bezier(0.16,1,0.3,1), border-color 0.4s ease; will-change:transform; }
@@ -426,13 +428,13 @@ export default function HomePage() {
 
         @media (max-width: 768px) {
           .hero-section { min-height: auto !important; padding-top: 0 !important; }
-          .hero-content { padding: 24px 16px 40px !important; padding-top: 90px !important; min-height: auto !important; }
+          .hero-content { padding: 24px 16px 230px !important; padding-top: 90px !important; min-height: auto !important; }
           .hero-pill { margin-bottom: 20px !important; padding: 5px 12px !important; font-size: 11px !important; }
-          .hero-h1 { font-size: clamp(30px, 8vw, 44px) !important; line-height: 1.1 !important; margin-bottom: 12px !important; }
+          .hero-h1 { font-size: clamp(34px, 9vw, 50px) !important; line-height: 1.1 !important; margin-bottom: 12px !important; }
           .hero-subline { font-size: 14px !important; margin-bottom: 24px !important; line-height: 1.6 !important; }
           .hero-searchbox { margin-bottom: 24px !important; border-radius: 16px !important; }
-          .hero-stats { padding-top: 20px !important; padding-bottom: 0 !important; margin-bottom: 0 !important; gap: 10px !important; }
-          .hero-stat { padding: 7px 8px; border-left: none !important; }
+          .hero-stats { padding-top: 20px !important; padding-bottom: 0 !important; margin-bottom: 24px !important; gap: 10px !important; }
+          .hero-stat { flex: 0 0 auto !important; padding: 6px 12px; border-left: none !important; }
           .hero-stat div:first-child { font-size: 15px !important; }
           .svc-card { min-width: 85px; padding: 14px 8px; gap: 8px; }
           .svc-icon-wrap { width: 38px; height: 38px; border-radius: 10px; }
@@ -447,12 +449,13 @@ export default function HomePage() {
           .hero-search-row select { border-right: none !important; border-bottom: 1px solid rgba(255,255,255,0.1) !important; padding: 10px 16px !important; }
           .hero-search-row button[type=submit], .hero-search-row > button:last-child { min-height: 44px !important; justify-content: center; }
           .section-heading { font-size: clamp(28px, 7vw, 40px) !important; }
+          .hero-skyline { height: 195px !important; }
         }
 
         @media (max-width: 480px) {
           .hero-content { padding-top: 84px !important; }
-          .hero-h1 { font-size: clamp(28px, 9vw, 38px) !important; }
-          .hero-stat { flex: 1 1 calc(50% - 6px) !important; padding: 6px 6px !important; min-width: 0 !important; border-left: none !important; }
+          .hero-h1 { font-size: clamp(32px, 10vw, 44px) !important; }
+          .hero-stat { flex: 0 0 auto !important; padding: 6px 10px !important; min-width: 0 !important; border-left: none !important; }
           .hero-stat div:first-child { font-size: 15px !important; }
           .hero-stat div:last-child { font-size: 8px !important; }
           .svc-card { min-width: 75px; padding: 10px 4px; font-size: 10px; }
@@ -533,14 +536,20 @@ export default function HomePage() {
         background:"radial-gradient(ellipse 130% 65% at 50% 0%, rgba(16,196,195,0.13) 0%, transparent 52%), radial-gradient(ellipse 80% 80% at 88% 100%, rgba(16,196,195,0.08) 0%, transparent 50%), radial-gradient(ellipse 60% 55% at 12% 55%, rgba(16,196,195,0.06) 0%, transparent 58%), linear-gradient(180deg, #020C1C 0%, #050810 50%, #020C1C 100%)",
         overflow:"visible",
       }}>
+        {/* Full-bleed hero background image, blurred behind sharp foreground text */}
+        <div aria-hidden style={{position:"absolute", inset:0, overflow:"hidden", zIndex:0}}>
+          <div style={{position:"absolute", inset:"-2%", backgroundImage:"url('/brand/hero-background.jpg')", backgroundSize:"cover", backgroundPosition:"center 38%", filter:"blur(5px)", transform:"scale(1.04)"}} />
+          <div style={{position:"absolute", inset:0, background:"linear-gradient(180deg, rgba(2,12,28,0.30) 0%, rgba(2,12,28,0.45) 40%, rgba(2,12,28,0.78) 100%), radial-gradient(ellipse 65% 50% at 50% 32%, rgba(2,12,28,0.18) 0%, transparent 70%)"}} />
+        </div>
+
         {/* Silk texture overlay */}
         <div style={{ position:"absolute", inset:0, zIndex:0, backgroundImage:"url('https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&q=40')", backgroundSize:"cover", opacity:0.04, mixBlendMode:"overlay", pointerEvents:"none" }} />
         {/* Cursor glow */}
         <div ref={glowRef} aria-hidden style={{position:"absolute", top:0, left:0, width:600, height:600, borderRadius:"50%", background:"radial-gradient(circle, rgba(16,196,195,0.14) 0%, transparent 70%)", pointerEvents:"none", opacity:0, transition:"opacity 0.3s ease", zIndex:0, willChange:"transform, opacity"}} />
-        <div style={{position:"absolute", inset:0, background:"radial-gradient(ellipse 80% 60% at 65% 40%, rgba(11,13,16,0.65) 0%, transparent 65%), radial-gradient(ellipse 60% 80% at 30% 60%, rgba(16,196,195,0.08) 0%, transparent 60%), rgba(5,8,12,0.72)"}} />
 
-        {/* Animated premium SVG city skyline */}
-        <svg style={{position:"absolute", bottom:0, left:0, right:0, width:"100%"}} viewBox="0 0 1440 380" preserveAspectRatio="xMidYMax meet">
+        {/* Animated premium SVG city skyline — foreground layer above the photo background */}
+        <div className="hero-skyline" style={{position:"absolute", bottom:0, left:0, right:0, overflow:"hidden", zIndex:1}}>
+        <svg style={{position:"absolute", bottom:0, left:"50%", transform:"translateX(-50%)", width:"auto", maxWidth:"none", height:"100%", aspectRatio:"1440 / 380"}} viewBox="0 0 1440 380" preserveAspectRatio="xMidYMax meet">
           <defs>
             <linearGradient id="bld-a" x1="0" y1="0" x2="0" y2="1">
               <stop offset="0%" stopColor="#3DDAD9" stopOpacity="0.9"/>
@@ -766,9 +775,10 @@ export default function HomePage() {
           <rect x="0" y="378" width="1440" height="2" fill="rgba(16,196,195,0.3)"/>
           <rect x="0" y="380" width="1440" height="40" fill="url(#reflect)" opacity="0.4"/>
         </svg>
+        </div>
 
         {/* Bottom fade */}
-        <div style={{position:"absolute", bottom:0, left:0, right:0, height:"50%", background:"linear-gradient(to top, #050810 0%, transparent 100%)", pointerEvents:"none"}} />
+        <div style={{position:"absolute", bottom:0, left:0, right:0, height:140, background:"linear-gradient(to top, #050810 0%, transparent 100%)", pointerEvents:"none", zIndex:1}} />
 
         {/* Content */}
         <motion.div
@@ -776,10 +786,34 @@ export default function HomePage() {
           animate={{ opacity:1, y:0 }}
           transition={{ duration:0.8, ease:[0.16,1,0.3,1] }}
           className="hero-content"
-          style={{position:"relative", zIndex:2, padding:"0 16px 48px", maxWidth:"min(860px, 100%)", margin:"0 auto", textAlign:"center", width:"100%", boxSizing:"border-box"}}
+          style={{position:"relative", zIndex:2, padding:"0 16px 270px", maxWidth:"min(980px, 100%)", margin:"0 auto", textAlign:"center", width:"100%", boxSizing:"border-box"}}
         >
-          {/* 2 — Search bar */}
-          <div className="hero-searchbox" style={{background:"rgba(255,255,255,0.06)", backdropFilter:"blur(30px)", WebkitBackdropFilter:"blur(30px)", border:"1px solid rgba(255,255,255,0.10)", borderRadius:24, overflow:"visible", maxWidth:"min(820px, 100%)", marginBottom:36, margin:"0 auto 36px", width:"100%", boxSizing:"border-box", boxShadow:"0 20px 60px rgba(0,0,0,0.45), 0 0 0 1px rgba(16,196,195,0.08), inset 0 1px 0 rgba(255,255,255,0.06)", position:"relative", zIndex:10}}>
+          {/* 2 — Headline */}
+          <h1 className="hero-h1" style={{fontFamily:"'Cal Sans',Georgia,serif", fontSize:"clamp(42px,9vw,92px)", fontWeight:300, color:"#fff", lineHeight:1.05, marginBottom:16, letterSpacing:"-0.01em", wordBreak:"break-word", maxWidth:"100%"}}>
+            {siteContent.hero_line1}
+            <em style={{display:"block", color:G.goldLt, fontStyle:"italic", fontWeight:400, fontSize:"clamp(20px,4vw,38px)", marginTop:6}}>{siteContent.hero_line2}</em>
+          </h1>
+
+          {/* 3 — Subline */}
+          <p className="hero-subline" style={{fontSize:15, color:"rgba(255,255,255,0.5)", lineHeight:1.75, marginBottom:0, maxWidth:500, fontWeight:300, margin:"0 auto", padding:"0 8px", maxWidth:"100%", boxSizing:"border-box"}}>
+            {siteContent.hero_subtitle}
+          </p>
+
+          {/* 4 — Stats strip */}
+          <div className="hero-stats" style={{display:"flex", flexWrap:"wrap", justifyContent:"center", gap:"12px", width:"100%", maxWidth:"100%", boxSizing:"border-box", marginTop:32, marginBottom:40, paddingBottom:32, borderBottom:"1px solid rgba(16,196,195,0.12)", position:"relative", zIndex:2}}>
+            {[[liveStats.listings.toLocaleString("en-IN"),"Listings"],[liveStats.agents.toLocaleString("en-IN"),"Agents"],[String(liveStats.cities),"Cities"]].map(([v,l])=>(
+              <div key={l} className="hero-stat" style={{background:"rgba(255,255,255,0.04)", backdropFilter:"blur(12px)", WebkitBackdropFilter:"blur(12px)", border:"1px solid rgba(16,196,195,0.12)", borderRadius:12, flex:"0 0 auto"}}>
+                <div className="stat-value" style={{fontFamily:"'Cal Sans',Georgia,serif", fontSize:19, fontWeight:600, background:"linear-gradient(135deg, #FFFFFF 0%, #10C4C3 100%)", WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent"}}>{v}</div>
+                <div style={{fontSize:9.5, color:"rgba(255,255,255,0.50)", marginTop:2, letterSpacing:"0.06em", textTransform:"uppercase"}}>{l}</div>
+              </div>
+            ))}
+          </div>
+          {siteContent.trust_bar_note && (
+            <p style={{fontSize:11, color:"rgba(255,255,255,0.4)", textAlign:"center", marginTop:-28, marginBottom:32}}>{siteContent.trust_bar_note}</p>
+          )}
+
+          {/* 5 — Search bar */}
+          <div className="hero-searchbox" style={{background:"rgba(255,255,255,0.06)", backdropFilter:"blur(30px)", WebkitBackdropFilter:"blur(30px)", border:"1px solid rgba(255,255,255,0.10)", borderRadius:24, overflow:"visible", maxWidth:"min(920px, 100%)", marginBottom:0, margin:"0 auto", width:"100%", boxSizing:"border-box", boxShadow:"0 20px 60px rgba(0,0,0,0.45), 0 0 0 1px rgba(16,196,195,0.08), inset 0 1px 0 rgba(255,255,255,0.06)", position:"relative", zIndex:10}}>
             <div style={{display:"flex", borderBottom:"1px solid rgba(255,255,255,0.08)", paddingLeft:4, overflowX:"auto"}} className="hide-scroll">
               {["Buy","Rent","New Projects","Valuation","List Property","Agents"].map(t=>(
                 <button key={t} onClick={()=>setSearchTab(t)} className={`search-tab${searchTab===t?" active":""}`}>
@@ -787,13 +821,13 @@ export default function HomePage() {
                 </button>
               ))}
             </div>
-            <div className="hero-search-row" style={{display:"flex", gap:0, alignItems:"stretch", padding:"12px 12px 12px 4px"}}>
+            <div className="hero-search-row" style={{display:"flex", gap:0, alignItems:"stretch", padding:"18px 18px 18px 6px"}}>
               {/* Custom city dropdown */}
               <div ref={cityDropRef} style={{flex:"0 0 160px", position:"relative", borderRight:"1px solid rgba(255,255,255,0.1)"}}>
                 <button
                   type="button"
                   onClick={()=>setCityOpen(o=>!o)}
-                  style={{width:"100%", height:"100%", minHeight:44, background:"transparent", border:"none", padding:"0 14px 0 16px", display:"flex", alignItems:"center", justifyContent:"space-between", gap:6, cursor:"pointer", fontFamily:"'Cal Sans',sans-serif", fontSize:13, color: searchCity ? "#fff" : "rgba(255,255,255,0.45)", outline:"none"}}
+                  style={{width:"100%", height:"100%", minHeight:56, background:"transparent", border:"none", padding:"0 14px 0 16px", display:"flex", alignItems:"center", justifyContent:"space-between", gap:6, cursor:"pointer", fontFamily:"'Cal Sans',sans-serif", fontSize:15, color: searchCity ? "#fff" : "rgba(255,255,255,0.45)", outline:"none"}}
                 >
                   <span style={{overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap"}}>{searchCity || "Select City"}</span>
                   <svg width="12" height="12" viewBox="0 0 12 12" fill="none" style={{flexShrink:0, transition:"transform 0.2s", transform: cityOpen ? "rotate(180deg)" : "rotate(0deg)"}}>
@@ -817,7 +851,7 @@ export default function HomePage() {
                 <SvgIcon d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" size={16} color="rgba(255,255,255,0.4)" />
                 <input value={searchQuery} onChange={e=>setSearchQuery(e.target.value)}
                   placeholder="Search by Locality, Project or Builder"
-                  style={{flex:1, background:"transparent", border:"none", color:"#fff", fontSize:14, outline:"none", fontFamily:"'Cal Sans',sans-serif"}}
+                  style={{flex:1, background:"transparent", border:"none", color:"#fff", fontSize:16, outline:"none", fontFamily:"'Cal Sans',sans-serif"}}
                   onKeyDown={e => {
                     if (e.key === 'Enter') {
                       router.push(`/search?q=${encodeURIComponent(searchQuery)}&city=${encodeURIComponent(searchCity)}&tab=${searchTab.toLowerCase().replace(/ /g, '-')}`);
@@ -834,7 +868,7 @@ export default function HomePage() {
               </div>
               <button
                 onClick={() => router.push(`/search?tab=${searchTab.toLowerCase().replace(/ /g, '-')}&city=${encodeURIComponent(searchCity)}&q=${encodeURIComponent(searchQuery)}`)}
-                style={{padding:"0 28px", background:G.gold, borderRadius:10, color:"#000", fontSize:14, fontWeight:700, display:"flex", alignItems:"center", gap:8, whiteSpace:"nowrap", transition:"background 0.15s, box-shadow 0.15s", border:"none", cursor:"pointer", height:"100%", minHeight:44, boxShadow:"0 10px 30px rgba(16,196,195,0.35)"}}
+                style={{padding:"0 34px", background:G.gold, borderRadius:10, color:"#000", fontSize:16, fontWeight:700, display:"flex", alignItems:"center", gap:8, whiteSpace:"nowrap", transition:"background 0.15s, box-shadow 0.15s", border:"none", cursor:"pointer", height:"100%", minHeight:56, boxShadow:"0 10px 30px rgba(16,196,195,0.35)"}}
                 onMouseOver={e=>(e.currentTarget.style.background=G.goldLt)}
                 onMouseOut={e=>(e.currentTarget.style.background=G.gold)}>
                 <SvgIcon d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" size={15} color="#000" />
@@ -842,30 +876,6 @@ export default function HomePage() {
               </button>
             </div>
           </div>
-
-          {/* 3 — Stats strip */}
-          <div className="hero-stats" style={{display:"flex", flexWrap:"wrap", justifyContent:"center", gap:"12px", width:"100%", maxWidth:"100%", boxSizing:"border-box", marginBottom:40, paddingBottom:32, borderBottom:"1px solid rgba(16,196,195,0.12)", position:"relative", zIndex:2}}>
-            {[[liveStats.listings.toLocaleString("en-IN"),"Listings"],[liveStats.agents.toLocaleString("en-IN"),"Agents"],[String(liveStats.cities),"Cities"]].map(([v,l])=>(
-              <div key={l} className="hero-stat" style={{background:"rgba(255,255,255,0.04)", backdropFilter:"blur(12px)", WebkitBackdropFilter:"blur(12px)", border:"1px solid rgba(16,196,195,0.12)", borderRadius:12, flex:"1 1 auto"}}>
-                <div className="stat-value" style={{fontFamily:"'Cal Sans',Georgia,serif", fontSize:19, fontWeight:600, background:"linear-gradient(135deg, #FFFFFF 0%, #10C4C3 100%)", WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent"}}>{v}</div>
-                <div style={{fontSize:9.5, color:"rgba(255,255,255,0.50)", marginTop:2, letterSpacing:"0.06em", textTransform:"uppercase"}}>{l}</div>
-              </div>
-            ))}
-          </div>
-          {siteContent.trust_bar_note && (
-            <p style={{fontSize:11, color:"rgba(255,255,255,0.4)", textAlign:"center", marginTop:-28, marginBottom:32}}>{siteContent.trust_bar_note}</p>
-          )}
-
-          {/* 4 — Headline */}
-          <h1 className="hero-h1" style={{fontFamily:"'Cal Sans',Georgia,serif", fontSize:"clamp(32px,7vw,72px)", fontWeight:300, color:"#fff", lineHeight:1.05, marginBottom:16, letterSpacing:"-0.01em", wordBreak:"break-word", maxWidth:"100%"}}>
-            {siteContent.hero_line1}
-            <em style={{display:"block", color:G.goldLt, fontStyle:"italic", fontWeight:400}}>{siteContent.hero_line2}</em>
-          </h1>
-
-          {/* 5 — Subline */}
-          <p className="hero-subline" style={{fontSize:15, color:"rgba(255,255,255,0.5)", lineHeight:1.75, marginBottom:0, maxWidth:500, fontWeight:300, margin:"0 auto", padding:"0 8px", maxWidth:"100%", boxSizing:"border-box"}}>
-            {siteContent.hero_subtitle}
-          </p>
         </motion.div>
       </section>
 
