@@ -9,6 +9,13 @@ import { useSavedProperties } from "@/hooks/useSavedProperties";
 import ReportButton from "@/components/shared/ReportButton";
 import { optimizedImageUrl } from "@/lib/image-url";
 
+interface FloorPlanRow {
+  id: string
+  image_url: string
+  label: string | null
+  display_order: number
+}
+
 // Mirrors post-property/page.tsx's COMMERCIAL_CATEGORIES — these categories
 // store "rooms/cabins" in the bedrooms field, not a BHK count, so display
 // must not label it "Bedrooms" / "X BHK".
@@ -401,6 +408,11 @@ export default function PropertyDetailClient() {
   // Feature 1 — lightbox
   const [lightboxOpen, setLightboxOpen] = useState(false);
 
+  // Floor plans
+  const [floorPlans, setFloorPlans] = useState<FloorPlanRow[]>([]);
+  const [activeFloorPlan, setActiveFloorPlan] = useState(0);
+  const [floorPlanZoom, setFloorPlanZoom] = useState(false);
+
   // Feature 4 — video tour lazy load
   const [videoPlaying, setVideoPlaying] = useState(false);
 
@@ -458,6 +470,25 @@ export default function PropertyDetailClient() {
     }
     load();
   }, [slug]);
+
+  // Floor plans live in a separate table (property_id → property_listings.id);
+  // this is a no-op for seed/catalog properties since their id has no matching rows.
+  useEffect(() => {
+    if (!property?.id) { setFloorPlans([]); return; }
+    let cancelled = false;
+    const supabase = createClient();
+    supabase
+      .from("property_floor_plans")
+      .select("id, image_url, label, display_order")
+      .eq("property_id", property.id)
+      .order("display_order", { ascending: true })
+      .then(({ data }: { data: FloorPlanRow[] | null }) => {
+        if (cancelled) return;
+        setFloorPlans(data ?? []);
+        setActiveFloorPlan(0);
+      });
+    return () => { cancelled = true; };
+  }, [property?.id]);
 
   // Record this property in per-device "recently viewed" history
   const { addRecentlyViewed } = useRecentlyViewed();
@@ -551,7 +582,7 @@ export default function PropertyDetailClient() {
   // page's auth state.
   const [subscriptionTier, setSubscriptionTier] = useState<string | null>(null);
   useEffect(() => {
-    if (!user?.id || !property?.kuula_tour_url) { setSubscriptionTier(null); return; }
+    if (!user?.id || (!property?.kuula_tour_url && floorPlans.length === 0)) { setSubscriptionTier(null); return; }
     let cancelled = false;
     const supabase = createClient();
     supabase
@@ -565,7 +596,7 @@ export default function PropertyDetailClient() {
         setSubscriptionTier(data?.subscription_tier ?? null);
       });
     return () => { cancelled = true; };
-  }, [user?.id, property?.kuula_tour_url]);
+  }, [user?.id, property?.kuula_tour_url, floorPlans.length]);
   const isPremium = subscriptionTier === "premium";
 
   // Locality + city + state only — no precise street address in the query, per privacy-by-default.
@@ -1017,6 +1048,83 @@ export default function PropertyDetailClient() {
                 </Card>
               ))}
 
+              {/* ── FLOOR PLANS ── */}
+              {floorPlans.length > 0 && (
+                <Card>
+                  <SectionHeading>Floor Plans</SectionHeading>
+
+                  {floorPlans.length > 1 && (
+                    <div style={{ display: "flex", gap: "8px", flexWrap: "wrap", marginBottom: "16px" }}>
+                      {floorPlans.map((plan, idx) => (
+                        <button
+                          key={plan.id}
+                          onClick={() => setActiveFloorPlan(idx)}
+                          style={{
+                            padding: "8px 16px", borderRadius: "100px",
+                            border: `1px solid ${idx === activeFloorPlan ? "#10C4C3" : "rgba(255,255,255,0.12)"}`,
+                            background: idx === activeFloorPlan ? "rgba(16,196,195,0.12)" : "transparent",
+                            color: idx === activeFloorPlan ? "#10C4C3" : "#A9B4C2",
+                            fontSize: "12.5px", fontWeight: idx === activeFloorPlan ? 700 : 500,
+                            cursor: "pointer", fontFamily: "'Cal Sans', sans-serif", whiteSpace: "nowrap",
+                            transition: "all 0.15s",
+                          }}
+                        >
+                          {plan.label?.trim() || `Plan ${idx + 1}`}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+
+                  {isPremium ? (
+                    <div
+                      onClick={() => setFloorPlanZoom(true)}
+                      style={{ position: "relative", width: "100%", paddingTop: "66%", borderRadius: "12px", overflow: "hidden", background: "#0A1526", cursor: "zoom-in" }}
+                    >
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={optimizedImageUrl(floorPlans[activeFloorPlan]?.image_url, 1200)}
+                        alt={floorPlans[activeFloorPlan]?.label || `${property.title} — floor plan`}
+                        style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "contain" }}
+                      />
+                    </div>
+                  ) : (
+                    <div style={{ position: "relative", width: "100%", paddingTop: "66%", borderRadius: "12px", overflow: "hidden", background: "#0A1526" }}>
+                      <div
+                        style={{
+                          position: "absolute", inset: 0,
+                          backgroundImage: `url(${optimizedImageUrl(floorPlans[0]?.image_url, 900)})`,
+                          backgroundSize: "cover", backgroundPosition: "center",
+                          filter: "blur(16px)", transform: "scale(1.1)",
+                        }}
+                      />
+                      <div style={{ position: "absolute", inset: 0, background: "rgba(11,13,16,0.72)" }} />
+                      <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "12px", padding: "24px", textAlign: "center" }}>
+                        <span style={{ width: "52px", height: "52px", borderRadius: "50%", background: "rgba(16,196,195,0.15)", border: "1.5px solid rgba(16,196,195,0.35)", display: "flex", alignItems: "center", justifyContent: "center", color: "#10C4C3" }}>
+                          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>
+                        </span>
+                        <div style={{ fontSize: "15px", fontWeight: 600, color: "#FFFFFF" }}>Floor Plans</div>
+                        <div style={{ fontSize: "13px", color: "#A9B4C2", maxWidth: "320px" }}>Upgrade to Premium to view</div>
+                        {user ? (
+                          <a
+                            href="/pricing"
+                            style={{ display: "inline-flex", alignItems: "center", gap: "6px", padding: "9px 20px", borderRadius: "100px", fontSize: "12px", fontWeight: 700, letterSpacing: "0.03em", color: "#020C1C", background: "#10C4C3", textDecoration: "none", fontFamily: "'Cal Sans', sans-serif" }}
+                          >
+                            Upgrade to Premium
+                          </a>
+                        ) : (
+                          <button
+                            onClick={() => openAuthModal("signin")}
+                            style={{ display: "inline-flex", alignItems: "center", gap: "6px", padding: "9px 20px", borderRadius: "100px", fontSize: "12px", fontWeight: 700, letterSpacing: "0.03em", color: "#020C1C", background: "#10C4C3", border: "none", cursor: "pointer", fontFamily: "'Cal Sans', sans-serif" }}
+                          >
+                            Sign In to Unlock
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </Card>
+              )}
+
               {/* ── LOCATION MAP ── */}
               {embedMapsUrl && (
                 <Card>
@@ -1067,16 +1175,6 @@ export default function PropertyDetailClient() {
                   </div>
                 </Card>
               )}
-
-              {/* ── FLOOR PLAN ── */}
-              <Card>
-                <SectionHeading>Floor Plan</SectionHeading>
-                <div style={{ border: "2px dashed rgba(255,255,255,0.12)", borderRadius: "16px", padding: "60px 24px", textAlign: "center", background: "rgba(255,255,255,0.04)" }}>
-                  <div style={{ fontSize: "40px", marginBottom: "14px", opacity: 0.3 }}>📐</div>
-                  <div style={{ fontSize: "16px", fontWeight: 500, color: "#FFFFFF", marginBottom: "6px" }}>Floor Plan Available on Request</div>
-                  <div style={{ fontSize: "13px", color: "#A9B4C2" }}>Contact our property expert to receive the detailed floor plan.</div>
-                </div>
-              </Card>
 
               {/* ── EMI CALCULATOR ── */}
               {property.listing_type === "sale" && (
@@ -1372,6 +1470,30 @@ export default function PropertyDetailClient() {
           <div style={{ position: "absolute", bottom: "28px", left: "50%", transform: "translateX(-50%)", padding: "6px 16px", borderRadius: "999px", background: "rgba(255,255,255,0.06)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", border: "1px solid rgba(255,255,255,0.10)", color: "#fff", fontSize: "13px", fontWeight: 600, letterSpacing: "0.04em" }}>
             {activeImg + 1} / {images.length}
           </div>
+        </div>
+      )}
+
+      {/* ── FLOOR PLAN ZOOM MODAL ── */}
+      {floorPlanZoom && floorPlans[activeFloorPlan] && (
+        <div
+          onClick={() => setFloorPlanZoom(false)}
+          style={{ position: "fixed", inset: 0, zIndex: 9999, background: "rgba(0,0,0,0.94)", display: "flex", alignItems: "center", justifyContent: "center" }}
+        >
+          <button
+            onClick={(e) => { e.stopPropagation(); setFloorPlanZoom(false); }}
+            aria-label="Close floor plan"
+            className="pd-lb-btn"
+            style={{ position: "absolute", top: "24px", right: "24px", width: "44px", height: "44px", borderRadius: "50%", background: "rgba(255,255,255,0.06)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", border: "1px solid rgba(255,255,255,0.10)", color: "#fff", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 2 }}
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M18 6L6 18M6 6l12 12" /></svg>
+          </button>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={optimizedImageUrl(floorPlans[activeFloorPlan].image_url, 1920)}
+            alt={floorPlans[activeFloorPlan].label || `${property.title} — floor plan`}
+            onClick={(e) => e.stopPropagation()}
+            style={{ maxWidth: "90vw", maxHeight: "86vh", objectFit: "contain", borderRadius: "6px" }}
+          />
         </div>
       )}
 

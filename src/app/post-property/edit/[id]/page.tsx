@@ -1,6 +1,6 @@
 ﻿'use client'
 
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 
@@ -18,6 +18,13 @@ interface ListingRow {
   maintenance_charge?: number | null; amenities?: string[] | null;
   highlights?: string | null; seller_name?: string | null;
   seller_phone?: string | null; seller_whatsapp?: string | null;
+}
+
+interface FloorPlanRow {
+  id: string
+  image_url: string
+  label: string | null
+  display_order: number
 }
 
 interface EditForm {
@@ -152,6 +159,11 @@ export default function EditListingPage() {
   const [notFound, setNotFound] = useState(false)
   const [userId,   setUserId]   = useState<string | null>(null)
 
+  const [floorPlans, setFloorPlans]     = useState<FloorPlanRow[]>([])
+  const [fpUploading, setFpUploading]   = useState(false)
+  const [fpError, setFpError]           = useState<string | null>(null)
+  const fpFileRef = useRef<HTMLInputElement | null>(null)
+
   useEffect(() => {
     async function loadUser() {
       const { data } = await createClient().auth.getSession()
@@ -213,6 +225,74 @@ export default function EditListingPage() {
         setLoading(false)
       })
   }, [id])
+
+  // Load existing floor plans
+  useEffect(() => {
+    const supabase = createClient()
+    supabase
+      .from('property_floor_plans')
+      .select('id, image_url, label, display_order')
+      .eq('property_id', id)
+      .order('display_order', { ascending: true })
+      .then(({ data }: { data: FloorPlanRow[] | null }) => {
+        setFloorPlans(data ?? [])
+      })
+  }, [id])
+
+  const addFloorPlanFiles = async (files: FileList) => {
+    setFpError(null)
+    setFpUploading(true)
+    const supabase = createClient()
+    const MAX_BYTES = 10 * 1024 * 1024
+    let nextOrder = floorPlans.length
+    for (const file of Array.from(files)) {
+      if (!file.type.startsWith('image/')) { setFpError(`${file.name} is not an image`); continue }
+      if (file.size > MAX_BYTES) { setFpError(`${file.name} is over 10 MB`); continue }
+      try {
+        const body = new FormData()
+        body.append('file', file)
+        const res = await fetch('/api/upload-image', { method: 'POST', body })
+        const json = await res.json()
+        if (!res.ok || !json?.secure_url) throw new Error(json?.error ?? 'Upload failed')
+        const { data: row, error: insErr } = await supabase
+          .from('property_floor_plans')
+          .insert([{ property_id: id, image_url: json.secure_url, label: null, display_order: nextOrder }])
+          .select('id, image_url, label, display_order')
+          .single()
+        if (insErr) throw insErr
+        setFloorPlans(prev => [...prev, row as FloorPlanRow])
+        nextOrder += 1
+      } catch (err) {
+        console.error('Floor plan upload failed:', file.name, err)
+        setFpError(`${file.name} failed to upload. Please try again.`)
+      }
+    }
+    setFpUploading(false)
+  }
+
+  const removeFloorPlan = async (planId: string) => {
+    const supabase = createClient()
+    const prev = floorPlans
+    setFloorPlans(fp => fp.filter(p => p.id !== planId))
+    const { error: delErr } = await supabase.from('property_floor_plans').delete().eq('id', planId)
+    if (delErr) {
+      console.error('Floor plan delete failed:', delErr)
+      setFpError('Could not remove that floor plan. Please try again.')
+      setFloorPlans(prev)
+    }
+  }
+
+  const updateFloorPlanLabel = (planId: string, label: string) =>
+    setFloorPlans(fp => fp.map(p => p.id === planId ? { ...p, label } : p))
+
+  const saveFloorPlanLabel = async (planId: string, label: string) => {
+    const supabase = createClient()
+    const { error: updErr } = await supabase
+      .from('property_floor_plans')
+      .update({ label: label.trim() || null })
+      .eq('id', planId)
+    if (updErr) console.error('Floor plan label save failed:', updErr)
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -473,6 +553,63 @@ export default function EditListingPage() {
                 <TInput value={form.seller_whatsapp} onChange={set('seller_whatsapp') as (v: string) => void} type="tel" placeholder="+91 98765 43210" />
               </Field>
             </div>
+          </SectionCard>
+
+          {/* Step 7 — Floor Plans */}
+          <SectionCard title="7. Floor Plans">
+            <p style={{ fontSize: 13, color: C.textMuted, marginBottom: 16 }}>
+              Optional — add one floor plan, or several for multi-config projects (e.g. &ldquo;2BHK - Type A&rdquo;, &ldquo;3BHK - Type B&rdquo;). Changes save immediately.
+            </p>
+
+            {floorPlans.length > 0 && (
+              <div style={{ display: 'grid', gap: 12, marginBottom: 16 }}>
+                {floorPlans.map((plan, idx) => (
+                  <div key={plan.id} style={{ display: 'flex', gap: 14, alignItems: 'center', border: `1px solid ${C.border}`, borderRadius: 10, padding: 12, background: C.surface2 }}>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={plan.image_url} alt={`Floor plan ${idx + 1}`} style={{ width: 84, height: 64, objectFit: 'cover', borderRadius: 6, flexShrink: 0 }} />
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <label style={lbl}>Label (optional)</label>
+                      <input
+                        type="text"
+                        value={plan.label ?? ''}
+                        onChange={e => updateFloorPlanLabel(plan.id, e.target.value)}
+                        onBlur={e => saveFloorPlanLabel(plan.id, e.target.value)}
+                        placeholder={`e.g. 2BHK - Type ${String.fromCharCode(65 + idx)}`}
+                        style={inp}
+                      />
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => removeFloorPlan(plan.id)}
+                      style={{ width: 30, height: 30, borderRadius: '50%', flexShrink: 0, background: 'rgba(0,0,0,0.35)', border: `1px solid ${C.border}`, color: C.text, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1rem', lineHeight: 1, fontFamily: FB }}
+                    >×</button>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            <input
+              ref={fpFileRef}
+              type="file"
+              multiple
+              accept="image/*"
+              style={{ display: 'none' }}
+              onChange={e => { if (e.target.files) addFloorPlanFiles(e.target.files); e.target.value = '' }}
+            />
+            <button
+              type="button"
+              disabled={fpUploading}
+              onClick={() => fpFileRef.current?.click()}
+              style={{ padding: '10px 20px', borderRadius: 8, border: `1px solid ${C.goldBorder}`, background: 'transparent', color: C.gold, fontFamily: FB, fontSize: '0.875rem', fontWeight: 600, cursor: fpUploading ? 'not-allowed' : 'pointer', opacity: fpUploading ? 0.6 : 1 }}
+            >
+              {fpUploading ? 'Uploading…' : '+ Add Floor Plan'}
+            </button>
+
+            {fpError && (
+              <div style={{ marginTop: 12, padding: '10px 14px', background: 'rgba(224,85,85,0.1)', border: '1px solid rgba(224,85,85,0.3)', borderRadius: 8, color: '#e05555', fontSize: 13, fontFamily: FB }}>
+                {fpError}
+              </div>
+            )}
           </SectionCard>
 
           {/* Error */}
