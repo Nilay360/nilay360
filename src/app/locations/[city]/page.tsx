@@ -324,24 +324,8 @@ export default function CityPage() {
 
       <div style={{ minHeight: "100vh", background: "#020C1C" }}>
 
-        {/* ── NAVBAR ─────────────────────────────────────────── */}
-        <nav className="loc-nav" style={{ position: "fixed", top: 0, left: 0, right: 0, zIndex: 200, height: "68px", display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 48px", background: "rgba(5,8,12,0.88)", backdropFilter: "blur(20px) saturate(180%)", borderBottom: "0.5px solid rgba(201,168,76,0.18)" }}>
-          <a href="/" style={{ fontFamily: "'Cal Sans', sans-serif", fontSize: "19px", fontWeight: 600, color: "#fff", letterSpacing: "0.16em", textDecoration: "none" }}>
-            Nilay 360 <span style={{ color: "#10C4C3" }}>·</span>
-          </a>
-          <div className="loc-nav-links" style={{ display: "flex", gap: "2px" }}>
-            {[["Home", "/"], ["Properties", "/properties"], ["Search", "/search"], ["Locations", "/locations"], ["Blog", "/blog"], ["Contact", "/contact"]].map(([l, h]) => (
-              <a key={l} href={h} style={{ padding: "7px 14px", borderRadius: "6px", fontSize: "13px", fontWeight: 500, color: "rgba(255,255,255,0.5)", textDecoration: "none" }}>{l}</a>
-            ))}
-          </div>
-          <div style={{ display: "flex", gap: "10px" }}>
-            <a href="/login"    style={{ padding: "8px 18px", borderRadius: "7px", border: "0.5px solid rgba(255,255,255,0.22)", color: "rgba(255,255,255,0.75)", fontSize: "13px", fontWeight: 500, textDecoration: "none" }}>Sign In</a>
-            <a href="/register" style={{ padding: "8px 22px", borderRadius: "7px", background: "#10C4C3", color: "#020C1C", fontSize: "13px", fontWeight: 600, textDecoration: "none" }}>List Property</a>
-          </div>
-        </nav>
-
         {/* ── HERO ───────────────────────────────────────────── */}
-        <section style={{ paddingTop: "68px", minHeight: "520px", display: "flex", alignItems: "flex-end", position: "relative", overflow: "hidden" }}>
+        <section style={{ paddingTop: "64px", minHeight: "520px", display: "flex", alignItems: "flex-end", position: "relative", overflow: "hidden" }}>
           <img src={cfg.img} alt={cfg.name} style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }} />
           <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(5,8,12,0.92) 0%, rgba(5,8,12,0.5) 50%, rgba(5,8,12,0.2) 100%)" }} />
           <div style={{ position: "absolute", inset: 0, background: "radial-gradient(ellipse 60% 60% at 80% 110%, rgba(201,168,76,0.1) 0%, transparent 55%)", pointerEvents: "none" }} />
