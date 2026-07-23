@@ -71,24 +71,24 @@ const MARKET: Record<string,{price:string;growth:string;localities:{name:string;
 
 /* ─── Property data ─────────────────────────────────────────── */
 const PROPERTIES = [
-  { id:1, city:"Hyderabad", title:"Prestige Falcon City", type:"Apartment", beds:3, baths:3, sqft:2100, price:"₹2.8 Cr", img:"https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800&q=80", tag:"Featured" },
-  { id:2, city:"Hyderabad", title:"Sobha Neopolis", type:"Villa", beds:4, baths:4, sqft:3800, price:"₹5.2 Cr", img:"https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=800&q=80", tag:"New Launch" },
-  { id:3, city:"Mumbai", title:"Lodha Malabar", type:"Apartment", beds:4, baths:4, sqft:3200, price:"₹18.5 Cr", img:"https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&q=80", tag:"Premium" },
-  { id:4, city:"Mumbai", title:"Rustomjee Elements", type:"Apartment", beds:3, baths:2, sqft:1900, price:"₹7.4 Cr", img:"https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&q=80", tag:"Under Construction" },
-  { id:5, city:"Bengaluru", title:"Brigade Insignia", type:"Villa", beds:5, baths:5, sqft:5200, price:"₹8.9 Cr", img:"https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&q=80", tag:"RERA" },
-  { id:6, city:"Bengaluru", title:"Godrej Reserve", type:"Apartment", beds:3, baths:3, sqft:1750, price:"₹3.1 Cr", img:"https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&q=80", tag:"Ready" },
-  { id:7, city:"Delhi NCR", title:"DLF Camellias", type:"Penthouse", beds:5, baths:6, sqft:8800, price:"₹42 Cr", img:"https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=800&q=80", tag:"Ultra Luxury" },
-  { id:8, city:"Chennai", title:"Mahindra Eden", type:"Villa", beds:4, baths:4, sqft:3400, price:"₹4.6 Cr", img:"https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea?w=800&q=80", tag:"New Launch" },
-  { id:9, city:"Pune", title:"Shapoorji Parkwest", type:"Apartment", beds:2, baths:2, sqft:1200, price:"₹1.8 Cr", img:"https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&q=80", tag:"Featured" },
+  { id:1, city:"Hyderabad", title:"Prestige Falcon City", type:"Apartment", beds:3, baths:3, sqft:2100, price:"₹2.8 Cr", img:"https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800&q=60&fm=avif", tag:"Featured" },
+  { id:2, city:"Hyderabad", title:"Sobha Neopolis", type:"Villa", beds:4, baths:4, sqft:3800, price:"₹5.2 Cr", img:"https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=800&q=60&fm=avif", tag:"New Launch" },
+  { id:3, city:"Mumbai", title:"Lodha Malabar", type:"Apartment", beds:4, baths:4, sqft:3200, price:"₹18.5 Cr", img:"https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&q=60&fm=avif", tag:"Premium" },
+  { id:4, city:"Mumbai", title:"Rustomjee Elements", type:"Apartment", beds:3, baths:2, sqft:1900, price:"₹7.4 Cr", img:"https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&q=60&fm=avif", tag:"Under Construction" },
+  { id:5, city:"Bengaluru", title:"Brigade Insignia", type:"Villa", beds:5, baths:5, sqft:5200, price:"₹8.9 Cr", img:"https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&q=60&fm=avif", tag:"RERA" },
+  { id:6, city:"Bengaluru", title:"Godrej Reserve", type:"Apartment", beds:3, baths:3, sqft:1750, price:"₹3.1 Cr", img:"https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&q=60&fm=avif", tag:"Ready" },
+  { id:7, city:"Delhi NCR", title:"DLF Camellias", type:"Penthouse", beds:5, baths:6, sqft:8800, price:"₹42 Cr", img:"https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=800&q=60&fm=avif", tag:"Ultra Luxury" },
+  { id:8, city:"Chennai", title:"Mahindra Eden", type:"Villa", beds:4, baths:4, sqft:3400, price:"₹4.6 Cr", img:"https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea?w=800&q=60&fm=avif", tag:"New Launch" },
+  { id:9, city:"Pune", title:"Shapoorji Parkwest", type:"Apartment", beds:2, baths:2, sqft:1200, price:"₹1.8 Cr", img:"https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&q=60&fm=avif", tag:"Featured" },
 ];
 
 const LOCATIONS = [
-  { city:"Hyderabad", area:"Kokapet", listings:124, avg:"₹6,800/sqft", grad:"linear-gradient(135deg,#020C1C,#0A1526)", img:"https://images.unsplash.com/photo-1590577976322-3d2d6e2130d5?w=800&q=80" },
-  { city:"Mumbai", area:"Bandra West", listings:89, avg:"₹42,000/sqft", grad:"linear-gradient(135deg,#0d1f3c,#1a3a6e)", img:"https://images.unsplash.com/photo-1570168007204-dfb528c6958f?w=800&q=80" },
-  { city:"Bengaluru", area:"Whitefield", listings:156, avg:"₹8,200/sqft", grad:"linear-gradient(135deg,#1a1040,#3020a0)", img:"https://images.unsplash.com/photo-1596176530529-78163a4f7af2?w=800&q=80" },
-  { city:"Delhi NCR", area:"Golf Course Rd", listings:72, avg:"₹18,500/sqft", grad:"linear-gradient(135deg,#2c1810,#5a3020)", img:"https://images.unsplash.com/photo-1587474260584-136574528ed5?w=800&q=80" },
-  { city:"Pune", area:"Kharadi", listings:103, avg:"₹9,400/sqft", grad:"linear-gradient(135deg,#101a10,#204020)", img:"https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&q=80" },
-  { city:"Chennai", area:"OMR", listings:91, avg:"₹7,600/sqft", grad:"linear-gradient(135deg,#201010,#401a1a)", img:"https://images.unsplash.com/photo-1582510003544-4d00b7f74220?w=800&q=80" },
+  { city:"Hyderabad", area:"Kokapet", listings:124, avg:"₹6,800/sqft", grad:"linear-gradient(135deg,#020C1C,#0A1526)", img:"https://images.unsplash.com/photo-1590577976322-3d2d6e2130d5?w=800&q=60&fm=avif" },
+  { city:"Mumbai", area:"Bandra West", listings:89, avg:"₹42,000/sqft", grad:"linear-gradient(135deg,#0d1f3c,#1a3a6e)", img:"https://images.unsplash.com/photo-1570168007204-dfb528c6958f?w=800&q=60&fm=avif" },
+  { city:"Bengaluru", area:"Whitefield", listings:156, avg:"₹8,200/sqft", grad:"linear-gradient(135deg,#1a1040,#3020a0)", img:"https://images.unsplash.com/photo-1596176530529-78163a4f7af2?w=800&q=60&fm=avif" },
+  { city:"Delhi NCR", area:"Golf Course Rd", listings:72, avg:"₹18,500/sqft", grad:"linear-gradient(135deg,#2c1810,#5a3020)", img:"https://images.unsplash.com/photo-1587474260584-136574528ed5?w=800&q=60&fm=avif" },
+  { city:"Pune", area:"Kharadi", listings:103, avg:"₹9,400/sqft", grad:"linear-gradient(135deg,#101a10,#204020)", img:"https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&q=60&fm=avif" },
+  { city:"Chennai", area:"OMR", listings:91, avg:"₹7,600/sqft", grad:"linear-gradient(135deg,#201010,#401a1a)", img:"https://images.unsplash.com/photo-1582510003544-4d00b7f74220?w=800&q=60&fm=avif" },
 ];
 
 type Testimonial = { id: string; name: string; role: string; rating: number; text: string; date: string };
@@ -1034,9 +1034,9 @@ export default function HomePage() {
 
           <div className="discover-grid" style={{display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:16}}>
             {[
-              {type:"Apartments", count:142, grad:"linear-gradient(135deg, rgba(16,196,195,0.6) 0%, rgba(11,13,16,0.8) 100%)", img:"https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=800&q=80", d:"M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-2 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"},
-              {type:"Villas", count:48, grad:"linear-gradient(135deg, rgba(61,190,245,0.5) 0%, rgba(11,13,16,0.8) 100%)", img:"https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=800&q=80", d:"M3 12l9-9 9 9M5 10v10h5v-6h4v6h5V10"},
-              {type:"Plots & Land", count:76, grad:"linear-gradient(135deg, rgba(16,196,195,0.4) 0%, rgba(11,13,16,0.8) 100%)", img:"https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=800&q=80", d:"M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"},
+              {type:"Apartments", count:142, grad:"linear-gradient(135deg, rgba(16,196,195,0.6) 0%, rgba(11,13,16,0.8) 100%)", img:"https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=800&q=60&fm=avif", d:"M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-2 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"},
+              {type:"Villas", count:48, grad:"linear-gradient(135deg, rgba(61,190,245,0.5) 0%, rgba(11,13,16,0.8) 100%)", img:"https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=800&q=60&fm=avif", d:"M3 12l9-9 9 9M5 10v10h5v-6h4v6h5V10"},
+              {type:"Plots & Land", count:76, grad:"linear-gradient(135deg, rgba(16,196,195,0.4) 0%, rgba(11,13,16,0.8) 100%)", img:"https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=800&q=60&fm=avif", d:"M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"},
             ].map((cat,i)=>(
               <Reveal key={cat.type} delay={i*0.08}>
               <a href={`/search?city=${catCity.toLowerCase().replace(" ","-")}&type=${cat.type.toLowerCase().split(" ")[0]}`}
