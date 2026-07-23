@@ -1290,7 +1290,7 @@ export default function PropertyDetailClient() {
                     <div style={{fontSize: 13, color: "#10C4C3", marginTop: 4, fontWeight: 600}}>₹{(prevProperty.price / 10000000).toFixed(1)} Cr</div>
                   </div>
                   {prevProperty.images?.[0] && (
-                    <div style={{width: 64, height: 64, borderRadius: 10, backgroundImage: `url(${prevProperty.images[0]})`, backgroundSize: "cover", backgroundPosition: "center", flexShrink: 0}} />
+                    <div style={{width: 64, height: 64, borderRadius: 10, backgroundImage: `url(${optimizedImageUrl(prevProperty.images[0], 128)})`, backgroundSize: "cover", backgroundPosition: "center", flexShrink: 0}} />
                   )}
                 </a>
               ) : <div />}
@@ -1306,7 +1306,7 @@ export default function PropertyDetailClient() {
                 onMouseOver={e => (e.currentTarget.style.borderColor = "rgba(16,196,195,0.3)")}
                 onMouseOut={e => (e.currentTarget.style.borderColor = "rgba(255,255,255,0.07)")}>
                   {nextProperty.images?.[0] && (
-                    <div style={{width: 64, height: 64, borderRadius: 10, backgroundImage: `url(${nextProperty.images[0]})`, backgroundSize: "cover", backgroundPosition: "center", flexShrink: 0}} />
+                    <div style={{width: 64, height: 64, borderRadius: 10, backgroundImage: `url(${optimizedImageUrl(nextProperty.images[0], 128)})`, backgroundSize: "cover", backgroundPosition: "center", flexShrink: 0}} />
                   )}
                   <div style={{overflow: "hidden", flex: 1, textAlign: "right"}}>
                     <div style={{fontSize: 11, color: "rgba(255,255,255,0.4)", marginBottom: 4, textTransform: "uppercase", letterSpacing: "0.1em"}}>Next Property</div>
