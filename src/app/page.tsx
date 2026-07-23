@@ -362,7 +362,7 @@ export default function HomePage() {
         .nav-drop-item { display:block; padding:9px 14px; border-radius:6px; font-size:13px; color:#111; transition:background 0.15s, color 0.15s; white-space:nowrap; }
         .nav-drop-item:hover { background:rgba(11,13,16,0.06); color:#111; }
 
-        .city-tab { padding:8px 18px; border-radius:999px; font-size:13px; font-weight:500; cursor:pointer; border:1px solid rgba(255,255,255,0.10); transition:all 0.2s; background:transparent; color:rgba(255,255,255,0.45); }
+        .city-tab { padding:8px 18px; min-height:44px; display:inline-flex; align-items:center; border-radius:999px; font-size:13px; font-weight:500; cursor:pointer; border:1px solid rgba(255,255,255,0.10); transition:all 0.2s; background:transparent; color:rgba(255,255,255,0.45); box-sizing:border-box; }
         .city-tab.active { background:${G.gold}; color:#fff; border-color:${G.gold}; }
         .city-tab:not(.active):hover { border-color:rgba(16,196,195,0.35); color:rgba(255,255,255,0.80); box-shadow:0 0 12px rgba(16,196,195,0.10); }
 
@@ -370,7 +370,7 @@ export default function HomePage() {
         .svc-card { display:flex; flex-direction:column; align-items:center; gap:12px; padding:22px 14px; border-radius:16px; border:1px solid rgba(255,255,255,0.08); background:rgba(255,255,255,0.04); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px); cursor:pointer; transition:transform 0.35s cubic-bezier(0.16,1,0.3,1), box-shadow 0.35s cubic-bezier(0.16,1,0.3,1), border-color 0.35s ease; min-width:110px; will-change:transform; }
         .svc-card:hover { border-color:rgba(16,196,195,0.45); box-shadow:0 20px 60px rgba(0,0,0,0.45), 0 0 24px rgba(16,196,195,0.12); transform:translateY(-6px); }
 
-        .search-tab { padding:12px 22px; font-size:14px; font-weight:500; cursor:pointer; border:none; background:transparent; color:rgba(255,255,255,0.55); border-bottom:2px solid transparent; transition:all 0.15s; white-space:nowrap; }
+        .search-tab { padding:12px 22px; min-height:44px; display:inline-flex; align-items:center; box-sizing:border-box; font-size:14px; font-weight:500; cursor:pointer; border:none; background:transparent; color:rgba(255,255,255,0.55); border-bottom:2px solid transparent; transition:all 0.15s; white-space:nowrap; }
         .search-tab.active { color:#fff; border-bottom-color:${G.gold}; }
         .search-tab:not(.active):hover { color:rgba(255,255,255,0.85); }
 
@@ -438,8 +438,8 @@ export default function HomePage() {
           .hero-stat div:first-child { font-size: 15px !important; }
           .svc-card { min-width: 85px; padding: 14px 8px; gap: 8px; }
           .svc-icon-wrap { width: 38px; height: 38px; border-radius: 10px; }
-          .city-tab { padding: 6px 10px; font-size: 11px; }
-          .search-tab { padding: 7px 10px; font-size: 11px; }
+          .city-tab { padding: 6px 14px; font-size: 11px; }
+          .search-tab { padding: 7px 14px; font-size: 11px; }
           .badge-free { display: none; }
           .premium-card { width: 260px !important; }
           .cat-card { min-height: 180px !important; border-radius: 16px !important; }
@@ -839,7 +839,7 @@ export default function HomePage() {
                     {["", ...CITIES].map((c,i)=>(
                       <button key={i} type="button"
                         onClick={()=>{ setSearchCity(c); setCityOpen(false); }}
-                        style={{width:"100%", padding:"9px 14px", background: searchCity===c ? "rgba(16,196,195,0.12)" : "transparent", border:"none", borderRadius:9, textAlign:"left", fontFamily:"'Cal Sans',sans-serif", fontSize:13, color: c ? "#fff" : "rgba(255,255,255,0.35)", cursor:"pointer", transition:"background 0.15s", display:"block"}}
+                        style={{width:"100%", padding:"9px 14px", minHeight:44, boxSizing:"border-box", background: searchCity===c ? "rgba(16,196,195,0.12)" : "transparent", border:"none", borderRadius:9, textAlign:"left", fontFamily:"'Cal Sans',sans-serif", fontSize:13, color: c ? "#fff" : "rgba(255,255,255,0.35)", cursor:"pointer", transition:"background 0.15s", display:"flex", alignItems:"center"}}
                         onMouseOver={e=>(e.currentTarget.style.background="rgba(16,196,195,0.10)")}
                         onMouseOut={e=>(e.currentTarget.style.background= searchCity===c ? "rgba(16,196,195,0.12)" : "transparent")}
                       >{c || "All Cities"}</button>
@@ -847,11 +847,11 @@ export default function HomePage() {
                   </div>
                 )}
               </div>
-              <div style={{flex:1, display:"flex", alignItems:"center", padding:"0 16px", gap:10}}>
+              <div style={{flex:1, display:"flex", alignItems:"stretch", padding:"0 16px", gap:10}}>
                 <SvgIcon d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" size={16} color="rgba(255,255,255,0.4)" />
                 <input value={searchQuery} onChange={e=>setSearchQuery(e.target.value)}
                   placeholder="Search by Locality, Project or Builder"
-                  style={{flex:1, background:"transparent", border:"none", color:"#fff", fontSize:16, outline:"none", fontFamily:"'Cal Sans',sans-serif"}}
+                  style={{flex:1, height:"100%", minHeight:44, background:"transparent", border:"none", color:"#fff", fontSize:16, outline:"none", fontFamily:"'Cal Sans',sans-serif"}}
                   onKeyDown={e => {
                     if (e.key === 'Enter') {
                       router.push(`/search?q=${encodeURIComponent(searchQuery)}&city=${encodeURIComponent(searchCity)}&tab=${searchTab.toLowerCase().replace(/ /g, '-')}`);
@@ -861,7 +861,7 @@ export default function HomePage() {
                 <button
                   title={isListening ? "Listening..." : "Voice search"}
                   onClick={startVoiceSearch}
-                  style={{background:"none", border:"none", cursor:"pointer", display:"flex", padding:4, transition:"all 0.2s", animation: isListening ? "mic-pulse 1s ease-in-out infinite" : "none"}}
+                  style={{background:"none", border:"none", cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", width:44, height:44, padding:4, boxSizing:"border-box", transition:"all 0.2s", animation: isListening ? "mic-pulse 1s ease-in-out infinite" : "none"}}
                 >
                   <SvgIcon d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4M12 3a4 4 0 014 4v4a4 4 0 01-8 0V7a4 4 0 014-4z" size={16} color={isListening ? "#10C4C3" : "rgba(255,255,255,0.4)"} />
                 </button>
@@ -908,7 +908,7 @@ export default function HomePage() {
             </div>
             <div className="services-tabs" style={{display:"flex", gap:6, background:"rgba(255,255,255,0.04)", borderRadius:12, padding:4, border:"1px solid rgba(255,255,255,0.06)"}}>
               {Object.keys(SERVICES).map(t=>(
-                <button key={t} onClick={()=>setServiceTab(t)} style={{padding:"8px 18px", borderRadius:10, fontSize:13, fontWeight:500, cursor:"pointer", border:"none", background: serviceTab===t ? G.gold : "transparent", color: serviceTab===t ? "#000" : "rgba(255,255,255,0.45)", transition:"all 0.15s"}}>
+                <button key={t} onClick={()=>setServiceTab(t)} style={{padding:"8px 18px", minHeight:44, display:"inline-flex", alignItems:"center", boxSizing:"border-box", borderRadius:10, fontSize:13, fontWeight:500, cursor:"pointer", border:"none", background: serviceTab===t ? G.gold : "transparent", color: serviceTab===t ? "#000" : "rgba(255,255,255,0.45)", transition:"all 0.15s"}}>
                   {t}
                 </button>
               ))}
@@ -951,7 +951,7 @@ export default function HomePage() {
               <div style={{display:"flex", gap:8}}>
                 {[-1,1].map(d=>(
                   <button key={d} onClick={()=>scrollCarousel(d)}
-                    style={{width:40, height:40, borderRadius:"50%", border:`1px solid rgba(16,196,195,0.25)`, background:"rgba(11,13,16,0.8)", backdropFilter:"blur(8px)", cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", transition:"all 0.15s", color:"#FFFFFF"}}
+                    style={{width:44, height:44, borderRadius:"50%", border:`1px solid rgba(16,196,195,0.25)`, background:"rgba(11,13,16,0.8)", backdropFilter:"blur(8px)", cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", transition:"all 0.15s", color:"#FFFFFF"}}
                     onMouseOver={e=>{(e.currentTarget as HTMLElement).style.background="rgba(16,196,195,0.2)";(e.currentTarget as HTMLElement).style.borderColor="rgba(16,196,195,0.6)";}}
                     onMouseOut={e=>{(e.currentTarget as HTMLElement).style.background="rgba(11,13,16,0.8)";(e.currentTarget as HTMLElement).style.borderColor="rgba(16,196,195,0.25)";}}>
                     <SvgIcon d={d<0 ? "M15 19l-7-7 7-7" : "M9 5l7 7-7 7"} size={14} color="currentColor" />
@@ -982,7 +982,7 @@ export default function HomePage() {
                   <span className="badge-tag" style={{position:"absolute", top:12, left:12, zIndex:1}}>{p.tag}</span>
                   <button
                     onClick={(e) => { e.preventDefault(); toggleSave(p.id) }}
-                    style={{position:"absolute", top:12, right:12, zIndex:2, background:"rgba(0,0,0,0.5)", backdropFilter:"blur(6px)", border:"1px solid rgba(255,255,255,0.15)", borderRadius:"50%", width:34, height:34, display:"flex", alignItems:"center", justifyContent:"center", cursor:"pointer", transition:"all 0.2s"}}
+                    style={{position:"absolute", top:8, right:8, zIndex:2, background:"rgba(0,0,0,0.5)", backdropFilter:"blur(6px)", border:"1px solid rgba(255,255,255,0.15)", borderRadius:"50%", width:44, height:44, display:"flex", alignItems:"center", justifyContent:"center", cursor:"pointer", transition:"all 0.2s"}}
                   >
                     <svg width="16" height="16" viewBox="0 0 24 24" fill={savedIds.has(p.id) ? "#10C4C3" : "none"} stroke={savedIds.has(p.id) ? "#10C4C3" : "rgba(255,255,255,0.8)"} strokeWidth="2">
                       <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
