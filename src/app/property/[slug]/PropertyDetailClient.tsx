@@ -753,23 +753,7 @@ export default function PropertyDetailClient() {
 
       <div style={{ background: "#020C1C", minHeight: "100vh" }}>
 
-        {/* ── NAV ── */}
-        <nav className="pd-nav" style={{ position: "fixed", top: 0, left: 0, right: 0, zIndex: 100, height: "68px", display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 48px", background: "rgba(5,8,12,0.82)", backdropFilter: "blur(20px) saturate(180%)", borderBottom: "0.5px solid rgba(16,196,195,0.18)" }}>
-          <a href="/" style={{ fontFamily: "'Cal Sans', sans-serif", fontSize: "19px", fontWeight: 600, color: "#fff", letterSpacing: "0.16em", display: "flex", alignItems: "center", gap: "6px", textDecoration: "none" }}>
-            Nilay 360 <span style={{ color: "#10C4C3", fontSize: "22px", lineHeight: 1 }}>·</span>
-          </a>
-          <div className="pd-nav-links" style={{ display: "flex", gap: "2px" }}>
-            {[["Home", "/"], ["Properties", "/properties"], ["Agents", "/agents"], ["Blog", "/blog"]].map(([label, href]) => (
-              <a key={label} href={href} style={{ padding: "7px 15px", borderRadius: "6px", fontSize: "13px", fontWeight: 500, color: "rgba(255,255,255,0.55)", textDecoration: "none" }}>{label}</a>
-            ))}
-          </div>
-          <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
-            <a href="/login" style={{ padding: "8px 18px", borderRadius: "7px", border: "0.5px solid rgba(255,255,255,0.22)", background: "transparent", color: "rgba(255,255,255,0.75)", fontSize: "13px", fontWeight: 500, textDecoration: "none" }}>Sign In</a>
-            <a href="/register" style={{ padding: "8px 22px", borderRadius: "7px", background: "#10C4C3", color: "#020C1C", fontSize: "13px", fontWeight: 600, textDecoration: "none" }}>List Property</a>
-          </div>
-        </nav>
-
-        <div style={{ paddingTop: "68px" }}>
+        <div style={{ paddingTop: "64px" }}>
 
           {/* ── IMAGE GALLERY ── */}
           <div style={{ background: "#0A1526", position: "relative" }}>
@@ -1290,7 +1274,7 @@ export default function PropertyDetailClient() {
                     <div style={{fontSize: 13, color: "#10C4C3", marginTop: 4, fontWeight: 600}}>₹{(prevProperty.price / 10000000).toFixed(1)} Cr</div>
                   </div>
                   {prevProperty.images?.[0] && (
-                    <div style={{width: 64, height: 64, borderRadius: 10, backgroundImage: `url(${prevProperty.images[0]})`, backgroundSize: "cover", backgroundPosition: "center", flexShrink: 0}} />
+                    <div style={{width: 64, height: 64, borderRadius: 10, backgroundImage: `url(${optimizedImageUrl(prevProperty.images[0], 128)})`, backgroundSize: "cover", backgroundPosition: "center", flexShrink: 0}} />
                   )}
                 </a>
               ) : <div />}
@@ -1306,7 +1290,7 @@ export default function PropertyDetailClient() {
                 onMouseOver={e => (e.currentTarget.style.borderColor = "rgba(16,196,195,0.3)")}
                 onMouseOut={e => (e.currentTarget.style.borderColor = "rgba(255,255,255,0.07)")}>
                   {nextProperty.images?.[0] && (
-                    <div style={{width: 64, height: 64, borderRadius: 10, backgroundImage: `url(${nextProperty.images[0]})`, backgroundSize: "cover", backgroundPosition: "center", flexShrink: 0}} />
+                    <div style={{width: 64, height: 64, borderRadius: 10, backgroundImage: `url(${optimizedImageUrl(nextProperty.images[0], 128)})`, backgroundSize: "cover", backgroundPosition: "center", flexShrink: 0}} />
                   )}
                   <div style={{overflow: "hidden", flex: 1, textAlign: "right"}}>
                     <div style={{fontSize: 11, color: "rgba(255,255,255,0.4)", marginBottom: 4, textTransform: "uppercase", letterSpacing: "0.1em"}}>Next Property</div>

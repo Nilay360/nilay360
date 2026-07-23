@@ -104,7 +104,7 @@ function RentalCard({ p }: { p: Property }) {
             </div>
           ))}
         </div>
-        <a href={`/property/${p.slug}`} style={{ display: "block", marginTop: "14px", padding: "10px", background: "#020C1C", borderRadius: "8px", color: "#10C4C3", fontSize: "11px", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", textDecoration: "none", textAlign: "center" }}>
+        <a href={`/property/${p.slug}`} style={{ display: "flex", alignItems: "center", justifyContent: "center", marginTop: "14px", padding: "10px", minHeight: "44px", boxSizing: "border-box", background: "#020C1C", borderRadius: "8px", color: "#10C4C3", fontSize: "11px", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", textDecoration: "none", textAlign: "center" }}>
           View Details →
         </a>
       </div>
@@ -174,7 +174,7 @@ export default function RentPage() {
     return true;
   });
 
-  const SEL_STYLE = { padding: "9px 32px 9px 14px", background: "#0A1526", border: "1.5px solid rgba(255,255,255,0.1)", borderRadius: "9px", fontSize: "12px", fontWeight: 600 as const, fontFamily: "'Cal Sans', sans-serif", cursor: "pointer" as const, outline: "none", appearance: "none" as const, color: "#FFFFFF" as const, backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%23AEB4BC' stroke-width='2.5'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E")`, backgroundRepeat: "no-repeat" as const, backgroundPosition: "right 12px center" as const };
+  const SEL_STYLE = { padding: "9px 32px 9px 14px", minHeight: "44px", boxSizing: "border-box" as const, background: "#0A1526", border: "1.5px solid rgba(255,255,255,0.1)", borderRadius: "9px", fontSize: "12px", fontWeight: 600 as const, fontFamily: "'Cal Sans', sans-serif", cursor: "pointer" as const, outline: "none", appearance: "none" as const, color: "#FFFFFF" as const, backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%23AEB4BC' stroke-width='2.5'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E")`, backgroundRepeat: "no-repeat" as const, backgroundPosition: "right 12px center" as const };
 
   return (
     <>
@@ -288,7 +288,7 @@ export default function RentPage() {
               <option value="60-150" style={{ background: "#0A1526" }}>₹60K – 1.5L/mo</option>
               <option value="above150" style={{ background: "#0A1526" }}>Above ₹1.5L/mo</option>
             </select>
-            <button onClick={() => { setCityFilter("All"); setTypeFilter("All"); setBhkFilter("All"); setBudgetFilter("all"); }} style={{ padding: "9px 18px", borderRadius: "9px", border: "1.5px solid rgba(255,255,255,0.1)", background: "transparent", color: "rgba(255,255,255,0.55)", fontSize: "12px", fontWeight: 600, cursor: "pointer", fontFamily: "'Cal Sans', sans-serif" }}>Reset</button>
+            <button onClick={() => { setCityFilter("All"); setTypeFilter("All"); setBhkFilter("All"); setBudgetFilter("all"); }} style={{ padding: "9px 18px", minHeight: "44px", boxSizing: "border-box", borderRadius: "9px", border: "1.5px solid rgba(255,255,255,0.1)", background: "transparent", color: "rgba(255,255,255,0.55)", fontSize: "12px", fontWeight: 600, cursor: "pointer", fontFamily: "'Cal Sans', sans-serif" }}>Reset</button>
             <span style={{ marginLeft: "auto", fontSize: "12px", fontWeight: 700, color: "rgba(255,255,255,0.45)" }}>{filtered.length} rentals</span>
           </div>
         </div>

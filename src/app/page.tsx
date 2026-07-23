@@ -71,24 +71,24 @@ const MARKET: Record<string,{price:string;growth:string;localities:{name:string;
 
 /* ─── Property data ─────────────────────────────────────────── */
 const PROPERTIES = [
-  { id:1, city:"Hyderabad", title:"Prestige Falcon City", type:"Apartment", beds:3, baths:3, sqft:2100, price:"₹2.8 Cr", img:"https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800&q=80", tag:"Featured" },
-  { id:2, city:"Hyderabad", title:"Sobha Neopolis", type:"Villa", beds:4, baths:4, sqft:3800, price:"₹5.2 Cr", img:"https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=800&q=80", tag:"New Launch" },
-  { id:3, city:"Mumbai", title:"Lodha Malabar", type:"Apartment", beds:4, baths:4, sqft:3200, price:"₹18.5 Cr", img:"https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&q=80", tag:"Premium" },
-  { id:4, city:"Mumbai", title:"Rustomjee Elements", type:"Apartment", beds:3, baths:2, sqft:1900, price:"₹7.4 Cr", img:"https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&q=80", tag:"Under Construction" },
-  { id:5, city:"Bengaluru", title:"Brigade Insignia", type:"Villa", beds:5, baths:5, sqft:5200, price:"₹8.9 Cr", img:"https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&q=80", tag:"RERA" },
-  { id:6, city:"Bengaluru", title:"Godrej Reserve", type:"Apartment", beds:3, baths:3, sqft:1750, price:"₹3.1 Cr", img:"https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&q=80", tag:"Ready" },
-  { id:7, city:"Delhi NCR", title:"DLF Camellias", type:"Penthouse", beds:5, baths:6, sqft:8800, price:"₹42 Cr", img:"https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=800&q=80", tag:"Ultra Luxury" },
-  { id:8, city:"Chennai", title:"Mahindra Eden", type:"Villa", beds:4, baths:4, sqft:3400, price:"₹4.6 Cr", img:"https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea?w=800&q=80", tag:"New Launch" },
-  { id:9, city:"Pune", title:"Shapoorji Parkwest", type:"Apartment", beds:2, baths:2, sqft:1200, price:"₹1.8 Cr", img:"https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&q=80", tag:"Featured" },
+  { id:1, city:"Hyderabad", title:"Prestige Falcon City", type:"Apartment", beds:3, baths:3, sqft:2100, price:"₹2.8 Cr", img:"https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800&q=60&fm=avif", tag:"Featured" },
+  { id:2, city:"Hyderabad", title:"Sobha Neopolis", type:"Villa", beds:4, baths:4, sqft:3800, price:"₹5.2 Cr", img:"https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=800&q=60&fm=avif", tag:"New Launch" },
+  { id:3, city:"Mumbai", title:"Lodha Malabar", type:"Apartment", beds:4, baths:4, sqft:3200, price:"₹18.5 Cr", img:"https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&q=60&fm=avif", tag:"Premium" },
+  { id:4, city:"Mumbai", title:"Rustomjee Elements", type:"Apartment", beds:3, baths:2, sqft:1900, price:"₹7.4 Cr", img:"https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&q=60&fm=avif", tag:"Under Construction" },
+  { id:5, city:"Bengaluru", title:"Brigade Insignia", type:"Villa", beds:5, baths:5, sqft:5200, price:"₹8.9 Cr", img:"https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&q=60&fm=avif", tag:"RERA" },
+  { id:6, city:"Bengaluru", title:"Godrej Reserve", type:"Apartment", beds:3, baths:3, sqft:1750, price:"₹3.1 Cr", img:"https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&q=60&fm=avif", tag:"Ready" },
+  { id:7, city:"Delhi NCR", title:"DLF Camellias", type:"Penthouse", beds:5, baths:6, sqft:8800, price:"₹42 Cr", img:"https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=800&q=60&fm=avif", tag:"Ultra Luxury" },
+  { id:8, city:"Chennai", title:"Mahindra Eden", type:"Villa", beds:4, baths:4, sqft:3400, price:"₹4.6 Cr", img:"https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea?w=800&q=60&fm=avif", tag:"New Launch" },
+  { id:9, city:"Pune", title:"Shapoorji Parkwest", type:"Apartment", beds:2, baths:2, sqft:1200, price:"₹1.8 Cr", img:"https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&q=60&fm=avif", tag:"Featured" },
 ];
 
 const LOCATIONS = [
-  { city:"Hyderabad", area:"Kokapet", listings:124, avg:"₹6,800/sqft", grad:"linear-gradient(135deg,#020C1C,#0A1526)", img:"https://images.unsplash.com/photo-1590577976322-3d2d6e2130d5?w=800&q=80" },
-  { city:"Mumbai", area:"Bandra West", listings:89, avg:"₹42,000/sqft", grad:"linear-gradient(135deg,#0d1f3c,#1a3a6e)", img:"https://images.unsplash.com/photo-1570168007204-dfb528c6958f?w=800&q=80" },
-  { city:"Bengaluru", area:"Whitefield", listings:156, avg:"₹8,200/sqft", grad:"linear-gradient(135deg,#1a1040,#3020a0)", img:"https://images.unsplash.com/photo-1596176530529-78163a4f7af2?w=800&q=80" },
-  { city:"Delhi NCR", area:"Golf Course Rd", listings:72, avg:"₹18,500/sqft", grad:"linear-gradient(135deg,#2c1810,#5a3020)", img:"https://images.unsplash.com/photo-1587474260584-136574528ed5?w=800&q=80" },
-  { city:"Pune", area:"Kharadi", listings:103, avg:"₹9,400/sqft", grad:"linear-gradient(135deg,#101a10,#204020)", img:"https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&q=80" },
-  { city:"Chennai", area:"OMR", listings:91, avg:"₹7,600/sqft", grad:"linear-gradient(135deg,#201010,#401a1a)", img:"https://images.unsplash.com/photo-1582510003544-4d00b7f74220?w=800&q=80" },
+  { city:"Hyderabad", area:"Kokapet", listings:124, avg:"₹6,800/sqft", grad:"linear-gradient(135deg,#020C1C,#0A1526)", img:"https://images.unsplash.com/photo-1590577976322-3d2d6e2130d5?w=800&q=60&fm=avif" },
+  { city:"Mumbai", area:"Bandra West", listings:89, avg:"₹42,000/sqft", grad:"linear-gradient(135deg,#0d1f3c,#1a3a6e)", img:"https://images.unsplash.com/photo-1570168007204-dfb528c6958f?w=800&q=60&fm=avif" },
+  { city:"Bengaluru", area:"Whitefield", listings:156, avg:"₹8,200/sqft", grad:"linear-gradient(135deg,#1a1040,#3020a0)", img:"https://images.unsplash.com/photo-1596176530529-78163a4f7af2?w=800&q=60&fm=avif" },
+  { city:"Delhi NCR", area:"Golf Course Rd", listings:72, avg:"₹18,500/sqft", grad:"linear-gradient(135deg,#2c1810,#5a3020)", img:"https://images.unsplash.com/photo-1587474260584-136574528ed5?w=800&q=60&fm=avif" },
+  { city:"Pune", area:"Kharadi", listings:103, avg:"₹9,400/sqft", grad:"linear-gradient(135deg,#101a10,#204020)", img:"https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&q=60&fm=avif" },
+  { city:"Chennai", area:"OMR", listings:91, avg:"₹7,600/sqft", grad:"linear-gradient(135deg,#201010,#401a1a)", img:"https://images.unsplash.com/photo-1582510003544-4d00b7f74220?w=800&q=60&fm=avif" },
 ];
 
 type Testimonial = { id: string; name: string; role: string; rating: number; text: string; date: string };
@@ -362,7 +362,7 @@ export default function HomePage() {
         .nav-drop-item { display:block; padding:9px 14px; border-radius:6px; font-size:13px; color:#111; transition:background 0.15s, color 0.15s; white-space:nowrap; }
         .nav-drop-item:hover { background:rgba(11,13,16,0.06); color:#111; }
 
-        .city-tab { padding:8px 18px; border-radius:999px; font-size:13px; font-weight:500; cursor:pointer; border:1px solid rgba(255,255,255,0.10); transition:all 0.2s; background:transparent; color:rgba(255,255,255,0.45); }
+        .city-tab { padding:8px 18px; min-height:44px; display:inline-flex; align-items:center; border-radius:999px; font-size:13px; font-weight:500; cursor:pointer; border:1px solid rgba(255,255,255,0.10); transition:all 0.2s; background:transparent; color:rgba(255,255,255,0.45); box-sizing:border-box; }
         .city-tab.active { background:${G.gold}; color:#fff; border-color:${G.gold}; }
         .city-tab:not(.active):hover { border-color:rgba(16,196,195,0.35); color:rgba(255,255,255,0.80); box-shadow:0 0 12px rgba(16,196,195,0.10); }
 
@@ -370,7 +370,7 @@ export default function HomePage() {
         .svc-card { display:flex; flex-direction:column; align-items:center; gap:12px; padding:22px 14px; border-radius:16px; border:1px solid rgba(255,255,255,0.08); background:rgba(255,255,255,0.04); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px); cursor:pointer; transition:transform 0.35s cubic-bezier(0.16,1,0.3,1), box-shadow 0.35s cubic-bezier(0.16,1,0.3,1), border-color 0.35s ease; min-width:110px; will-change:transform; }
         .svc-card:hover { border-color:rgba(16,196,195,0.45); box-shadow:0 20px 60px rgba(0,0,0,0.45), 0 0 24px rgba(16,196,195,0.12); transform:translateY(-6px); }
 
-        .search-tab { padding:12px 22px; font-size:14px; font-weight:500; cursor:pointer; border:none; background:transparent; color:rgba(255,255,255,0.55); border-bottom:2px solid transparent; transition:all 0.15s; white-space:nowrap; }
+        .search-tab { padding:12px 22px; min-height:44px; display:inline-flex; align-items:center; box-sizing:border-box; font-size:14px; font-weight:500; cursor:pointer; border:none; background:transparent; color:rgba(255,255,255,0.55); border-bottom:2px solid transparent; transition:all 0.15s; white-space:nowrap; }
         .search-tab.active { color:#fff; border-bottom-color:${G.gold}; }
         .search-tab:not(.active):hover { color:rgba(255,255,255,0.85); }
 
@@ -438,8 +438,8 @@ export default function HomePage() {
           .hero-stat div:first-child { font-size: 15px !important; }
           .svc-card { min-width: 85px; padding: 14px 8px; gap: 8px; }
           .svc-icon-wrap { width: 38px; height: 38px; border-radius: 10px; }
-          .city-tab { padding: 6px 10px; font-size: 11px; }
-          .search-tab { padding: 7px 10px; font-size: 11px; }
+          .city-tab { padding: 6px 14px; font-size: 11px; }
+          .search-tab { padding: 7px 14px; font-size: 11px; }
           .badge-free { display: none; }
           .premium-card { width: 260px !important; }
           .cat-card { min-height: 180px !important; border-radius: 16px !important; }
@@ -839,7 +839,7 @@ export default function HomePage() {
                     {["", ...CITIES].map((c,i)=>(
                       <button key={i} type="button"
                         onClick={()=>{ setSearchCity(c); setCityOpen(false); }}
-                        style={{width:"100%", padding:"9px 14px", background: searchCity===c ? "rgba(16,196,195,0.12)" : "transparent", border:"none", borderRadius:9, textAlign:"left", fontFamily:"'Cal Sans',sans-serif", fontSize:13, color: c ? "#fff" : "rgba(255,255,255,0.35)", cursor:"pointer", transition:"background 0.15s", display:"block"}}
+                        style={{width:"100%", padding:"9px 14px", minHeight:44, boxSizing:"border-box", background: searchCity===c ? "rgba(16,196,195,0.12)" : "transparent", border:"none", borderRadius:9, textAlign:"left", fontFamily:"'Cal Sans',sans-serif", fontSize:13, color: c ? "#fff" : "rgba(255,255,255,0.35)", cursor:"pointer", transition:"background 0.15s", display:"flex", alignItems:"center"}}
                         onMouseOver={e=>(e.currentTarget.style.background="rgba(16,196,195,0.10)")}
                         onMouseOut={e=>(e.currentTarget.style.background= searchCity===c ? "rgba(16,196,195,0.12)" : "transparent")}
                       >{c || "All Cities"}</button>
@@ -847,11 +847,11 @@ export default function HomePage() {
                   </div>
                 )}
               </div>
-              <div style={{flex:1, display:"flex", alignItems:"center", padding:"0 16px", gap:10}}>
+              <div style={{flex:1, display:"flex", alignItems:"stretch", padding:"0 16px", gap:10}}>
                 <SvgIcon d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" size={16} color="rgba(255,255,255,0.4)" />
                 <input value={searchQuery} onChange={e=>setSearchQuery(e.target.value)}
                   placeholder="Search by Locality, Project or Builder"
-                  style={{flex:1, background:"transparent", border:"none", color:"#fff", fontSize:16, outline:"none", fontFamily:"'Cal Sans',sans-serif"}}
+                  style={{flex:1, height:"100%", minHeight:44, background:"transparent", border:"none", color:"#fff", fontSize:16, outline:"none", fontFamily:"'Cal Sans',sans-serif"}}
                   onKeyDown={e => {
                     if (e.key === 'Enter') {
                       router.push(`/search?q=${encodeURIComponent(searchQuery)}&city=${encodeURIComponent(searchCity)}&tab=${searchTab.toLowerCase().replace(/ /g, '-')}`);
@@ -861,7 +861,7 @@ export default function HomePage() {
                 <button
                   title={isListening ? "Listening..." : "Voice search"}
                   onClick={startVoiceSearch}
-                  style={{background:"none", border:"none", cursor:"pointer", display:"flex", padding:4, transition:"all 0.2s", animation: isListening ? "mic-pulse 1s ease-in-out infinite" : "none"}}
+                  style={{background:"none", border:"none", cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", width:44, height:44, padding:4, boxSizing:"border-box", transition:"all 0.2s", animation: isListening ? "mic-pulse 1s ease-in-out infinite" : "none"}}
                 >
                   <SvgIcon d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4M12 3a4 4 0 014 4v4a4 4 0 01-8 0V7a4 4 0 014-4z" size={16} color={isListening ? "#10C4C3" : "rgba(255,255,255,0.4)"} />
                 </button>
@@ -908,7 +908,7 @@ export default function HomePage() {
             </div>
             <div className="services-tabs" style={{display:"flex", gap:6, background:"rgba(255,255,255,0.04)", borderRadius:12, padding:4, border:"1px solid rgba(255,255,255,0.06)"}}>
               {Object.keys(SERVICES).map(t=>(
-                <button key={t} onClick={()=>setServiceTab(t)} style={{padding:"8px 18px", borderRadius:10, fontSize:13, fontWeight:500, cursor:"pointer", border:"none", background: serviceTab===t ? G.gold : "transparent", color: serviceTab===t ? "#000" : "rgba(255,255,255,0.45)", transition:"all 0.15s"}}>
+                <button key={t} onClick={()=>setServiceTab(t)} style={{padding:"8px 18px", minHeight:44, display:"inline-flex", alignItems:"center", boxSizing:"border-box", borderRadius:10, fontSize:13, fontWeight:500, cursor:"pointer", border:"none", background: serviceTab===t ? G.gold : "transparent", color: serviceTab===t ? "#000" : "rgba(255,255,255,0.45)", transition:"all 0.15s"}}>
                   {t}
                 </button>
               ))}
@@ -951,7 +951,7 @@ export default function HomePage() {
               <div style={{display:"flex", gap:8}}>
                 {[-1,1].map(d=>(
                   <button key={d} onClick={()=>scrollCarousel(d)}
-                    style={{width:40, height:40, borderRadius:"50%", border:`1px solid rgba(16,196,195,0.25)`, background:"rgba(11,13,16,0.8)", backdropFilter:"blur(8px)", cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", transition:"all 0.15s", color:"#FFFFFF"}}
+                    style={{width:44, height:44, borderRadius:"50%", border:`1px solid rgba(16,196,195,0.25)`, background:"rgba(11,13,16,0.8)", backdropFilter:"blur(8px)", cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", transition:"all 0.15s", color:"#FFFFFF"}}
                     onMouseOver={e=>{(e.currentTarget as HTMLElement).style.background="rgba(16,196,195,0.2)";(e.currentTarget as HTMLElement).style.borderColor="rgba(16,196,195,0.6)";}}
                     onMouseOut={e=>{(e.currentTarget as HTMLElement).style.background="rgba(11,13,16,0.8)";(e.currentTarget as HTMLElement).style.borderColor="rgba(16,196,195,0.25)";}}>
                     <SvgIcon d={d<0 ? "M15 19l-7-7 7-7" : "M9 5l7 7-7 7"} size={14} color="currentColor" />
@@ -982,7 +982,7 @@ export default function HomePage() {
                   <span className="badge-tag" style={{position:"absolute", top:12, left:12, zIndex:1}}>{p.tag}</span>
                   <button
                     onClick={(e) => { e.preventDefault(); toggleSave(p.id) }}
-                    style={{position:"absolute", top:12, right:12, zIndex:2, background:"rgba(0,0,0,0.5)", backdropFilter:"blur(6px)", border:"1px solid rgba(255,255,255,0.15)", borderRadius:"50%", width:34, height:34, display:"flex", alignItems:"center", justifyContent:"center", cursor:"pointer", transition:"all 0.2s"}}
+                    style={{position:"absolute", top:8, right:8, zIndex:2, background:"rgba(0,0,0,0.5)", backdropFilter:"blur(6px)", border:"1px solid rgba(255,255,255,0.15)", borderRadius:"50%", width:44, height:44, display:"flex", alignItems:"center", justifyContent:"center", cursor:"pointer", transition:"all 0.2s"}}
                   >
                     <svg width="16" height="16" viewBox="0 0 24 24" fill={savedIds.has(p.id) ? "#10C4C3" : "none"} stroke={savedIds.has(p.id) ? "#10C4C3" : "rgba(255,255,255,0.8)"} strokeWidth="2">
                       <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
@@ -1034,9 +1034,9 @@ export default function HomePage() {
 
           <div className="discover-grid" style={{display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:16}}>
             {[
-              {type:"Apartments", count:142, grad:"linear-gradient(135deg, rgba(16,196,195,0.6) 0%, rgba(11,13,16,0.8) 100%)", img:"https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=800&q=80", d:"M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-2 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"},
-              {type:"Villas", count:48, grad:"linear-gradient(135deg, rgba(61,190,245,0.5) 0%, rgba(11,13,16,0.8) 100%)", img:"https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=800&q=80", d:"M3 12l9-9 9 9M5 10v10h5v-6h4v6h5V10"},
-              {type:"Plots & Land", count:76, grad:"linear-gradient(135deg, rgba(16,196,195,0.4) 0%, rgba(11,13,16,0.8) 100%)", img:"https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=800&q=80", d:"M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"},
+              {type:"Apartments", count:142, grad:"linear-gradient(135deg, rgba(16,196,195,0.6) 0%, rgba(11,13,16,0.8) 100%)", img:"https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=800&q=60&fm=avif", d:"M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-2 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"},
+              {type:"Villas", count:48, grad:"linear-gradient(135deg, rgba(61,190,245,0.5) 0%, rgba(11,13,16,0.8) 100%)", img:"https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=800&q=60&fm=avif", d:"M3 12l9-9 9 9M5 10v10h5v-6h4v6h5V10"},
+              {type:"Plots & Land", count:76, grad:"linear-gradient(135deg, rgba(16,196,195,0.4) 0%, rgba(11,13,16,0.8) 100%)", img:"https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=800&q=60&fm=avif", d:"M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"},
             ].map((cat,i)=>(
               <Reveal key={cat.type} delay={i*0.08}>
               <a href={`/search?city=${catCity.toLowerCase().replace(" ","-")}&type=${cat.type.toLowerCase().split(" ")[0]}`}

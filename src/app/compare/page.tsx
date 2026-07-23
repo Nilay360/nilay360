@@ -459,24 +459,8 @@ export default function ComparePage() {
 
       <div style={{ minHeight: "100vh", background: "#020C1C" }}>
 
-        {/* ── NAVBAR ─────────────────────────────────────────── */}
-        <nav className="cp-nav" style={{ position: "fixed", top: 0, left: 0, right: 0, zIndex: 200, height: "68px", display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 48px", background: "rgba(5,8,12,0.88)", backdropFilter: "blur(20px) saturate(180%)", borderBottom: "0.5px solid rgba(201,168,76,0.18)" }}>
-          <a href="/" style={{ fontFamily: "'Cal Sans', sans-serif", fontSize: "19px", fontWeight: 600, color: "#fff", letterSpacing: "0.16em", textDecoration: "none", display: "flex", alignItems: "center", gap: "5px" }}>
-            Nilay 360 <span style={{ color: "#10C4C3", fontSize: "22px", lineHeight: 1 }}>·</span>
-          </a>
-          <div className="cp-nav-links" style={{ display: "flex", gap: "2px" }}>
-            {[["Home", "/"], ["Properties", "/properties"], ["Search", "/search"], ["Blog", "/blog"], ["About", "/about"], ["Contact", "/contact"]].map(([l, h]) => (
-              <a key={l} href={h} style={{ padding: "7px 14px", borderRadius: "6px", fontSize: "13px", fontWeight: 500, color: "rgba(255,255,255,0.5)", textDecoration: "none" }}>{l}</a>
-            ))}
-          </div>
-          <div style={{ display: "flex", gap: "10px" }}>
-            <a href="/login"    style={{ padding: "8px 18px", borderRadius: "7px", border: "0.5px solid rgba(255,255,255,0.22)", color: "rgba(255,255,255,0.75)", fontSize: "13px", fontWeight: 500, textDecoration: "none" }}>Sign In</a>
-            <a href="/register" style={{ padding: "8px 22px", borderRadius: "7px", background: "#10C4C3", color: "#020C1C", fontSize: "13px", fontWeight: 600, textDecoration: "none" }}>List Property</a>
-          </div>
-        </nav>
-
         {/* ── HERO ───────────────────────────────────────────── */}
-        <section style={{ paddingTop: "68px", background: "#020C1C", position: "relative", overflow: "hidden" }}>
+        <section style={{ paddingTop: "64px", background: "#020C1C", position: "relative", overflow: "hidden" }}>
           <div style={{ position: "absolute", inset: 0, backgroundImage: "linear-gradient(rgba(201,168,76,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(201,168,76,0.04) 1px, transparent 1px)", backgroundSize: "52px 52px", pointerEvents: "none" }} />
           <div style={{ position: "absolute", inset: 0, background: "radial-gradient(ellipse 60% 65% at 85% 110%, rgba(201,168,76,0.09) 0%, transparent 55%)", pointerEvents: "none" }} />
           <div style={{ position: "relative", zIndex: 2, maxWidth: "720px", margin: "0 auto", padding: "64px 48px 72px", textAlign: "center" }}>

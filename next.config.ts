@@ -13,6 +13,19 @@ const nextConfig: NextConfig = {
   typescript: { ignoreBuildErrors: true },
   devIndicators: false,
   allowedDevOrigins: ['192.168.10.39'],
+  async headers() {
+    return [
+      {
+        // Static brand assets (logo, hero background) never change filename
+        // on update, so give them long-lived caching instead of the
+        // platform's conservative max-age=0 default for /public files.
+        source: '/brand/:path*',
+        headers: [
+          { key: 'Cache-Control', value: 'public, max-age=31536000, immutable' },
+        ],
+      },
+    ];
+  },
 };
 
 export default withSentryConfig(nextConfig, {

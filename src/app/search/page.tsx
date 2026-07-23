@@ -232,7 +232,7 @@ function PropertyCard({ p, comparing, onCompare, onSave, saved }: { p: Property;
             </span>
             {p.is_featured && <span style={{ padding: "3px 9px", borderRadius: "100px", fontSize: "10px", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", background: "rgba(11,13,16,0.82)", color: "#3DDAD9", border: "1px solid rgba(16,196,195,0.35)", backdropFilter: "blur(6px)" }}>Premium</span>}
           </div>
-          <button onClick={e => { e.preventDefault(); e.stopPropagation(); onSave(); }} style={{ position: "absolute", bottom: "12px", right: "12px", width: "32px", height: "32px", borderRadius: "50%", background: "rgba(255,255,255,0.88)", border: "none", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", backdropFilter: "blur(4px)" }}>
+          <button onClick={e => { e.preventDefault(); e.stopPropagation(); onSave(); }} style={{ position: "absolute", bottom: "8px", right: "8px", width: "44px", height: "44px", borderRadius: "50%", background: "rgba(255,255,255,0.88)", border: "none", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", backdropFilter: "blur(4px)" }}>
             <svg width="14" height="14" viewBox="0 0 24 24" fill={saved ? "#10C4C3" : "none"} stroke={saved ? "#10C4C3" : "#6B7686"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" /></svg>
           </button>
           <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, background: "linear-gradient(transparent, rgba(0,0,0,0.55))", padding: "28px 14px 12px" }}>
@@ -619,7 +619,10 @@ function SearchPageInner() {
     [...bhk].length > 0 ? `${[...bhk].join("/")} BHK` : null,
   ].filter(Boolean).join(" · ") || "All Properties";
 
-  const selStyle = { padding: "10px 36px 10px 14px", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.14)", borderRadius: "8px", color: "#FFFFFF", fontSize: "13px", fontFamily: "'Cal Sans', sans-serif", cursor: "pointer", outline: "none" } as React.CSSProperties;
+  const selStyle = { padding: "10px 36px 10px 14px", minHeight: "44px", boxSizing: "border-box", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.14)", borderRadius: "8px", color: "#FFFFFF", fontSize: "13px", fontFamily: "'Cal Sans', sans-serif", cursor: "pointer", outline: "none" } as React.CSSProperties;
+  // Shared base for the sidebar filter selects (state/city/possession/propertyAge) —
+  // was 4 copy-pasted identical style objects; each instance still overrides `color`.
+  const sidebarSelectBase = { width: "100%", padding: "10px 32px 10px 12px", minHeight: "44px", boxSizing: "border-box", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: "8px", fontSize: "13px", fontFamily: "'Cal Sans', sans-serif", cursor: "pointer", outline: "none" } as React.CSSProperties;
   const chevron = (
     <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.4)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ position: "absolute", right: "12px", top: "50%", transform: "translateY(-50%)", pointerEvents: "none" }}><polyline points="6 9 12 15 18 9" /></svg>
   );
@@ -669,24 +672,8 @@ function SearchPageInner() {
 
       <div style={{ minHeight: "100vh", background: "#020C1C" }}>
 
-        {/* ── NAV ── */}
-        <nav style={{ position: "fixed", top: 0, left: 0, right: 0, zIndex: 100, height: "68px", display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 48px", background: "rgba(5,8,12,0.82)", backdropFilter: "blur(20px) saturate(180%)", borderBottom: "0.5px solid rgba(16,196,195,0.18)" }}>
-          <a href="/" style={{ fontFamily: "'Cal Sans', sans-serif", fontSize: "19px", fontWeight: 600, color: "#fff", letterSpacing: "0.16em", display: "flex", alignItems: "center", gap: "6px", textDecoration: "none" }}>
-            Nilay 360 <span style={{ color: "#10C4C3", fontSize: "22px", lineHeight: 1 }}>·</span>
-          </a>
-          <div style={{ display: "flex", gap: "2px" }}>
-            {[["Home", "/"], ["Properties", "/properties"], ["Search", "/search"], ["Blog", "/blog"]].map(([lbl, href]) => (
-              <a key={lbl} href={href} style={{ padding: "7px 15px", borderRadius: "6px", fontSize: "13px", fontWeight: 500, color: lbl === "Search" ? "#fff" : "rgba(255,255,255,0.55)", textDecoration: "none", background: lbl === "Search" ? "rgba(255,255,255,0.07)" : "transparent" }}>{lbl}</a>
-            ))}
-          </div>
-          <div style={{ display: "flex", gap: "10px" }}>
-            <a href="/login" style={{ padding: "8px 18px", borderRadius: "7px", border: "0.5px solid rgba(255,255,255,0.22)", background: "transparent", color: "rgba(255,255,255,0.75)", fontSize: "13px", fontWeight: 500, textDecoration: "none" }}>Sign In</a>
-            <a href="/register" style={{ padding: "8px 22px", borderRadius: "7px", background: "#10C4C3", color: "#020C1C", fontSize: "13px", fontWeight: 600, textDecoration: "none" }}>List Property</a>
-          </div>
-        </nav>
-
         {/* ── SEARCH SUMMARY BAND ── */}
-        <div className="search-summary" style={{ marginTop: "68px", background: "rgba(255,255,255,0.02)", borderBottom: "1px solid rgba(255,255,255,0.06)", padding: "14px 48px", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "12px" }}>
+        <div className="search-summary" style={{ marginTop: "64px", background: "rgba(255,255,255,0.02)", borderBottom: "1px solid rgba(255,255,255,0.06)", padding: "14px 48px", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "12px" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
             {loading ? (
               <div style={{ height: "14px", width: "200px", borderRadius: "4px", background: "rgba(255,255,255,0.1)", animation: "pulse 1.6s ease-in-out infinite" }} />
@@ -748,7 +735,7 @@ function SearchPageInner() {
               {chevron}
             </div>
             {/* Search button */}
-            <button onClick={applySearch} style={{ padding: "10px 28px", background: "#10C4C3", border: "none", borderRadius: "8px", color: "#020C1C", fontSize: "13px", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", cursor: "pointer", fontFamily: "'Cal Sans', sans-serif", whiteSpace: "nowrap", display: "flex", alignItems: "center", gap: "8px" }}>
+            <button onClick={applySearch} style={{ padding: "10px 28px", minHeight: "44px", boxSizing: "border-box", background: "#10C4C3", border: "none", borderRadius: "8px", color: "#020C1C", fontSize: "13px", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", cursor: "pointer", fontFamily: "'Cal Sans', sans-serif", whiteSpace: "nowrap", display: "flex", alignItems: "center", gap: "8px" }}>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" /></svg>
               Search
             </button>
@@ -782,7 +769,7 @@ function SearchPageInner() {
                 <SbLabel>Type</SbLabel>
                 <div style={{ display: "flex", gap: "6px" }}>
                   {(["all", "sale", "rent"] as const).map(t => (
-                    <button key={t} onClick={() => { setListingType(t); setPage(1); }} style={{ flex: 1, padding: "8px 4px", borderRadius: "8px", fontSize: "12px", fontWeight: 600, background: listingType === t ? "#10C4C3" : "rgba(255,255,255,0.05)", border: listingType === t ? "none" : "1px solid rgba(255,255,255,0.1)", color: listingType === t ? "#020C1C" : "rgba(255,255,255,0.55)", cursor: "pointer", fontFamily: "'Cal Sans', sans-serif", transition: "all 0.15s" }}>
+                    <button key={t} onClick={() => { setListingType(t); setPage(1); }} style={{ flex: 1, padding: "8px 4px", minHeight: "44px", boxSizing: "border-box", borderRadius: "8px", fontSize: "12px", fontWeight: 600, background: listingType === t ? "#10C4C3" : "rgba(255,255,255,0.05)", border: listingType === t ? "none" : "1px solid rgba(255,255,255,0.1)", color: listingType === t ? "#020C1C" : "rgba(255,255,255,0.55)", cursor: "pointer", fontFamily: "'Cal Sans', sans-serif", transition: "all 0.15s" }}>
                       {t === "all" ? "All" : t === "sale" ? "Buy" : "Rent"}
                     </button>
                   ))}
@@ -793,7 +780,7 @@ function SearchPageInner() {
               <div style={{ marginBottom: "22px" }}>
                 <SbLabel>State</SbLabel>
                 <div style={{ position: "relative" }}>
-                  <select value={stateFilter} onChange={e => { handleStateChange(e.target.value); setPage(1); }} style={{ width: "100%", padding: "10px 32px 10px 12px", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: "8px", color: stateFilter === "all" ? "rgba(255,255,255,0.4)" : "#FFFFFF", fontSize: "13px", fontFamily: "'Cal Sans', sans-serif", cursor: "pointer", outline: "none" }}>
+                  <select value={stateFilter} onChange={e => { handleStateChange(e.target.value); setPage(1); }} style={{ ...sidebarSelectBase, color: stateFilter === "all" ? "rgba(255,255,255,0.4)" : "#FFFFFF" }}>
                     <option value="all" style={{ background: "#020C1C" }}>All States</option>
                     {Object.keys(STATE_CITY_MAP).sort().map(s => <option key={s} value={s} style={{ background: "#020C1C" }}>{s}</option>)}
                   </select>
@@ -805,7 +792,7 @@ function SearchPageInner() {
               <div style={{ marginBottom: "22px" }}>
                 <SbLabel>City</SbLabel>
                 <div style={{ position: "relative" }}>
-                  <select value={city} onChange={e => { handleCityChange(e.target.value); setPage(1); }} style={{ width: "100%", padding: "10px 32px 10px 12px", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: "8px", color: city === "all" ? "rgba(255,255,255,0.4)" : "#FFFFFF", fontSize: "13px", fontFamily: "'Cal Sans', sans-serif", cursor: "pointer", outline: "none" }}>
+                  <select value={city} onChange={e => { handleCityChange(e.target.value); setPage(1); }} style={{ ...sidebarSelectBase, color: city === "all" ? "rgba(255,255,255,0.4)" : "#FFFFFF" }}>
                     <option value="all" style={{ background: "#020C1C" }}>All Cities</option>
                     {(stateFilter !== "all" ? (STATE_CITY_MAP[stateFilter] || []) : Object.keys(CITY_STATE_MAP).sort()).map(c => <option key={c} value={c} style={{ background: "#020C1C" }}>{c}</option>)}
                   </select>
@@ -822,7 +809,7 @@ function SearchPageInner() {
                   onChange={e => handlePincodeChange(e.target.value)}
                   placeholder="Enter pincode..."
                   maxLength={6}
-                  style={{ width: "100%", padding: "10px 12px", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: "8px", color: "#FFFFFF", fontSize: "13px", fontFamily: "'Cal Sans', sans-serif", outline: "none" }}
+                  style={{ width: "100%", padding: "10px 12px", minHeight: "44px", boxSizing: "border-box", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: "8px", color: "#FFFFFF", fontSize: "13px", fontFamily: "'Cal Sans', sans-serif", outline: "none" }}
                 />
                 {pincodeInput.length >= 3 && PINCODE_MAP[pincodeInput.slice(0, 3)] && (
                   <div style={{ fontSize: "11px", color: "#10C4C3", marginTop: "6px" }}>
@@ -844,12 +831,12 @@ function SearchPageInner() {
                 <SbLabel>Price Range (₹)</SbLabel>
                 <div style={{ display: "flex", gap: "8px", marginBottom: "8px" }}>
                   {[{ ph: "Min", val: minPrice, set: setMinPrice }, { ph: "Max", val: maxPrice, set: setMaxPrice }].map(({ ph, val, set }) => (
-                    <input key={ph} type="number" placeholder={ph} value={val} onChange={e => { set(e.target.value); setPage(1); }} style={{ flex: 1, padding: "9px 10px", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: "8px", color: "#FFFFFF", fontSize: "12px", fontFamily: "'Cal Sans', sans-serif", outline: "none" }} />
+                    <input key={ph} type="number" placeholder={ph} value={val} onChange={e => { set(e.target.value); setPage(1); }} style={{ flex: 1, padding: "9px 10px", minHeight: "44px", boxSizing: "border-box", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: "8px", color: "#FFFFFF", fontSize: "12px", fontFamily: "'Cal Sans', sans-serif", outline: "none" }} />
                   ))}
                 </div>
                 <div style={{ display: "flex", gap: "5px", flexWrap: "wrap" }}>
                   {Object.entries(BUDGET_PRESETS).map(([label, [mn, mx]]) => (
-                    <button key={label} onClick={() => { setMinPrice(mn ? String(mn) : ""); setMaxPrice(mx < 999999999 ? String(mx) : ""); setPage(1); }} style={{ padding: "3px 9px", borderRadius: "100px", fontSize: "10px", fontWeight: 600, background: "rgba(16,196,195,0.08)", border: "1px solid rgba(16,196,195,0.2)", color: "#10C4C3", cursor: "pointer", fontFamily: "'Cal Sans', sans-serif" }}>{label}</button>
+                    <button key={label} onClick={() => { setMinPrice(mn ? String(mn) : ""); setMaxPrice(mx < 999999999 ? String(mx) : ""); setPage(1); }} style={{ padding: "3px 9px", minHeight: "44px", boxSizing: "border-box", display: "inline-flex", alignItems: "center", borderRadius: "100px", fontSize: "10px", fontWeight: 600, background: "rgba(16,196,195,0.08)", border: "1px solid rgba(16,196,195,0.2)", color: "#10C4C3", cursor: "pointer", fontFamily: "'Cal Sans', sans-serif" }}>{label}</button>
                   ))}
                 </div>
               </div>
@@ -859,7 +846,7 @@ function SearchPageInner() {
                 <SbLabel>Bedrooms</SbLabel>
                 <div style={{ display: "flex", gap: "6px", flexWrap: "wrap" }}>
                   {[1, 2, 3, 4, 5].map(n => (
-                    <button key={n} onClick={() => { setBhk(s => toggleSet(s, n)); setPage(1); }} style={{ width: "40px", height: "36px", borderRadius: "8px", fontSize: "13px", fontWeight: 600, background: bhk.has(n) ? "#10C4C3" : "rgba(255,255,255,0.05)", border: bhk.has(n) ? "none" : "1px solid rgba(255,255,255,0.1)", color: bhk.has(n) ? "#020C1C" : "rgba(255,255,255,0.55)", cursor: "pointer", fontFamily: "'Cal Sans', sans-serif", transition: "all 0.15s" }}>{n === 5 ? "5+" : n}</button>
+                    <button key={n} onClick={() => { setBhk(s => toggleSet(s, n)); setPage(1); }} style={{ width: "44px", height: "44px", borderRadius: "8px", fontSize: "13px", fontWeight: 600, background: bhk.has(n) ? "#10C4C3" : "rgba(255,255,255,0.05)", border: bhk.has(n) ? "none" : "1px solid rgba(255,255,255,0.1)", color: bhk.has(n) ? "#020C1C" : "rgba(255,255,255,0.55)", cursor: "pointer", fontFamily: "'Cal Sans', sans-serif", transition: "all 0.15s" }}>{n === 5 ? "5+" : n}</button>
                   ))}
                 </div>
               </div>
@@ -868,7 +855,7 @@ function SearchPageInner() {
               <div style={{ marginBottom: "22px" }}>
                 <SbLabel>Possession Status</SbLabel>
                 <div style={{ position: "relative" }}>
-                  <select value={possession} onChange={e => { setPossession(e.target.value); setPage(1); }} style={{ width: "100%", padding: "10px 32px 10px 12px", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: "8px", color: possession === "all" ? "rgba(255,255,255,0.4)" : "#FFFFFF", fontSize: "13px", fontFamily: "'Cal Sans', sans-serif", cursor: "pointer", outline: "none" }}>
+                  <select value={possession} onChange={e => { setPossession(e.target.value); setPage(1); }} style={{ ...sidebarSelectBase, color: possession === "all" ? "rgba(255,255,255,0.4)" : "#FFFFFF" }}>
                     <option value="all" style={{ background: "#020C1C" }}>Any Status</option>
                     {POSSESSION_OPTIONS.map(o => <option key={o} value={o} style={{ background: "#020C1C" }}>{o}</option>)}
                   </select>
@@ -880,7 +867,7 @@ function SearchPageInner() {
               <div style={{ marginBottom: "22px" }}>
                 <SbLabel>Property Age</SbLabel>
                 <div style={{ position: "relative" }}>
-                  <select value={propertyAge} onChange={e => { setPropertyAge(e.target.value); setPage(1); }} style={{ width: "100%", padding: "10px 32px 10px 12px", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: "8px", color: propertyAge === "all" ? "rgba(255,255,255,0.4)" : "#FFFFFF", fontSize: "13px", fontFamily: "'Cal Sans', sans-serif", cursor: "pointer", outline: "none" }}>
+                  <select value={propertyAge} onChange={e => { setPropertyAge(e.target.value); setPage(1); }} style={{ ...sidebarSelectBase, color: propertyAge === "all" ? "rgba(255,255,255,0.4)" : "#FFFFFF" }}>
                     <option value="all" style={{ background: "#020C1C" }}>Any Age</option>
                     {AGE_OPTIONS.map(o => <option key={o.value} value={o.value} style={{ background: "#020C1C" }}>{o.label}</option>)}
                   </select>
@@ -893,7 +880,7 @@ function SearchPageInner() {
                 <SbLabel>Floor Number</SbLabel>
                 <div style={{ display: "flex", gap: "8px" }}>
                   {[{ ph: "Min", val: minFloor, set: setMinFloor }, { ph: "Max", val: maxFloor, set: setMaxFloor }].map(({ ph, val, set }) => (
-                    <input key={ph} type="number" placeholder={ph} value={val} onChange={e => { set(e.target.value); setPage(1); }} style={{ flex: 1, padding: "9px 10px", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: "8px", color: "#FFFFFF", fontSize: "12px", fontFamily: "'Cal Sans', sans-serif", outline: "none" }} />
+                    <input key={ph} type="number" placeholder={ph} value={val} onChange={e => { set(e.target.value); setPage(1); }} style={{ flex: 1, padding: "9px 10px", minHeight: "44px", boxSizing: "border-box", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: "8px", color: "#FFFFFF", fontSize: "12px", fontFamily: "'Cal Sans', sans-serif", outline: "none" }} />
                   ))}
                 </div>
               </div>
@@ -903,7 +890,7 @@ function SearchPageInner() {
                 <SbLabel>Facing</SbLabel>
                 <div style={{ display: "flex", gap: "6px", flexWrap: "wrap" }}>
                   {FACING_OPTIONS.map(f => (
-                    <button key={f} onClick={() => { setFacingFilters(s => toggleSet(s, f)); setPage(1); }} style={{ padding: "6px 11px", borderRadius: "100px", fontSize: "11px", fontWeight: 600, background: facingFilters.has(f) ? "#10C4C3" : "rgba(255,255,255,0.05)", border: facingFilters.has(f) ? "none" : "1px solid rgba(255,255,255,0.1)", color: facingFilters.has(f) ? "#020C1C" : "rgba(255,255,255,0.55)", cursor: "pointer", fontFamily: "'Cal Sans', sans-serif", transition: "all 0.15s" }}>{f}</button>
+                    <button key={f} onClick={() => { setFacingFilters(s => toggleSet(s, f)); setPage(1); }} style={{ padding: "6px 11px", minHeight: "44px", boxSizing: "border-box", display: "inline-flex", alignItems: "center", borderRadius: "100px", fontSize: "11px", fontWeight: 600, background: facingFilters.has(f) ? "#10C4C3" : "rgba(255,255,255,0.05)", border: facingFilters.has(f) ? "none" : "1px solid rgba(255,255,255,0.1)", color: facingFilters.has(f) ? "#020C1C" : "rgba(255,255,255,0.55)", cursor: "pointer", fontFamily: "'Cal Sans', sans-serif", transition: "all 0.15s" }}>{f}</button>
                   ))}
                 </div>
               </div>
@@ -960,7 +947,7 @@ function SearchPageInner() {
               <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
                 {/* Sort */}
                 <div style={{ position: "relative" }}>
-                  <select value={sortBy} onChange={e => { setSortBy(e.target.value); setPage(1); }} style={{ padding: "9px 36px 9px 14px", background: "#0A1526", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "8px", color: "#FFFFFF", fontSize: "13px", fontFamily: "'Cal Sans', sans-serif", cursor: "pointer", outline: "none" }}>
+                  <select value={sortBy} onChange={e => { setSortBy(e.target.value); setPage(1); }} style={{ padding: "9px 36px 9px 14px", minHeight: "44px", boxSizing: "border-box", background: "#0A1526", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "8px", color: "#FFFFFF", fontSize: "13px", fontFamily: "'Cal Sans', sans-serif", cursor: "pointer", outline: "none" }}>
                     <option value="featured">Featured First</option>
                     <option value="newest">Newest First</option>
                     <option value="price_asc">Price: Low → High</option>
@@ -1047,15 +1034,15 @@ function SearchPageInner() {
             {/* Pagination */}
             {!loading && totalPages > 1 && (
               <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: "6px", marginTop: "40px" }}>
-                <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1} style={{ padding: "9px 18px", borderRadius: "999px", fontSize: "13px", fontWeight: 500, background: page === 1 ? "rgba(255,255,255,0.04)" : "rgba(255,255,255,0.06)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", border: "1px solid rgba(255,255,255,0.10)", color: page === 1 ? "rgba(255,255,255,0.3)" : "#A9B4C2", cursor: page === 1 ? "default" : "pointer", fontFamily: "'Cal Sans', sans-serif" }}>← Prev</button>
+                <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1} style={{ padding: "9px 18px", minHeight: "44px", boxSizing: "border-box", borderRadius: "999px", fontSize: "13px", fontWeight: 500, background: page === 1 ? "rgba(255,255,255,0.04)" : "rgba(255,255,255,0.06)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", border: "1px solid rgba(255,255,255,0.10)", color: page === 1 ? "rgba(255,255,255,0.3)" : "#A9B4C2", cursor: page === 1 ? "default" : "pointer", fontFamily: "'Cal Sans', sans-serif" }}>← Prev</button>
                 {Array.from({ length: Math.min(totalPages, 7) }, (_, i) => {
                   const p = totalPages <= 7 ? i + 1 : (page <= 4 ? i + 1 : page - 3 + i);
                   if (p < 1 || p > totalPages) return null;
                   return (
-                    <button key={p} onClick={() => setPage(p)} style={{ width: "38px", height: "38px", borderRadius: "999px", fontSize: "13px", fontWeight: page === p ? 700 : 400, background: page === p ? "#10C4C3" : "rgba(255,255,255,0.06)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", border: page === p ? "1px solid #10C4C3" : "1px solid rgba(255,255,255,0.10)", boxShadow: page === p ? "0 10px 30px rgba(30,167,255,.35)" : "none", color: page === p ? "#020C1C" : "#A9B4C2", cursor: "pointer", fontFamily: "'Cal Sans', sans-serif", transition: "all 0.15s" }}>{p}</button>
+                    <button key={p} onClick={() => setPage(p)} style={{ width: "44px", height: "44px", borderRadius: "999px", fontSize: "13px", fontWeight: page === p ? 700 : 400, background: page === p ? "#10C4C3" : "rgba(255,255,255,0.06)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", border: page === p ? "1px solid #10C4C3" : "1px solid rgba(255,255,255,0.10)", boxShadow: page === p ? "0 10px 30px rgba(30,167,255,.35)" : "none", color: page === p ? "#020C1C" : "#A9B4C2", cursor: "pointer", fontFamily: "'Cal Sans', sans-serif", transition: "all 0.15s" }}>{p}</button>
                   );
                 })}
-                <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page === totalPages} style={{ padding: "9px 18px", borderRadius: "999px", fontSize: "13px", fontWeight: 500, background: page === totalPages ? "rgba(255,255,255,0.04)" : "rgba(255,255,255,0.06)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", border: "1px solid rgba(255,255,255,0.10)", color: page === totalPages ? "rgba(255,255,255,0.3)" : "#A9B4C2", cursor: page === totalPages ? "default" : "pointer", fontFamily: "'Cal Sans', sans-serif" }}>Next →</button>
+                <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page === totalPages} style={{ padding: "9px 18px", minHeight: "44px", boxSizing: "border-box", borderRadius: "999px", fontSize: "13px", fontWeight: 500, background: page === totalPages ? "rgba(255,255,255,0.04)" : "rgba(255,255,255,0.06)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", border: "1px solid rgba(255,255,255,0.10)", color: page === totalPages ? "rgba(255,255,255,0.3)" : "#A9B4C2", cursor: page === totalPages ? "default" : "pointer", fontFamily: "'Cal Sans', sans-serif" }}>Next →</button>
               </div>
             )}
           </div>
@@ -1079,7 +1066,7 @@ function SearchPageInner() {
             </div>
           </div>
           <div style={{ display: "flex", gap: "10px" }}>
-            <button onClick={() => setCompareIds(new Set())} style={{ padding: "9px 18px", background: "transparent", border: "1px solid rgba(255,255,255,0.2)", borderRadius: "8px", color: "rgba(255,255,255,0.6)", fontSize: "12px", fontWeight: 500, cursor: "pointer", fontFamily: "'Cal Sans', sans-serif" }}>Clear</button>
+            <button onClick={() => setCompareIds(new Set())} style={{ padding: "9px 18px", minHeight: "44px", boxSizing: "border-box", background: "transparent", border: "1px solid rgba(255,255,255,0.2)", borderRadius: "8px", color: "rgba(255,255,255,0.6)", fontSize: "12px", fontWeight: 500, cursor: "pointer", fontFamily: "'Cal Sans', sans-serif" }}>Clear</button>
             <button style={{ padding: "9px 24px", background: "#10C4C3", border: "none", borderRadius: "8px", color: "#020C1C", fontSize: "13px", fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", cursor: "pointer", fontFamily: "'Cal Sans', sans-serif" }}>Compare {compareIds.size} Properties →</button>
           </div>
         </div>
