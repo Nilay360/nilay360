@@ -14,6 +14,10 @@ import { optimizedImageUrl } from "@/lib/image-url";
 // must not label it "Bedrooms" / "X BHK".
 const COMMERCIAL_CATEGORIES = ["office", "retail", "warehouse"];
 
+// TEMPORARY (requested by Vanith, 2026-07-24): Kuula 360° tours are unlocked for
+// everyone regardless of subscription_tier. Flip to false to restore the paywall.
+const TOURS_TEMPORARILY_UNLOCKED = true;
+
 // ── Types ────────────────────────────────────────────────────
 type Property = {
   id: string;
@@ -567,6 +571,7 @@ export default function PropertyDetailClient() {
     return () => { cancelled = true; };
   }, [user?.id, property?.kuula_tour_url]);
   const isPremium = subscriptionTier === "premium";
+  const tourUnlocked = TOURS_TEMPORARILY_UNLOCKED || isPremium;
 
   // Locality + city + state only — no precise street address in the query, per privacy-by-default.
   const mapsUrl = useMemo(() => {
@@ -949,7 +954,7 @@ export default function PropertyDetailClient() {
               )}
 
               {/* ── 360° VIRTUAL TOUR ── */}
-              {property.kuula_tour_url && (isPremium ? (
+              {property.kuula_tour_url && (tourUnlocked ? (
                 <Card>
                   <SectionHeading>360° Virtual Tour</SectionHeading>
                   <div style={{ position: "relative", width: "100%", paddingTop: "56.25%", borderRadius: "12px", overflow: "hidden", background: "#0A1526" }}>
