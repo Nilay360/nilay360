@@ -5,20 +5,23 @@ import Link from "next/link"
 import { BRAND } from "@/constants"
 
 /* ─── Link-in-bio hub page — mobile-first, single column, 44px min tap targets ───
-   PLACEHOLDER CONTENT (flagged in delivery report, not yet real):
-   - X (Twitter) URL — not in BRAND.social, no account confirmed yet
+   Remaining placeholder / intentionally-omitted content (flagged in delivery report):
    - Channel Partners destination — no dedicated route exists in the app yet
    - Company Profile / Brochure downloads — no PDF assets exist yet (shown as "Coming Soon")
+   - LinkedIn — no confirmed URL, omitted rather than guessed
+   - Book Consultation / Calendly — no link provided, section omitted entirely
 */
 
 const LOGO_SRC = "/brand/Nilay360-09-Photoroom%20(1).png"
+const FEEDBACK_FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLSfVazyCsqQIgzdaqffNM9IPkfub_WmsNT1CNXPDwnD2g2B9cg/viewform?usp=dialog"
+const OFFICE_LOCATION_URL = "https://maps.app.goo.gl/jiGr42DrevGruwnh6"
 
-const SOCIALS: { label: string; icon: string; href: string; placeholder?: boolean }[] = [
-  { label: "Instagram", icon: "IG", href: BRAND.social.instagram },
-  { label: "Facebook",  icon: "FB", href: BRAND.social.facebook },
-  { label: "LinkedIn",  icon: "LI", href: BRAND.social.linkedin },
-  { label: "YouTube",   icon: "YT", href: BRAND.social.youtube },
-  { label: "X",         icon: "X",  href: "https://x.com/nilay360", placeholder: true },
+// Real, page-specific URLs — some differ from the shared BRAND.social constants
+// (kept local to /connect rather than editing the shared constants file).
+const SOCIALS: { label: string; icon: string; href: string }[] = [
+  { label: "Instagram", icon: "IG", href: "https://www.instagram.com/nilay360_/" },
+  { label: "Facebook",  icon: "FB", href: "https://www.facebook.com/share/1CWEg3hSmx/" },
+  { label: "YouTube",   icon: "YT", href: "https://youtube.com/@nilay360.digital?si=wKl9wxWM1oMxmwne" },
 ]
 
 const PARTNERS: { label: string; href: string; placeholder?: boolean }[] = [
@@ -69,6 +72,25 @@ function IconMail() {
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
       <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
       <polyline points="22,6 12,13 2,6" />
+    </svg>
+  )
+}
+
+function IconMapPin() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z" />
+      <circle cx="12" cy="10" r="3" />
+    </svg>
+  )
+}
+
+function IconFeedback() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" />
+      <line x1="8" y1="9" x2="16" y2="9" />
+      <line x1="8" y1="13" x2="13" y2="13" />
     </svg>
   )
 }
@@ -151,9 +173,9 @@ export default function ConnectPage() {
                   href={s.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  aria-label={s.placeholder ? `${s.label} (placeholder link)` : s.label}
+                  aria-label={s.label}
                   className="connect-social"
-                  title={s.placeholder ? `${s.label} — placeholder link` : s.label}
+                  title={s.label}
                 >
                   {s.icon}
                 </a>
@@ -174,6 +196,9 @@ export default function ConnectPage() {
             </a>
             <a href={`mailto:${BRAND.email}`} className={HUB_BUTTON} style={{ background: "#0A1526", color: "#fff", border: "1px solid rgba(255,255,255,0.1)" }}>
               <IconMail /> {BRAND.email}
+            </a>
+            <a href={OFFICE_LOCATION_URL} target="_blank" rel="noopener noreferrer" className={HUB_BUTTON} style={{ background: "#0A1526", color: "#fff", border: "1px solid rgba(255,255,255,0.1)" }}>
+              <IconMapPin /> Office Location
             </a>
           </section>
 
@@ -269,6 +294,11 @@ export default function ConnectPage() {
               </Link>
             </div>
           </section>
+
+          {/* Feedback */}
+          <a href={FEEDBACK_FORM_URL} target="_blank" rel="noopener noreferrer" className={HUB_BUTTON} style={{ background: "transparent", color: "rgba(255,255,255,0.75)", border: "1px solid rgba(255,255,255,0.15)" }}>
+            <IconFeedback /> Share Feedback
+          </a>
 
           {/* 10 — Footer */}
           <footer style={{ textAlign: "center", paddingTop: 8, display: "flex", flexDirection: "column", gap: 4 }}>
