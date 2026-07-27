@@ -2,7 +2,6 @@
 
 import { useState } from "react"
 import Link from "next/link"
-import { QRCodeSVG } from "qrcode.react"
 import { Phone, Mail, MapPin, MessageSquareText, Shield, Lock, Video, Building2, Home, Compass, Info, Newspaper, HelpCircle, Ticket, Handshake, Download, Smartphone, Globe, Headset, Menu, X } from "lucide-react"
 import { BRAND, NAV_LINKS } from "@/constants"
 
@@ -230,7 +229,7 @@ export default function ConnectPage() {
           {/* 3 — QR Feedback Panel */}
           <section className="connect-glass connect-qr-panel">
             <div className="connect-qr-code">
-              <QRCodeSVG value={FEEDBACK_FORM_URL} size={128} bgColor="transparent" fgColor="#FFFFFF" level="M" />
+              <img src="/brand/feedback-qr-code.png" alt="QR code linking to the Nilay 360 feedback form" width={128} height={128} />
             </div>
             <div className="connect-qr-text">
               <h2 className="connect-section-title" style={{ textAlign: "left", margin: 0 }}>Scan to Share Feedback</h2>
@@ -530,7 +529,7 @@ const CONNECT_STYLES = `
   @media (prefers-reduced-motion: reduce) { .connect-orb-1, .connect-orb-2, .connect-orb-3 { animation: none; } }
 
   .connect-gold-text { color: var(--gold); }
-  .connect-tagline { font-size: 13px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--gold); margin: 0 0 12px; }
+  .connect-tagline { font-size: 15px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--gold); margin: 0 0 12px; }
   .connect-body { position: relative; z-index: 1; max-width: 1040px; margin: 0 auto; padding: 0 20px 64px; display: flex; flex-direction: column; gap: 48px; }
   .connect-section { display: flex; flex-direction: column; gap: 16px; }
   .connect-section-title { font-size: 22px; font-weight: 700; color: #fff; text-align: center; margin: 0; }
@@ -570,9 +569,10 @@ const CONNECT_STYLES = `
   .connect-hero-bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 0; }
   .connect-hero-scrim { position: absolute; inset: 0; z-index: 1; background: linear-gradient(to bottom, rgba(2,12,28,0.55) 0%, rgba(2,12,28,0.5) 40%, rgba(2,12,28,0.85) 85%, #020C1C 100%); }
   .connect-hero-content { position: relative; z-index: 2; max-width: 1040px; margin: 0 auto; padding: 64px 20px; text-align: center; width: 100%; }
-  .connect-hero-h1 { font-size: clamp(30px, 6vw, 52px); font-weight: 700; color: #fff; line-height: 1.15; margin: 0 0 18px; }
+  .connect-hero-h1 { font-size: clamp(36px, 8vw, 68px); font-weight: 700; color: #fff; line-height: 1.15; margin: 0 0 18px; }
   .connect-hero-sub { font-size: 16px; color: rgba(255,255,255,0.7); max-width: 560px; margin: 0 auto 32px; line-height: 1.7; }
-  .connect-hero-buttons { display: flex; flex-direction: column; gap: 12px; max-width: 340px; margin: 0 auto; }
+  .connect-hero-buttons { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; max-width: 360px; margin: 0 auto; }
+  .connect-hero-buttons .${BTN} { min-height: 56px; padding: 16px 30px; font-size: 16px; }
 
   .${BTN} {
     display: flex; align-items: center; justify-content: center; gap: 10px;
@@ -591,16 +591,18 @@ const CONNECT_STYLES = `
 
   /* QR panel */
   .connect-qr-panel { display: flex; flex-direction: column; align-items: center; gap: 20px; padding: 28px 24px; text-align: center; }
-  .connect-qr-code { background: #0A1526; padding: 16px; border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .connect-qr-code { background: #000000; padding: 16px; border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .connect-qr-code img { display: block; width: 128px; height: 128px; border-radius: 4px; }
   .connect-qr-text { display: flex; flex-direction: column; gap: 8px; align-items: center; }
 
   /* Social */
   .connect-social-row { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
   .connect-social {
-    width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    width: 64px; height: 64px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
     border: 1px solid rgba(255,255,255,0.15); color: rgba(255,255,255,0.7); text-decoration: none;
     transition: border-color 0.15s, color 0.15s, transform 0.15s, box-shadow 0.2s;
   }
+  .connect-social svg { width: 28px; height: 28px; }
 
   @media (hover: hover) and (pointer: fine) {
     .${BTN}:hover { transform: translateY(-2px); }
@@ -695,5 +697,7 @@ const CONNECT_STYLES = `
     .connect-app-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
     .connect-trust-panel { grid-template-columns: repeat(4, 1fr); }
     .connect-footer-grid { grid-template-columns: 2fr 1fr 1fr 1fr 1.4fr; gap: 32px; }
+    .connect-social { width: 76px; height: 76px; }
+    .connect-social svg { width: 32px; height: 32px; }
   }
 `
