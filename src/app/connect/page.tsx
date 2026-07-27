@@ -196,7 +196,15 @@ export default function ConnectPage() {
 
         {/* 2 — Hero */}
         <section className="connect-hero">
-          <img src={HERO_BG} alt="" className="connect-hero-bg" fetchPriority="high" loading="eager" />
+          <img
+            src={HERO_BG}
+            srcSet="/brand/hero-background-900w.jpg 900w, /brand/hero-background.jpg 2400w"
+            sizes="100vw"
+            alt=""
+            className="connect-hero-bg"
+            fetchPriority="high"
+            loading="eager"
+          />
           <div className="connect-hero-scrim" />
           <div className="connect-hero-content">
             <p className="connect-tagline">View First. Home Next.</p>
