@@ -3,7 +3,7 @@
 import { useState } from "react"
 import Link from "next/link"
 import { QRCodeSVG } from "qrcode.react"
-import { Phone, Mail, MapPin, MessageSquareText, Shield, Lock, Video, Building2, Home, Compass, Info, Newspaper, HelpCircle, Ticket, Handshake, Download, Smartphone, Globe } from "lucide-react"
+import { Phone, Mail, MapPin, MessageSquareText, Shield, Lock, Video, Building2, Home, Compass, Info, Newspaper, HelpCircle, Ticket, Handshake, Download, Smartphone, Globe, Headset } from "lucide-react"
 import { BRAND, NAV_LINKS } from "@/constants"
 
 /* ─── /connect — full marketing landing page (link-in-bio hub, expanded) ───
@@ -299,6 +299,102 @@ export default function ConnectPage() {
             ))}
           </section>
 
+          {/* 8 — Contact & Support */}
+          <section className="connect-section">
+            <h2 className="connect-section-title">Contact &amp; Support</h2>
+            <div className="connect-help-grid">
+              <a href={TEL_HREF} className={`${BTN} connect-glass`} style={{ color: "#fff" }}>
+                <Phone size={18} /> Call {BRAND.phone}
+              </a>
+              <a href={wa("Hi, I need some support.")} target="_blank" rel="noopener noreferrer" className={`${BTN} connect-glass`} style={{ color: "#fff" }}>
+                <IconWhatsApp /> WhatsApp Support
+              </a>
+              <a href={`mailto:${BRAND.email}`} className={`${BTN} connect-glass`} style={{ color: "#fff" }}>
+                <Mail size={18} /> {BRAND.email}
+              </a>
+            </div>
+            <a
+              href={wa("Hi, I'd like to raise a support ticket.")}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`${BTN} connect-btn-outline`}
+              title="No ticketing system exists yet — routes to WhatsApp"
+            >
+              <Ticket size={18} /> Raise a Support Ticket
+            </a>
+          </section>
+
+          {/* 9 — Become a Partner */}
+          <section className="connect-glass connect-partner-panel">
+            <Handshake size={32} color="var(--gold)" />
+            <div>
+              <h2 className="connect-card-title" style={{ fontSize: 20 }}>Become a Partner</h2>
+              <p className="connect-body-copy">
+                Builders, agents, channel partners, and developers — let&apos;s talk about working together.
+              </p>
+            </div>
+            <Link href="/contact" className={`${BTN} connect-btn-gold`} title="No dedicated partnership page yet — routed to Contact">
+              Explore Partnership
+            </Link>
+          </section>
+
+          {/* 10 — Quick Resources */}
+          <section className="connect-section">
+            <h2 className="connect-section-title">Quick Resources</h2>
+            <div className="connect-download-grid">
+              <button type="button" disabled className={`${BTN} ${BTN}--disabled connect-glass`} style={{ color: "#fff" }}>
+                <Download size={16} /> Company Profile (Coming Soon)
+              </button>
+              <button type="button" disabled className={`${BTN} ${BTN}--disabled connect-glass`} style={{ color: "#fff" }}>
+                <Download size={16} /> Brochure (Coming Soon)
+              </button>
+              <button type="button" disabled className={`${BTN} ${BTN}--disabled connect-glass`} style={{ color: "#fff" }}>
+                <Download size={16} /> Media Kit (Coming Soon)
+              </button>
+              <button type="button" disabled className={`${BTN} ${BTN}--disabled connect-glass`} style={{ color: "#fff" }}>
+                <Download size={16} /> Project Showcase (Coming Soon)
+              </button>
+            </div>
+          </section>
+
+          {/* 11 — Experience Nilay360 on the Go */}
+          <section className="connect-section">
+            <h2 className="connect-section-title">Experience Nilay360 on the Go</h2>
+            <p className="connect-body-copy" style={{ textAlign: "center" }}>
+              A native app is in the works — nothing to download yet, so these aren&apos;t linked.
+            </p>
+            <div className="connect-app-grid">
+              <div className="connect-glass connect-app-badge">
+                <Smartphone size={22} color="rgba(255,255,255,0.5)" />
+                <span>Coming Soon on the App Store</span>
+              </div>
+              <div className="connect-glass connect-app-badge">
+                <Smartphone size={22} color="rgba(255,255,255,0.5)" />
+                <span>Coming Soon on Google Play</span>
+              </div>
+            </div>
+          </section>
+
+          {/* 12/13 — Trust (consolidated, see note at top of file) */}
+          <section className="connect-glass connect-trust-panel">
+            <div className="connect-trust-tile">
+              <Shield size={24} color="var(--gold)" />
+              <span>Verified Listings</span>
+            </div>
+            <div className="connect-trust-tile">
+              <Compass size={24} color="var(--gold)" />
+              <span>360° Experiences</span>
+            </div>
+            <div className="connect-trust-tile">
+              <Lock size={24} color="var(--gold)" />
+              <span>Secure Platform</span>
+            </div>
+            <div className="connect-trust-tile">
+              <Headset size={24} color="var(--gold)" />
+              <span>Premium Support</span>
+            </div>
+          </section>
+
         </div>
       </main>
     </>
@@ -417,8 +513,25 @@ const CONNECT_STYLES = `
   .connect-faq-toggle { font-size: 20px; color: var(--gold); flex-shrink: 0; line-height: 1; }
   .connect-faq-a { font-size: 13px; color: rgba(255,255,255,0.6); line-height: 1.7; margin-top: 12px; }
 
+  /* Partner panel */
+  .connect-partner-panel { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 16px; padding: 32px 24px; }
+
+  /* Download grid (Quick Resources) */
+  .connect-download-grid { display: flex; flex-direction: column; gap: 10px; }
+
+  /* App teaser */
+  .connect-app-grid { display: flex; flex-direction: column; gap: 12px; }
+  .connect-app-badge { display: flex; align-items: center; gap: 12px; padding: 16px 20px; min-height: 44px; opacity: 0.7; }
+  .connect-app-badge span { font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.7); }
+
+  /* Trust panel */
+  .connect-trust-panel { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; padding: 28px 20px; }
+  .connect-trust-tile { display: flex; flex-direction: column; align-items: center; gap: 10px; text-align: center; }
+  .connect-trust-tile span { font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.8); }
+
   @media (min-width: 640px) {
     .connect-consult-grid { grid-template-columns: repeat(3, 1fr); }
+    .connect-partner-panel { flex-direction: row; text-align: left; justify-content: space-between; }
   }
 
   @media (min-width: 1024px) {
@@ -429,5 +542,8 @@ const CONNECT_STYLES = `
     .connect-help-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
     .connect-explore-grid { grid-template-columns: repeat(3, 1fr); gap: 16px; }
     .connect-faq-wrap { max-width: 720px; margin: 0 auto; width: 100%; }
+    .connect-download-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+    .connect-app-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .connect-trust-panel { grid-template-columns: repeat(4, 1fr); }
   }
 `
