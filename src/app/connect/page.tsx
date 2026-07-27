@@ -3,7 +3,7 @@
 import { useState } from "react"
 import Link from "next/link"
 import { QRCodeSVG } from "qrcode.react"
-import { Phone, Mail, MapPin, MessageSquareText, Shield, Lock, Video, Building2 } from "lucide-react"
+import { Phone, Mail, MapPin, MessageSquareText, Shield, Lock, Video, Building2, Home, Compass, Info, Newspaper, HelpCircle, Ticket, Handshake, Download, Smartphone, Globe } from "lucide-react"
 import { BRAND, NAV_LINKS } from "@/constants"
 
 /* ─── /connect — full marketing landing page (link-in-bio hub, expanded) ───
@@ -70,6 +70,40 @@ const SOCIALS = [
   { label: "YouTube",   href: "https://youtube.com/@nilay360.digital?si=wKl9wxWM1oMxmwne", Icon: IconYouTube },
 ]
 
+const CONSULTATIONS = [
+  { label: "Phone Call",   Icon: Phone,      message: "Hi, I'd like to book a phone call consultation." },
+  { label: "Video Call",   Icon: Video,      message: "Hi, I'd like to book a video call consultation." },
+  { label: "Office Visit", Icon: Building2,  message: "Hi, I'd like to book an office visit consultation." },
+]
+
+const EXPLORE_TILES = [
+  { label: "Latest Properties",   Icon: Home,    href: "/properties" },
+  { label: "360° Virtual Tours",  Icon: Compass, href: "/properties", note: "Kuula tours are embedded per-property, no standalone gallery page" },
+  { label: "VR Experiences",      Icon: Globe,   href: "/properties", note: "same underlying feature as 360° tours, no separate VR page exists" },
+  { label: "Why Nilay360",        Icon: Info,    href: "/about" },
+  { label: "Blog & Updates",      Icon: Newspaper, href: "/blog" },
+  { label: "FAQs",                Icon: HelpCircle, href: "#faq" },
+]
+
+const FAQS = [
+  {
+    question: "What is Nilay 360?",
+    answer: "Nilay 360 is a technology-powered real estate platform offering property discovery, virtual tours, and end-to-end transaction support across India.",
+  },
+  {
+    question: "Is it free to browse and save properties?",
+    answer: "Yes — browsing listings, saving properties, and contacting our team is free for buyers and renters.",
+  },
+  {
+    question: "How do I list my property?",
+    answer: "Tap “Become a Seller” on the site, or visit /post-property, and follow the guided listing flow.",
+  },
+  {
+    question: "Are listings verified?",
+    answer: "Every listing on Nilay 360 goes through a verification check before it goes live on the platform.",
+  },
+]
+
 function IconInstagram() {
   return (
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -97,9 +131,20 @@ function IconYouTube() {
   )
 }
 
+function IconWhatsApp() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z" />
+      <path d="M12 0C5.373 0 0 5.373 0 12c0 2.125.555 4.122 1.528 5.855L0 24l6.335-1.517A11.946 11.946 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.795 9.795 0 01-4.988-1.364l-.358-.214-3.716.89.927-3.63-.234-.372A9.797 9.797 0 012.182 12C2.182 6.564 6.564 2.182 12 2.182c5.436 0 9.818 4.382 9.818 9.818 0 5.436-4.382 9.818-9.818 9.818z" />
+    </svg>
+  )
+}
+
 const BTN = "connect-btn"
 
 export default function ConnectPage() {
+  const [openFaq, setOpenFaq] = useState<number | null>(null)
+
   return (
     <>
       <style>{CONNECT_STYLES}</style>
@@ -177,6 +222,81 @@ export default function ConnectPage() {
                 </a>
               ))}
             </div>
+          </section>
+
+          {/* 5 — Book a Consultation */}
+          <section className="connect-section">
+            <h2 className="connect-section-title">Book a Consultation</h2>
+            <p className="connect-body-copy" style={{ textAlign: "center" }}>
+              No calendar booking system yet — tap Book Now and we&apos;ll confirm your slot on WhatsApp.
+            </p>
+            <div className="connect-consult-grid">
+              {CONSULTATIONS.map(c => (
+                <div key={c.label} className="connect-glass connect-consult-card">
+                  <c.Icon size={28} color="var(--gold)" />
+                  <h3 className="connect-card-title">{c.label}</h3>
+                  <a href={wa(c.message)} target="_blank" rel="noopener noreferrer" className={`${BTN} connect-btn-gold`}>
+                    Book Now
+                  </a>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          {/* 6 — Need Help With Anything */}
+          <section className="connect-section">
+            <h2 className="connect-section-title">Need Help With Anything?</h2>
+            <div className="connect-help-grid">
+              <a href={wa("Hi, I need some help.")} target="_blank" rel="noopener noreferrer" className={`${BTN} connect-glass`} style={{ color: "#fff" }}>
+                <IconWhatsApp /> Chat on WhatsApp
+              </a>
+              <a href={TEL_HREF} className={`${BTN} connect-glass`} style={{ color: "#fff" }}>
+                <Phone size={18} /> Call Now
+              </a>
+              <a href={`mailto:${BRAND.email}`} className={`${BTN} connect-glass`} style={{ color: "#fff" }}>
+                <Mail size={18} /> Email Us
+              </a>
+            </div>
+          </section>
+
+          {/* 7 — Explore More */}
+          <section className="connect-section">
+            <h2 className="connect-section-title">Explore More</h2>
+            <div className="connect-explore-grid">
+              {EXPLORE_TILES.map(t => (
+                <Link key={t.label} href={t.href} title={t.note} className="connect-glass connect-explore-tile">
+                  <t.Icon size={24} color="var(--gold)" />
+                  <span>{t.label}</span>
+                </Link>
+              ))}
+            </div>
+          </section>
+
+          {/* FAQ — anchored from the Explore More "FAQs" tile above */}
+          <section id="faq" className="connect-section connect-faq-wrap">
+            <h2 className="connect-section-title">Frequently Asked Questions</h2>
+            {FAQS.map((faq, i) => (
+              <div
+                key={faq.question}
+                className="connect-faq-item"
+                onClick={() => setOpenFaq(openFaq === i ? null : i)}
+                role="button"
+                tabIndex={0}
+                aria-expanded={openFaq === i}
+                onKeyDown={e => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault()
+                    setOpenFaq(openFaq === i ? null : i)
+                  }
+                }}
+              >
+                <div className="connect-faq-row">
+                  <span className="connect-faq-q">{faq.question}</span>
+                  <span className="connect-faq-toggle">{openFaq === i ? "−" : "+"}</span>
+                </div>
+                {openFaq === i && <p className="connect-faq-a">{faq.answer}</p>}
+              </div>
+            ))}
           </section>
 
         </div>
@@ -276,10 +396,38 @@ const CONNECT_STYLES = `
     .connect-qr-text { align-items: flex-start; }
   }
 
+  /* Consultation cards */
+  .connect-consult-grid { display: grid; grid-template-columns: 1fr; gap: 16px; }
+  .connect-consult-card { display: flex; flex-direction: column; align-items: center; gap: 12px; text-align: center; padding: 28px 20px; }
+  .connect-card-title { font-size: 16px; font-weight: 700; color: #fff; margin: 0; }
+
+  /* Need Help grid */
+  .connect-help-grid { display: flex; flex-direction: column; gap: 10px; }
+
+  /* Explore More */
+  .connect-explore-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .connect-explore-tile { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; padding: 24px 12px; text-decoration: none; min-height: 96px; text-align: center; }
+  .connect-explore-tile span { font-size: 13px; font-weight: 600; color: #fff; }
+
+  /* FAQ */
+  .connect-faq-item { background: #0A1526; border-radius: 12px; padding: 18px 20px; cursor: pointer; }
+  .connect-faq-item + .connect-faq-item { margin-top: 10px; }
+  .connect-faq-row { display: flex; justify-content: space-between; align-items: center; gap: 12px; min-height: 44px; }
+  .connect-faq-q { font-size: 14px; font-weight: 600; color: #fff; }
+  .connect-faq-toggle { font-size: 20px; color: var(--gold); flex-shrink: 0; line-height: 1; }
+  .connect-faq-a { font-size: 13px; color: rgba(255,255,255,0.6); line-height: 1.7; margin-top: 12px; }
+
+  @media (min-width: 640px) {
+    .connect-consult-grid { grid-template-columns: repeat(3, 1fr); }
+  }
+
   @media (min-width: 1024px) {
     .connect-header-nav { display: flex; align-items: center; gap: 2px; }
     .connect-header-logo { height: 44px; }
     .connect-body { padding: 0 48px 96px; gap: 64px; }
     .connect-section-title { font-size: 26px; }
+    .connect-help-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    .connect-explore-grid { grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    .connect-faq-wrap { max-width: 720px; margin: 0 auto; width: 100%; }
   }
 `
