@@ -3,7 +3,7 @@
 import { useState } from "react"
 import Link from "next/link"
 import { QRCodeSVG } from "qrcode.react"
-import { Phone, Mail, MapPin, MessageSquareText, Shield, Lock, Video, Building2, Home, Compass, Info, Newspaper, HelpCircle, Ticket, Handshake, Download, Smartphone, Globe, Headset } from "lucide-react"
+import { Phone, Mail, MapPin, MessageSquareText, Shield, Lock, Video, Building2, Home, Compass, Info, Newspaper, HelpCircle, Ticket, Handshake, Download, Smartphone, Globe, Headset, Menu, X } from "lucide-react"
 import { BRAND, NAV_LINKS } from "@/constants"
 
 /* ─── /connect — full marketing landing page (link-in-bio hub, expanded) ───
@@ -144,6 +144,9 @@ const BTN = "connect-btn"
 
 export default function ConnectPage() {
   const [openFaq, setOpenFaq] = useState<number | null>(null)
+  const [mobileNavOpen, setMobileNavOpen] = useState(false)
+  const [newsletterEmail, setNewsletterEmail] = useState("")
+  const [newsletterMsg, setNewsletterMsg] = useState(false)
 
   return (
     <>
@@ -166,9 +169,29 @@ export default function ConnectPage() {
               </Link>
             ))}
           </nav>
-          <Link href="/" className="connect-header-cta">
-            Visit Website
-          </Link>
+          <div className="connect-header-actions">
+            <Link href="/" className="connect-header-cta">
+              Visit Website
+            </Link>
+            <button
+              type="button"
+              className="connect-header-menu-btn"
+              onClick={() => setMobileNavOpen(o => !o)}
+              aria-label={mobileNavOpen ? "Close menu" : "Open menu"}
+              aria-expanded={mobileNavOpen}
+            >
+              {mobileNavOpen ? <X size={22} /> : <Menu size={22} />}
+            </button>
+          </div>
+          {mobileNavOpen && (
+            <nav className="connect-header-nav-mobile">
+              {HEADER_LINKS.map(l => (
+                <Link key={l.label} href={l.href} title={l.note} className="connect-header-link-mobile" onClick={() => setMobileNavOpen(false)}>
+                  {l.label}
+                </Link>
+              ))}
+            </nav>
+          )}
         </header>
 
         {/* 2 — Hero */}
@@ -396,6 +419,86 @@ export default function ConnectPage() {
           </section>
 
         </div>
+
+        {/* 14 — Footer */}
+        <footer className="connect-footer">
+          <div className="connect-footer-inner">
+            <div className="connect-footer-grid">
+
+              <div className="connect-footer-brand">
+                <img src={LOGO_SRC} alt="Nilay 360" className="connect-footer-logo" />
+                <p className="connect-footer-tagline">View First. Home Next.</p>
+                <div className="connect-social-row" style={{ justifyContent: "flex-start" }}>
+                  {SOCIALS.map(s => (
+                    <a key={s.label} href={s.href} target="_blank" rel="noopener noreferrer" aria-label={s.label} title={s.label} className="connect-social" style={{ width: 40, height: 40 }}>
+                      <s.Icon />
+                    </a>
+                  ))}
+                </div>
+              </div>
+
+              <div className="connect-footer-col">
+                <h3 className="connect-footer-heading">Quick Links</h3>
+                {NAV_LINKS.map(l => (
+                  <Link key={l.href} href={l.href} className="connect-footer-link">{l.label}</Link>
+                ))}
+              </div>
+
+              <div className="connect-footer-col">
+                <h3 className="connect-footer-heading">Company</h3>
+                <Link href="/about" className="connect-footer-link">About Us</Link>
+                <Link href="/agents" className="connect-footer-link">Our Agents</Link>
+                <Link href="/careers" className="connect-footer-link">Careers</Link>
+                <Link href="/press" className="connect-footer-link">Press</Link>
+                <Link href="/contact" className="connect-footer-link">Contact</Link>
+              </div>
+
+              <div className="connect-footer-col">
+                <h3 className="connect-footer-heading">Connect</h3>
+                <a href={TEL_HREF} className="connect-footer-link">{BRAND.phone}</a>
+                <a href={`mailto:${BRAND.email}`} className="connect-footer-link">{BRAND.email}</a>
+                <a href={OFFICE_LOCATION_URL} target="_blank" rel="noopener noreferrer" className="connect-footer-link">
+                  <MapPin size={14} style={{ marginRight: 6 }} /> {BRAND.address}
+                </a>
+              </div>
+
+              <div className="connect-footer-col connect-footer-newsletter">
+                <h3 className="connect-footer-heading">Newsletter</h3>
+                {newsletterMsg ? (
+                  <p className="connect-footer-newsletter-msg">
+                    We don&apos;t have automated updates yet — message us on{" "}
+                    <a href={wa("Hi, I'd like to get updates from Nilay 360.")} target="_blank" rel="noopener noreferrer" style={{ color: "var(--gold)" }}>WhatsApp</a>
+                    {" "}or <Link href="/contact" style={{ color: "var(--gold)" }}>Contact</Link> instead.
+                  </p>
+                ) : (
+                  <form
+                    className="connect-newsletter-form"
+                    onSubmit={e => { e.preventDefault(); setNewsletterMsg(true) }}
+                  >
+                    <input
+                      type="email"
+                      required
+                      placeholder="Your email"
+                      value={newsletterEmail}
+                      onChange={e => setNewsletterEmail(e.target.value)}
+                      className="connect-newsletter-input"
+                      aria-label="Email address"
+                    />
+                    <button type="submit" className={`${BTN} connect-btn-gold`} style={{ minHeight: 44 }}>
+                      Subscribe
+                    </button>
+                  </form>
+                )}
+              </div>
+
+            </div>
+
+            <div className="connect-footer-bottom">
+              <p>© {new Date().getFullYear()} Nilay 360</p>
+              <p>View First. Home Next.</p>
+            </div>
+          </div>
+        </footer>
       </main>
     </>
   )
@@ -434,11 +537,25 @@ const CONNECT_STYLES = `
   .connect-header-logo { height: 40px; width: auto; object-fit: contain; }
   .connect-header-nav { display: none; }
   .connect-header-link { font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.7); text-decoration: none; padding: 8px 10px; border-radius: 6px; transition: color 0.15s, background 0.15s; }
+  .connect-header-actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
   .connect-header-cta {
     display: flex; align-items: center; justify-content: center; min-height: 40px; padding: 0 18px;
     background: var(--gold); color: #020C1C; font-size: 13px; font-weight: 700; border-radius: 10px;
     text-decoration: none; flex-shrink: 0; transition: background 0.15s, transform 0.15s;
   }
+  .connect-header-menu-btn {
+    display: flex; align-items: center; justify-content: center; width: 44px; height: 44px;
+    background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); border-radius: 10px;
+    color: #fff; cursor: pointer; flex-shrink: 0;
+  }
+  .connect-header-nav-mobile {
+    position: absolute; top: 100%; left: 20px; right: 20px; z-index: 5;
+    display: flex; flex-direction: column; gap: 2px; padding: 10px;
+    background: #0A1526; border: 1px solid rgba(255,255,255,0.1); border-radius: 12px;
+    box-shadow: 0 12px 32px rgba(0,0,0,0.4);
+  }
+  .connect-header-link-mobile { display: flex; align-items: center; min-height: 44px; padding: 0 12px; font-size: 14px; font-weight: 600; color: rgba(255,255,255,0.85); text-decoration: none; border-radius: 8px; }
+  .connect-header-link-mobile:active { background: rgba(255,255,255,0.06); }
 
   /* Hero */
   .connect-hero { position: relative; min-height: 78vh; display: flex; align-items: center; overflow: hidden; }
@@ -529,13 +646,37 @@ const CONNECT_STYLES = `
   .connect-trust-tile { display: flex; flex-direction: column; align-items: center; gap: 10px; text-align: center; }
   .connect-trust-tile span { font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.8); }
 
+  /* Footer */
+  .connect-footer { position: relative; z-index: 1; background: #0A1526; border-top: 1px solid rgba(255,255,255,0.08); margin-top: 8px; }
+  .connect-footer-inner { max-width: 1040px; margin: 0 auto; padding: 48px 20px 24px; }
+  .connect-footer-grid { display: grid; grid-template-columns: 1fr; gap: 32px; margin-bottom: 32px; }
+  .connect-footer-brand { display: flex; flex-direction: column; gap: 12px; align-items: flex-start; }
+  .connect-footer-logo { height: 32px; width: auto; object-fit: contain; }
+  .connect-footer-tagline { font-size: 13px; color: var(--gold); margin: 0; }
+  .connect-footer-col { display: flex; flex-direction: column; gap: 10px; }
+  .connect-footer-heading { font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--gold); margin: 0 0 4px; }
+  .connect-footer-link { font-size: 13px; color: rgba(255,255,255,0.6); text-decoration: none; min-height: 24px; display: flex; align-items: center; }
+  .connect-newsletter-form { display: flex; flex-direction: column; gap: 10px; }
+  .connect-newsletter-input {
+    width: 100%; padding: 12px 14px; border-radius: 10px; font-size: 13px;
+    background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.15); color: #fff;
+    font-family: 'Cal Sans', sans-serif; min-height: 44px; box-sizing: border-box;
+  }
+  .connect-newsletter-input::placeholder { color: rgba(255,255,255,0.35); }
+  .connect-footer-newsletter-msg { font-size: 12px; color: rgba(255,255,255,0.6); line-height: 1.7; margin: 0; }
+  .connect-footer-bottom { display: flex; flex-direction: column; gap: 6px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.08); text-align: center; }
+  .connect-footer-bottom p { font-size: 12px; color: rgba(255,255,255,0.35); margin: 0; }
+
   @media (min-width: 640px) {
     .connect-consult-grid { grid-template-columns: repeat(3, 1fr); }
     .connect-partner-panel { flex-direction: row; text-align: left; justify-content: space-between; }
+    .connect-footer-grid { grid-template-columns: 1fr 1fr; }
+    .connect-footer-brand { grid-column: 1 / -1; }
   }
 
   @media (min-width: 1024px) {
     .connect-header-nav { display: flex; align-items: center; gap: 2px; }
+    .connect-header-menu-btn { display: none; }
     .connect-header-logo { height: 44px; }
     .connect-body { padding: 0 48px 96px; gap: 64px; }
     .connect-section-title { font-size: 26px; }
@@ -545,5 +686,6 @@ const CONNECT_STYLES = `
     .connect-download-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
     .connect-app-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
     .connect-trust-panel { grid-template-columns: repeat(4, 1fr); }
+    .connect-footer-grid { grid-template-columns: 2fr 1fr 1fr 1fr 1.4fr; gap: 32px; }
   }
 `
