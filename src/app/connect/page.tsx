@@ -2,9 +2,21 @@
 
 import { useState } from "react"
 import Link from "next/link"
+import { Phone, Mail, MapPin, MessageSquareText, Shield, Lock } from "lucide-react"
 import { BRAND } from "@/constants"
 
-/* ─── Link-in-bio hub page — mobile-first, single column, 44px min tap targets ───
+/* ─── Link-in-bio hub page ───
+   Mobile (default, unchanged from prior verified pass): single column, 44px min tap targets.
+   Desktop (1024px+): additive grid layout via CSS classes below — see connect-*-grid rules.
+
+   Icon note: lucide-react does not ship brand/social logos (Instagram, Facebook, YouTube,
+   WhatsApp, X, etc. were removed from the library upstream for trademark reasons — confirmed
+   against the installed v1.21.0 package, it's not a project-specific gap). Generic UI icons
+   (Phone, Mail, MapPin, Feedback, Shield, Lock) below are real lucide-react imports as
+   requested; the three social glyphs and WhatsApp use hand-drawn outline paths in the same
+   stroke style as lucide (Instagram/Facebook/YouTube borrowed from Feather Icons, lucide's
+   own MIT-licensed upstream project) instead of text initials.
+
    Remaining placeholder / intentionally-omitted content (flagged in delivery report):
    - Channel Partners destination — no dedicated route exists in the app yet
    - Company Profile / Brochure downloads — no PDF assets exist yet (shown as "Coming Soon")
@@ -18,10 +30,10 @@ const OFFICE_LOCATION_URL = "https://maps.app.goo.gl/jiGr42DrevGruwnh6"
 
 // Real, page-specific URLs — some differ from the shared BRAND.social constants
 // (kept local to /connect rather than editing the shared constants file).
-const SOCIALS: { label: string; icon: string; href: string }[] = [
-  { label: "Instagram", icon: "IG", href: "https://www.instagram.com/nilay360_/" },
-  { label: "Facebook",  icon: "FB", href: "https://www.facebook.com/share/1CWEg3hSmx/" },
-  { label: "YouTube",   icon: "YT", href: "https://youtube.com/@nilay360.digital?si=wKl9wxWM1oMxmwne" },
+const SOCIALS = [
+  { label: "Instagram", href: "https://www.instagram.com/nilay360_/", Icon: IconInstagram },
+  { label: "Facebook",  href: "https://www.facebook.com/share/1CWEg3hSmx/", Icon: IconFacebook },
+  { label: "YouTube",   href: "https://youtube.com/@nilay360.digital?si=wKl9wxWM1oMxmwne", Icon: IconYouTube },
 ]
 
 const PARTNERS: { label: string; href: string; placeholder?: boolean }[] = [
@@ -50,10 +62,29 @@ const FAQS = [
   },
 ]
 
-function IconPhone() {
+function IconInstagram() {
   return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.89 9.11a19.79 19.79 0 01-3.07-8.67A2 2 0 012.8 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L7.09 9.91a16 16 0 006 6l.96-.96a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z" />
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
+      <path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z" />
+      <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
+    </svg>
+  )
+}
+
+function IconFacebook() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z" />
+    </svg>
+  )
+}
+
+function IconYouTube() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M22.54 6.42a2.78 2.78 0 00-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 00-1.94 2A29 29 0 001 11.75a29 29 0 00.46 5.33A2.78 2.78 0 003.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 001.94-2 29 29 0 00.46-5.25 29 29 0 00-.46-5.33z" />
+      <polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02" />
     </svg>
   )
 }
@@ -67,52 +98,6 @@ function IconWhatsApp() {
   )
 }
 
-function IconMail() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
-      <polyline points="22,6 12,13 2,6" />
-    </svg>
-  )
-}
-
-function IconMapPin() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z" />
-      <circle cx="12" cy="10" r="3" />
-    </svg>
-  )
-}
-
-function IconFeedback() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" />
-      <line x1="8" y1="9" x2="16" y2="9" />
-      <line x1="8" y1="13" x2="13" y2="13" />
-    </svg>
-  )
-}
-
-function IconShield() {
-  return (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#10C4C3" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-      <path d="M9 12l2 2 4-4" />
-    </svg>
-  )
-}
-
-function IconLock() {
-  return (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#10C4C3" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      <rect x="3" y="11" width="18" height="11" rx="2" />
-      <path d="M7 11V7a5 5 0 0110 0v4" />
-    </svg>
-  )
-}
-
 const HUB_BUTTON = "connect-btn"
 
 export default function ConnectPage() {
@@ -121,43 +106,99 @@ export default function ConnectPage() {
   return (
     <>
       <style>{`
+        .connect-main { position: relative; overflow: hidden; }
+
+        /* Background depth — pure CSS glow orbs, no WebGL/canvas */
+        .connect-orb { position: absolute; border-radius: 50%; pointer-events: none; will-change: transform; z-index: 0; }
+        .connect-orb-1 { width: 420px; height: 420px; top: -140px; right: -120px; background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%); animation: connectOrb1 18s ease-in-out infinite alternate; }
+        .connect-orb-2 { width: 340px; height: 340px; bottom: -100px; left: -110px; background: radial-gradient(circle, rgba(61,218,217,0.16) 0%, transparent 70%); animation: connectOrb2 22s ease-in-out infinite alternate; }
+        .connect-orb-3 { width: 240px; height: 240px; top: 45%; left: 50%; background: radial-gradient(circle, rgba(16,196,195,0.12) 0%, transparent 70%); animation: connectOrb3 26s ease-in-out infinite alternate; }
+        @keyframes connectOrb1 { 0% { transform: translate(0,0) scale(1); } 100% { transform: translate(-24px, 26px) scale(1.08); } }
+        @keyframes connectOrb2 { 0% { transform: translate(0,0) scale(1); } 100% { transform: translate(22px,-18px) scale(1.05); } }
+        @keyframes connectOrb3 { 0% { transform: translate(-50%,0); } 100% { transform: translate(-50%,-18px); } }
+        @media (prefers-reduced-motion: reduce) {
+          .connect-orb-1, .connect-orb-2, .connect-orb-3 { animation: none; }
+        }
+
+        .connect-shell { position: relative; z-index: 1; max-width: 480px; margin: 0 auto; padding: 64px 20px 48px; display: flex; flex-direction: column; gap: 40px; }
+
+        .connect-logo { height: 84px; width: auto; object-fit: contain; filter: drop-shadow(0 0 22px var(--accent-glow)); }
+        .connect-tagline { font-size: 17px; font-weight: 600; color: #3DDAD9; margin: 0; }
+        .connect-subtitle { font-size: 13px; color: rgba(255,255,255,0.5); margin: 0; }
+
         .${HUB_BUTTON} {
           display: flex; align-items: center; justify-content: center; gap: 10px;
           min-height: 44px; width: 100%; padding: 14px 20px;
           border-radius: 12px; font-family: 'Cal Sans', sans-serif;
           font-size: 15px; font-weight: 600; text-decoration: none;
-          transition: transform 0.15s, opacity 0.15s;
+          transition: transform 0.15s, opacity 0.15s, box-shadow 0.2s, background 0.15s, border-color 0.15s;
         }
         .${HUB_BUTTON}:active { transform: scale(0.98); }
         .${HUB_BUTTON}--disabled { opacity: 0.45; pointer-events: none; }
+        .connect-cta-primary { box-shadow: 0 8px 28px var(--accent-glow); }
+        .connect-cta-solo { }
+
+        .connect-glass {
+          background: rgba(255,255,255,0.05);
+          backdrop-filter: blur(16px);
+          -webkit-backdrop-filter: blur(16px);
+          border: 1px solid var(--border-accent);
+        }
+
         .connect-social {
           width: 44px; height: 44px; border-radius: 50%;
           display: flex; align-items: center; justify-content: center;
           border: 1px solid rgba(255,255,255,0.15); color: rgba(255,255,255,0.7);
-          font-size: 12px; font-weight: 700; text-decoration: none;
-          transition: border-color 0.15s, color 0.15s;
+          text-decoration: none; transition: border-color 0.15s, color 0.15s, transform 0.15s, box-shadow 0.2s;
         }
-        .connect-social:hover { border-color: #10C4C3; color: #3DDAD9; }
+
+        .connect-contact-grid { display: flex; flex-direction: column; gap: 10px; }
+        .connect-partner-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .connect-download-grid { display: flex; flex-direction: column; gap: 10px; }
+        .connect-trust-icons { display: flex; flex-direction: column; gap: 12px; }
+
         .connect-faq-item { background: #0A1526; border-radius: 12px; padding: 18px 20px; cursor: pointer; }
         .connect-faq-item + .connect-faq-item { margin-top: 10px; }
+
+        @media (hover: hover) and (pointer: fine) {
+          .${HUB_BUTTON}:hover { transform: translateY(-2px); }
+          .connect-cta-primary:hover { box-shadow: 0 12px 36px var(--accent-glow); }
+          .connect-glass:hover { background: rgba(255,255,255,0.09); border-color: var(--accent); box-shadow: 0 8px 24px var(--accent-glow); }
+          .connect-social:hover { border-color: #10C4C3; color: #3DDAD9; transform: scale(1.08); box-shadow: 0 0 0 3px var(--accent-glow); }
+        }
+
+        /* ── Desktop (1024px+) — additive layout only, mobile rules above are untouched ── */
+        @media (min-width: 1024px) {
+          .connect-shell { max-width: 1040px; padding: 96px 48px 96px; gap: 56px; }
+          .connect-logo { height: 140px; }
+          .connect-tagline { font-size: 26px; }
+          .connect-subtitle { font-size: 16px; }
+          .connect-cta-solo { max-width: 420px; margin: 0 auto; }
+          .connect-social { width: 48px; height: 48px; }
+          .connect-contact-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+          .connect-partner-grid { grid-template-columns: repeat(4, 1fr); gap: 16px; }
+          .connect-download-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+          .connect-faq-wrap { max-width: 720px; margin: 0 auto; width: 100%; }
+          .connect-trust-icons { flex-direction: row; gap: 32px; }
+        }
       `}</style>
 
-      <main style={{ background: "#020C1C", minHeight: "100vh", fontFamily: "'Cal Sans', sans-serif" }}>
-        <div style={{ maxWidth: 480, margin: "0 auto", padding: "64px 20px 48px", display: "flex", flexDirection: "column", gap: 40 }}>
+      <main className="connect-main" style={{ background: "#020C1C", minHeight: "100vh", fontFamily: "'Cal Sans', sans-serif" }}>
+        <div className="connect-orb connect-orb-1" />
+        <div className="connect-orb connect-orb-2" />
+        <div className="connect-orb connect-orb-3" />
+
+        <div className="connect-shell">
 
           {/* 1 — Header */}
           <header style={{ textAlign: "center", display: "flex", flexDirection: "column", alignItems: "center", gap: 12, paddingTop: 24 }}>
-            <img src={LOGO_SRC} alt="Nilay 360" style={{ height: 56, width: "auto", objectFit: "contain" }} />
-            <p style={{ fontSize: 17, fontWeight: 600, color: "#3DDAD9", margin: 0 }}>
-              View First. Home Next.
-            </p>
-            <p style={{ fontSize: 13, color: "rgba(255,255,255,0.5)", margin: 0 }}>
-              Your Gateway to Premium Real Estate
-            </p>
+            <img src={LOGO_SRC} alt="Nilay 360" className="connect-logo" />
+            <p className="connect-tagline">View First. Home Next.</p>
+            <p className="connect-subtitle">Your Gateway to Premium Real Estate</p>
           </header>
 
           {/* 2 — Visit Our Platform */}
-          <Link href="/" className={HUB_BUTTON} style={{ background: "#10C4C3", color: "#020C1C" }}>
+          <Link href="/" className={`${HUB_BUTTON} connect-cta-primary connect-cta-solo`} style={{ background: "#10C4C3", color: "#020C1C" }}>
             Visit Our Platform → nilay360.com
           </Link>
 
@@ -168,16 +209,8 @@ export default function ConnectPage() {
             </h2>
             <div style={{ display: "flex", gap: 12, flexWrap: "wrap", justifyContent: "center" }}>
               {SOCIALS.map(s => (
-                <a
-                  key={s.label}
-                  href={s.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label={s.label}
-                  className="connect-social"
-                  title={s.label}
-                >
-                  {s.icon}
+                <a key={s.label} href={s.href} target="_blank" rel="noopener noreferrer" aria-label={s.label} className="connect-social" title={s.label}>
+                  <s.Icon />
                 </a>
               ))}
             </div>
@@ -188,22 +221,24 @@ export default function ConnectPage() {
             <h2 style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", color: "rgba(255,255,255,0.45)", margin: "0 0 4px", textAlign: "center" }}>
               Contact Us
             </h2>
-            <a href={`tel:${BRAND.phone.replace(/\s+/g, "")}`} className={HUB_BUTTON} style={{ background: "#0A1526", color: "#fff", border: "1px solid rgba(255,255,255,0.1)" }}>
-              <IconPhone /> Call {BRAND.phone}
-            </a>
-            <a href={`https://wa.me/${BRAND.whatsapp.replace("+", "")}`} target="_blank" rel="noopener noreferrer" className={HUB_BUTTON} style={{ background: "#25D366", color: "#08331d" }}>
-              <IconWhatsApp /> WhatsApp Us
-            </a>
-            <a href={`mailto:${BRAND.email}`} className={HUB_BUTTON} style={{ background: "#0A1526", color: "#fff", border: "1px solid rgba(255,255,255,0.1)" }}>
-              <IconMail /> {BRAND.email}
-            </a>
-            <a href={OFFICE_LOCATION_URL} target="_blank" rel="noopener noreferrer" className={HUB_BUTTON} style={{ background: "#0A1526", color: "#fff", border: "1px solid rgba(255,255,255,0.1)" }}>
-              <IconMapPin /> Office Location
-            </a>
+            <div className="connect-contact-grid">
+              <a href={`tel:${BRAND.phone.replace(/\s+/g, "")}`} className={`${HUB_BUTTON} connect-glass`} style={{ color: "#fff" }}>
+                <Phone size={18} /> Call {BRAND.phone}
+              </a>
+              <a href={`https://wa.me/${BRAND.whatsapp.replace("+", "")}`} target="_blank" rel="noopener noreferrer" className={HUB_BUTTON} style={{ background: "#25D366", color: "#08331d" }}>
+                <IconWhatsApp /> WhatsApp Us
+              </a>
+              <a href={`mailto:${BRAND.email}`} className={`${HUB_BUTTON} connect-glass`} style={{ color: "#fff" }}>
+                <Mail size={18} /> {BRAND.email}
+              </a>
+              <a href={OFFICE_LOCATION_URL} target="_blank" rel="noopener noreferrer" className={`${HUB_BUTTON} connect-glass`} style={{ color: "#fff" }}>
+                <MapPin size={18} /> Office Location
+              </a>
+            </div>
           </section>
 
           {/* 5 — Become a Seller */}
-          <Link href="/post-property" className={HUB_BUTTON} style={{ background: "transparent", color: "#3DDAD9", border: "1.5px solid #10C4C3" }}>
+          <Link href="/post-property" className={`${HUB_BUTTON} connect-cta-solo`} style={{ background: "transparent", color: "#3DDAD9", border: "1.5px solid #10C4C3" }}>
             Become a Seller
           </Link>
 
@@ -212,13 +247,13 @@ export default function ConnectPage() {
             <h2 style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", color: "rgba(255,255,255,0.45)", margin: "0 0 4px", textAlign: "center" }}>
               Partner With Us
             </h2>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+            <div className="connect-partner-grid">
               {PARTNERS.map(p => (
                 <Link
                   key={p.label}
                   href={p.href}
-                  className={HUB_BUTTON}
-                  style={{ background: "#0A1526", color: "#fff", border: "1px solid rgba(255,255,255,0.1)", fontSize: 13, padding: "12px 14px" }}
+                  className={`${HUB_BUTTON} connect-glass`}
+                  style={{ color: "#fff", fontSize: 13, padding: "12px 14px" }}
                   title={p.placeholder ? `${p.label} — no dedicated page yet, routed to Contact` : undefined}
                 >
                   {p.label}
@@ -232,16 +267,18 @@ export default function ConnectPage() {
             <h2 style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", color: "rgba(255,255,255,0.45)", margin: "0 0 4px", textAlign: "center" }}>
               Download
             </h2>
-            <button type="button" disabled className={`${HUB_BUTTON} ${HUB_BUTTON}--disabled`} style={{ background: "#0A1526", color: "#fff", border: "1px solid rgba(255,255,255,0.1)" }}>
-              Company Profile (Coming Soon)
-            </button>
-            <button type="button" disabled className={`${HUB_BUTTON} ${HUB_BUTTON}--disabled`} style={{ background: "#0A1526", color: "#fff", border: "1px solid rgba(255,255,255,0.1)" }}>
-              Brochure (Coming Soon)
-            </button>
+            <div className="connect-download-grid">
+              <button type="button" disabled className={`${HUB_BUTTON} ${HUB_BUTTON}--disabled connect-glass`} style={{ color: "#fff" }}>
+                Company Profile (Coming Soon)
+              </button>
+              <button type="button" disabled className={`${HUB_BUTTON} ${HUB_BUTTON}--disabled connect-glass`} style={{ color: "#fff" }}>
+                Brochure (Coming Soon)
+              </button>
+            </div>
           </section>
 
           {/* 8 — FAQ */}
-          <section style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+          <section className="connect-faq-wrap" style={{ display: "flex", flexDirection: "column", gap: 4 }}>
             <h2 style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", color: "rgba(255,255,255,0.45)", margin: "0 0 10px", textAlign: "center" }}>
               FAQ
             </h2>
@@ -277,13 +314,15 @@ export default function ConnectPage() {
 
           {/* 9 — Trust */}
           <section style={{ display: "flex", flexDirection: "column", gap: 12, background: "#0A1526", borderRadius: 14, padding: "20px 18px" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-              <IconShield />
-              <span style={{ fontSize: 13, color: "rgba(255,255,255,0.75)" }}>Verified Listings</span>
-            </div>
-            <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-              <IconLock />
-              <span style={{ fontSize: 13, color: "rgba(255,255,255,0.75)" }}>Secure Platform</span>
+            <div className="connect-trust-icons">
+              <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                <Shield size={22} color="#10C4C3" />
+                <span style={{ fontSize: 13, color: "rgba(255,255,255,0.75)" }}>Verified Listings</span>
+              </div>
+              <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                <Lock size={22} color="#10C4C3" />
+                <span style={{ fontSize: 13, color: "rgba(255,255,255,0.75)" }}>Secure Platform</span>
+              </div>
             </div>
             <div style={{ display: "flex", gap: 16, paddingTop: 4, borderTop: "1px solid rgba(255,255,255,0.08)", marginTop: 4 }}>
               <Link href="/privacy" style={{ fontSize: 12, color: "#3DDAD9", minHeight: 44, display: "flex", alignItems: "center" }}>
@@ -296,8 +335,8 @@ export default function ConnectPage() {
           </section>
 
           {/* Feedback */}
-          <a href={FEEDBACK_FORM_URL} target="_blank" rel="noopener noreferrer" className={HUB_BUTTON} style={{ background: "transparent", color: "rgba(255,255,255,0.75)", border: "1px solid rgba(255,255,255,0.15)" }}>
-            <IconFeedback /> Share Feedback
+          <a href={FEEDBACK_FORM_URL} target="_blank" rel="noopener noreferrer" className={`${HUB_BUTTON} connect-cta-solo`} style={{ background: "transparent", color: "rgba(255,255,255,0.75)", border: "1px solid rgba(255,255,255,0.15)" }}>
+            <MessageSquareText size={18} /> Share Feedback
           </a>
 
           {/* 10 — Footer */}
