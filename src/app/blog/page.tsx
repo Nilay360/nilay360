@@ -26,92 +26,6 @@ type Category = {
   post_count: number;
 };
 
-// ── Placeholder data shown when DB returns no posts ───────────
-const PLACEHOLDER_POSTS: Post[] = [
-  {
-    id: "p1", slug: "hyderabad-real-estate-2025", title: "Hyderabad Real Estate: Why 2025 Is the Year to Buy",
-    excerpt: "Hyderabad's property market is entering a new cycle of growth. With infrastructure investments surging and IT employment at record highs, here's what buyers need to know before making their move.",
-    content: "", featured_image: "https://images.unsplash.com/photo-1611348586804-61bf6c080437?w=800&q=80",
-    category_id: "market-trends", tags: ["Hyderabad", "Market", "2025"],
-    is_featured: true, published_at: "2025-06-10T09:00:00Z", read_time_mins: 8, views: 2341,
-    author: { full_name: "Priya Sharma", avatar_url: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&q=80" },
-  },
-  {
-    id: "p2", slug: "first-home-buying-guide-india", title: "The Complete First-Time Buyer's Guide to Indian Real Estate",
-    excerpt: "From RERA checks to home loan eligibility, stamp duty to possession timelines — everything a first-time buyer needs to know condensed into one comprehensive guide.",
-    content: "", featured_image: "https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=800&q=80",
-    category_id: "buying-guides", tags: ["Buying", "Guide", "RERA"],
-    is_featured: false, published_at: "2025-06-07T09:00:00Z", read_time_mins: 12, views: 1876,
-    author: { full_name: "Arjun Mehta", avatar_url: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&q=80" },
-  },
-  {
-    id: "p3", slug: "jubilee-hills-neighbourhood-guide", title: "Jubilee Hills: Hyderabad's Most Prestigious Address Explained",
-    excerpt: "An intimate look at Road No. 36, the dining scene, the schools, the clubs, and why Jubilee Hills continues to command a premium over every other Hyderabad neighbourhood.",
-    content: "", featured_image: "https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=800&q=80",
-    category_id: "neighbourhood-guides", tags: ["Jubilee Hills", "Hyderabad"],
-    is_featured: false, published_at: "2025-06-04T09:00:00Z", read_time_mins: 7, views: 1542,
-    author: { full_name: "Sneha Reddy", avatar_url: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&q=80" },
-  },
-  {
-    id: "p4", slug: "rental-yield-india-2025", title: "Where Are Rental Yields Strongest in India Right Now?",
-    excerpt: "Micro-markets in Bengaluru's Whitefield, Hyderabad's Kokapet and Mumbai's Thane are delivering yields that outpace traditional strongholds. Our data-driven breakdown.",
-    content: "", featured_image: "https://images.unsplash.com/photo-1579621970563-ebec7560ff3e?w=800&q=80",
-    category_id: "investment-insights", tags: ["Investment", "Rental Yield"],
-    is_featured: false, published_at: "2025-06-01T09:00:00Z", read_time_mins: 10, views: 1198,
-    author: { full_name: "Vikram Nair", avatar_url: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&q=80" },
-  },
-  {
-    id: "p5", slug: "nri-buying-property-india-2025", title: "NRI Property Buying in India: FEMA Rules, Loans & Tax Guide 2025",
-    excerpt: "Updated for the 2025 FEMA amendments. Everything an NRI needs to know about acquiring residential and commercial property in India — from documentation to repatriation.",
-    content: "", featured_image: "https://images.unsplash.com/photo-1524813686514-a57563d77965?w=800&q=80",
-    category_id: "nri-corner", tags: ["NRI", "FEMA", "Tax"],
-    is_featured: false, published_at: "2025-05-28T09:00:00Z", read_time_mins: 14, views: 987,
-    author: { full_name: "Kavya Iyer", avatar_url: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&q=80" },
-  },
-  {
-    id: "p6", slug: "rera-what-homebuyers-need-to-know", title: "RERA 2025: What Every Homebuyer Must Know Before Signing",
-    excerpt: "RERA has transformed Indian real estate — but loopholes remain. Our legal team breaks down your rights, common developer violations, and how to protect your investment.",
-    content: "", featured_image: "https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=800&q=80",
-    category_id: "legal-finance", tags: ["RERA", "Legal", "Rights"],
-    is_featured: false, published_at: "2025-05-22T09:00:00Z", read_time_mins: 9, views: 2104,
-    author: { full_name: "Rahul Krishnan", avatar_url: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&q=80" },
-  },
-  {
-    id: "p7", slug: "kokapet-financial-district-investment", title: "Kokapet & Financial District: The Case for Buying Now",
-    excerpt: "The Financial District has transformed from a construction zone to Hyderabad's most sought-after corporate corridor. Here's why values will continue climbing through 2027.",
-    content: "", featured_image: "https://images.unsplash.com/photo-1560520653-9e0e4c89eb11?w=800&q=80",
-    category_id: "market-trends", tags: ["Kokapet", "Financial District"],
-    is_featured: false, published_at: "2025-05-18T09:00:00Z", read_time_mins: 8, views: 763,
-    author: { full_name: "Priya Sharma", avatar_url: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&q=80" },
-  },
-  {
-    id: "p8", slug: "home-loan-tips-india", title: "Securing the Best Home Loan Rate in India: A 2025 Playbook",
-    excerpt: "With RBI rates stabilising, this is the most competitive home loan environment in years. We walk you through credit score optimisation, lender comparison, and negotiation tactics.",
-    content: "", featured_image: "https://images.unsplash.com/photo-1579621970563-ebec7560ff3e?w=800&q=80",
-    category_id: "legal-finance", tags: ["Home Loan", "Finance"],
-    is_featured: false, published_at: "2025-05-14T09:00:00Z", read_time_mins: 11, views: 1432,
-    author: { full_name: "Arjun Mehta", avatar_url: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&q=80" },
-  },
-  {
-    id: "p9", slug: "commercial-office-hyderabad-2025", title: "Grade A Office Space in Hyderabad: Demand Outpaces Supply",
-    excerpt: "Global capability centres, tech giants and co-working operators are absorbing office space faster than developers can deliver it. A deep dive into Hyderabad's commercial story.",
-    content: "", featured_image: "https://images.unsplash.com/photo-1497366216548-37526070297c?w=800&q=80",
-    category_id: "commercial", tags: ["Commercial", "Office Space"],
-    is_featured: false, published_at: "2025-05-10T09:00:00Z", read_time_mins: 9, views: 645,
-    author: { full_name: "Vikram Nair", avatar_url: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&q=80" },
-  },
-];
-
-const PLACEHOLDER_CATS: Category[] = [
-  { id: "buying-guides",       name: "Buying Guides",        slug: "buying-guides",        post_count: 12 },
-  { id: "market-trends",       name: "Market Trends",        slug: "market-trends",        post_count: 18 },
-  { id: "investment-insights", name: "Investment Insights",  slug: "investment-insights",  post_count: 9  },
-  { id: "neighbourhood-guides",name: "Neighbourhood Guides", slug: "neighbourhood-guides", post_count: 14 },
-  { id: "legal-finance",       name: "Legal & Finance",      slug: "legal-finance",        post_count: 11 },
-  { id: "nri-corner",          name: "NRI Corner",           slug: "nri-corner",           post_count: 7  },
-  { id: "commercial",          name: "Commercial",           slug: "commercial",           post_count: 5  },
-];
-
 // ── Helpers ───────────────────────────────────────────────────
 function fmtDate(iso: string | null): string {
   if (!iso) return "";
@@ -199,19 +113,11 @@ export default function BlogPage() {
           supabase.from("blog_posts").select("*, author:profiles(full_name, avatar_url)").eq("is_published", true).order("published_at", { ascending: false }),
           supabase.from("blog_categories").select("*").order("name"),
         ]);
-        if (postsData && postsData.length > 0) {
-          setPosts(postsData as Post[]);
-        } else {
-          setPosts(PLACEHOLDER_POSTS);
-        }
-        if (catsData && catsData.length > 0) {
-          setCats(catsData as Category[]);
-        } else {
-          setCats(PLACEHOLDER_CATS);
-        }
+        setPosts((postsData ?? []) as Post[]);
+        setCats((catsData ?? []) as Category[]);
       } catch {
-        setPosts(PLACEHOLDER_POSTS);
-        setCats(PLACEHOLDER_CATS);
+        setPosts([]);
+        setCats([]);
       } finally {
         setLoading(false);
       }
@@ -382,9 +288,15 @@ export default function BlogPage() {
                   ? (
                     <div style={{ gridColumn: "1 / -1", padding: "80px 0", textAlign: "center" }}>
                       <div style={{ fontSize: "40px", opacity: 0.2, marginBottom: "14px" }}>📝</div>
-                      <h3 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "26px", fontWeight: 400, color: "#020C1C", marginBottom: "8px" }}>No articles found</h3>
-                      <p style={{ fontSize: "13px", color: "#6B7C72" }}>Try a different category or clear your search.</p>
-                      <button onClick={() => { setActiveCat("all"); setSearch(""); setSearchInput(""); }} style={{ marginTop: "18px", padding: "10px 24px", background: "#020C1C", border: "none", borderRadius: "8px", color: "#020C1C", fontSize: "13px", fontWeight: 600, cursor: "pointer", fontFamily: "'Cal Sans', sans-serif" }}>Show All Articles</button>
+                      {posts.length === 0 ? (
+                        <h3 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "26px", fontWeight: 400, color: "#020C1C", marginBottom: "8px" }}>No articles published yet</h3>
+                      ) : (
+                        <>
+                          <h3 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "26px", fontWeight: 400, color: "#020C1C", marginBottom: "8px" }}>No articles found</h3>
+                          <p style={{ fontSize: "13px", color: "#6B7C72" }}>Try a different category or clear your search.</p>
+                          <button onClick={() => { setActiveCat("all"); setSearch(""); setSearchInput(""); }} style={{ marginTop: "18px", padding: "10px 24px", background: "#020C1C", border: "none", borderRadius: "8px", color: "#020C1C", fontSize: "13px", fontWeight: 600, cursor: "pointer", fontFamily: "'Cal Sans', sans-serif" }}>Show All Articles</button>
+                        </>
+                      )}
                     </div>
                   )
                   : visiblePosts.map(post => <ArticleCard key={post.id} post={post} cats={cats} />)
