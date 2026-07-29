@@ -106,6 +106,10 @@ const _MENU_CITIES = [
   { name: "Chennai",   slug: "chennai"   },
 ]
 
+// Sale is currently only available in Hyderabad — used by the Buy, New
+// Projects, and Commercial mega-menus. Rent keeps the full city list.
+const _MENU_CITIES_SALE = _MENU_CITIES.filter(c => c.name === "Hyderabad")
+
 export const NAV_MENUS: Record<string, NavMenuData> = {
   "Buy": {
     leftColumn: {
@@ -122,21 +126,21 @@ export const NAV_MENUS: Record<string, NavMenuData> = {
     columns: [
       {
         heading: "Properties for Sale",
-        links: _MENU_CITIES.map(c => ({
+        links: _MENU_CITIES_SALE.map(c => ({
           label: `Property in ${c.name}`,
           href:  `/buy?city=${c.slug}`,
         })),
       },
       {
         heading: "Flats",
-        links: _MENU_CITIES.map(c => ({
+        links: _MENU_CITIES_SALE.map(c => ({
           label: `Flats in ${c.name}`,
           href:  `/buy?city=${c.slug}&type=apartment`,
         })),
       },
       {
         heading: "Houses",
-        links: _MENU_CITIES.map(c => ({
+        links: _MENU_CITIES_SALE.map(c => ({
           label: `Houses in ${c.name}`,
           href:  `/buy?city=${c.slug}&type=villa`,
         })),
@@ -191,7 +195,7 @@ export const NAV_MENUS: Record<string, NavMenuData> = {
     columns: [
       {
         heading: "Projects by City",
-        links: _MENU_CITIES.map(c => ({
+        links: _MENU_CITIES_SALE.map(c => ({
           label: `New Projects in ${c.name}`,
           href:  `/new-projects?city=${c.slug}`,
         })),
@@ -223,7 +227,7 @@ export const NAV_MENUS: Record<string, NavMenuData> = {
     columns: [
       {
         heading: "Commercial by City",
-        links: _MENU_CITIES.map(c => ({
+        links: _MENU_CITIES_SALE.map(c => ({
           label: `Commercial in ${c.name}`,
           href:  `/commercial?city=${c.slug}`,
         })),

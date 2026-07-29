@@ -481,6 +481,9 @@ function SearchPageInner() {
       });
     }
     if (listingType !== "all") list = list.filter(p => p.listing_type === listingType);
+    // Sale is Hyderabad-only — enforced here regardless of which tab is active,
+    // not just hidden behind the Buy-tab UI restriction below.
+    list = list.filter(p => p.listing_type !== "sale" || p.city?.toLowerCase() === "hyderabad");
     if (city !== "all") list = list.filter(p => p.city?.toLowerCase() === city.toLowerCase());
     // State filter
     if (stateFilter !== "all") {
@@ -538,6 +541,11 @@ function SearchPageInner() {
 
   const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
   const paginated = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+
+  // Buy is Hyderabad-only. A specific non-Hyderabad city selected while the
+  // Buy tab is active (via direct URL, bookmark, etc.) should show an honest
+  // message instead of a generic/empty result set.
+  const saleCityBlocked = listingType === "sale" && city !== "all" && city.toLowerCase() !== "hyderabad";
 
   function clearFilters() {
     setListingType("all"); setCity("all"); setPropTypes(new Set()); setBhk(new Set());
@@ -769,7 +777,18 @@ function SearchPageInner() {
                 <SbLabel>Type</SbLabel>
                 <div style={{ display: "flex", gap: "6px" }}>
                   {(["all", "sale", "rent"] as const).map(t => (
-                    <button key={t} onClick={() => { setListingType(t); setPage(1); }} style={{ flex: 1, padding: "8px 4px", minHeight: "44px", boxSizing: "border-box", borderRadius: "8px", fontSize: "12px", fontWeight: 600, background: listingType === t ? "#10C4C3" : "rgba(255,255,255,0.05)", border: listingType === t ? "none" : "1px solid rgba(255,255,255,0.1)", color: listingType === t ? "#020C1C" : "rgba(255,255,255,0.55)", cursor: "pointer", fontFamily: "'Cal Sans', sans-serif", transition: "all 0.15s" }}>
+                    <button key={t} onClick={() => {
+                      setListingType(t);
+                      setPage(1);
+                      // Buy is Hyderabad-only — switching to it with a different
+                      // city already selected silently corrects it forward,
+                      // rather than leaving the user on a result set they
+                      // didn't ask for.
+                      if (t === "sale" && city !== "all" && city.toLowerCase() !== "hyderabad") {
+                        setCity("Hyderabad");
+                        setStateFilter("Telangana");
+                      }
+                    }} style={{ flex: 1, padding: "8px 4px", minHeight: "44px", boxSizing: "border-box", borderRadius: "8px", fontSize: "12px", fontWeight: 600, background: listingType === t ? "#10C4C3" : "rgba(255,255,255,0.05)", border: listingType === t ? "none" : "1px solid rgba(255,255,255,0.1)", color: listingType === t ? "#020C1C" : "rgba(255,255,255,0.55)", cursor: "pointer", fontFamily: "'Cal Sans', sans-serif", transition: "all 0.15s" }}>
                       {t === "all" ? "All" : t === "sale" ? "Buy" : "Rent"}
                     </button>
                   ))}
@@ -779,25 +798,39 @@ function SearchPageInner() {
               {/* State */}
               <div style={{ marginBottom: "22px" }}>
                 <SbLabel>State</SbLabel>
-                <div style={{ position: "relative" }}>
-                  <select value={stateFilter} onChange={e => { handleStateChange(e.target.value); setPage(1); }} style={{ ...sidebarSelectBase, color: stateFilter === "all" ? "rgba(255,255,255,0.4)" : "#FFFFFF" }}>
-                    <option value="all" style={{ background: "#020C1C" }}>All States</option>
-                    {Object.keys(STATE_CITY_MAP).sort().map(s => <option key={s} value={s} style={{ background: "#020C1C" }}>{s}</option>)}
-                  </select>
-                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.35)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ position: "absolute", right: "10px", top: "50%", transform: "translateY(-50%)", pointerEvents: "none" }}><polyline points="6 9 12 15 18 9" /></svg>
-                </div>
+                {listingType === "sale" ? (
+                  <div style={{ ...sidebarSelectBase, display: "flex", alignItems: "center", gap: "6px", color: "#10C4C3" }}>
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                    Telangana
+                  </div>
+                ) : (
+                  <div style={{ position: "relative" }}>
+                    <select value={stateFilter} onChange={e => { handleStateChange(e.target.value); setPage(1); }} style={{ ...sidebarSelectBase, color: stateFilter === "all" ? "rgba(255,255,255,0.4)" : "#FFFFFF" }}>
+                      <option value="all" style={{ background: "#020C1C" }}>All States</option>
+                      {Object.keys(STATE_CITY_MAP).sort().map(s => <option key={s} value={s} style={{ background: "#020C1C" }}>{s}</option>)}
+                    </select>
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.35)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ position: "absolute", right: "10px", top: "50%", transform: "translateY(-50%)", pointerEvents: "none" }}><polyline points="6 9 12 15 18 9" /></svg>
+                  </div>
+                )}
               </div>
 
               {/* City */}
               <div style={{ marginBottom: "22px" }}>
                 <SbLabel>City</SbLabel>
-                <div style={{ position: "relative" }}>
-                  <select value={city} onChange={e => { handleCityChange(e.target.value); setPage(1); }} style={{ ...sidebarSelectBase, color: city === "all" ? "rgba(255,255,255,0.4)" : "#FFFFFF" }}>
-                    <option value="all" style={{ background: "#020C1C" }}>All Cities</option>
-                    {(stateFilter !== "all" ? (STATE_CITY_MAP[stateFilter] || []) : Object.keys(CITY_STATE_MAP).sort()).map(c => <option key={c} value={c} style={{ background: "#020C1C" }}>{c}</option>)}
-                  </select>
-                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.35)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ position: "absolute", right: "10px", top: "50%", transform: "translateY(-50%)", pointerEvents: "none" }}><polyline points="6 9 12 15 18 9" /></svg>
-                </div>
+                {listingType === "sale" ? (
+                  <div style={{ ...sidebarSelectBase, display: "flex", alignItems: "center", gap: "6px", color: "#10C4C3" }}>
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                    Hyderabad
+                  </div>
+                ) : (
+                  <div style={{ position: "relative" }}>
+                    <select value={city} onChange={e => { handleCityChange(e.target.value); setPage(1); }} style={{ ...sidebarSelectBase, color: city === "all" ? "rgba(255,255,255,0.4)" : "#FFFFFF" }}>
+                      <option value="all" style={{ background: "#020C1C" }}>All Cities</option>
+                      {(stateFilter !== "all" ? (STATE_CITY_MAP[stateFilter] || []) : Object.keys(CITY_STATE_MAP).sort()).map(c => <option key={c} value={c} style={{ background: "#020C1C" }}>{c}</option>)}
+                    </select>
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.35)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ position: "absolute", right: "10px", top: "50%", transform: "translateY(-50%)", pointerEvents: "none" }}><polyline points="6 9 12 15 18 9" /></svg>
+                  </div>
+                )}
               </div>
 
               {/* Pincode */}
@@ -973,7 +1006,19 @@ function SearchPageInner() {
             </div>
 
             {/* Content */}
-            {viewMode === "map" ? (
+            {saleCityBlocked ? (
+              /* Buy is Hyderabad-only — replace the grid entirely, same empty-state
+                 visual language as the "no properties found" state below. */
+              <div style={{ textAlign: "center", padding: "80px 24px", background: "rgba(255,255,255,0.04)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", borderRadius: "24px", border: "1px solid rgba(255,255,255,0.08)", boxShadow: "0 4px 24px rgba(0,0,0,0.18)" }}>
+                <div style={{ fontSize: "52px", marginBottom: "16px", opacity: 0.25 }}>⌂</div>
+                <h3 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "28px", fontWeight: 400, color: "#FFFFFF", marginBottom: "10px" }}>Currently only available in Hyderabad for sale</h3>
+                <p style={{ fontSize: "14px", color: "#A9B4C2", marginBottom: "8px" }}>We're not listing sale properties in other cities yet. Looking to rent in this area instead?</p>
+                <div style={{ display: "flex", gap: "10px", justifyContent: "center", flexWrap: "wrap", marginTop: "20px" }}>
+                  <button onClick={() => { setCity("Hyderabad"); setStateFilter("Telangana"); setPage(1); }} style={{ padding: "12px 28px", background: "#10C4C3", border: "none", borderRadius: "999px", color: "#020C1C", fontSize: "13px", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", cursor: "pointer", fontFamily: "'Cal Sans', sans-serif" }}>Browse Hyderabad</button>
+                  <button onClick={() => { setListingType("rent"); setPage(1); }} style={{ padding: "12px 28px", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.10)", borderRadius: "999px", color: "#FFFFFF", fontSize: "13px", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", cursor: "pointer", fontFamily: "'Cal Sans', sans-serif" }}>Switch to Rent</button>
+                </div>
+              </div>
+            ) : viewMode === "map" ? (
               /* Map placeholder */
               <div style={{ background: "#0A1526", borderRadius: "14px", overflow: "hidden", position: "relative", height: "600px", border: "1px solid rgba(255,255,255,0.07)" }}>
                 <div style={{ position: "absolute", inset: 0, backgroundImage: "linear-gradient(rgba(16,196,195,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(16,196,195,0.04) 1px, transparent 1px)", backgroundSize: "40px 40px" }} />
