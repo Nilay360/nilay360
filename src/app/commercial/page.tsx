@@ -1,6 +1,7 @@
 ﻿"use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 
@@ -211,7 +212,9 @@ function PropertyCard({ prop }: { prop: Property }) {
 
 // ─── Main page ────────────────────────────────────────────────────────────────
 
-export default function CommercialPage() {
+function CommercialPageInner() {
+  const searchParams = useSearchParams();
+
   // ROI Calculator state
   const [propValue, setPropValue] = useState(50000000);
   const [rentalYield, setRentalYield] = useState(8);
@@ -227,9 +230,19 @@ export default function CommercialPage() {
   // Listings state
   const [properties, setProperties] = useState<Property[]>([]);
   const [loading, setLoading] = useState(true);
-  const [cityFilter, setCityFilter] = useState("All");
   const [typeFilter, setTypeFilter] = useState("All");
   const [budgetFilter, setBudgetFilter] = useState("All");
+  const [cityNotAvailable, setCityNotAvailable] = useState(false);
+
+  // Commercial listings are Hyderabad-only. A non-Hyderabad city reached via
+  // URL flips an honest "not available" flag instead of a silent empty view.
+  useEffect(() => {
+    const city = searchParams.get("city");
+    if (city && city.toLowerCase() !== "hyderabad") {
+      setCityNotAvailable(true);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // ROI calculation
   useEffect(() => {
@@ -264,7 +277,8 @@ export default function CommercialPage() {
         if (error || !data) {
           setProperties([]);
         } else {
-          setProperties(data as Property[]);
+          // Commercial listings are Hyderabad-only — enforced here, not just hidden in the UI.
+          setProperties((data as Property[]).filter(p => p.location?.toLowerCase().includes("hyderabad")));
         }
       } catch {
         setProperties([]);
@@ -277,7 +291,6 @@ export default function CommercialPage() {
 
   // Filtered properties (client-side on fallback data)
   const filteredProperties = properties.filter((p) => {
-    if (cityFilter !== "All" && !p.location.toLowerCase().includes(cityFilter.toLowerCase())) return false;
     if (typeFilter !== "All" && p.property_type !== typeFilter) return false;
     if (budgetFilter === "Under ₹1Cr" && p.price >= 10000000) return false;
     if (budgetFilter === "₹1-5Cr" && (p.price < 10000000 || p.price > 50000000)) return false;
@@ -822,15 +835,15 @@ export default function CommercialPage() {
             flexWrap: "wrap",
             justifyContent: "center",
           }}>
-            <select
-              value={cityFilter}
-              onChange={(e) => setCityFilter(e.target.value)}
-              style={selectStyle}
-            >
-              {["All", "Hyderabad", "Mumbai", "Bengaluru", "Delhi NCR", "Chennai", "Pune"].map((c) => (
-                <option key={c}>{c}</option>
-              ))}
-            </select>
+            <span style={{
+              display: "inline-flex", alignItems: "center", gap: 6,
+              padding: "10px 16px", borderRadius: 6,
+              background: "rgba(16,196,195,0.08)", border: "1px solid rgba(16,196,195,0.25)",
+              color: "#10C4C3", fontSize: 14, fontWeight: 600, fontFamily: "'Cal Sans', sans-serif",
+            }}>
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+              Hyderabad
+            </span>
 
             <select
               value={typeFilter}
@@ -861,7 +874,18 @@ export default function CommercialPage() {
           }}>
             {loading
               ? Array.from({ length: 6 }).map((_, i) => <ShimmerCard key={i} />)
-              : filteredProperties.length > 0
+              : cityNotAvailable
+                ? (
+                  <div style={{ gridColumn: "1 / -1", textAlign: "center", padding: "60px 0" }}>
+                    <p style={{ fontFamily: "'Cal Sans', serif", fontSize: 28, color: "#020C1C", marginBottom: 8 }}>
+                      Currently only available in Hyderabad
+                    </p>
+                    <p style={{ fontSize: 14, color: "#020C1C", opacity: 0.5 }}>
+                      We're not listing commercial properties in other cities yet.
+                    </p>
+                  </div>
+                )
+                : filteredProperties.length > 0
                 ? filteredProperties.map((p) => <PropertyCard key={p.id} prop={p} />)
                 : (
                   <div style={{
@@ -1241,5 +1265,13 @@ export default function CommercialPage() {
         </div>
       </footer>
     </>
+  );
+}
+
+export default function CommercialPage() {
+  return (
+    <Suspense fallback={<div style={{ minHeight: "100vh", background: "#020C1C" }} />}>
+      <CommercialPageInner />
+    </Suspense>
   );
 }
