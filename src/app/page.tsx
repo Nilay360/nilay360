@@ -70,26 +70,60 @@ const MARKET: Record<string,{price:string;growth:string;localities:{name:string;
 };
 
 /* ─── Property data ─────────────────────────────────────────── */
-const PROPERTIES = [
-  { id:1, city:"Hyderabad", title:"Prestige Falcon City", type:"Apartment", beds:3, baths:3, sqft:2100, price:"₹2.8 Cr", img:"https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800&q=60&fm=avif", tag:"Featured" },
-  { id:2, city:"Hyderabad", title:"Sobha Neopolis", type:"Villa", beds:4, baths:4, sqft:3800, price:"₹5.2 Cr", img:"https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=800&q=60&fm=avif", tag:"New Launch" },
-  { id:3, city:"Mumbai", title:"Lodha Malabar", type:"Apartment", beds:4, baths:4, sqft:3200, price:"₹18.5 Cr", img:"https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&q=60&fm=avif", tag:"Premium" },
-  { id:4, city:"Mumbai", title:"Rustomjee Elements", type:"Apartment", beds:3, baths:2, sqft:1900, price:"₹7.4 Cr", img:"https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&q=60&fm=avif", tag:"Under Construction" },
-  { id:5, city:"Bengaluru", title:"Brigade Insignia", type:"Villa", beds:5, baths:5, sqft:5200, price:"₹8.9 Cr", img:"https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&q=60&fm=avif", tag:"RERA" },
-  { id:6, city:"Bengaluru", title:"Godrej Reserve", type:"Apartment", beds:3, baths:3, sqft:1750, price:"₹3.1 Cr", img:"https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&q=60&fm=avif", tag:"Ready" },
-  { id:7, city:"Delhi NCR", title:"DLF Camellias", type:"Penthouse", beds:5, baths:6, sqft:8800, price:"₹42 Cr", img:"https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=800&q=60&fm=avif", tag:"Ultra Luxury" },
-  { id:8, city:"Chennai", title:"Mahindra Eden", type:"Villa", beds:4, baths:4, sqft:3400, price:"₹4.6 Cr", img:"https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea?w=800&q=60&fm=avif", tag:"New Launch" },
-  { id:9, city:"Pune", title:"Shapoorji Parkwest", type:"Apartment", beds:2, baths:2, sqft:1200, price:"₹1.8 Cr", img:"https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&q=60&fm=avif", tag:"Featured" },
-];
+type HomeProperty = {
+  id: string; slug: string; city: string; title: string; type: string;
+  beds?: number; baths?: number; sqft?: number; price: string; img: string; tag: string;
+};
 
-const LOCATIONS = [
-  { city:"Hyderabad", area:"Kokapet", listings:124, avg:"₹6,800/sqft", grad:"linear-gradient(135deg,#020C1C,#0A1526)", img:"https://images.unsplash.com/photo-1590577976322-3d2d6e2130d5?w=800&q=60&fm=avif" },
-  { city:"Mumbai", area:"Bandra West", listings:89, avg:"₹42,000/sqft", grad:"linear-gradient(135deg,#0d1f3c,#1a3a6e)", img:"https://images.unsplash.com/photo-1570168007204-dfb528c6958f?w=800&q=60&fm=avif" },
-  { city:"Bengaluru", area:"Whitefield", listings:156, avg:"₹8,200/sqft", grad:"linear-gradient(135deg,#1a1040,#3020a0)", img:"https://images.unsplash.com/photo-1596176530529-78163a4f7af2?w=800&q=60&fm=avif" },
-  { city:"Delhi NCR", area:"Golf Course Rd", listings:72, avg:"₹18,500/sqft", grad:"linear-gradient(135deg,#2c1810,#5a3020)", img:"https://images.unsplash.com/photo-1587474260584-136574528ed5?w=800&q=60&fm=avif" },
-  { city:"Pune", area:"Kharadi", listings:103, avg:"₹9,400/sqft", grad:"linear-gradient(135deg,#101a10,#204020)", img:"https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&q=60&fm=avif" },
-  { city:"Chennai", area:"OMR", listings:91, avg:"₹7,600/sqft", grad:"linear-gradient(135deg,#201010,#401a1a)", img:"https://images.unsplash.com/photo-1582510003544-4d00b7f74220?w=800&q=60&fm=avif" },
-];
+const FALLBACK_PROPERTY_IMG = "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&q=60&fm=avif";
+
+function fmtINR(v: number): string {
+  if (v >= 1_00_00_000) return `₹${(v / 1_00_00_000).toFixed(2)} Cr`;
+  if (v >= 1_00_000) return `₹${(v / 1_00_000).toFixed(1)} L`;
+  return `₹${v.toLocaleString("en-IN")}`;
+}
+
+function num(v: unknown): number | undefined {
+  if (v == null || v === "") return undefined;
+  const x = Number(v);
+  return isNaN(x) ? undefined : x;
+}
+
+// property_listings row → HomeProperty
+function mapListingToHomeProperty(row: Record<string, unknown>): HomeProperty {
+  const photos = Array.isArray(row.photo_urls) ? (row.photo_urls as string[]).filter(Boolean) : [];
+  return {
+    id: String(row.id ?? ""),
+    slug: typeof row.slug === "string" ? row.slug : String(row.id ?? ""),
+    city: typeof row.city === "string" ? row.city : "",
+    title: typeof row.title === "string" ? row.title : "Untitled Property",
+    type: typeof row.property_category === "string" ? row.property_category : "",
+    beds: num(row.bedrooms),
+    baths: num(row.bathrooms),
+    sqft: num(row.built_up_area),
+    price: fmtINR(num(row.price) ?? 0),
+    img: photos[0] ?? FALLBACK_PROPERTY_IMG,
+    tag: row.is_featured ? "Featured" : row.listing_type === "rent" ? "For Rent" : "For Sale",
+  };
+}
+
+// properties (seed-shaped) row → HomeProperty
+function mapSeedToHomeProperty(row: Record<string, unknown>): HomeProperty {
+  const images = Array.isArray(row.images) ? (row.images as string[]).filter(Boolean) : [];
+  return {
+    id: String(row.id ?? ""),
+    slug: typeof row.slug === "string" ? row.slug : String(row.id ?? ""),
+    city: typeof row.city === "string" ? row.city : "",
+    title: typeof row.title === "string" ? row.title : "Untitled Property",
+    type: typeof row.type === "string" ? row.type : "",
+    beds: num(row.bedrooms),
+    baths: num(row.bathrooms),
+    sqft: num(row.area_sqft),
+    price: fmtINR(num(row.price) ?? 0),
+    img: images[0] ?? FALLBACK_PROPERTY_IMG,
+    tag: row.is_featured ? "Featured" : row.listing_type === "rent" ? "For Rent" : "For Sale",
+  };
+}
 
 type Testimonial = { id: string; name: string; role: string; rating: number; text: string; date: string };
 
@@ -187,6 +221,25 @@ export default function HomePage() {
     loadTestimonials();
   }, []);
 
+  const [properties, setProperties] = useState<HomeProperty[]>([]);
+  useEffect(() => {
+    async function loadProperties() {
+      try {
+        const supabase = createClient();
+        const [{ data: listingData }, { data: seedData }] = await Promise.all([
+          supabase.from("property_listings").select("*").eq("status", "active"),
+          supabase.from("properties").select("*").eq("status", "active").eq("approval_status", "approved"),
+        ]);
+        const mapped = [
+          ...(listingData ?? []).map((row: Record<string, unknown>) => mapListingToHomeProperty(row)),
+          ...(seedData ?? []).map((row: Record<string, unknown>) => mapSeedToHomeProperty(row)),
+        ];
+        setProperties(mapped);
+      } catch (_) {}
+    }
+    loadProperties();
+  }, []);
+
   const [searchTab, setSearchTab] = useState("Buy");
   const [searchCity, setSearchCity] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
@@ -208,7 +261,7 @@ export default function HomePage() {
   const heroRef = useRef<HTMLElement>(null);
   const glowRef = useRef<HTMLDivElement>(null);
 
-  const filteredProps = propCity === "All" ? PROPERTIES : PROPERTIES.filter(p => p.city === propCity);
+  const filteredProps = propCity === "All" ? properties : properties.filter(p => p.city === propCity);
 
   const scrollCarousel = (dir: number) => {
     if (!carouselRef.current) return;
@@ -970,10 +1023,15 @@ export default function HomePage() {
           </div>
 
           {/* Carousel */}
+          {filteredProps.length === 0 ? (
+            <div style={{padding:"48px 56px 48px 0", textAlign:"center", color:"rgba(255,255,255,0.45)", fontSize:14}}>
+              No properties available yet{propCity !== "All" ? ` in ${propCity}` : ""}. Check back soon.
+            </div>
+          ) : (
           <div ref={carouselRef} className="hide-scroll featured-carousel" style={{display:"flex", gap:16, overflowX:"auto", paddingBottom:8, paddingRight:56, scrollSnapType:"x mandatory", WebkitOverflowScrolling:"touch", maxWidth:"100vw", boxSizing:"border-box"}}>
             {filteredProps.map((p,i)=>(
               <Reveal key={p.id} delay={i*0.06} style={{flexShrink:0}}>
-              <a href={`/property/${p.id}`} className="premium-card"
+              <a href={`/property/${p.slug}`} className="premium-card"
                 style={{flexShrink:0, width:280, borderRadius:16, overflow:"hidden", display:"block", scrollSnapAlign:"start"}}>
                 {/* Image */}
                 <div style={{height:180, position:"relative", overflow:"hidden"}}>
@@ -998,18 +1056,19 @@ export default function HomePage() {
                   <h3 style={{fontFamily:"'Cal Sans',Georgia,serif", fontSize:18, fontWeight:700, color:"#fff", marginBottom:10}}>{p.title}</h3>
                   <div style={{display:"flex", gap:14, fontSize:12, color:"rgba(255,255,255,0.45)"}}>
                     <span style={{display:"flex", alignItems:"center", gap:4}}>
-                      <SvgIcon d="M3 12l9-9 9 9M5 10v10h5v-6h4v6h5V10" size={12} color="rgba(255,255,255,0.35)" /> {p.beds} Beds
+                      <SvgIcon d="M3 12l9-9 9 9M5 10v10h5v-6h4v6h5V10" size={12} color="rgba(255,255,255,0.35)" /> {p.beds ?? 0} Beds
                     </span>
                     <span style={{display:"flex", alignItems:"center", gap:4}}>
-                      <SvgIcon d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z" size={12} color="rgba(255,255,255,0.35)" /> {p.baths} Baths
+                      <SvgIcon d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z" size={12} color="rgba(255,255,255,0.35)" /> {p.baths ?? 0} Baths
                     </span>
-                    <span>{p.sqft.toLocaleString()} sqft</span>
+                    <span>{(p.sqft ?? 0).toLocaleString()} sqft</span>
                   </div>
                 </div>
               </a>
               </Reveal>
             ))}
           </div>
+          )}
         </div>
       </section>
 
@@ -1173,45 +1232,6 @@ export default function HomePage() {
                   <div style={{fontSize:12, color:"rgba(255,255,255,0.45)"}}>{c.desc}</div>
                 </div>
               </div>
-              </Reveal>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <div className="section-divider" />
-
-      {/* ══════════ SECTION 8 — TRENDING LOCATIONS ══════════ */}
-      <section className="trending-section" style={{background:"#020C1C", padding:"96px 0 96px 56px"}}>
-        <div style={{maxWidth:1280+56, margin:"0 auto"}}>
-          <Reveal>
-          <div style={{display:"flex", justifyContent:"space-between", alignItems:"flex-end", marginBottom:28, paddingRight:56}}>
-            <div>
-              <div style={{fontSize:11, color:G.gold, fontWeight:700, letterSpacing:2, textTransform:"uppercase", marginBottom:8}}>Hot Markets</div>
-              <h2 className="trending-heading" style={{fontFamily:"'Cal Sans',Georgia,serif", fontSize:32, fontWeight:700, color:"#fff", wordBreak:"break-word", maxWidth:"100%"}}>Trending Locations</h2>
-            </div>
-            <a href="/locations" style={{fontSize:14, color:G.gold, fontWeight:600}}>View all cities →</a>
-          </div>
-          </Reveal>
-
-          <div className="hide-scroll trending-carousel" style={{display:"flex", gap:16, overflowX:"auto", paddingRight:56, paddingBottom:8, scrollSnapType:"x mandatory", WebkitOverflowScrolling:"touch", maxWidth:"100vw", boxSizing:"border-box"}}>
-            {LOCATIONS.map((loc,i)=>(
-              <Reveal key={`${loc.city}-${loc.area}`} delay={i*0.06} style={{flexShrink:0}}>
-              <a href={`/search?city=${loc.city.toLowerCase().replace(" ","-")}&locality=${loc.area.toLowerCase().replace(" ","-")}`}
-                className="loc-card"
-                style={{ position:"relative", borderRadius:20, overflow:"hidden", height:240, width:240, flexShrink:0, cursor:"pointer", display:"block", scrollSnapAlign:"start" }}>
-                <div style={{position:"absolute", inset:0, backgroundImage:`url(${loc.img})`, backgroundSize:"cover", backgroundPosition:"center", transition:"transform 0.6s cubic-bezier(0.16,1,0.3,1)"}} />
-                <div style={{position:"absolute", inset:0, background:loc.grad, opacity:0.25}} />
-                <div style={{position:"absolute", inset:0, background:"linear-gradient(to top, rgba(0,0,0,0.90) 0%, rgba(0,0,0,0.20) 60%, transparent 100%)"}} />
-                <div style={{position:"absolute", bottom:16, left:16, right:16}}>
-                  <div style={{fontSize:10, color:"rgba(255,255,255,0.6)", letterSpacing:"0.05em", marginBottom:2}}>{loc.city}</div>
-                  <div style={{fontFamily:"'Cal Sans',Georgia,serif", fontSize:20, fontWeight:700, color:"#fff"}}>{loc.area}</div>
-                  <div style={{display:"flex", gap:12, marginTop:6}}>
-                    <span style={{fontSize:11, color:G.goldLt}}>{loc.listings} listings</span>
-                    <span style={{fontSize:11, color:"rgba(255,255,255,0.6)"}}>{loc.avg}</span>
-                  </div>
-                </div>
-              </a>
               </Reveal>
             ))}
           </div>
