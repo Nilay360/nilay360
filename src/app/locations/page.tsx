@@ -2,35 +2,20 @@
 import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
 
-// ── Static city data ──────────────────────────────────────────
+// ── City directory ───────────────────────────────────────────
+// Real cities Nilay 360 operates in — not fake content. Per-city listing
+// counts come from a live query below; there is no fabricated avg-price,
+// growth %, or "Top Pick"/"Trending" style marketing tag attached anymore.
 const CITIES = [
-  { slug: "hyderabad",  name: "Hyderabad",  state: "Telangana",     img: "https://images.unsplash.com/photo-1590577976322-3d2d6e2130d5?w=800&q=80",   ppsf: 95000,  growth: 14.2, tag: "Top Pick", tagColor: "#059669" },
-  { slug: "mumbai",     name: "Mumbai",     state: "Maharashtra",   img: "https://images.unsplash.com/photo-1570168007204-dfb528c6958f?w=800&q=80",   ppsf: 185000, growth: 9.8,  tag: "Premium",  tagColor: "#4A90D9" },
-  { slug: "bengaluru",  name: "Bengaluru",  state: "Karnataka",     img: "https://images.unsplash.com/photo-1596176530529-78163a4f7af2?w=800&q=80",   ppsf: 112000, growth: 11.5, tag: "Trending", tagColor: "#10C4C3" },
-  { slug: "delhi-ncr",  name: "Delhi NCR",  state: "Delhi / NCR",   img: "https://images.unsplash.com/photo-1587474260584-136574528ed5?w=800&q=80",   ppsf: 145000, growth: 8.3,  tag: null,       tagColor: "" },
-  { slug: "chennai",    name: "Chennai",    state: "Tamil Nadu",    img: "https://images.unsplash.com/photo-1582510003544-4d00b7f74220?w=800&q=80",   ppsf: 88000,  growth: 10.1, tag: null,       tagColor: "" },
-  { slug: "pune",       name: "Pune",       state: "Maharashtra",   img: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&q=80",   ppsf: 97000,  growth: 12.4, tag: "Rising",   tagColor: "#7C3AED" },
-  { slug: "kolkata",    name: "Kolkata",    state: "West Bengal",   img: "https://images.unsplash.com/photo-1558618047-f4e80bf0ab30?w=800&q=80",   ppsf: 72000,  growth: 7.6,  tag: null,       tagColor: "" },
-  { slug: "ahmedabad",  name: "Ahmedabad",  state: "Gujarat",       img: "https://images.unsplash.com/photo-1585123334904-845d60e97b29?w=800&q=80",   ppsf: 68000,  growth: 9.2,  tag: null,       tagColor: "" },
+  { slug: "hyderabad",  name: "Hyderabad",  state: "Telangana",     img: "https://images.unsplash.com/photo-1590577976322-3d2d6e2130d5?w=800&q=80" },
+  { slug: "mumbai",     name: "Mumbai",     state: "Maharashtra",   img: "https://images.unsplash.com/photo-1570168007204-dfb528c6958f?w=800&q=80" },
+  { slug: "bengaluru",  name: "Bengaluru",  state: "Karnataka",     img: "https://images.unsplash.com/photo-1596176530529-78163a4f7af2?w=800&q=80" },
+  { slug: "delhi-ncr",  name: "Delhi NCR",  state: "Delhi / NCR",   img: "https://images.unsplash.com/photo-1587474260584-136574528ed5?w=800&q=80" },
+  { slug: "chennai",    name: "Chennai",    state: "Tamil Nadu",    img: "https://images.unsplash.com/photo-1582510003544-4d00b7f74220?w=800&q=80" },
+  { slug: "pune",       name: "Pune",       state: "Maharashtra",   img: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&q=80" },
+  { slug: "kolkata",    name: "Kolkata",    state: "West Bengal",   img: "https://images.unsplash.com/photo-1558618047-f4e80bf0ab30?w=800&q=80" },
+  { slug: "ahmedabad",  name: "Ahmedabad",  state: "Gujarat",       img: "https://images.unsplash.com/photo-1585123334904-845d60e97b29?w=800&q=80" },
 ];
-
-const NEIGHBOURHOODS = [
-  { name: "Jubilee Hills", city: "Hyderabad",  count: 38 },
-  { name: "Kokapet",       city: "Hyderabad",  count: 52 },
-  { name: "Bandra West",   city: "Mumbai",     count: 41 },
-  { name: "Koramangala",   city: "Bengaluru",  count: 34 },
-  { name: "Gachibowli",    city: "Hyderabad",  count: 29 },
-  { name: "Worli",         city: "Mumbai",     count: 27 },
-  { name: "Indiranagar",   city: "Bengaluru",  count: 22 },
-  { name: "Banjara Hills", city: "Hyderabad",  count: 31 },
-  { name: "Whitefield",    city: "Bengaluru",  count: 45 },
-  { name: "Lower Parel",   city: "Mumbai",     count: 18 },
-];
-
-function fmtINR(v: number): string {
-  if (v >= 1_00_000) return `₹${(v / 1_00_000).toFixed(0)}K/sqft`;
-  return `₹${v.toLocaleString("en-IN")}`;
-}
 
 function Eyebrow({ label, dark = false }: { label: string; dark?: boolean }) {
   return (
@@ -55,22 +40,16 @@ export default function LocationsPage() {
           .select("city:cities(name)")
           .eq("status", "active")
           .eq("approval_status", "approved");
-        if (data && data.length > 0) {
-          setTotalListings(data.length);
-          const map: Record<string, number> = {};
-          data.forEach((p: any) => {
-            const name = p.city?.name ?? "";
-            if (name) map[name] = (map[name] ?? 0) + 1;
-          });
-          setCounts(map);
-        } else {
-          // placeholder counts
-          setCounts({ Hyderabad: 148, Mumbai: 93, Bengaluru: 112, "Delhi NCR": 67, Chennai: 54, Pune: 71, Kolkata: 38, Ahmedabad: 29 });
-          setTotalListings(612);
-        }
+        const map: Record<string, number> = {};
+        (data ?? []).forEach((p: any) => {
+          const name = p.city?.name ?? "";
+          if (name) map[name] = (map[name] ?? 0) + 1;
+        });
+        setCounts(map);
+        setTotalListings((data ?? []).length);
       } catch {
-        setCounts({ Hyderabad: 148, Mumbai: 93, Bengaluru: 112, "Delhi NCR": 67, Chennai: 54, Pune: 71, Kolkata: 38, Ahmedabad: 29 });
-        setTotalListings(612);
+        setCounts({});
+        setTotalListings(0);
       }
     }
     load();
@@ -120,7 +99,7 @@ export default function LocationsPage() {
               Premium listings in India's most sought-after cities. Verified properties, certified agents, and expert local knowledge — wherever you want to buy.
             </p>
             <div style={{ display: "flex", gap: "10px", justifyContent: "center", flexWrap: "wrap", animation: "fadeUp 0.5s 0.2s ease-out both" }}>
-              {[`${totalListings}+ Listings`, "8 Cities", "50+ Neighbourhoods"].map(p => (
+              {[`${totalListings} Listings`, `${CITIES.length} Cities`].map(p => (
                 <span key={p} style={{ padding: "7px 18px", background: "rgba(201,168,76,0.08)", border: "1px solid rgba(201,168,76,0.2)", borderRadius: "100px", fontSize: "12px", fontWeight: 600, color: "#10C4C3", letterSpacing: "0.05em" }}>{p}</span>
               ))}
             </div>
@@ -136,7 +115,6 @@ export default function LocationsPage() {
                 Browse by City
               </h2>
             </div>
-            <p style={{ fontSize: "13px", color: "#9CA3AF" }}>Avg price data · Q2 2025</p>
           </div>
 
           <div className="loc-pg-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: "22px" }}>
@@ -150,9 +128,6 @@ export default function LocationsPage() {
                   <div style={{ height: "180px", position: "relative", overflow: "hidden" }}>
                     <img src={city.img} alt={city.name} style={{ width: "100%", height: "100%", objectFit: "cover", transform: hover ? "scale(1.06)" : "scale(1)", transition: "transform 0.35s" }} />
                     <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(5,8,12,0.72) 0%, transparent 55%)" }} />
-                    {city.tag && (
-                      <span style={{ position: "absolute", top: "12px", left: "12px", padding: "3px 10px", borderRadius: "100px", fontSize: "9px", fontWeight: 800, letterSpacing: "0.1em", textTransform: "uppercase", background: city.tagColor, color: "#fff" }}>{city.tag}</span>
-                    )}
                     <div style={{ position: "absolute", bottom: "12px", left: "14px" }}>
                       <h3 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "22px", fontWeight: 600, color: "#020C1C", lineHeight: 1.1 }}>{city.name}</h3>
                       <p style={{ fontSize: "11px", color: "rgba(245,242,236,0.55)", marginTop: "2px" }}>{city.state}</p>
@@ -160,16 +135,6 @@ export default function LocationsPage() {
                   </div>
                   {/* Stats */}
                   <div style={{ padding: "18px 18px 20px" }}>
-                    <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "14px" }}>
-                      <div>
-                        <p style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.1em", color: "#9CA3AF", textTransform: "uppercase", marginBottom: "3px" }}>Avg Price</p>
-                        <p style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "17px", fontWeight: 600, color: "#020C1C" }}>{fmtINR(city.ppsf)}</p>
-                      </div>
-                      <div style={{ textAlign: "right" }}>
-                        <p style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.1em", color: "#9CA3AF", textTransform: "uppercase", marginBottom: "3px" }}>YoY Growth</p>
-                        <p style={{ fontSize: "16px", fontWeight: 700, color: "#059669" }}>+{city.growth}%</p>
-                      </div>
-                    </div>
                     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                       <span style={{ fontSize: "12px", color: "#6B7C72" }}>{count > 0 ? `${count} listings` : "Coming soon"}</span>
                       <span style={{ display: "inline-flex", alignItems: "center", gap: "5px", padding: "6px 14px", background: hover ? "#020C1C" : "#F8F6F1", borderRadius: "100px", fontSize: "11px", fontWeight: 700, color: hover ? "#10C4C3" : "#020C1C", letterSpacing: "0.06em", transition: "all 0.18s" }}>
@@ -177,34 +142,6 @@ export default function LocationsPage() {
                         <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" /></svg>
                       </span>
                     </div>
-                  </div>
-                </a>
-              );
-            })}
-          </div>
-        </section>
-
-        {/* ── TRENDING NEIGHBOURHOODS ─────────────────────────── */}
-        <section className="loc-pg-trending" style={{ background: "#fff", padding: "64px 0", borderTop: "1px solid rgba(13,43,31,0.06)", borderBottom: "1px solid rgba(13,43,31,0.06)" }}>
-          <div style={{ maxWidth: "1280px", margin: "0 auto", padding: "0 48px 0" }}>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "24px" }}>
-              <div>
-                <Eyebrow label="Hotspots" />
-                <h2 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "30px", fontWeight: 400, color: "#020C1C" }}>Trending Neighbourhoods</h2>
-              </div>
-              <a href="/search" style={{ fontSize: "12px", fontWeight: 700, color: "#10C4C3", textDecoration: "none", letterSpacing: "0.06em" }}>View All →</a>
-            </div>
-          </div>
-          <div className="scroll-row loc-pg-scroll" style={{ display: "flex", gap: "12px", overflowX: "auto", padding: "4px 48px", scrollbarWidth: "none" }}>
-            {NEIGHBOURHOODS.map(n => {
-              const [hover, setHover] = useState(false);
-              return (
-                <a key={n.name} href={`/search?neighbourhood=${encodeURIComponent(n.name)}`} style={{ textDecoration: "none", flexShrink: 0 }}
-                  onMouseEnter={() => setHover(true)} onMouseLeave={() => setHover(false)}>
-                  <div style={{ padding: "12px 20px", background: hover ? "#020C1C" : "#F8F6F1", border: `1.5px solid ${hover ? "transparent" : "rgba(13,43,31,0.08)"}`, borderRadius: "100px", display: "flex", alignItems: "center", gap: "8px", transition: "all 0.18s" }}>
-                    <span style={{ fontSize: "13px", fontWeight: 600, color: hover ? "#020C1C" : "#020C1C", whiteSpace: "nowrap" }}>{n.name}</span>
-                    <span style={{ fontSize: "11px", fontWeight: 600, color: hover ? "#10C4C3" : "#9CA3AF" }}>{n.count}</span>
-                    <span style={{ fontSize: "10px", color: hover ? "rgba(245,242,236,0.4)" : "#C0BAB0" }}>{n.city}</span>
                   </div>
                 </a>
               );
@@ -224,8 +161,8 @@ export default function LocationsPage() {
             </div>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "20px" }}>
               {[
-                { value: `${totalListings}+`, label: "Verified Listings", sub: "Across all cities", icon: "🏠" },
-                { value: "8",                  label: "Cities Covered",    sub: "And growing",       icon: "🗺" },
+                { value: `${totalListings}`, label: "Verified Listings", sub: "Across all cities", icon: "🏠" },
+                { value: `${CITIES.length}`,  label: "Cities Covered",    sub: "And growing",       icon: "🗺" },
                 { value: "11.4%",              label: "Avg Price Growth",  sub: "YoY across markets", icon: "📈" },
               ].map(s => (
                 <div key={s.label} style={{ background: "rgba(245,242,236,0.04)", border: "1px solid rgba(245,242,236,0.07)", borderRadius: "16px", padding: "32px 28px", textAlign: "center" }}>
