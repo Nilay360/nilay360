@@ -1,5 +1,6 @@
 ﻿"use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
 // ── Types ─────────────────────────────────────────────────────
@@ -183,18 +184,30 @@ function ProjectCard({ p, onInterest }: { p: Project; onInterest: (p: Project) =
 }
 
 // ── Main page ─────────────────────────────────────────────────
-export default function NewProjectsPage() {
+function NewProjectsPageInner() {
+  const searchParams = useSearchParams();
   const [projects, setProjects] = useState<Project[]>([]);
   const [search, setSearch] = useState("");
   const [typeFilter, setTypeFilter] = useState("All");
-  const [cityFilter, setCityFilter] = useState("All Cities");
   const [budgetFilter, setBudgetFilter] = useState("all");
   const [possessionFilter, setPossessionFilter] = useState("all");
   const [interestProject, setInterestProject] = useState<Project | null>(null);
   const [alertForm, setAlertForm] = useState({ email: "", city: "", type: "" });
   const [alertSent, setAlertSent] = useState(false);
+  const [cityNotAvailable, setCityNotAvailable] = useState(false);
 
   const featured = projects.find(p => p.featured) ?? projects[0];
+
+  // New-launch projects are Hyderabad-only. A non-Hyderabad city reached via
+  // URL flips an honest "not available" flag instead of silently showing
+  // an empty "All Cities" view.
+  useEffect(() => {
+    const city = searchParams.get("city");
+    if (city && city.toLowerCase() !== "hyderabad") {
+      setCityNotAvailable(true);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     async function load() {
@@ -206,7 +219,9 @@ export default function NewProjectsPage() {
           .eq("status", "active")
           .order("featured", { ascending: false })
           .limit(20);
-        if (data && data.length > 0) setProjects(data);
+        // New launches are Hyderabad-only — enforced here, not just hidden in the UI.
+        const hyderabadOnly = (data ?? []).filter((p: Project) => p.city?.includes("Hyderabad"));
+        if (hyderabadOnly.length > 0) setProjects(hyderabadOnly);
       } catch (_) {}
     }
     load();
@@ -215,7 +230,6 @@ export default function NewProjectsPage() {
   // Client-side filter
   const filtered = projects.filter(p => {
     if (typeFilter !== "All" && p.property_type !== typeFilter) return false;
-    if (cityFilter !== "All Cities" && !p.city.includes(cityFilter)) return false;
     if (search && !p.name.toLowerCase().includes(search.toLowerCase()) &&
         !p.developer.toLowerCase().includes(search.toLowerCase()) &&
         !p.location.toLowerCase().includes(search.toLowerCase())) return false;
@@ -395,33 +409,35 @@ export default function NewProjectsPage() {
         {/* ── FILTERS ROW ────────────────────────────────────── */}
         <div className="np-filters" style={{ maxWidth: "1280px", margin: "0 auto", padding: "44px 48px 0" }}>
           <div className="np-filters-row" style={{ background: "#fff", border: "1px solid rgba(13,43,31,0.07)", borderRadius: "14px", padding: "18px 22px", display: "flex", gap: "14px", alignItems: "center", flexWrap: "wrap", boxShadow: "0 2px 12px rgba(13,43,31,0.04)" }}>
-            {/* City tabs */}
-            <div style={{ display: "flex", gap: "4px", background: "#F8F6F1", borderRadius: "9px", padding: "3px" }}>
-              {["All Cities", "Hyderabad", "Mumbai", "Bengaluru", "Delhi NCR"].map(c => (
-                <button key={c} onClick={() => setCityFilter(c)} style={{ padding: "7px 14px", borderRadius: "7px", fontSize: "12px", fontWeight: 600, background: cityFilter === c ? "#020C1C" : "transparent", color: cityFilter === c ? "#10C4C3" : "#6B7C72", border: "none", cursor: "pointer", fontFamily: "'Cal Sans', sans-serif", transition: "all 0.15s", whiteSpace: "nowrap" }}>
-                  {c}
-                </button>
-              ))}
-            </div>
+            <span style={{ display: "inline-flex", alignItems: "center", gap: "6px", padding: "7px 14px", borderRadius: "7px", background: "rgba(16,196,195,0.08)", border: "1px solid rgba(16,196,195,0.25)", color: "#10C4C3", fontSize: "12px", fontWeight: 600 }}>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+              Hyderabad
+            </span>
             <div style={{ width: "1px", height: "28px", background: "rgba(13,43,31,0.08)", flexShrink: 0 }} />
             {SEL(budgetFilter, setBudgetFilter, [["under1","Under ₹1 Cr"],["1-3","₹1–3 Cr"],["3-10","₹3–10 Cr"],["above10","Above ₹10 Cr"]], "Any Budget")}
             {SEL(possessionFilter, setPossessionFilter, [["rtm","Ready to Move"],["2025","2025"],["2026","2026"],["2027","2027"]], "Possession Year")}
             <span style={{ marginLeft: "auto", fontSize: "12px", fontWeight: 700, color: "#9CA3AF" }}>
-              {filtered.length} project{filtered.length !== 1 ? "s" : ""} found
+              {cityNotAvailable ? 0 : filtered.length} project{filtered.length !== 1 ? "s" : ""} found
             </span>
           </div>
         </div>
 
         {/* ── PROJECTS GRID ──────────────────────────────────── */}
         <section style={{ maxWidth: "1280px", margin: "0 auto", padding: "40px 48px 72px" }}>
-          {filtered.length === 0 ? (
+          {cityNotAvailable ? (
+            <div style={{ padding: "80px", textAlign: "center", background: "#fff", borderRadius: "18px", border: "1px solid rgba(13,43,31,0.07)" }}>
+              <p style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "28px", color: "#020C1C", marginBottom: "8px" }}>Currently only available in Hyderabad</p>
+              <p style={{ fontSize: "13px", color: "#6B7C72", marginBottom: "20px" }}>We're not listing new launches in other cities yet.</p>
+              <a href="/new-projects" style={{ fontSize: "13px", fontWeight: 600, color: "#10C4C3", textDecoration: "none" }}>Browse Hyderabad launches →</a>
+            </div>
+          ) : filtered.length === 0 ? (
             <div style={{ padding: "80px", textAlign: "center", background: "#fff", borderRadius: "18px", border: "1px solid rgba(13,43,31,0.07)" }}>
               {projects.length === 0 ? (
                 <p style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "28px", color: "#020C1C", marginBottom: "8px" }}>No projects listed yet</p>
               ) : (
                 <>
                   <p style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "28px", color: "#020C1C", marginBottom: "8px" }}>No projects match your filters</p>
-                  <button onClick={() => { setCityFilter("All Cities"); setBudgetFilter("all"); setPossessionFilter("all"); setTypeFilter("All"); setSearch(""); }}
+                  <button onClick={() => { setBudgetFilter("all"); setPossessionFilter("all"); setTypeFilter("All"); setSearch(""); }}
                     style={{ fontSize: "13px", fontWeight: 600, color: "#10C4C3", background: "transparent", border: "none", cursor: "pointer", fontFamily: "'Cal Sans', sans-serif" }}>Clear all filters</button>
                 </>
               )}
@@ -601,5 +617,13 @@ export default function NewProjectsPage() {
       {/* ── INTEREST MODAL ─────────────────────────────────── */}
       <InterestModal project={interestProject} onClose={() => setInterestProject(null)} />
     </>
+  );
+}
+
+export default function NewProjectsPage() {
+  return (
+    <Suspense fallback={<div style={{ minHeight: "100vh", background: "#020C1C" }} />}>
+      <NewProjectsPageInner />
+    </Suspense>
   );
 }
