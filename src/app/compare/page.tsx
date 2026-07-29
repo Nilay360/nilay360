@@ -33,55 +33,6 @@ type Property = {
 // store "rooms/cabins" in the bedrooms field, not a BHK count.
 const COMMERCIAL_CATEGORIES = ["office", "retail", "warehouse"];
 
-// ── Placeholder pool ──────────────────────────────────────────
-const PLACEHOLDER_PROPERTIES: Property[] = [
-  {
-    id: "pp1", slug: "jubilee-hills-villa", title: "Luxury Villa — Jubilee Hills",
-    price: 85_000_000, listing_type: "sale", property_type: "Villa", status: "active",
-    bedrooms: 5, bathrooms: 5, area_sqft: 6200, floor_number: null, total_floors: 3,
-    parking_spaces: 3, year_built: 2022, is_furnished: true,
-    amenities: ["Swimming Pool", "Gym", "Home Theatre", "Smart Home", "Garden", "Security"],
-    address: "Road No. 36, Jubilee Hills", city: "Hyderabad", neighbourhood: "Jubilee Hills",
-    images: [], featured_image: "https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=800&q=80",
-  },
-  {
-    id: "pp2", slug: "kokapet-apartment", title: "3BHK Premium Apartment — Kokapet",
-    price: 22_500_000, listing_type: "sale", property_type: "Apartment", status: "active",
-    bedrooms: 3, bathrooms: 3, area_sqft: 2100, floor_number: 14, total_floors: 28,
-    parking_spaces: 2, year_built: 2023, is_furnished: false,
-    amenities: ["Swimming Pool", "Gym", "Clubhouse", "Children's Play Area", "24×7 Security"],
-    address: "Financial District Road, Kokapet", city: "Hyderabad", neighbourhood: "Kokapet",
-    images: [], featured_image: "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800&q=80",
-  },
-  {
-    id: "pp3", slug: "banjara-hills-penthouse", title: "Sky Penthouse — Banjara Hills",
-    price: 65_000_000, listing_type: "sale", property_type: "Penthouse", status: "active",
-    bedrooms: 4, bathrooms: 4, area_sqft: 5100, floor_number: 32, total_floors: 32,
-    parking_spaces: 3, year_built: 2024, is_furnished: true,
-    amenities: ["Private Terrace", "Swimming Pool", "Gym", "Smart Home", "Concierge", "Security"],
-    address: "Road No. 12, Banjara Hills", city: "Hyderabad", neighbourhood: "Banjara Hills",
-    images: [], featured_image: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=800&q=80",
-  },
-  {
-    id: "pp4", slug: "gachibowli-apartment", title: "2BHK Modern Flat — Gachibowli",
-    price: 12_500_000, listing_type: "sale", property_type: "Apartment", status: "active",
-    bedrooms: 2, bathrooms: 2, area_sqft: 1350, floor_number: 8, total_floors: 20,
-    parking_spaces: 1, year_built: 2021, is_furnished: false,
-    amenities: ["Gym", "Clubhouse", "24×7 Security", "Power Backup"],
-    address: "HITEC City Road, Gachibowli", city: "Hyderabad", neighbourhood: "Gachibowli",
-    images: [], featured_image: "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&q=80",
-  },
-  {
-    id: "pp5", slug: "madhapur-studio", title: "Furnished Studio — Madhapur",
-    price: 45_000, listing_type: "rent", property_type: "Apartment", status: "active",
-    bedrooms: 1, bathrooms: 1, area_sqft: 650, floor_number: 4, total_floors: 10,
-    parking_spaces: 1, year_built: 2020, is_furnished: true,
-    amenities: ["Gym", "24×7 Security", "Power Backup", "CCTV"],
-    address: "Ayyappa Society, Madhapur", city: "Hyderabad", neighbourhood: "Madhapur",
-    images: [], featured_image: "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&q=80",
-  },
-];
-
 // ── Helpers ───────────────────────────────────────────────────
 function fmtINR(val: number | null, compact = false): string {
   if (val === null || val === undefined) return "—";
@@ -325,12 +276,12 @@ export default function ComparePage() {
           setAllProps(mapped);
           setSimilarProps(mapped.slice(0, 3));
         } else {
-          setAllProps(PLACEHOLDER_PROPERTIES);
-          setSimilarProps(PLACEHOLDER_PROPERTIES.slice(0, 3));
+          setAllProps([]);
+          setSimilarProps([]);
         }
       } catch {
-        setAllProps(PLACEHOLDER_PROPERTIES);
-        setSimilarProps(PLACEHOLDER_PROPERTIES.slice(0, 3));
+        setAllProps([]);
+        setSimilarProps([]);
       } finally {
         setLoading(false);
       }
@@ -613,6 +564,7 @@ export default function ComparePage() {
         )}
 
         {/* ── SIMILAR PROPERTIES ─────────────────────────────── */}
+        {similarProps.length > 0 && (
         <section style={{ maxWidth: "1280px", margin: "0 auto", padding: "72px 48px" }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "32px" }}>
             <div>
@@ -631,6 +583,7 @@ export default function ComparePage() {
             {similarProps.map(p => <MiniCard key={p.id} p={p} />)}
           </div>
         </section>
+        )}
 
         {/* ── CTA BANNER ─────────────────────────────────────── */}
         <section style={{ background: "#020C1C", padding: "90px 48px", position: "relative", overflow: "hidden" }}>

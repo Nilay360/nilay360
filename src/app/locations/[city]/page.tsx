@@ -5,14 +5,16 @@ import { createClient } from "@/lib/supabase/client";
 import { optimizedImageUrl } from "@/lib/image-url";
 
 // ── Static city config ────────────────────────────────────────
+// Descriptive/factual content only (real infrastructure, general FAQs) —
+// no fabricated price/growth stats or per-neighbourhood numbers. Those
+// were invented figures presented as real market data and have been
+// removed; anything price/listing-related now comes only from the live
+// properties query below.
 type CityConfig = {
   name: string; state: string; country: string; img: string;
   population: string; lifestyle: string; transport: string; schools: string;
-  ppsf: number; avgRent: number; growth: number;
-  neighbourhoods: { name: string; ppsf: number; type: string; count: number }[];
   transport_list: string[]; schools_list: string[]; hospitals_list: string[]; shopping_list: string[];
   faqs: { q: string; a: string }[];
-  trends: { year: string; sale: number; rent: number }[];
 };
 
 const CITY_DATA: Record<string, CityConfig> = {
@@ -20,32 +22,14 @@ const CITY_DATA: Record<string, CityConfig> = {
     name: "Hyderabad", state: "Telangana", country: "India",
     img: "https://images.unsplash.com/photo-1590577976322-3d2d6e2130d5?w=1600&q=80",
     population: "10.5 million", lifestyle: "Cosmopolitan IT hub blending Nizami heritage with modern corporate culture. Known for its biryani, pearls, and a fast-growing startup ecosystem.", transport: "Metro Rail (3 lines), TSRTC buses, ORR connectivity, Rajiv Gandhi International Airport (30km).", schools: "International School of Hyderabad, Oakridge International, Chirec, Bhavans, Jubilee Hills Public School.",
-    ppsf: 95000, avgRent: 45000, growth: 14.2,
-    neighbourhoods: [
-      { name: "Jubilee Hills",   ppsf: 155000, type: "Ultra Luxury",  count: 38 },
-      { name: "Banjara Hills",   ppsf: 140000, type: "Luxury",        count: 31 },
-      { name: "Kokapet",         ppsf: 105000, type: "Premium",       count: 52 },
-      { name: "Gachibowli",      ppsf: 92000,  type: "Premium",       count: 29 },
-      { name: "Madhapur",        ppsf: 88000,  type: "Premium",       count: 24 },
-      { name: "Kondapur",        ppsf: 82000,  type: "Mid-Premium",   count: 19 },
-    ],
     transport_list: ["Rajiv Gandhi Intl Airport — 30 min", "Hyderabad Metro (3 lines)", "ORR — 158km ring road", "Secunderabad Railway Station"],
     schools_list: ["International School of Hyderabad", "Oakridge International", "Chirec International", "Bhavans Public School"],
     hospitals_list: ["Apollo Hospitals Jubilee Hills", "KIMS Hospitals", "Yashoda Hospitals", "Care Hospitals"],
     shopping_list: ["GVK One Mall", "Inorbit Mall Cyberabad", "Forum Sujana City", "City Centre Mall"],
-    trends: [
-      { year: "2020", sale: 62000, rent: 28000 },
-      { year: "2021", sale: 68000, rent: 31000 },
-      { year: "2022", sale: 76000, rent: 36000 },
-      { year: "2023", sale: 84000, rent: 40000 },
-      { year: "2024", sale: 91000, rent: 44000 },
-      { year: "2025", sale: 95000, rent: 47000 },
-    ],
     faqs: [
       { q: "Which is the best area to buy in Hyderabad?", a: "For ultra-luxury, Jubilee Hills and Banjara Hills are the gold standard. For premium investment with strong appreciation potential, Kokapet and the Financial District are the top picks due to proximity to GCCs and IT campuses." },
-      { q: "What is the average 3BHK price in Hyderabad?", a: "A 3BHK apartment in Hyderabad ranges from ₹1.5 crore in areas like Kondapur to ₹4–5 crore in Banjara Hills. Kokapet averages ₹2–2.8 crore for a quality 3BHK." },
-      { q: "Is Hyderabad good for rental investment?", a: "Yes. The IT corridor (Kokapet to Gachibowli) consistently delivers 3.5–5% gross rental yields, driven by demand from GCC employees. Occupancy rates remain above 92% in premium localities." },
-      { q: "What are the upcoming infrastructure projects in Hyderabad?", a: "Key projects include the Regional Ring Road (RRR), Metro Phase 2 (including the Airport Corridor), and the 6-lane Hyderabad-Vijayawada Expressway — all of which are expected to significantly boost property values in the western corridor." },
+      { q: "Is Hyderabad good for rental investment?", a: "Yes. The IT corridor (Kokapet to Gachibowli) has historically seen strong rental demand, driven by GCC employees." },
+      { q: "What are the upcoming infrastructure projects in Hyderabad?", a: "Key projects include the Regional Ring Road (RRR), Metro Phase 2 (including the Airport Corridor), and the 6-lane Hyderabad-Vijayawada Expressway — all of which are expected to boost property values in the western corridor." },
       { q: "Is RERA mandatory for Hyderabad projects?", a: "Yes. All residential projects above 500 sq.m. or 8 apartments must be registered with TSRERA (Telangana RERA). Nilay 360 verifies TSRERA registration for every listing before it goes live." },
     ],
   },
@@ -53,31 +37,13 @@ const CITY_DATA: Record<string, CityConfig> = {
     name: "Mumbai", state: "Maharashtra", country: "India",
     img: "https://images.unsplash.com/photo-1570168007204-dfb528c6958f?w=1600&q=80",
     population: "20.7 million", lifestyle: "India's financial capital — high energy, world-class dining, Bollywood, and the most diverse real estate market in the country.", transport: "Chhatrapati Shivaji Maharaj International Airport, Western & Central Railways, Mumbai Metro, Mono Rail, Eastern & Western Expressways.", schools: "Dhirubhai Ambani International, Cathedral & John Connon, JBCN International, Bombay Scottish, Oberoi International.",
-    ppsf: 185000, avgRent: 95000, growth: 9.8,
-    neighbourhoods: [
-      { name: "Bandra West",  ppsf: 280000, type: "Ultra Luxury",  count: 41 },
-      { name: "Worli",        ppsf: 320000, type: "Ultra Luxury",  count: 27 },
-      { name: "Lower Parel",  ppsf: 260000, type: "Luxury",        count: 18 },
-      { name: "Powai",        ppsf: 175000, type: "Premium",       count: 33 },
-      { name: "Thane West",   ppsf: 115000, type: "Mid-Premium",   count: 58 },
-      { name: "Navi Mumbai",  ppsf: 95000,  type: "Mid-Premium",   count: 72 },
-    ],
     transport_list: ["CSIA Airport — 30 min", "Western & Central Railways", "Mumbai Metro (9 lines)", "Mumbai Mono Rail"],
     schools_list: ["Dhirubhai Ambani International", "Cathedral & John Connon", "JBCN International", "Bombay Scottish School"],
     hospitals_list: ["Lilavati Hospital", "Kokilaben Dhirubhai Ambani Hospital", "Breach Candy Hospital", "Hinduja Hospital"],
     shopping_list: ["Palladium Mall", "High Street Phoenix", "Infiniti Mall", "R City Mall"],
-    trends: [
-      { year: "2020", sale: 145000, rent: 72000 },
-      { year: "2021", sale: 152000, rent: 76000 },
-      { year: "2022", sale: 162000, rent: 82000 },
-      { year: "2023", sale: 172000, rent: 88000 },
-      { year: "2024", sale: 181000, rent: 93000 },
-      { year: "2025", sale: 185000, rent: 96000 },
-    ],
     faqs: [
       { q: "What is the best area to buy in Mumbai?", a: "For ultra-premium: South Mumbai, Bandra West, and Worli. For strong appreciation: Powai, Lower Parel, and Thane West offer better value with excellent connectivity." },
-      { q: "What is the average 2BHK price in Mumbai?", a: "A 2BHK in Mumbai ranges from ₹1.2–1.8Cr in Thane to ₹4–7Cr in Bandra West and ₹8–15Cr in Worli/South Mumbai." },
-      { q: "Is Mumbai a good rental market?", a: "Yes, Mumbai has India's most liquid rental market. Bandra West yields 2.5–3.5% while Powai and Thane offer 3.5–5% with strong occupancy." },
+      { q: "Is Mumbai a good rental market?", a: "Yes, Mumbai has India's most liquid rental market, with steady demand across Bandra West, Powai, and Thane." },
       { q: "What is the stamp duty in Maharashtra?", a: "Stamp duty in Maharashtra is 5% of the property value for men and 4% for women buyers. Registration charges are an additional 1%." },
       { q: "What new infrastructure will boost Mumbai property?", a: "The Mumbai Trans Harbour Link (Atal Setu), Metro Line 3 (Aqua Line), and Navi Mumbai International Airport are the three transformative projects expected to reshape the market through 2030." },
     ],
@@ -86,33 +52,15 @@ const CITY_DATA: Record<string, CityConfig> = {
     name: "Bengaluru", state: "Karnataka", country: "India",
     img: "https://images.unsplash.com/photo-1596176530529-78163a4f7af2?w=1600&q=80",
     population: "13.2 million", lifestyle: "India's Silicon Valley — startup culture, craft beer, pleasant weather year-round, and the most cosmopolitan real estate market outside Mumbai.", transport: "Kempegowda International Airport, Namma Metro (2 operational lines + expansion), BMTC buses, NICE Ring Road.", schools: "Inventure Academy, Greenwood High, Candor International, DPS Bangalore, Bangalore International School.",
-    ppsf: 112000, avgRent: 55000, growth: 11.5,
-    neighbourhoods: [
-      { name: "Whitefield",   ppsf: 98000,  type: "Premium",       count: 45 },
-      { name: "Koramangala",  ppsf: 135000, type: "Luxury",        count: 34 },
-      { name: "Indiranagar",  ppsf: 128000, type: "Luxury",        count: 22 },
-      { name: "Hebbal",       ppsf: 105000, type: "Premium",       count: 29 },
-      { name: "Sarjapur",     ppsf: 88000,  type: "Mid-Premium",   count: 37 },
-      { name: "Electronic City", ppsf: 75000, type: "Mid-Premium",count: 41 },
-    ],
     transport_list: ["Kempegowda Intl Airport — 45 min", "Namma Metro (Purple & Green Lines)", "NICE Ring Road", "BMTC City Buses"],
     schools_list: ["Inventure Academy", "Greenwood High International", "Candor International", "DPS Bangalore North"],
     hospitals_list: ["Manipal Hospital Old Airport Road", "Apollo Hospital Jayanagar", "Fortis Hospital Bannerghatta", "Narayana Health City"],
     shopping_list: ["UB City Mall", "Phoenix Marketcity Whitefield", "Orion Mall", "VR Bengaluru"],
-    trends: [
-      { year: "2020", sale: 78000, rent: 38000 },
-      { year: "2021", sale: 83000, rent: 40000 },
-      { year: "2022", sale: 90000, rent: 45000 },
-      { year: "2023", sale: 98000, rent: 50000 },
-      { year: "2024", sale: 108000, rent: 54000 },
-      { year: "2025", sale: 112000, rent: 57000 },
-    ],
     faqs: [
-      { q: "Which area in Bengaluru has the best appreciation?", a: "Whitefield and Sarjapur Road have led appreciation driven by IT company relocations. Koramangala and Indiranagar are established premium markets with steady 8–10% annual growth." },
-      { q: "What is the average 3BHK price in Bengaluru?", a: "3BHK flats range from ₹1.2Cr in Electronic City to ₹3–4Cr in Koramangala and Indiranagar. Whitefield averages ₹1.8–2.5Cr for a quality 3BHK." },
-      { q: "Is metro connectivity improving in Bengaluru?", a: "Yes. Namma Metro Phase 2 and 2A extensions are adding 58km of new lines. The Airport Metro Line is expected by 2026, dramatically improving north Bengaluru connectivity." },
+      { q: "Which area in Bengaluru has the best appreciation?", a: "Whitefield and Sarjapur Road have seen strong appreciation driven by IT company relocations. Koramangala and Indiranagar are established premium markets." },
+      { q: "Is metro connectivity improving in Bengaluru?", a: "Yes. Namma Metro Phase 2 and 2A extensions are adding new lines. The Airport Metro Line is expected to significantly improve north Bengaluru connectivity." },
       { q: "What is stamp duty in Karnataka?", a: "Stamp duty in Karnataka is 5% for properties above ₹45L, with 1% registration charges. There is no gender-based concession unlike some other states." },
-      { q: "Is Bengaluru good for NRI investors?", a: "Very much so. Strong IT-sector rental demand, transparent RERA implementation, and consistent price appreciation make Bengaluru one of the top two NRI investment cities alongside Hyderabad." },
+      { q: "Is Bengaluru good for NRI investors?", a: "Strong IT-sector rental demand and transparent RERA implementation make Bengaluru one of the top NRI investment cities alongside Hyderabad." },
     ],
   },
 };
@@ -124,14 +72,7 @@ function buildFallback(slug: string): CityConfig {
     name, state: "India", country: "India",
     img: `https://images.unsplash.com/photo-1587474260584-136574528ed5?w=1600&q=80`,
     population: "Coming soon", lifestyle: `${name} is one of India's premium real estate markets, offering a blend of urban convenience and lifestyle infrastructure.`, transport: "Information coming soon.", schools: "Information coming soon.",
-    ppsf: 90000, avgRent: 40000, growth: 10.0,
-    neighbourhoods: [],
     transport_list: [], schools_list: [], hospitals_list: [], shopping_list: [],
-    trends: [
-      { year: "2021", sale: 70000, rent: 30000 }, { year: "2022", sale: 76000, rent: 34000 },
-      { year: "2023", sale: 82000, rent: 38000 }, { year: "2024", sale: 88000, rent: 41000 },
-      { year: "2025", sale: 90000, rent: 43000 },
-    ],
     faqs: [
       { q: `Is ${name} a good city to invest in real estate?`, a: `${name} offers strong fundamentals for real estate investment — growing infrastructure, rising employment, and consistent property appreciation.` },
       { q: "How do I find verified properties?", a: "All properties on Nilay 360 are manually verified by our ground team before listing. Each property comes with RERA registration details and legal clearance status." },
@@ -243,26 +184,11 @@ export default function CityPage() {
           .eq("approval_status", "approved")
           .ilike("city_id", `%${cfg.name}%`)
           .limit(12);
-        if (data && data.length > 0) {
-          setProperties(data.map((p: any) => ({
-            ...p,
-            neighbourhood: p.neighbourhood?.name ?? null,
-            featured_image: p.images?.[0] ?? null,
-          })));
-        } else {
-          // Placeholder properties for this city
-          setProperties(Array.from({ length: 6 }, (_, i) => ({
-            id: `${slug}-${i}`, slug: `${slug}-property-${i + 1}`,
-            title: [`Luxury 4BHK Villa`, `3BHK Premium Apartment`, `Sky Penthouse`, `2BHK Modern Flat`, `5BHK Independent House`, `1BHK Studio`][i] + ` — ${cfg.name}`,
-            price: [85_000_000, 22_500_000, 65_000_000, 12_500_000, 120_000_000, 7_500_000][i],
-            listing_type: (i < 4 ? "sale" : "rent") as "sale" | "rent",
-            property_type: ["Villa", "Apartment", "Penthouse", "Apartment", "Independent House", "Apartment"][i],
-            bedrooms: [4, 3, 4, 2, 5, 1][i], bathrooms: [4, 3, 4, 2, 5, 1][i],
-            area_sqft: [6200, 2100, 5100, 1350, 8500, 650][i],
-            images: [], featured_image: `https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=600&q=80`,
-            neighbourhood: cfg.neighbourhoods[i % cfg.neighbourhoods.length]?.name ?? null,
-          })));
-        }
+        setProperties((data ?? []).map((p: any) => ({
+          ...p,
+          neighbourhood: p.neighbourhood?.name ?? null,
+          featured_image: p.images?.[0] ?? null,
+        })));
       } catch {
         setProperties([]);
       } finally {
@@ -280,9 +206,6 @@ export default function CityPage() {
     if (priceFilter === "above3") list = list.filter(p => p.price >= 3_00_00_000);
     return list;
   }, [properties, typeFilter, priceFilter]);
-
-  const maxSale = Math.max(...cfg.trends.map(t => t.sale));
-  const maxRent = Math.max(...cfg.trends.map(t => t.rent));
 
   const AMENITY_CATS = [
     { icon: "🚆", label: "Transport", items: cfg.transport_list },
@@ -347,10 +270,7 @@ export default function CityPage() {
             {/* Stats pills */}
             <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
               {[
-                { label: `${properties.length || "—"} listings`, icon: "🏠" },
-                { label: `Avg ₹${(cfg.ppsf / 1000).toFixed(0)}K/sqft`, icon: "💰" },
-                { label: `Avg rent ₹${(cfg.avgRent / 1000).toFixed(0)}K/mo`, icon: "🔑" },
-                { label: `+${cfg.growth}% YoY`, icon: "📈" },
+                { label: `${properties.length} listings`, icon: "🏠" },
               ].map(p => (
                 <span key={p.label} style={{ display: "inline-flex", alignItems: "center", gap: "6px", padding: "7px 16px", background: "rgba(245,242,236,0.08)", border: "1px solid rgba(245,242,236,0.15)", borderRadius: "100px", fontSize: "12px", fontWeight: 600, color: "#020C1C", backdropFilter: "blur(8px)" }}>
                   {p.icon} {p.label}
@@ -375,7 +295,6 @@ export default function CityPage() {
                   { icon: "👥", label: "Population",      value: cfg.population },
                   { icon: "🚆", label: "Transport",       value: cfg.transport.split(",")[0] + "…" },
                   { icon: "🎓", label: "Top Schools",     value: cfg.schools.split(",")[0] + " & more" },
-                  { icon: "📈", label: "Price Trend",     value: `+${cfg.growth}% YoY appreciation` },
                 ].map(item => (
                   <div key={item.label} style={{ background: "#fff", border: "1px solid rgba(13,43,31,0.07)", borderRadius: "12px", padding: "16px 16px" }}>
                     <div style={{ fontSize: "18px", marginBottom: "6px" }}>{item.icon}</div>
@@ -394,10 +313,7 @@ export default function CityPage() {
                   <span style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.2em", color: "#10C4C3", textTransform: "uppercase" }}>Market Stats · {cfg.name}</span>
                 </div>
                 {[
-                  { label: "Avg Sale Price",   value: `₹${(cfg.ppsf / 1000).toFixed(0)}K/sqft` },
-                  { label: "Avg Monthly Rent", value: `₹${(cfg.avgRent / 1000).toFixed(0)}K/mo` },
-                  { label: "YoY Appreciation", value: `+${cfg.growth}%` },
-                  { label: "Active Listings",  value: `${properties.length || "—"}` },
+                  { label: "Active Listings",  value: `${properties.length}` },
                 ].map(row => (
                   <div key={row.label} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "13px 0", borderBottom: "1px solid rgba(245,242,236,0.07)" }}>
                     <span style={{ fontSize: "12px", color: "rgba(245,242,236,0.45)" }}>{row.label}</span>
@@ -447,8 +363,14 @@ export default function CityPage() {
               </div>
             ) : filtered.length === 0 ? (
               <div style={{ padding: "60px", textAlign: "center", background: "#fff", borderRadius: "16px", border: "1px solid rgba(13,43,31,0.07)" }}>
-                <p style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "24px", color: "#020C1C", marginBottom: "8px" }}>No properties match this filter</p>
-                <button onClick={() => { setTypeFilter("all"); setPriceFilter("all"); }} style={{ fontSize: "13px", fontWeight: 600, color: "#10C4C3", background: "transparent", border: "none", cursor: "pointer", fontFamily: "'Cal Sans', sans-serif" }}>Clear filters</button>
+                {properties.length === 0 ? (
+                  <p style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "24px", color: "#020C1C", marginBottom: "8px" }}>No properties listed in {cfg.name} yet</p>
+                ) : (
+                  <>
+                    <p style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "24px", color: "#020C1C", marginBottom: "8px" }}>No properties match this filter</p>
+                    <button onClick={() => { setTypeFilter("all"); setPriceFilter("all"); }} style={{ fontSize: "13px", fontWeight: 600, color: "#10C4C3", background: "transparent", border: "none", cursor: "pointer", fontFamily: "'Cal Sans', sans-serif" }}>Clear filters</button>
+                  </>
+                )}
               </div>
             ) : (
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: "20px" }}>
@@ -466,103 +388,6 @@ export default function CityPage() {
             )}
           </div>
         </section>
-
-        {/* ── MARKET TRENDS ──────────────────────────────────── */}
-        <section style={{ maxWidth: "1280px", margin: "0 auto", padding: "72px 48px" }}>
-          <div style={{ textAlign: "center", marginBottom: "44px" }}>
-            <Eyebrow label="Price History" />
-            <h2 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "clamp(28px, 3.5vw, 44px)", fontWeight: 400, color: "#020C1C" }}>
-              {cfg.name} Market<br /><em style={{ fontStyle: "italic", color: "#10C4C3" }}>Trends</em>
-            </h2>
-          </div>
-          <div style={{ background: "#fff", borderRadius: "18px", padding: "36px 36px", border: "1px solid rgba(13,43,31,0.07)" }}>
-            {/* Legend */}
-            <div style={{ display: "flex", gap: "20px", marginBottom: "28px", flexWrap: "wrap" }}>
-              <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                <div style={{ width: "24px", height: "3px", background: "#10C4C3", borderRadius: "2px" }} />
-                <span style={{ fontSize: "12px", fontWeight: 600, color: "#6B7C72" }}>Avg Sale Price (₹/sqft)</span>
-              </div>
-              <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                <div style={{ width: "24px", height: "3px", background: "#4A90D9", borderRadius: "2px" }} />
-                <span style={{ fontSize: "12px", fontWeight: 600, color: "#6B7C72" }}>Avg Monthly Rent (₹)</span>
-              </div>
-            </div>
-            {/* Bar chart */}
-            <div style={{ display: "flex", gap: "16px", alignItems: "flex-end", height: "200px", paddingBottom: "36px", borderBottom: "2px solid rgba(13,43,31,0.06)", position: "relative" }}>
-              {/* Y-axis lines */}
-              {[0, 25, 50, 75, 100].map(pct => (
-                <div key={pct} style={{ position: "absolute", left: 0, right: 0, bottom: `calc(${pct}% + 36px)`, height: "1px", background: "rgba(13,43,31,0.04)", display: pct > 0 ? "block" : "none" }} />
-              ))}
-              {cfg.trends.map(t => (
-                <div key={t.year} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: "4px" }}>
-                  <div style={{ width: "100%", display: "flex", gap: "4px", alignItems: "flex-end" }}>
-                    <div style={{ flex: 1, height: `${(t.sale / maxSale) * 160}px`, background: "linear-gradient(to top, #10C4C3, rgba(201,168,76,0.6))", borderRadius: "4px 4px 0 0", minHeight: "8px", transition: "height 0.4s" }} title={`₹${(t.sale / 1000).toFixed(0)}K/sqft`} />
-                    <div style={{ flex: 1, height: `${(t.rent / maxRent) * 160}px`, background: "linear-gradient(to top, #4A90D9, rgba(74,144,217,0.5))", borderRadius: "4px 4px 0 0", minHeight: "8px", transition: "height 0.4s" }} title={`₹${(t.rent / 1000).toFixed(0)}K/mo`} />
-                  </div>
-                </div>
-              ))}
-            </div>
-            {/* X axis labels */}
-            <div style={{ display: "flex", gap: "16px", marginTop: "10px" }}>
-              {cfg.trends.map(t => (
-                <div key={t.year} style={{ flex: 1, textAlign: "center" }}>
-                  <p style={{ fontSize: "11px", fontWeight: 700, color: "#9CA3AF" }}>{t.year}</p>
-                </div>
-              ))}
-            </div>
-            {/* Key numbers */}
-            <div style={{ display: "flex", gap: "16px", marginTop: "24px", flexWrap: "wrap" }}>
-              {[
-                { label: "2025 Avg Sale",  value: `₹${(cfg.ppsf / 1000).toFixed(0)}K/sqft`, color: "#10C4C3" },
-                { label: "2025 Avg Rent",  value: `₹${(cfg.avgRent / 1000).toFixed(0)}K/mo`, color: "#4A90D9" },
-                { label: "5-Year Growth",  value: `+${(((cfg.ppsf / cfg.trends[0].sale) - 1) * 100).toFixed(0)}%`,  color: "#059669" },
-              ].map(s => (
-                <div key={s.label} style={{ flex: 1, background: "#F8F6F1", borderRadius: "10px", padding: "14px 18px" }}>
-                  <p style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.1em", color: "#9CA3AF", textTransform: "uppercase", marginBottom: "4px" }}>{s.label}</p>
-                  <p style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "22px", fontWeight: 600, color: s.color }}>{s.value}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* ── POPULAR NEIGHBOURHOODS ─────────────────────────── */}
-        {cfg.neighbourhoods.length > 0 && (
-          <section style={{ background: "#F8F6F1", padding: "72px 48px", borderTop: "1px solid rgba(13,43,31,0.06)" }}>
-            <div style={{ maxWidth: "1280px", margin: "0 auto" }}>
-              <div style={{ textAlign: "center", marginBottom: "44px" }}>
-                <Eyebrow label="Local Areas" />
-                <h2 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "clamp(28px, 3.5vw, 44px)", fontWeight: 400, color: "#020C1C" }}>
-                  Popular Neighbourhoods<br /><em style={{ fontStyle: "italic", color: "#10C4C3" }}>in {cfg.name}</em>
-                </h2>
-              </div>
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))", gap: "18px" }}>
-                {cfg.neighbourhoods.map((n, i) => {
-                  const [hover, setHover] = useState(false);
-                  return (
-                    <a key={n.name} href={`/search?city=${encodeURIComponent(cfg.name)}&neighbourhood=${encodeURIComponent(n.name)}`} style={{ textDecoration: "none", display: "block", background: hover ? "#020C1C" : "#fff", border: "1px solid rgba(13,43,31,0.07)", borderRadius: "14px", padding: "24px 22px", transition: "all 0.2s", boxShadow: hover ? "0 16px 48px rgba(13,43,31,0.14)" : "0 1px 5px rgba(13,43,31,0.04)", transform: hover ? "translateY(-3px)" : "none" }}
-                      onMouseEnter={() => setHover(true)} onMouseLeave={() => setHover(false)}>
-                      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "12px" }}>
-                        <div>
-                          <h3 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "20px", fontWeight: 600, color: hover ? "#020C1C" : "#020C1C", transition: "color 0.2s" }}>{n.name}</h3>
-                          <span style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.1em", color: "#10C4C3", textTransform: "uppercase" }}>{n.type}</span>
-                        </div>
-                        <span style={{ fontSize: "22px", opacity: 0.5 }}>{["🏡", "🏙", "🌆", "🏘", "🏗", "🌇"][i % 6]}</span>
-                      </div>
-                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                        <div>
-                          <p style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.08em", color: hover ? "rgba(201,168,76,0.5)" : "#9CA3AF", textTransform: "uppercase", marginBottom: "2px" }}>Avg Price</p>
-                          <p style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "17px", fontWeight: 600, color: hover ? "#10C4C3" : "#020C1C", transition: "color 0.2s" }}>₹{(n.ppsf / 1000).toFixed(0)}K/sqft</p>
-                        </div>
-                        <span style={{ fontSize: "12px", color: hover ? "rgba(245,242,236,0.4)" : "#9CA3AF" }}>{n.count} listings</span>
-                      </div>
-                    </a>
-                  );
-                })}
-              </div>
-            </div>
-          </section>
-        )}
 
         {/* ── NEARBY AMENITIES ───────────────────────────────── */}
         <section style={{ maxWidth: "1280px", margin: "0 auto", padding: "72px 48px" }}>

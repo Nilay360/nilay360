@@ -10,75 +10,15 @@ const GOLD = "#10C4C3";
 const IVORY = "#020C1C";
 const FOOTER_BG = "#05080C";
 
-// ─── Static developer data ────────────────────────────────────────────────────
-const ALL_DEVELOPERS = [
-  {
-    id: 1,
-    initials: "PG",
-    name: "Prestige Group",
-    slug: "prestige-group",
-    tagline: "Shaping Skylines Since 1986",
-    cities: ["Bengaluru", "Hyderabad", "Chennai", "Mumbai"],
-    projects: 48,
-    years: 38,
-    featured: true,
-  },
-  {
-    id: 2,
-    initials: "LG",
-    name: "Lodha Group",
-    slug: "lodha-group",
-    tagline: "Building a Better Life Since 1980",
-    cities: ["Mumbai", "Hyderabad", "Pune", "London"],
-    projects: 62,
-    years: 35,
-    featured: true,
-  },
-  {
-    id: 3,
-    initials: "SR",
-    name: "Sobha Realty",
-    slug: "sobha-realty",
-    tagline: "Passion at Work Since 1995",
-    cities: ["Bengaluru", "Hyderabad", "Dubai", "Coimbatore"],
-    projects: 29,
-    years: 28,
-    featured: true,
-  },
-  {
-    id: 4,
-    initials: "GP",
-    name: "Godrej Properties",
-    slug: "godrej-properties",
-    tagline: "Building Spaces That Inspire",
-    cities: ["Pan India"],
-    projects: 55,
-    years: 31,
-    featured: false,
-  },
-  {
-    id: 5,
-    initials: "DL",
-    name: "DLF Limited",
-    slug: "dlf-limited",
-    tagline: "Building India Since 1946",
-    cities: ["Delhi NCR", "Pan India"],
-    projects: 72,
-    years: 74,
-    featured: false,
-  },
-  {
-    id: 6,
-    initials: "BG",
-    name: "Brigade Group",
-    slug: "brigade-group",
-    tagline: "Building Positive Experiences Since 1986",
-    cities: ["Bengaluru", "Chennai", "Hyderabad"],
-    projects: 34,
-    years: 37,
-    featured: false,
-  },
-];
+// ─── Developer data ───────────────────────────────────────────────────────────
+// No real developer/builder table exists yet — this page has no data source
+// to query, so the directory is intentionally empty until one is built.
+type Developer = {
+  id: number; initials: string; name: string; slug: string; tagline: string;
+  cities: string[]; projects: number; years: number; featured: boolean;
+};
+
+const ALL_DEVELOPERS: Developer[] = [];
 
 const ALL_CITIES = [
   "All Cities",
@@ -859,6 +799,7 @@ export default function BuildersPage() {
       {/* ══════════════════════════════════════════════════════
           3. FEATURED DEVELOPERS
       ══════════════════════════════════════════════════════ */}
+      {featuredDevs.length > 0 && (
       <section className="bd-featured" style={{ background: IVORY, padding: "0 40px 80px" }}>
         <div style={{ maxWidth: 1200, margin: "0 auto" }}>
           <h2
@@ -880,6 +821,7 @@ export default function BuildersPage() {
           </div>
         </div>
       </section>
+      )}
 
       {/* ══════════════════════════════════════════════════════
           4. ALL DEVELOPERS GRID
@@ -938,7 +880,7 @@ export default function BuildersPage() {
                     color: "rgba(255,255,255,0.5)",
                   }}
                 >
-                  No developers found matching your criteria.
+                  {ALL_DEVELOPERS.length === 0 ? "No developers listed yet." : "No developers found matching your criteria."}
                 </div>
               )}
             </div>

@@ -25,39 +25,6 @@ type Agent = {
 type Review = { name: string; rating: number; date: string; text: string; property: string };
 type Property = { id: string; slug: string; title: string; price: number; type: string; city: string; bedrooms: number; area: number; image: string; listing_type: string };
 
-const AGENTS: Record<string, Agent> = {
-  "arjun-mehta": {
-    id: "a1", userId: "a1", slug: "arjun-mehta", full_name: "Arjun Mehta", title: "Senior Property Consultant", agency: "Nilay 360 Premium Realty",
-    city: "Hyderabad", cities_served: ["Hyderabad", "Secunderabad", "Warangal"],
-    specialisation: "Luxury Apartments", specialisations: ["Luxury Apartments", "Penthouse Sales", "NRI Investments", "Builder Tie-ups"],
-    languages: ["English", "Hindi", "Telugu"], experience_years: 12,
-    rating: 0, reviews_count: 0, properties_sold: 318, properties_listed: 42,
-    rera_number: "A02400001234", verified: true, featured: true, avatar_color: "#020C1C",
-    bio: "Arjun Mehta is one of Hyderabad's most decorated luxury real estate consultants, with over 12 years of deep expertise across the Jubilee Hills, Banjara Hills, Kokapet, and Financial District corridors.\n\nHis client portfolio spans C-suite executives, NRI professionals in the Gulf and USA, and institutional investors. Arjun is known for his meticulous due diligence, transparent advisory, and ability to negotiate complex high-value transactions with grace.\n\nHe holds certifications from RERA Telangana, the National Association of Realtors (NAR India), and the Nilay 360 Certified Advisor programme. In 2024, he was recognised as Nilay 360's Top Performer of the Year — an honour voted on by verified client reviews.",
-    phone: "+919876543210", email: "arjun.mehta@nilay360.com", whatsapp: "+919876543210",
-  },
-  "priya-raghavan": {
-    id: "a2", userId: "a2", slug: "priya-raghavan", full_name: "Priya Raghavan", title: "Principal Advisor", agency: "Nilay 360 Premium Realty",
-    city: "Mumbai", cities_served: ["Mumbai", "Navi Mumbai", "Thane"],
-    specialisation: "Sea-View Residences", specialisations: ["Sea-View Residences", "Bandra & Worli", "NRI Clients", "Luxury Rentals"],
-    languages: ["English", "Hindi", "Tamil"], experience_years: 9,
-    rating: 0, reviews_count: 0, properties_sold: 241, properties_listed: 38,
-    rera_number: "A51900002817", verified: true, featured: true, avatar_color: "#1E3A5F",
-    bio: "Priya Raghavan is Mumbai's go-to specialist for premium sea-facing residences. Over nine years, she has curated transactions across Worli, Bandra West, Lower Parel, and Juhu — consistently delivering above-market outcomes for buyers and sellers alike.\n\nHer NRI clientele base spans the UAE, United Kingdom, and North America, and she offers a seamless end-to-end remote buying experience including virtual tours, FEMA-compliant documentation, and Power of Attorney coordination.\n\nPriya was previously with JLL Residential and brings institutional rigour to every advisory engagement.",
-    phone: "+919876543211", email: "priya.raghavan@nilay360.com", whatsapp: "+919876543211",
-  },
-  "rohit-desai": {
-    id: "a3", userId: "a3", slug: "rohit-desai", full_name: "Rohit Desai", title: "Investment Specialist", agency: "Nilay 360 Premium Realty",
-    city: "Bengaluru", cities_served: ["Bengaluru", "Mysuru", "Hosur"],
-    specialisation: "IT Corridor Homes", specialisations: ["IT Corridor Homes", "Investment Portfolios", "Pre-Launch Projects", "Tech Professionals"],
-    languages: ["English", "Hindi", "Kannada"], experience_years: 8,
-    rating: 0, reviews_count: 0, properties_sold: 198, properties_listed: 31,
-    rera_number: "A29200003441", verified: true, featured: true, avatar_color: "#3B1F5F",
-    bio: "Rohit Desai brings a uniquely data-driven approach to property investment in Bengaluru's technology corridor. He specialises in helping software professionals, startup founders, and GCC employees build wealth through real estate — structuring purchases as portfolio investments rather than one-off transactions.\n\nHis deep knowledge of the Whitefield–Sarjapur belt, Koramangala, and Electronic City micro-markets, combined with strong builder relationships, gives his clients access to pre-launch pricing and off-market opportunities unavailable to the general public.",
-    phone: "+919876543212", email: "rohit.desai@nilay360.com", whatsapp: "+919876543212",
-  },
-};
-
 // ── Real agent_profiles row → Agent (used once a slug matches a live, approved agent) ──
 const AVATAR_COLORS = ["#020C1C", "#1E3A5F", "#3B1F5F", "#4A2A0F", "#0F3D2E"];
 function colorForName(name: string): string {
@@ -94,29 +61,6 @@ function mapAgentProfileRow(row: AgentProfileRow, slug: string): Agent {
     phone, email: row.profiles?.email ?? "", whatsapp: phone,
   };
 }
-
-function buildFallback(slug: string): Agent {
-  const name = slug.replace(/-/g, " ").replace(/\b\w/g, l => l.toUpperCase());
-  return {
-    id: slug, userId: slug, slug, full_name: name, title: "Property Consultant", agency: "Nilay 360 Premium Realty",
-    city: "India", cities_served: ["Pan India"],
-    specialisation: "Residential Properties", specialisations: ["Residential Properties", "Investment Advisory"],
-    languages: ["English", "Hindi"], experience_years: 5,
-    rating: 0, reviews_count: 0, properties_sold: 88, properties_listed: 14,
-    rera_number: "A00000000000", verified: true, featured: false, avatar_color: "#020C1C",
-    bio: `${name} is a certified real estate professional at Nilay 360, specialising in residential properties across India's premium markets. With a focus on transparency and client-first advisory, they bring deep market knowledge and a commitment to helping buyers and investors make confident decisions.`,
-    phone: "+919999999999", email: "contact@nilay360.com", whatsapp: "+919999999999",
-  };
-}
-
-const PLACEHOLDER_PROPERTIES: Property[] = [
-  { id: "pr1", slug: "luxury-4bhk-kokapet", title: "Luxury 4BHK — Prestige Luminary, Kokapet", price: 32500000, type: "Apartment", city: "Hyderabad", bedrooms: 4, area: 3200, image: "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=600&q=80", listing_type: "sale" },
-  { id: "pr2", slug: "sky-penthouse-banjara", title: "Sky Penthouse — Banjara Hills", price: 78000000, type: "Penthouse", city: "Hyderabad", bedrooms: 5, area: 6100, image: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=600&q=80", listing_type: "sale" },
-  { id: "pr3", slug: "3bhk-gachibowli", title: "3BHK Premium — Sobha Crystal, Gachibowli", price: 21000000, type: "Apartment", city: "Hyderabad", bedrooms: 3, area: 2050, image: "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=600&q=80", listing_type: "sale" },
-  { id: "pr4", slug: "villa-jubilee-hills", title: "Independent Villa — Jubilee Hills Road 36", price: 95000000, type: "Villa", city: "Hyderabad", bedrooms: 5, area: 7200, image: "https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=600&q=80", listing_type: "sale" },
-  { id: "pr5", slug: "3bhk-rental-kokapet", title: "3BHK Luxury Rental — Kokapet", price: 85000, type: "Apartment", city: "Hyderabad", bedrooms: 3, area: 2100, image: "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=600&q=80", listing_type: "rent" },
-  { id: "pr6", slug: "2bhk-madhapur", title: "2BHK Modern Flat — Madhapur", price: 12500000, type: "Apartment", city: "Hyderabad", bedrooms: 2, area: 1350, image: "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=600&q=80", listing_type: "sale" },
-];
 
 // ── Helpers ───────────────────────────────────────────────────
 function initials(name: string) { return name.split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase(); }
@@ -253,7 +197,7 @@ export default function AgentProfilePage() {
   const [agent,       setAgent]       = useState<Agent | null>(null);
   const [agentLoading, setAgentLoading] = useState(true);
   const [isRealAgent, setIsRealAgent] = useState(false);
-  const [properties, setProperties] = useState<Property[]>(PLACEHOLDER_PROPERTIES);
+  const [properties, setProperties] = useState<Property[]>([]);
   const [reviews,    setReviews]    = useState<Review[]>([]);
   const [activeTab,  setActiveTab]  = useState<"listings" | "reviews">("listings");
 
@@ -281,11 +225,11 @@ export default function AgentProfilePage() {
           setProperties([]);
           setReviews([]);
         } else {
-          setAgent(AGENTS[slug] ?? buildFallback(slug));
+          setAgent(null);
           setIsRealAgent(false);
         }
       } catch (_) {
-        if (!cancelled) { setAgent(AGENTS[slug] ?? buildFallback(slug)); setIsRealAgent(false); }
+        if (!cancelled) { setAgent(null); setIsRealAgent(false); }
       } finally {
         if (!cancelled) setAgentLoading(false);
       }
@@ -295,35 +239,26 @@ export default function AgentProfilePage() {
   }, [slug]);
 
   useEffect(() => {
-    if (!agent) return;
+    if (!agent || !isRealAgent) return;
     async function load() {
       try {
         const supabase = createClient();
-        if (isRealAgent) {
-          const { data: listings } = await supabase
-            .from("property_listings")
-            .select("id, slug, title, price, property_category, city, bedrooms, built_up_area, photo_urls, listing_type")
-            .eq("assigned_agent_id", agent!.id)
-            .eq("status", "active")
-            .limit(6);
-          const mapped: Property[] = (listings ?? []).map((r: any) => ({
-            id: r.id, slug: r.slug ?? r.id, title: r.title ?? "Untitled Property",
-            price: r.price ?? 0, type: r.property_category ?? "Property", city: r.city ?? "",
-            bedrooms: r.bedrooms ?? 0, area: r.built_up_area ?? 0,
-            image: Array.isArray(r.photo_urls) && r.photo_urls[0] ? r.photo_urls[0] : "https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=600&q=80",
-            listing_type: r.listing_type ?? "sale",
-          }));
-          setProperties(mapped);
-          // No real review system wired yet — leave empty rather than show fabricated reviews for a real agent.
-          setReviews([]);
-        } else {
-          const [{ data: props }, { data: revs }] = await Promise.all([
-            supabase.from("properties").select("*").eq("agent_id", agent!.id).eq("status", "active").limit(6),
-            supabase.from("reviews").select("id, rating, title, content, created_at, profiles(full_name), properties(title)").eq("agent_id", agent!.id).eq("is_approved", true).order("created_at", { ascending: false }).limit(12),
-          ]);
-          if (props && props.length > 0) setProperties(props);
-          if (revs  && revs.length  > 0) setReviews(revs.map((r: any) => ({ name: r.profiles?.full_name || "Verified Client", rating: r.rating, date: r.created_at?.slice(0,7) ?? "", text: r.content ?? "", property: r.properties?.title ?? r.title ?? "" })));
-        }
+        const { data: listings } = await supabase
+          .from("property_listings")
+          .select("id, slug, title, price, property_category, city, bedrooms, built_up_area, photo_urls, listing_type")
+          .eq("assigned_agent_id", agent!.id)
+          .eq("status", "active")
+          .limit(6);
+        const mapped: Property[] = (listings ?? []).map((r: any) => ({
+          id: r.id, slug: r.slug ?? r.id, title: r.title ?? "Untitled Property",
+          price: r.price ?? 0, type: r.property_category ?? "Property", city: r.city ?? "",
+          bedrooms: r.bedrooms ?? 0, area: r.built_up_area ?? 0,
+          image: Array.isArray(r.photo_urls) && r.photo_urls[0] ? r.photo_urls[0] : "https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=600&q=80",
+          listing_type: r.listing_type ?? "sale",
+        }));
+        setProperties(mapped);
+        // No real review system wired yet — leave empty rather than show fabricated reviews.
+        setReviews([]);
       } catch (_) {}
     }
     void load();
@@ -331,10 +266,20 @@ export default function AgentProfilePage() {
 
   const avgRating = reviews.length > 0 ? reviews.reduce((s, r) => s + r.rating, 0) / reviews.length : 0;
 
-  if (agentLoading || !agent) {
+  if (agentLoading) {
     return (
       <div style={{ minHeight: "100vh", background: "#020C1C", display: "flex", alignItems: "center", justifyContent: "center" }}>
         <span style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "20px", color: "rgba(245,242,236,0.5)" }}>Loading agent…</span>
+      </div>
+    );
+  }
+
+  if (!agent) {
+    return (
+      <div style={{ minHeight: "100vh", background: "#020C1C", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "16px", padding: "24px", textAlign: "center" }}>
+        <span style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "26px", color: "#fff" }}>Agent not found</span>
+        <p style={{ fontSize: "13px", color: "rgba(245,242,236,0.5)", maxWidth: "360px" }}>This agent profile doesn't exist or hasn't been approved yet.</p>
+        <a href="/agents" style={{ padding: "12px 28px", background: "#10C4C3", borderRadius: "9px", color: "#020C1C", fontSize: "12px", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", textDecoration: "none" }}>Browse Agents</a>
       </div>
     );
   }

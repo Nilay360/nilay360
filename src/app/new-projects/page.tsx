@@ -22,89 +22,6 @@ type Project = {
   featured: boolean;
 };
 
-// ── Placeholder data ──────────────────────────────────────────
-const PLACEHOLDER_PROJECTS: Project[] = [
-  {
-    id: "p1", name: "Prestige Luminary", developer: "Prestige Group",
-    location: "Kokapet, Hyderabad", city: "Hyderabad",
-    price_from: 22500000, property_type: "Apartments",
-    status: "new_launch", units_total: 480, units_available: 312,
-    possession_date: "Dec 2027", possession_year: 2027,
-    rera_number: "P02400003621", configurations: "3 & 4 BHK",
-    image: "https://images.unsplash.com/photo-1486325212027-8081e485255e?w=800&q=80", featured: true,
-  },
-  {
-    id: "p2", name: "Sobha Neopolis", developer: "Sobha Realty",
-    location: "Financial District, Hyderabad", city: "Hyderabad",
-    price_from: 18500000, property_type: "Apartments",
-    status: "under_construction", units_total: 622, units_available: 218,
-    possession_date: "Mar 2026", possession_year: 2026,
-    rera_number: "P02400004812", configurations: "2, 3 & 4 BHK",
-    image: "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&q=80", featured: false,
-  },
-  {
-    id: "p3", name: "Lodha Malabar", developer: "Lodha Group",
-    location: "Worli, Mumbai", city: "Mumbai",
-    price_from: 95000000, property_type: "Apartments",
-    status: "new_launch", units_total: 144, units_available: 97,
-    possession_date: "Jun 2028", possession_year: 2028,
-    rera_number: "P51900048221", configurations: "3, 4 & 5 BHK",
-    image: "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800&q=80", featured: false,
-  },
-  {
-    id: "p4", name: "Brigade Insignia", developer: "Brigade Group",
-    location: "Yelahanka, Bengaluru", city: "Bengaluru",
-    price_from: 12800000, property_type: "Villas",
-    status: "new_launch", units_total: 96, units_available: 72,
-    possession_date: "Sep 2027", possession_year: 2027,
-    rera_number: "PRM/KA/RERA/1251/310/PR/2024/007823", configurations: "4 & 5 BHK Villas",
-    image: "https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=800&q=80", featured: false,
-  },
-  {
-    id: "p5", name: "DLF The Camellias 2", developer: "DLF Limited",
-    location: "Golf Course Road, Gurugram", city: "Delhi NCR",
-    price_from: 150000000, property_type: "Apartments",
-    status: "new_launch", units_total: 88, units_available: 61,
-    possession_date: "Dec 2028", possession_year: 2028,
-    rera_number: "RC/REP/HARERA/GGM/2024/288", configurations: "4 & 5 BHK Penthouses",
-    image: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=800&q=80", featured: false,
-  },
-  {
-    id: "p6", name: "Godrej Reserve", developer: "Godrej Properties",
-    location: "Whitefield, Bengaluru", city: "Bengaluru",
-    price_from: 9800000, property_type: "Apartments",
-    status: "under_construction", units_total: 740, units_available: 489,
-    possession_date: "Mar 2026", possession_year: 2026,
-    rera_number: "PRM/KA/RERA/1251/310/PR/2023/006142", configurations: "2 & 3 BHK",
-    image: "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&q=80", featured: false,
-  },
-  {
-    id: "p7", name: "Mahindra Eden", developer: "Mahindra Lifespaces",
-    location: "Kandivali East, Mumbai", city: "Mumbai",
-    price_from: 16500000, property_type: "Apartments",
-    status: "ready", units_total: 310, units_available: 44,
-    possession_date: "Ready to Move", possession_year: 2024,
-    rera_number: "P51800054817", configurations: "2 & 3 BHK",
-    image: "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=800&q=80", featured: false,
-  },
-  {
-    id: "p8", name: "Shapoorji Parkwest 2", developer: "Shapoorji Pallonji",
-    location: "Binnypet, Bengaluru", city: "Bengaluru",
-    price_from: 11200000, property_type: "Plots",
-    status: "new_launch", units_total: 210, units_available: 187,
-    possession_date: "Jun 2026", possession_year: 2026,
-    rera_number: "PRM/KA/RERA/1251/310/PR/2024/008901", configurations: "1200–3600 sqft Plots",
-    image: "https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=800&q=80", featured: false,
-  },
-];
-
-const DEVELOPERS = [
-  { name: "Prestige Group",       logo: "PG", projects: 48, years: 38, cities: "Hyderabad · Bengaluru · Chennai" },
-  { name: "Lodha Group",          logo: "LG", projects: 62, years: 35, cities: "Mumbai · Hyderabad · Pune" },
-  { name: "Sobha Realty",         logo: "SR", projects: 29, years: 28, cities: "Hyderabad · Bengaluru · Dubai" },
-  { name: "Godrej Properties",    logo: "GP", projects: 55, years: 31, cities: "Pan India" },
-];
-
 // ── Helpers ───────────────────────────────────────────────────
 function fmtINR(v: number): string {
   if (v >= 1_00_00_000) return `₹${(v / 1_00_00_000).toFixed(1)} Cr`;
@@ -267,7 +184,7 @@ function ProjectCard({ p, onInterest }: { p: Project; onInterest: (p: Project) =
 
 // ── Main page ─────────────────────────────────────────────────
 export default function NewProjectsPage() {
-  const [projects, setProjects] = useState<Project[]>(PLACEHOLDER_PROJECTS);
+  const [projects, setProjects] = useState<Project[]>([]);
   const [search, setSearch] = useState("");
   const [typeFilter, setTypeFilter] = useState("All");
   const [cityFilter, setCityFilter] = useState("All Cities");
@@ -499,54 +416,21 @@ export default function NewProjectsPage() {
         <section style={{ maxWidth: "1280px", margin: "0 auto", padding: "40px 48px 72px" }}>
           {filtered.length === 0 ? (
             <div style={{ padding: "80px", textAlign: "center", background: "#fff", borderRadius: "18px", border: "1px solid rgba(13,43,31,0.07)" }}>
-              <p style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "28px", color: "#020C1C", marginBottom: "8px" }}>No projects match your filters</p>
-              <button onClick={() => { setCityFilter("All Cities"); setBudgetFilter("all"); setPossessionFilter("all"); setTypeFilter("All"); setSearch(""); }}
-                style={{ fontSize: "13px", fontWeight: 600, color: "#10C4C3", background: "transparent", border: "none", cursor: "pointer", fontFamily: "'Cal Sans', sans-serif" }}>Clear all filters</button>
+              {projects.length === 0 ? (
+                <p style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "28px", color: "#020C1C", marginBottom: "8px" }}>No projects listed yet</p>
+              ) : (
+                <>
+                  <p style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "28px", color: "#020C1C", marginBottom: "8px" }}>No projects match your filters</p>
+                  <button onClick={() => { setCityFilter("All Cities"); setBudgetFilter("all"); setPossessionFilter("all"); setTypeFilter("All"); setSearch(""); }}
+                    style={{ fontSize: "13px", fontWeight: 600, color: "#10C4C3", background: "transparent", border: "none", cursor: "pointer", fontFamily: "'Cal Sans', sans-serif" }}>Clear all filters</button>
+                </>
+              )}
             </div>
           ) : (
             <div className="np-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "22px" }}>
               {filtered.map(p => <ProjectCard key={p.id} p={p} onInterest={setInterestProject} />)}
             </div>
           )}
-        </section>
-
-        {/* ── DEVELOPER SPOTLIGHT ────────────────────────────── */}
-        <section className="np-developers" style={{ background: "#F8F6F1", padding: "72px 48px", borderTop: "1px solid rgba(13,43,31,0.06)" }}>
-          <div style={{ maxWidth: "1280px", margin: "0 auto" }}>
-            <div style={{ textAlign: "center", marginBottom: "44px" }}>
-              <Eyebrow label="Trusted Partners" />
-              <h2 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "clamp(28px, 3.5vw, 44px)", fontWeight: 400, color: "#020C1C" }}>
-                Featured<br /><em style={{ fontStyle: "italic", color: "#10C4C3" }}>Developers</em>
-              </h2>
-            </div>
-            <div className="np-dev-grid" style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "18px" }}>
-              {DEVELOPERS.map((d, i) => {
-                const [hover, setHover] = useState(false);
-                return (
-                  <div key={d.name} onMouseEnter={() => setHover(true)} onMouseLeave={() => setHover(false)}
-                    style={{ background: hover ? "#020C1C" : "#fff", border: "1px solid rgba(13,43,31,0.07)", borderRadius: "16px", padding: "28px 22px", textAlign: "center", transition: "all 0.22s", boxShadow: hover ? "0 20px 52px rgba(13,43,31,0.14)" : "0 2px 8px rgba(13,43,31,0.04)", transform: hover ? "translateY(-4px)" : "none", cursor: "pointer" }}>
-                    {/* Logo placeholder */}
-                    <div style={{ width: "64px", height: "64px", borderRadius: "16px", background: hover ? "rgba(201,168,76,0.1)" : "#F8F6F1", border: hover ? "1px solid rgba(201,168,76,0.2)" : "1px solid rgba(13,43,31,0.07)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px", fontFamily: "'Cal Sans', Georgia, serif", fontSize: "20px", fontWeight: 700, color: "#10C4C3", transition: "all 0.22s" }}>
-                      {d.logo}
-                    </div>
-                    <h3 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "18px", fontWeight: 600, color: hover ? "#020C1C" : "#020C1C", marginBottom: "4px", transition: "color 0.22s" }}>{d.name}</h3>
-                    <p style={{ fontSize: "11px", color: hover ? "rgba(245,242,236,0.35)" : "#9CA3AF", marginBottom: "14px", transition: "color 0.22s" }}>{d.cities}</p>
-                    <div style={{ display: "flex", justifyContent: "center", gap: "16px", marginBottom: "14px" }}>
-                      {[["Projects", d.projects], ["Years Exp.", d.years]].map(([l, v]) => (
-                        <div key={String(l)}>
-                          <p style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "20px", fontWeight: 600, color: "#10C4C3" }}>{v}</p>
-                          <p style={{ fontSize: "9px", fontWeight: 700, letterSpacing: "0.1em", color: hover ? "rgba(245,242,236,0.3)" : "#9CA3AF", textTransform: "uppercase" }}>{l}</p>
-                        </div>
-                      ))}
-                    </div>
-                    <span style={{ display: "inline-flex", alignItems: "center", gap: "5px", padding: "4px 10px", borderRadius: "100px", background: hover ? "rgba(16,185,129,0.1)" : "rgba(16,185,129,0.08)", border: "1px solid rgba(16,185,129,0.25)", fontSize: "9px", fontWeight: 800, color: "#10B981", letterSpacing: "0.1em", textTransform: "uppercase" }}>
-                      ✓ Verified Developer
-                    </span>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
         </section>
 
         {/* ── WHY BUY NEW ────────────────────────────────────── */}
