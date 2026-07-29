@@ -18,17 +18,6 @@ interface Property {
   image_url: string | null;
 }
 
-// ─── Fallback data ────────────────────────────────────────────────────────────
-
-const FALLBACK_PROPERTIES: Property[] = [
-  { id: 1, title: "Grade A Office Tower", location: "HITEC City, Hyderabad", price: 45000000, area: 3200, price_per_sqft: 14063, property_type: "Office", yield_percent: 7.8, image_url: null },
-  { id: 2, title: "Premium Retail Space", location: "Bandra Kurla Complex, Mumbai", price: 85000000, area: 2800, price_per_sqft: 30357, property_type: "Retail", yield_percent: 8.2, image_url: null },
-  { id: 3, title: "Tech Park Office", location: "UB City, Bengaluru", price: 62000000, area: 4500, price_per_sqft: 13778, property_type: "Office", yield_percent: 7.5, image_url: null },
-  { id: 4, title: "Logistics Hub", location: "NH-44, Hyderabad", price: 38000000, area: 12000, price_per_sqft: 3167, property_type: "Warehouse", yield_percent: 9.1, image_url: null },
-  { id: 5, title: "Mixed-Use Complex", location: "Whitefield, Bengaluru", price: 120000000, area: 8000, price_per_sqft: 15000, property_type: "Mixed-Use", yield_percent: 8.5, image_url: null },
-  { id: 6, title: "High Street Retail", location: "Connaught Place, Delhi", price: 95000000, area: 1800, price_per_sqft: 52778, property_type: "Retail", yield_percent: 8.9, image_url: null },
-];
-
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 function formatINR(value: number): string {
@@ -272,13 +261,13 @@ export default function CommercialPage() {
           .eq("status", "active")
           .limit(6);
 
-        if (error || !data || data.length === 0) {
-          setProperties(FALLBACK_PROPERTIES);
+        if (error || !data) {
+          setProperties([]);
         } else {
           setProperties(data as Property[]);
         }
       } catch {
-        setProperties(FALLBACK_PROPERTIES);
+        setProperties([]);
       } finally {
         setLoading(false);
       }
@@ -886,7 +875,7 @@ export default function CommercialPage() {
                       color: "#020C1C",
                       opacity: 0.5,
                     }}>
-                      No properties match your filters.
+                      {properties.length === 0 ? "No commercial properties listed yet." : "No properties match your filters."}
                     </p>
                   </div>
                 )}
