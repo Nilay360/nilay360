@@ -1,5 +1,6 @@
 ﻿"use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { optimizedImageUrl } from "@/lib/image-url";
 
@@ -127,19 +128,40 @@ const FOOTER_COLS = [
   { heading: "Legal",      links: [["Privacy Policy","/privacy"],["Terms of Service","/terms"],["Cookie Policy","/cookies"],["RERA Guide","/legal-guide"]] },
 ];
 
+// Sale is currently Hyderabad-only. A non-Hyderabad city reaching this page
+// (bookmark, old link, typed URL) should show an honest message, not a
+// silently-empty "All Cities" view.
+const TYPE_PARAM_MAP: Record<string, string> = { apartment: "Apartment", villa: "Villa" };
+
 // ── Main page ─────────────────────────────────────────────────
-export default function BuyPage() {
+function BuyPageInner() {
+  const searchParams = useSearchParams();
   const [properties, setProperties] = useState<Property[]>([]);
-  const [cityFilter, setCityFilter] = useState("All");
   const [typeFilter, setTypeFilter] = useState("All");
   const [bhkFilter, setBhkFilter] = useState("All");
   const [budgetFilter, setBudgetFilter] = useState("all");
+  const [cityNotAvailable, setCityNotAvailable] = useState(false);
 
   // EMI calculator state
   const [loanAmt, setLoanAmt] = useState(8000000);
   const [rate, setRate] = useState(8.5);
   const [tenure, setTenure] = useState(20);
   const emi = calcEMI(loanAmt, rate, tenure);
+
+  // Read ?city= and ?type= once on mount. Sale is Hyderabad-only, so any
+  // other city just flips an honest "not available" flag instead of
+  // silently showing (or hiding) the wrong results.
+  useEffect(() => {
+    const city = searchParams.get("city");
+    const type = searchParams.get("type");
+    if (city && city.toLowerCase() !== "hyderabad") {
+      setCityNotAvailable(true);
+    }
+    if (type && TYPE_PARAM_MAP[type.toLowerCase()]) {
+      setTypeFilter(TYPE_PARAM_MAP[type.toLowerCase()]);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     async function load() {
@@ -158,13 +180,15 @@ export default function BuyPage() {
           .eq("approval_status", "approved"),
       ]);
       const mapped = (listingData ?? []).map((row: Record<string, unknown>) => mapListingToProperty(row));
-      setProperties([...mapped, ...((seedData ?? []) as Property[])]);
+      // Sale is Hyderabad-only — enforced here, not just hidden in the UI.
+      const hyderabadOnly = [...mapped, ...((seedData ?? []) as Property[])]
+        .filter(p => p.city.toLowerCase() === "hyderabad");
+      setProperties(hyderabadOnly);
     }
     void load();
   }, []);
 
   const filtered = properties.filter(p => {
-    if (cityFilter !== "All" && !p.city.toLowerCase().includes(cityFilter.toLowerCase())) return false;
     if (typeFilter !== "All" && p.type !== typeFilter.toLowerCase()) return false;
     if (bhkFilter !== "All") {
       const bhk = parseInt(bhkFilter);
@@ -277,10 +301,10 @@ export default function BuyPage() {
             <Eyebrow label="Browse Properties" />
           </div>
           <div style={{ background: "#111F33", border: "1px solid rgba(255,255,255,0.07)", borderRadius: "14px", padding: "18px 22px", display: "flex", gap: "12px", alignItems: "center", flexWrap: "wrap", boxShadow: "0 2px 12px rgba(0,0,0,0.3)" }}>
-            <select value={cityFilter} onChange={e => setCityFilter(e.target.value)} style={{ ...SEL_STYLE, color: cityFilter === "All" ? "rgba(255,255,255,0.4)" : "#FFFFFF" }}>
-              <option value="All" style={{ background: "#0A1526" }}>All Cities</option>
-              {["Hyderabad", "Mumbai", "Bengaluru", "Gurugram", "Noida", "Chennai", "Pune"].map(c => <option key={c} value={c} style={{ background: "#0A1526" }}>{c}</option>)}
-            </select>
+            <span style={{ display: "inline-flex", alignItems: "center", gap: "6px", padding: "9px 16px", minHeight: "44px", boxSizing: "border-box", borderRadius: "9px", border: "1.5px solid rgba(16,196,195,0.25)", background: "rgba(16,196,195,0.06)", color: "#10C4C3", fontSize: "12px", fontWeight: 600 }}>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+              Hyderabad
+            </span>
             <select value={typeFilter} onChange={e => setTypeFilter(e.target.value)} style={{ ...SEL_STYLE, color: typeFilter === "All" ? "rgba(255,255,255,0.4)" : "#FFFFFF" }}>
               <option value="All" style={{ background: "#0A1526" }}>All Types</option>
               {["Apartment", "Villa", "Penthouse", "Plot", "Office"].map(t => <option key={t} value={t} style={{ background: "#0A1526" }}>{t}</option>)}
@@ -296,14 +320,26 @@ export default function BuyPage() {
               <option value="3-10" style={{ background: "#0A1526" }}>₹3 – 10 Cr</option>
               <option value="above10" style={{ background: "#0A1526" }}>Above ₹10 Cr</option>
             </select>
-            <button onClick={() => { setCityFilter("All"); setTypeFilter("All"); setBhkFilter("All"); setBudgetFilter("all"); }} style={{ padding: "9px 18px", minHeight: "44px", boxSizing: "border-box", borderRadius: "9px", border: "1.5px solid rgba(255,255,255,0.1)", background: "transparent", color: "rgba(255,255,255,0.55)", fontSize: "12px", fontWeight: 600, cursor: "pointer", fontFamily: "'Cal Sans', sans-serif" }}>Reset</button>
-            <span style={{ marginLeft: "auto", fontSize: "12px", fontWeight: 700, color: "rgba(255,255,255,0.45)" }}>{filtered.length} properties</span>
+            <button onClick={() => { setTypeFilter("All"); setBhkFilter("All"); setBudgetFilter("all"); }} style={{ padding: "9px 18px", minHeight: "44px", boxSizing: "border-box", borderRadius: "9px", border: "1.5px solid rgba(255,255,255,0.1)", background: "transparent", color: "rgba(255,255,255,0.55)", fontSize: "12px", fontWeight: 600, cursor: "pointer", fontFamily: "'Cal Sans', sans-serif" }}>Reset</button>
+            <span style={{ marginLeft: "auto", fontSize: "12px", fontWeight: 700, color: "rgba(255,255,255,0.45)" }}>{cityNotAvailable ? 0 : filtered.length} properties</span>
           </div>
         </div>
 
         {/* ── LISTINGS GRID ────────────────────────────────────── */}
         <section style={{ maxWidth: "1280px", margin: "0 auto", padding: "28px 48px 72px" }}>
-          {filtered.length === 0 ? (
+          {cityNotAvailable ? (
+            <div style={{ padding: "80px", textAlign: "center", background: "#182B3F", borderRadius: "18px", border: "1px solid rgba(255,255,255,0.07)" }}>
+              <div style={{ width: "56px", height: "56px", borderRadius: "50%", background: "rgba(16,196,195,0.08)", border: "1.5px solid rgba(16,196,195,0.2)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 20px" }}>
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#10C4C3" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+              </div>
+              <p style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "28px", color: "#FFFFFF", marginBottom: "10px" }}>Currently only available in Hyderabad for sale</p>
+              <p style={{ fontSize: "13px", color: "rgba(255,255,255,0.45)", marginBottom: "20px" }}>We're not listing sale properties in other cities yet. Looking to rent instead, or browse Hyderabad?</p>
+              <div style={{ display: "flex", gap: "12px", justifyContent: "center", flexWrap: "wrap" }}>
+                <a href="/buy" style={{ display: "inline-flex", alignItems: "center", gap: "8px", padding: "11px 24px", background: "#10C4C3", borderRadius: "8px", color: "#020C1C", fontSize: "12px", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", textDecoration: "none" }}>Browse Hyderabad →</a>
+                <a href="/rent" style={{ display: "inline-flex", alignItems: "center", gap: "8px", padding: "11px 24px", background: "#0A1526", borderRadius: "8px", color: "#10C4C3", fontSize: "12px", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", textDecoration: "none" }}>Browse Rentals →</a>
+              </div>
+            </div>
+          ) : filtered.length === 0 ? (
             <div style={{ padding: "80px", textAlign: "center", background: "#182B3F", borderRadius: "18px", border: "1px solid rgba(255,255,255,0.07)" }}>
               {properties.length === 0 ? (
                 <>
@@ -317,7 +353,7 @@ export default function BuyPage() {
               ) : (
                 <>
                   <p style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "28px", color: "#FFFFFF", marginBottom: "10px" }}>No properties match your filters</p>
-                  <button onClick={() => { setCityFilter("All"); setTypeFilter("All"); setBhkFilter("All"); setBudgetFilter("all"); }} style={{ fontSize: "13px", fontWeight: 600, color: "#10C4C3", background: "transparent", border: "none", cursor: "pointer", fontFamily: "'Cal Sans', sans-serif" }}>Clear all filters →</button>
+                  <button onClick={() => { setTypeFilter("All"); setBhkFilter("All"); setBudgetFilter("all"); }} style={{ fontSize: "13px", fontWeight: 600, color: "#10C4C3", background: "transparent", border: "none", cursor: "pointer", fontFamily: "'Cal Sans', sans-serif" }}>Clear all filters →</button>
                 </>
               )}
             </div>
@@ -477,5 +513,13 @@ export default function BuyPage() {
 
       </div>
     </>
+  );
+}
+
+export default function BuyPage() {
+  return (
+    <Suspense fallback={<div style={{ minHeight: "100vh", background: "#020C1C" }} />}>
+      <BuyPageInner />
+    </Suspense>
   );
 }
