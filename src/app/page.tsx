@@ -1307,7 +1307,7 @@ export default function HomePage() {
             Ready to Find Your<br /><em style={{fontStyle:"italic", color:G.goldLt}}>Perfect Property?</em>
           </h2>
           <p style={{fontSize:15, color:"rgba(255,255,255,0.65)", marginBottom:32, lineHeight:1.7}}>
-            Join 50,000+ buyers and investors who found their dream property through Nilay 360.
+            Join buyers and investors who found their dream property through Nilay 360.
           </p>
           <div className="cta-buttons" style={{display:"flex", gap:14, justifyContent:"center", flexWrap:"wrap"}}>
             <a href="/search" style={{padding:"14px 32px", background:G.gold, borderRadius:10, color:"#000", fontSize:15, fontWeight:700, transition:"background 0.15s, box-shadow 0.15s", boxShadow:"0 10px 30px rgba(16,196,195,0.35)"}}
