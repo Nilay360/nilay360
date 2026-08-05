@@ -4,6 +4,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { AMENITIES } from "@/constants";
 import { optimizedImageUrl } from "@/lib/image-url";
+import ResultsGate from "@/components/property/ResultsGate";
 
 // ── Types ─────────────────────────────────────────────────────
 type Property = {
@@ -1020,25 +1021,27 @@ function SearchPageInner() {
               </div>
             ) : viewMode === "map" ? (
               /* Map placeholder */
-              <div style={{ background: "#0A1526", borderRadius: "14px", overflow: "hidden", position: "relative", height: "600px", border: "1px solid rgba(255,255,255,0.07)" }}>
-                <div style={{ position: "absolute", inset: 0, backgroundImage: "linear-gradient(rgba(16,196,195,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(16,196,195,0.04) 1px, transparent 1px)", backgroundSize: "40px 40px" }} />
-                <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "16px" }}>
-                  <div style={{ fontSize: "48px", opacity: 0.3 }}>🗺️</div>
-                  <div style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "24px", fontWeight: 400, color: "#FFFFFF", opacity: 0.5 }}>Map View</div>
-                  <div style={{ fontSize: "13px", color: "#A9B4C2", textAlign: "center", maxWidth: "300px" }}>
-                    Interactive map with property pins coming soon. Add a Google Maps API key to enable.
-                  </div>
-                </div>
-                {/* Fake pins */}
-                {paginated.slice(0, 6).map((p, i) => (
-                  <div key={p.id} style={{ position: "absolute", top: `${20 + (i * 13) % 60}%`, left: `${15 + (i * 17) % 70}%`, transform: "translate(-50%, -100%)" }}>
-                    <div style={{ background: "#020C1C", color: "#10C4C3", padding: "5px 10px", borderRadius: "6px", fontSize: "11px", fontWeight: 700, whiteSpace: "nowrap", boxShadow: "0 2px 8px rgba(0,0,0,0.2)" }}>
-                      {fmt(p.price, p.listing_type)}
+              <ResultsGate>
+                <div style={{ background: "#0A1526", borderRadius: "14px", overflow: "hidden", position: "relative", height: "600px", border: "1px solid rgba(255,255,255,0.07)" }}>
+                  <div style={{ position: "absolute", inset: 0, backgroundImage: "linear-gradient(rgba(16,196,195,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(16,196,195,0.04) 1px, transparent 1px)", backgroundSize: "40px 40px" }} />
+                  <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "16px" }}>
+                    <div style={{ fontSize: "48px", opacity: 0.3 }}>🗺️</div>
+                    <div style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "24px", fontWeight: 400, color: "#FFFFFF", opacity: 0.5 }}>Map View</div>
+                    <div style={{ fontSize: "13px", color: "#A9B4C2", textAlign: "center", maxWidth: "300px" }}>
+                      Interactive map with property pins coming soon. Add a Google Maps API key to enable.
                     </div>
-                    <div style={{ width: 0, height: 0, borderLeft: "6px solid transparent", borderRight: "6px solid transparent", borderTop: "8px solid #020C1C", margin: "0 auto" }} />
                   </div>
-                ))}
-              </div>
+                  {/* Fake pins */}
+                  {paginated.slice(0, 6).map((p, i) => (
+                    <div key={p.id} style={{ position: "absolute", top: `${20 + (i * 13) % 60}%`, left: `${15 + (i * 17) % 70}%`, transform: "translate(-50%, -100%)" }}>
+                      <div style={{ background: "#020C1C", color: "#10C4C3", padding: "5px 10px", borderRadius: "6px", fontSize: "11px", fontWeight: 700, whiteSpace: "nowrap", boxShadow: "0 2px 8px rgba(0,0,0,0.2)" }}>
+                        {fmt(p.price, p.listing_type)}
+                      </div>
+                      <div style={{ width: 0, height: 0, borderLeft: "6px solid transparent", borderRight: "6px solid transparent", borderTop: "8px solid #020C1C", margin: "0 auto" }} />
+                    </div>
+                  ))}
+                </div>
+              </ResultsGate>
             ) : loading ? (
               <div style={{ display: "grid", gridTemplateColumns: viewMode === "grid" ? "repeat(auto-fill, minmax(270px, 1fr))" : "1fr", gap: "16px" }}>
                 {Array.from({ length: 6 }).map((_, i) => <Skeleton key={i} />)}
@@ -1066,12 +1069,14 @@ function SearchPageInner() {
                       Showing all properties — no exact match found for <span style={{ color: "#10C4C3", fontWeight: 600 }}>{textQuery}</span>
                     </div>
                   )}
-                  <div className="search-results-grid" style={{ display: "grid", gridTemplateColumns: viewMode === "grid" ? "repeat(auto-fill, minmax(270px, 1fr))" : "1fr", gap: "16px" }}>
-                    {viewMode === "grid"
-                      ? displayList.map(p => <PropertyCard key={p.id} p={p} comparing={compareIds.has(p.id)} onCompare={() => { if (compareIds.has(p.id)) { setCompareIds(s => { const n = new Set(s); n.delete(p.id); return n; }); } else if (compareIds.size < 3) { setCompareIds(s => new Set([...s, p.id])); } }} onSave={() => setSavedIds(s => { const n = new Set(s); if (n.has(p.id)) n.delete(p.id); else n.add(p.id); return n; })} saved={savedIds.has(p.id)} />)
-                      : displayList.map(p => <ListRow key={p.id} p={p} comparing={compareIds.has(p.id)} onCompare={() => { if (compareIds.has(p.id)) { setCompareIds(s => { const n = new Set(s); n.delete(p.id); return n; }); } else if (compareIds.size < 3) { setCompareIds(s => new Set([...s, p.id])); } }} onSave={() => setSavedIds(s => { const n = new Set(s); if (n.has(p.id)) n.delete(p.id); else n.add(p.id); return n; })} saved={savedIds.has(p.id)} />)
-                    }
-                  </div>
+                  <ResultsGate>
+                    <div className="search-results-grid" style={{ display: "grid", gridTemplateColumns: viewMode === "grid" ? "repeat(auto-fill, minmax(270px, 1fr))" : "1fr", gap: "16px" }}>
+                      {viewMode === "grid"
+                        ? displayList.map(p => <PropertyCard key={p.id} p={p} comparing={compareIds.has(p.id)} onCompare={() => { if (compareIds.has(p.id)) { setCompareIds(s => { const n = new Set(s); n.delete(p.id); return n; }); } else if (compareIds.size < 3) { setCompareIds(s => new Set([...s, p.id])); } }} onSave={() => setSavedIds(s => { const n = new Set(s); if (n.has(p.id)) n.delete(p.id); else n.add(p.id); return n; })} saved={savedIds.has(p.id)} />)
+                        : displayList.map(p => <ListRow key={p.id} p={p} comparing={compareIds.has(p.id)} onCompare={() => { if (compareIds.has(p.id)) { setCompareIds(s => { const n = new Set(s); n.delete(p.id); return n; }); } else if (compareIds.size < 3) { setCompareIds(s => new Set([...s, p.id])); } }} onSave={() => setSavedIds(s => { const n = new Set(s); if (n.has(p.id)) n.delete(p.id); else n.add(p.id); return n; })} saved={savedIds.has(p.id)} />)
+                      }
+                    </div>
+                  </ResultsGate>
                 </>
               );
             })()}
