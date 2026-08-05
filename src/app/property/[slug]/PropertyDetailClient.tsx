@@ -375,6 +375,8 @@ function SimilarCard({ p }: { p: Property }) {
 // Shown to logged-out visitors instead of the full detail page: blurred hero,
 // basic info only (same as what's already visible on listing cards), full
 // details hidden behind a "Sign In" CTA that opens the existing AuthModal.
+// One full-height, deliberately-centered composition — the blurred hero reads
+// as a scrim behind a single frosted card, not a stray floating box.
 function LockedPropertyPreview({
   property, heroImage, onSignIn,
 }: { property: Property; heroImage: string; onSignIn: () => void }) {
@@ -384,29 +386,36 @@ function LockedPropertyPreview({
       <style>{`
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: 'Cal Sans', system-ui, sans-serif; background: #020C1C; color: #FFFFFF; overflow-x: hidden; }
-        .pd-lock-btn { transition: background 0.2s, box-shadow 0.2s; }
-        .pd-lock-btn:hover { background: #3DDAD9 !important; }
+        .pd-lock-btn { transition: background 0.2s, box-shadow 0.2s, transform 0.2s; }
+        .pd-lock-btn:hover { background: #3DDAD9 !important; transform: translateY(-1px); }
+        @media (max-width: 480px) {
+          .pd-lock-card { padding: 28px 22px !important; }
+          .pd-lock-price { font-size: 30px !important; }
+        }
       `}</style>
-      <div style={{ background: "#020C1C", minHeight: "100vh", paddingTop: "64px" }}>
-        <div style={{ position: "relative", height: "480px", overflow: "hidden" }}>
+      <div style={{ background: "#020C1C", minHeight: "100vh" }}>
+        <div style={{ position: "relative", minHeight: "calc(100vh - 64px)", marginTop: "64px", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden" }}>
+          {/* Blurred hero — deliberately full-bleed scrim, not a stray image */}
           <img
             src={optimizedImageUrl(heroImage, 1200)}
             alt=""
             aria-hidden="true"
-            style={{ width: "100%", height: "100%", objectFit: "cover", display: "block", filter: "blur(28px) brightness(0.55)", transform: "scale(1.1)" }}
+            style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", filter: "blur(36px) brightness(0.55) saturate(1.05)", transform: "scale(1.15)" }}
           />
-          <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, rgba(2,12,28,0.35) 0%, rgba(2,12,28,0.92) 100%)" }} />
-          <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", textAlign: "center", padding: "24px" }}>
-            <span style={{ padding: "6px 14px", borderRadius: "100px", fontSize: "11px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", background: property.listing_type === "rent" ? "rgba(11,13,16,0.85)" : "rgba(16,196,195,0.92)", color: property.listing_type === "rent" ? "#10C4C3" : "#020C1C", border: property.listing_type === "rent" ? "1px solid rgba(16,196,195,0.5)" : "none", marginBottom: "18px" }}>
+          <div style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg, rgba(2,12,28,0.55) 0%, rgba(2,12,28,0.72) 45%, rgba(2,12,28,0.94) 100%)" }} />
+
+          {/* Centered content column */}
+          <div style={{ position: "relative", zIndex: 2, width: "100%", maxWidth: "440px", margin: "0 auto", padding: "56px 20px", display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center" }}>
+            <span style={{ padding: "6px 14px", borderRadius: "100px", fontSize: "11px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", background: property.listing_type === "rent" ? "rgba(11,13,16,0.85)" : "rgba(16,196,195,0.92)", color: property.listing_type === "rent" ? "#10C4C3" : "#020C1C", border: property.listing_type === "rent" ? "1px solid rgba(16,196,195,0.5)" : "none", marginBottom: "16px" }}>
               {property.listing_type === "rent" ? "For Rent" : "For Sale"}
             </span>
-            <div style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "38px", fontWeight: 700, color: "#10C4C3", marginBottom: "10px" }}>
+            <div className="pd-lock-price" style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "36px", fontWeight: 700, color: "#10C4C3", marginBottom: "8px" }}>
               {formatPrice(property.price, property.listing_type)}
             </div>
-            <div style={{ fontSize: "14px", color: "#A9B4C2", marginBottom: "22px" }}>
+            <div style={{ fontSize: "14px", color: "#A9B4C2", marginBottom: "18px" }}>
               {property.neighbourhood ? `${property.neighbourhood}, ` : ""}{property.city}
             </div>
-            <div style={{ display: "flex", gap: "20px", marginBottom: "30px" }}>
+            <div style={{ display: "flex", gap: "20px", marginBottom: "28px" }}>
               {[
                 { v: property.bedrooms, l: isCommercial ? "Rooms" : "Beds" },
                 { v: property.bathrooms, l: isCommercial ? "Wash" : "Bath" },
@@ -419,11 +428,16 @@ function LockedPropertyPreview({
               ))}
             </div>
 
-            <div style={{ background: "rgba(255,255,255,0.04)", backdropFilter: "blur(24px)", WebkitBackdropFilter: "blur(24px)", border: "1px solid rgba(255,255,255,0.10)", borderRadius: "24px", padding: "32px 28px", maxWidth: "420px", boxShadow: "0 4px 24px rgba(0,0,0,0.25)" }}>
+            {/* Single frosted card — lock icon, CTA, and "back to browse" all live
+                inside it so nothing floats loose against the blurred scrim. */}
+            <div className="pd-lock-card" style={{ width: "100%", background: "rgba(255,255,255,0.05)", backdropFilter: "blur(28px)", WebkitBackdropFilter: "blur(28px)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: "24px", padding: "36px 32px", boxShadow: "0 20px 60px rgba(0,0,0,0.4), 0 0 0 1px rgba(16,196,195,0.06)" }}>
+              <div style={{ width: "48px", height: "48px", borderRadius: "50%", background: "rgba(16,196,195,0.12)", border: "1px solid rgba(16,196,195,0.3)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 18px" }}>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10C4C3" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>
+              </div>
               <div style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "22px", fontWeight: 600, color: "#FFFFFF", marginBottom: "8px" }}>
                 Sign In to View Full Details
               </div>
-              <p style={{ fontSize: "13px", color: "#A9B4C2", lineHeight: 1.6, marginBottom: "22px" }}>
+              <p style={{ fontSize: "13px", color: "#A9B4C2", lineHeight: 1.6, marginBottom: "24px" }}>
                 Create a free account to see photos, exact location, amenities, and contact the seller.
               </p>
               <button
@@ -433,17 +447,11 @@ function LockedPropertyPreview({
               >
                 Sign In to View Full Details
               </button>
+              <div style={{ marginTop: "20px", paddingTop: "18px", borderTop: "1px solid rgba(255,255,255,0.08)" }}>
+                <a href="/properties" style={{ fontSize: "12.5px", color: "#A9B4C2", textDecoration: "none" }}>← Back to Browse</a>
+              </div>
             </div>
           </div>
-        </div>
-
-        <div style={{ maxWidth: "600px", margin: "0 auto", padding: "48px 24px", textAlign: "center" }}>
-          <h1 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "24px", fontWeight: 500, color: "#FFFFFF", marginBottom: "12px", filter: "blur(6px)", userSelect: "none" }}>
-            {property.title}
-          </h1>
-          <p style={{ fontSize: "13px", color: "#A9B4C2" }}>
-            <a href="/properties" style={{ color: "#10C4C3", textDecoration: "none" }}>← Back to Browse</a>
-          </p>
         </div>
       </div>
     </>
