@@ -5,6 +5,7 @@ import { motion, useScroll, useTransform } from "framer-motion";
 import Reveal from "@/components/ui/Reveal";
 import { createClient } from "@/lib/supabase/client";
 import { useSavedProperties } from "@/hooks/useSavedProperties";
+import ResultsGate from "@/components/property/ResultsGate";
 
 /* ─── Palette ─────────────────────────────────────────────── */
 const G = {
@@ -1028,6 +1029,7 @@ export default function HomePage() {
               No properties available yet{propCity !== "All" ? ` in ${propCity}` : ""}. Check back soon.
             </div>
           ) : (
+          <ResultsGate>
           <div ref={carouselRef} className="hide-scroll featured-carousel" style={{display:"flex", gap:16, overflowX:"auto", paddingBottom:8, paddingRight:56, scrollSnapType:"x mandatory", WebkitOverflowScrolling:"touch", maxWidth:"100vw", boxSizing:"border-box"}}>
             {filteredProps.map((p,i)=>(
               <Reveal key={p.id} delay={i*0.06} style={{flexShrink:0}}>
@@ -1068,6 +1070,7 @@ export default function HomePage() {
               </Reveal>
             ))}
           </div>
+          </ResultsGate>
           )}
         </div>
       </section>
