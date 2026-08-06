@@ -81,11 +81,11 @@ export default function Hero() {
       >
         <div className="ab-hero-reveal" style={{ animationDelay: "0s", "--rise": "22px", "--zoom": "0.96" } as React.CSSProperties}>
           <motion.img
-            src="/brand/nilay360_icon_only_dark-bg.png"
+            src="/brand/nilay360_logo_v2_transparent_trimmed.png"
             alt="Nilay360"
             animate={{ y: [-9, 9, -9] }}
             transition={{ duration: 9, repeat: Infinity, ease: "easeInOut" }}
-            style={{ height: "200px", width: "auto", display: "block", filter: `drop-shadow(0 18px 60px rgba(16,196,195,0.34))` }}
+            style={{ height: "170px", width: "auto", display: "block", filter: `drop-shadow(0 18px 60px rgba(16,196,195,0.34))` }}
           />
         </div>
 

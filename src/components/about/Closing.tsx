@@ -29,7 +29,7 @@ export default function Closing() {
       </div>
 
       <Reveal delay={0.9}>
-        <img src="/brand/nilay360_icon_only_dark-bg.png" alt="Nilay360" style={{ position: "relative", height: "clamp(44px, 5vw, 66px)", width: "auto", display: "block" }} />
+        <img src="/brand/nilay360_logo_v2_transparent_trimmed.png" alt="Nilay360" style={{ position: "relative", height: "clamp(38px, 4.2vw, 56px)", width: "auto", display: "block" }} />
       </Reveal>
       <Reveal delay={1.1}>
         <p style={{ position: "relative", margin: 0, fontFamily: "'Cal Sans', sans-serif", fontSize: "clamp(9.5px, 0.85vw, 11px)", fontWeight: 600, letterSpacing: "0.28em", textTransform: "uppercase", color: "rgba(255,255,255,0.42)" }}>A Flagship PropTech Platform by NIVILA Group</p>
