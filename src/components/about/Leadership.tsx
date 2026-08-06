@@ -105,7 +105,13 @@ export default function Leadership() {
         .ab-lead-portrait { grid-row: 1; }
         .ab-lead-body { grid-row: 2; }
         @media (min-width: 860px) {
-          .ab-lead-row { grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr); }
+          /* Equal tracks, not the earlier 0.85fr/1.15fr split — that asymmetry
+             meant the portrait rendered at a different pixel width depending on
+             which column the flip put it in (measured: 425px vs 585px CSS width
+             at 1280px viewport), which upscaled two of the four portraits
+             noticeably harder than the other two. Equal fr units guarantee the
+             portrait is the same width in both grid-column positions. */
+          .ab-lead-row { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
           /* Portrait always first in the DOM (so mobile stacks photo-above-text
              consistently); desktop alternates sides purely with grid placement. */
           .ab-lead-portrait { grid-row: 1; grid-column: 1; }
