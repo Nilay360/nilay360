@@ -10,6 +10,8 @@ import WhyNilay360 from "@/components/about/WhyNilay360";
 import WhatWeBuild from "@/components/about/WhatWeBuild";
 import Mission from "@/components/about/Mission";
 import Hyderabad from "@/components/about/Hyderabad";
+import Leadership from "@/components/about/Leadership";
+import Values from "@/components/about/Values";
 
 // IMPORTANT: the Philosophy section (checkpoint 2) pins via `position:
 // sticky`. Any ancestor here that sets `overflow` (or `overflow-x`) to
@@ -44,6 +46,8 @@ export default function AboutPage() {
           <WhatWeBuild />
           <Mission />
           <Hyderabad />
+          <Leadership />
+          <Values />
         </main>
       </div>
     </>
