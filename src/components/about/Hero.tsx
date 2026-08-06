@@ -56,15 +56,30 @@ export default function Hero() {
 
   return (
     <section id="ch01" ref={ref} style={{ position: "relative", minHeight: "100vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", textAlign: "center", padding: "20vh clamp(20px, 6vw, 80px) 14vh", overflow: "clip" }}>
+      {/*
+        Entrance reveals below are CSS keyframes, not Framer Motion
+        initial/animate. Framer Motion renders its `initial` state during SSR
+        too — the hero logo (this page's actual LCP element, confirmed via
+        Lighthouse) would ship the server HTML at opacity:0 and stay invisible
+        until React hydrates AND Framer Motion's effect fires, which is gated
+        behind the whole JS bundle (gsap+framer-motion+lenis) finishing
+        execution. That measured as a 2.77s LCP render delay. CSS keyframe
+        animations run on the compositor from first paint, independent of
+        hydration — the infinite float/tilt/particle loops stay on Framer
+        Motion since those don't affect first-paint visibility.
+      */}
+      <style>{`
+        @keyframes ab-hero-in { from { opacity: 0; transform: translateY(var(--rise, 20px)) scale(var(--zoom, 1)); } to { opacity: 1; transform: translateY(0) scale(1); } }
+        .ab-hero-reveal { opacity: 0; animation: ab-hero-in 1s cubic-bezier(0.16,1,0.3,1) both; }
+        @media (prefers-reduced-motion: reduce) {
+          .ab-hero-reveal { animation: none !important; opacity: 1 !important; transform: none !important; }
+        }
+      `}</style>
       <Particles />
       <motion.div
         style={{ position: "relative", display: "flex", flexDirection: "column", alignItems: "center", gap: "clamp(26px, 3.4vw, 46px)", maxWidth: "1180px", perspective: 1400, rotateX: tilt.rotateX, rotateY: tilt.rotateY }}
       >
-        <motion.div
-          initial={{ opacity: 0, y: 22, scale: 0.96 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          transition={{ duration: 1.4, ease: [0.16, 1, 0.3, 1] }}
-        >
+        <div className="ab-hero-reveal" style={{ animationDelay: "0s", "--rise": "22px", "--zoom": "0.96" } as React.CSSProperties}>
           <motion.img
             src="/brand/nilay360_icon_only_dark-bg.png"
             alt="Nilay360"
@@ -72,35 +87,29 @@ export default function Hero() {
             transition={{ duration: 9, repeat: Infinity, ease: "easeInOut" }}
             style={{ height: "200px", width: "auto", display: "block", filter: `drop-shadow(0 18px 60px rgba(16,196,195,0.34))` }}
           />
-        </motion.div>
+        </div>
 
-        <motion.h1
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1.5, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
-          style={{ margin: 0, fontFamily: "'Cal Sans', Georgia, serif", fontWeight: 300, fontSize: "clamp(38px, 6.8vw, 108px)", lineHeight: 1.04, letterSpacing: "-0.026em", color: "#FFFFFF" }}
+        <h1
+          className="ab-hero-reveal"
+          style={{ animationDelay: "0.15s", margin: 0, fontFamily: "'Cal Sans', Georgia, serif", fontWeight: 300, fontSize: "clamp(38px, 6.8vw, 108px)", lineHeight: 1.04, letterSpacing: "-0.026em", color: "#FFFFFF" }}
         >
           The Future of Real Estate<br />Begins Here.
-        </motion.h1>
+        </h1>
 
-        <motion.div
-          initial={{ opacity: 0, y: 18 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1.3, delay: 0.45, ease: [0.16, 1, 0.3, 1] }}
-          style={{ display: "flex", alignItems: "center", gap: "clamp(14px, 2vw, 26px)" }}
+        <div
+          className="ab-hero-reveal"
+          style={{ animationDelay: "0.45s", display: "flex", alignItems: "center", gap: "clamp(14px, 2vw, 26px)" }}
         >
           <span style={{ fontFamily: "'Cal Sans', sans-serif", fontWeight: 300, fontSize: "clamp(14px, 1.4vw, 20px)", letterSpacing: "0.28em", textTransform: "uppercase", color: "rgba(255,255,255,0.7)" }}>View First</span>
           <span style={{ width: "26px", height: "1px", background: TEAL, opacity: 0.6 }} />
           <span style={{ fontFamily: "'Cal Sans', sans-serif", fontWeight: 300, fontSize: "clamp(14px, 1.4vw, 20px)", letterSpacing: "0.28em", textTransform: "uppercase", color: "rgba(255,255,255,0.7)" }}>Home Next</span>
-        </motion.div>
+        </div>
 
         <motion.a
           href="#ch02"
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1.2, delay: 0.65, ease: [0.16, 1, 0.3, 1] }}
+          className="ab-hero-reveal"
+          style={{ animationDelay: "0.65s", position: "relative", overflow: "hidden", display: "inline-flex", alignItems: "center", gap: "14px", marginTop: "clamp(6px, 1.5vw, 18px)", padding: "16px 32px", border: "1px solid rgba(255,255,255,0.16)", borderRadius: "999px", background: "rgba(255,255,255,0.04)", backdropFilter: "blur(16px)", fontFamily: "'Cal Sans', sans-serif", fontSize: "11px", fontWeight: 600, letterSpacing: "0.24em", textTransform: "uppercase", color: "#FFFFFF", textDecoration: "none" }}
           whileHover={{ borderColor: "rgba(16,196,195,0.5)", background: "rgba(16,196,195,0.12)" }}
-          style={{ position: "relative", overflow: "hidden", display: "inline-flex", alignItems: "center", gap: "14px", marginTop: "clamp(6px, 1.5vw, 18px)", padding: "16px 32px", border: "1px solid rgba(255,255,255,0.16)", borderRadius: "999px", background: "rgba(255,255,255,0.04)", backdropFilter: "blur(16px)", fontFamily: "'Cal Sans', sans-serif", fontSize: "11px", fontWeight: 600, letterSpacing: "0.24em", textTransform: "uppercase", color: "#FFFFFF", textDecoration: "none" }}
         >
           Explore Our Story
           <span aria-hidden="true" style={{ display: "block", width: "20px", height: "1px", background: TEAL }} />

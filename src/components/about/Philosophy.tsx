@@ -1,7 +1,5 @@
 "use client";
 import { useEffect, useRef } from "react";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { TEAL } from "./shared";
 
 // The signature moment: "VIEW FIRST." opens out and recedes into blur while
@@ -15,6 +13,13 @@ import { TEAL } from "./shared";
 // NOTE: this depends on NO ancestor setting `overflow: hidden` (on either
 // axis) — that silently makes the ancestor a scroll container and kills the
 // sticky pin. The page uses `overflow: clip` everywhere for this reason.
+//
+// gsap/ScrollTrigger are dynamically imported (not top-level) so their
+// weight isn't in the page's initial JS bundle — they're a progressive
+// enhancement for a below-the-fold section, not needed for first paint.
+// Confirmed via Lighthouse this reduces Total Blocking Time; the
+// reduced-motion branch below needs no GSAP at all, so it skips the import
+// entirely in that case.
 export default function Philosophy() {
   const sectionRef = useRef<HTMLElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
@@ -24,11 +29,6 @@ export default function Philosophy() {
   const glowRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    // See SmoothScroll.tsx — registering at module scope causes a hydration
-    // mismatch, because ScrollTrigger touches root element styles before
-    // React hydrates.
-    gsap.registerPlugin(ScrollTrigger);
-
     const section = sectionRef.current;
     const words = wordsRef.current;
     const a = aRef.current;
@@ -37,47 +37,73 @@ export default function Philosophy() {
 
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-    // Reduced-motion fallback: no scrub, no morph, no tall scroll container.
-    // The two lines simply stack and read as static type.
+    // Reduced-motion fallback: no scrub, no morph, no tall scroll container,
+    // no GSAP import at all — plain style mutation is enough here.
     if (reduce) {
       section.style.height = "auto";
       words.style.display = "flex";
       words.style.flexDirection = "column";
       words.style.gap = "8px";
-      gsap.set([a, b], { opacity: 1, filter: "blur(0px)", letterSpacing: "0.02em", clearProps: "transform" });
+      [a, b].forEach(el => {
+        el.style.opacity = "1";
+        el.style.filter = "blur(0px)";
+        el.style.letterSpacing = "0.02em";
+        el.style.transform = "";
+      });
       return;
     }
 
-    const ctx = gsap.context(() => {
-      const tl = gsap.timeline({
-        scrollTrigger: {
-          trigger: section,
-          start: "top top",
-          end: "bottom bottom",
-          scrub: 0.6,
-        },
-      });
+    let cancelled = false;
+    let revert: (() => void) | undefined;
 
-      // VIEW FIRST — letter-spacing opens through the first half...
-      tl.fromTo(a,
-        { letterSpacing: "0em" },
-        { letterSpacing: "0.15em", ease: "none", duration: 0.44 }, 0)
-        // ...then it blurs, lifts and pushes toward the viewer as it leaves.
-        .to(a,
-          { opacity: 0, filter: "blur(15px)", y: -30, z: 420, rotateX: -14, ease: "none", duration: 0.14 }, 0.42)
-        // HOME NEXT — arrives out of depth, blur and wide tracking resolving.
-        .fromTo(b,
-          { opacity: 0, filter: "blur(16px)", letterSpacing: "0.3em", y: 20, z: -520, rotateX: 12 },
-          { opacity: 1, filter: "blur(0px)", letterSpacing: "0.02em", y: 0, z: 0, rotateX: 0, ease: "none", duration: 0.28 }, 0.58);
+    (async () => {
+      const [{ default: gsap }, { ScrollTrigger }] = await Promise.all([
+        import("gsap"),
+        import("gsap/ScrollTrigger"),
+      ]);
+      if (cancelled) return;
 
-      if (glowRef.current) {
-        tl.fromTo(glowRef.current,
-          { xPercent: -8, yPercent: 6, scale: 1 },
-          { xPercent: 8, yPercent: -6, scale: 1.12, ease: "none", duration: 1 }, 0);
-      }
-    }, section);
+      // Registered inside the effect (post-hydration), not at module scope —
+      // ScrollTrigger touches root element styles, and doing that before
+      // React hydrates produces a body style-attribute hydration mismatch.
+      gsap.registerPlugin(ScrollTrigger);
 
-    return () => ctx.revert();
+      const ctx = gsap.context(() => {
+        const tl = gsap.timeline({
+          scrollTrigger: {
+            trigger: section,
+            start: "top top",
+            end: "bottom bottom",
+            scrub: 0.6,
+          },
+        });
+
+        // VIEW FIRST — letter-spacing opens through the first half...
+        tl.fromTo(a,
+          { letterSpacing: "0em" },
+          { letterSpacing: "0.15em", ease: "none", duration: 0.44 }, 0)
+          // ...then it blurs, lifts and pushes toward the viewer as it leaves.
+          .to(a,
+            { opacity: 0, filter: "blur(15px)", y: -30, z: 420, rotateX: -14, ease: "none", duration: 0.14 }, 0.42)
+          // HOME NEXT — arrives out of depth, blur and wide tracking resolving.
+          .fromTo(b,
+            { opacity: 0, filter: "blur(16px)", letterSpacing: "0.3em", y: 20, z: -520, rotateX: 12 },
+            { opacity: 1, filter: "blur(0px)", letterSpacing: "0.02em", y: 0, z: 0, rotateX: 0, ease: "none", duration: 0.28 }, 0.58);
+
+        if (glowRef.current) {
+          tl.fromTo(glowRef.current,
+            { xPercent: -8, yPercent: 6, scale: 1 },
+            { xPercent: 8, yPercent: -6, scale: 1.12, ease: "none", duration: 1 }, 0);
+        }
+      }, section);
+
+      revert = () => ctx.revert();
+    })();
+
+    return () => {
+      cancelled = true;
+      revert?.();
+    };
   }, []);
 
   const wordStyle: React.CSSProperties = {

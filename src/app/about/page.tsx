@@ -12,6 +12,7 @@ import Mission from "@/components/about/Mission";
 import Hyderabad from "@/components/about/Hyderabad";
 import Leadership from "@/components/about/Leadership";
 import Values from "@/components/about/Values";
+import Closing from "@/components/about/Closing";
 
 // IMPORTANT: the Philosophy section (checkpoint 2) pins via `position:
 // sticky`. Any ancestor here that sets `overflow` (or `overflow-x`) to
@@ -48,6 +49,7 @@ export default function AboutPage() {
           <Hyderabad />
           <Leadership />
           <Values />
+          <Closing />
         </main>
       </div>
     </>
