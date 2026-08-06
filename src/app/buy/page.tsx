@@ -3,6 +3,7 @@ import { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { optimizedImageUrl } from "@/lib/image-url";
+import ResultsGate from "@/components/property/ResultsGate";
 
 // ── Types ─────────────────────────────────────────────────────
 type Property = {
@@ -358,9 +359,11 @@ function BuyPageInner() {
               )}
             </div>
           ) : (
-            <div className="buy-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "22px" }}>
-              {filtered.map(p => <PropertyCard key={p.id} p={p} />)}
-            </div>
+            <ResultsGate>
+              <div className="buy-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "22px" }}>
+                {filtered.map(p => <PropertyCard key={p.id} p={p} />)}
+              </div>
+            </ResultsGate>
           )}
         </section>
 

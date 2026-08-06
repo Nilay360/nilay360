@@ -18,6 +18,12 @@ const COMMERCIAL_CATEGORIES = ["office", "retail", "warehouse"];
 // everyone regardless of subscription_tier. Flip to false to restore the paywall.
 const TOURS_TEMPORARILY_UNLOCKED = true;
 
+// Temporary experiment requested by Vanith to build user base/leads. Started 2026-08-05.
+// STAYS ACTIVE UNTIL VANITH EXPLICITLY SAYS TO RELEASE/TURN OFF — no automatic expiration.
+// When true, logged-out visitors see a locked/blurred preview of this page instead of the
+// full property details; signing in (any tier) unlocks it. Browse/search pages are unaffected.
+const REQUIRE_SIGNIN_FOR_PROPERTY_VIEW = true;
+
 // ── Types ────────────────────────────────────────────────────
 type Property = {
   id: string;
@@ -365,6 +371,93 @@ function SimilarCard({ p }: { p: Property }) {
   );
 }
 
+// ── Locked preview (gated by REQUIRE_SIGNIN_FOR_PROPERTY_VIEW) ──
+// Shown to logged-out visitors instead of the full detail page: blurred hero,
+// basic info only (same as what's already visible on listing cards), full
+// details hidden behind a "Sign In" CTA that opens the existing AuthModal.
+// One full-height, deliberately-centered composition — the blurred hero reads
+// as a scrim behind a single frosted card, not a stray floating box.
+function LockedPropertyPreview({
+  property, heroImage, onSignIn,
+}: { property: Property; heroImage: string; onSignIn: () => void }) {
+  const isCommercial = COMMERCIAL_CATEGORIES.includes(property.type);
+  return (
+    <>
+      <style>{`
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Cal Sans', system-ui, sans-serif; background: #020C1C; color: #FFFFFF; overflow-x: hidden; }
+        .pd-lock-btn { transition: background 0.2s, box-shadow 0.2s, transform 0.2s; }
+        .pd-lock-btn:hover { background: #3DDAD9 !important; transform: translateY(-1px); }
+        @media (max-width: 480px) {
+          .pd-lock-card { padding: 28px 22px !important; }
+          .pd-lock-price { font-size: 30px !important; }
+        }
+      `}</style>
+      <div style={{ background: "#020C1C", minHeight: "100vh" }}>
+        <div style={{ position: "relative", minHeight: "calc(100vh - 64px)", marginTop: "64px", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden" }}>
+          {/* Blurred hero — deliberately full-bleed scrim, not a stray image */}
+          <img
+            src={optimizedImageUrl(heroImage, 1200)}
+            alt=""
+            aria-hidden="true"
+            style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", filter: "blur(36px) brightness(0.55) saturate(1.05)", transform: "scale(1.15)" }}
+          />
+          <div style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg, rgba(2,12,28,0.55) 0%, rgba(2,12,28,0.72) 45%, rgba(2,12,28,0.94) 100%)" }} />
+
+          {/* Centered content column */}
+          <div style={{ position: "relative", zIndex: 2, width: "100%", maxWidth: "440px", margin: "0 auto", padding: "56px 20px", display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center" }}>
+            <span style={{ padding: "6px 14px", borderRadius: "100px", fontSize: "11px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", background: property.listing_type === "rent" ? "rgba(11,13,16,0.85)" : "rgba(16,196,195,0.92)", color: property.listing_type === "rent" ? "#10C4C3" : "#020C1C", border: property.listing_type === "rent" ? "1px solid rgba(16,196,195,0.5)" : "none", marginBottom: "16px" }}>
+              {property.listing_type === "rent" ? "For Rent" : "For Sale"}
+            </span>
+            <div className="pd-lock-price" style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "36px", fontWeight: 700, color: "#10C4C3", marginBottom: "8px" }}>
+              {formatPrice(property.price, property.listing_type)}
+            </div>
+            <div style={{ fontSize: "14px", color: "#A9B4C2", marginBottom: "18px" }}>
+              {property.neighbourhood ? `${property.neighbourhood}, ` : ""}{property.city}
+            </div>
+            <div style={{ display: "flex", gap: "20px", marginBottom: "28px" }}>
+              {[
+                { v: property.bedrooms, l: isCommercial ? "Rooms" : "Beds" },
+                { v: property.bathrooms, l: isCommercial ? "Wash" : "Bath" },
+                { v: property.area_sqft ? property.area_sqft.toLocaleString("en-IN") : null, l: "sqft" },
+              ].map(s => s.v != null && (
+                <div key={s.l} style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
+                  <span style={{ fontSize: "16px", fontWeight: 600, color: "#FFFFFF" }}>{s.v}</span>
+                  <span style={{ fontSize: "10px", color: "rgba(255,255,255,0.5)", textTransform: "uppercase", letterSpacing: "0.06em" }}>{s.l}</span>
+                </div>
+              ))}
+            </div>
+
+            {/* Single frosted card — lock icon, CTA, and "back to browse" all live
+                inside it so nothing floats loose against the blurred scrim. */}
+            <div className="pd-lock-card" style={{ width: "100%", background: "rgba(255,255,255,0.05)", backdropFilter: "blur(28px)", WebkitBackdropFilter: "blur(28px)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: "24px", padding: "36px 32px", boxShadow: "0 20px 60px rgba(0,0,0,0.4), 0 0 0 1px rgba(16,196,195,0.06)" }}>
+              <div style={{ width: "48px", height: "48px", borderRadius: "50%", background: "rgba(16,196,195,0.12)", border: "1px solid rgba(16,196,195,0.3)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 18px" }}>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10C4C3" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>
+              </div>
+              <div style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "22px", fontWeight: 600, color: "#FFFFFF", marginBottom: "8px" }}>
+                Sign In to View Full Details
+              </div>
+              <p style={{ fontSize: "13px", color: "#A9B4C2", lineHeight: 1.6, marginBottom: "24px" }}>
+                Create a free account to see photos, exact location, amenities, and contact the seller.
+              </p>
+              <button
+                onClick={onSignIn}
+                className="pd-lock-btn"
+                style={{ width: "100%", padding: "13px", background: "#10C4C3", border: "none", borderRadius: "16px", boxShadow: "0 10px 30px rgba(30,167,255,.35)", color: "#020C1C", fontSize: "13px", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", cursor: "pointer", fontFamily: "'Cal Sans', sans-serif" }}
+              >
+                Sign In to View Full Details
+              </button>
+              <div style={{ marginTop: "20px", paddingTop: "18px", borderTop: "1px solid rgba(255,255,255,0.08)" }}>
+                <a href="/properties" style={{ fontSize: "12.5px", color: "#A9B4C2", textDecoration: "none" }}>← Back to Browse</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </>
+  );
+}
+
 // ── Main component ────────────────────────────────────────────
 export default function PropertyDetailClient() {
   const params = useParams();
@@ -409,7 +502,7 @@ export default function PropertyDetailClient() {
   const [videoPlaying, setVideoPlaying] = useState(false);
 
   // Feature 2 — schedule visit modal
-  const { user, profile, openAuthModal } = useAuth();
+  const { user, profile, loading: authLoading, openAuthModal } = useAuth();
   const [visitOpen, setVisitOpen] = useState(false);
   const [visitDate, setVisitDate] = useState("");
   const [visitSlot, setVisitSlot] = useState<"morning" | "afternoon" | "evening">("morning");
@@ -702,7 +795,9 @@ export default function PropertyDetailClient() {
   const waRaw = (property?.seller_whatsapp || property?.seller_phone || "").replace(/\D/g, "");
   const waNumber = waRaw ? (waRaw.length === 10 ? `91${waRaw}` : waRaw) : "";
 
-  if (loading) return (
+  // Wait for auth to resolve too (when the gate is on) so we don't flash full
+  // content before locking it — the property spinner covers both.
+  if (loading || (REQUIRE_SIGNIN_FOR_PROPERTY_VIEW && authLoading)) return (
     <>
       <div style={{ minHeight: "100vh", background: "#020C1C", display: "flex", alignItems: "center", justifyContent: "center" }}>
         <div style={{ textAlign: "center" }}>
@@ -724,6 +819,16 @@ export default function PropertyDetailClient() {
   );
 
   if (!property) return null;
+
+  if (REQUIRE_SIGNIN_FOR_PROPERTY_VIEW && !user) {
+    return (
+      <LockedPropertyPreview
+        property={property}
+        heroImage={images[0]}
+        onSignIn={() => openAuthModal("signin")}
+      />
+    );
+  }
 
   return (
     <>

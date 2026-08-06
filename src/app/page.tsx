@@ -5,6 +5,7 @@ import { motion, useScroll, useTransform } from "framer-motion";
 import Reveal from "@/components/ui/Reveal";
 import { createClient } from "@/lib/supabase/client";
 import { useSavedProperties } from "@/hooks/useSavedProperties";
+import ResultsGate from "@/components/property/ResultsGate";
 
 /* ─── Palette ─────────────────────────────────────────────── */
 const G = {
@@ -124,6 +125,16 @@ function mapSeedToHomeProperty(row: Record<string, unknown>): HomeProperty {
     tag: row.is_featured ? "Featured" : row.listing_type === "rent" ? "For Rent" : "For Sale",
   };
 }
+
+// "Discover Properties Across India" category tiles — matchTypes maps each tile to the
+// `type` values stored on HomeProperty (mirrors property_category / type in the DB), used
+// to compute a real per-city count instead of a hardcoded number, and to build the
+// /search?type= link.
+const CATEGORY_TILES: { type: string; matchTypes: string[]; grad: string; img: string; d: string }[] = [
+  { type: "Apartments",   matchTypes: ["apartment"],      grad: "linear-gradient(135deg, rgba(16,196,195,0.6) 0%, rgba(11,13,16,0.8) 100%)", img: "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=800&q=60&fm=avif", d: "M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-2 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" },
+  { type: "Villas",       matchTypes: ["villa"],          grad: "linear-gradient(135deg, rgba(61,190,245,0.5) 0%, rgba(11,13,16,0.8) 100%)", img: "https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=800&q=60&fm=avif", d: "M3 12l9-9 9 9M5 10v10h5v-6h4v6h5V10" },
+  { type: "Plots & Land", matchTypes: ["plot", "land"],   grad: "linear-gradient(135deg, rgba(16,196,195,0.4) 0%, rgba(11,13,16,0.8) 100%)", img: "https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=800&q=60&fm=avif", d: "M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z" },
+];
 
 type Testimonial = { id: string; name: string; role: string; rating: number; text: string; date: string };
 
@@ -1028,6 +1039,7 @@ export default function HomePage() {
               No properties available yet{propCity !== "All" ? ` in ${propCity}` : ""}. Check back soon.
             </div>
           ) : (
+          <ResultsGate>
           <div ref={carouselRef} className="hide-scroll featured-carousel" style={{display:"flex", gap:16, overflowX:"auto", paddingBottom:8, paddingRight:56, scrollSnapType:"x mandatory", WebkitOverflowScrolling:"touch", maxWidth:"100vw", boxSizing:"border-box"}}>
             {filteredProps.map((p,i)=>(
               <Reveal key={p.id} delay={i*0.06} style={{flexShrink:0}}>
@@ -1068,6 +1080,7 @@ export default function HomePage() {
               </Reveal>
             ))}
           </div>
+          </ResultsGate>
           )}
         </div>
       </section>
@@ -1092,27 +1105,28 @@ export default function HomePage() {
           </Reveal>
 
           <div className="discover-grid" style={{display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:16}}>
-            {[
-              {type:"Apartments", count:142, grad:"linear-gradient(135deg, rgba(16,196,195,0.6) 0%, rgba(11,13,16,0.8) 100%)", img:"https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=800&q=60&fm=avif", d:"M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-2 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"},
-              {type:"Villas", count:48, grad:"linear-gradient(135deg, rgba(61,190,245,0.5) 0%, rgba(11,13,16,0.8) 100%)", img:"https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=800&q=60&fm=avif", d:"M3 12l9-9 9 9M5 10v10h5v-6h4v6h5V10"},
-              {type:"Plots & Land", count:76, grad:"linear-gradient(135deg, rgba(16,196,195,0.4) 0%, rgba(11,13,16,0.8) 100%)", img:"https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=800&q=60&fm=avif", d:"M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"},
-            ].map((cat,i)=>(
+            {CATEGORY_TILES.map((cat,i)=>{
+              // Real count from the same `properties` dataset backing the carousel above —
+              // no hardcoded number. See CATEGORY_TILES for the matchTypes → DB `type` mapping.
+              const count = properties.filter(p => p.city === catCity && cat.matchTypes.includes((p.type || "").toLowerCase())).length;
+              return (
               <Reveal key={cat.type} delay={i*0.08}>
-              <a href={`/search?city=${catCity.toLowerCase().replace(" ","-")}&type=${cat.type.toLowerCase().split(" ")[0]}`}
+              <a href={`/search?city=${catCity.toLowerCase().replace(" ","-")}&type=${cat.matchTypes[0]}`}
                 className="cat-card"
                 style={{width:"100%"}}>
                 <div className="cat-img" style={{backgroundImage:`url(${cat.img})`}} />
                 <div style={{position:"absolute", inset:0, background:"linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.20) 60%, transparent 100%)"}} />
                 <div style={{position:"absolute", inset:0, background:cat.grad, opacity:0.3}} />
                 <div style={{position:"relative", zIndex:2, padding:"0 28px 28px"}}>
-                  <span style={{display:"inline-block", background:"rgba(16,196,195,0.15)", border:"1px solid rgba(16,196,195,0.30)", color:G.goldLt, borderRadius:8, padding:"4px 12px", fontSize:11, fontWeight:600, marginBottom:8}}>{cat.count} properties</span>
+                  <span style={{display:"inline-block", background:"rgba(16,196,195,0.15)", border:"1px solid rgba(16,196,195,0.30)", color:G.goldLt, borderRadius:8, padding:"4px 12px", fontSize:11, fontWeight:600, marginBottom:8}}>{count > 0 ? `${count} properties` : "Explore listings"}</span>
                   <h3 style={{fontFamily:"'Cal Sans',Georgia,serif", fontSize:32, fontWeight:700, color:"#fff", marginBottom:6}}>{cat.type}</h3>
                   <p style={{fontSize:12, color:"rgba(255,255,255,0.6)", marginBottom:0}}>for Sale in {catCity}</p>
                   <div style={{color:G.gold, fontSize:13, marginTop:8, opacity:0.8}}>→</div>
                 </div>
               </a>
               </Reveal>
-            ))}
+              );
+            })}
           </div>
         </div>
       </section>
@@ -1307,7 +1321,7 @@ export default function HomePage() {
             Ready to Find Your<br /><em style={{fontStyle:"italic", color:G.goldLt}}>Perfect Property?</em>
           </h2>
           <p style={{fontSize:15, color:"rgba(255,255,255,0.65)", marginBottom:32, lineHeight:1.7}}>
-            Join 50,000+ buyers and investors who found their dream property through Nilay 360.
+            Join buyers and investors who found their dream property through Nilay 360.
           </p>
           <div className="cta-buttons" style={{display:"flex", gap:14, justifyContent:"center", flexWrap:"wrap"}}>
             <a href="/search" style={{padding:"14px 32px", background:G.gold, borderRadius:10, color:"#000", fontSize:15, fontWeight:700, transition:"background 0.15s, box-shadow 0.15s", boxShadow:"0 10px 30px rgba(16,196,195,0.35)"}}
