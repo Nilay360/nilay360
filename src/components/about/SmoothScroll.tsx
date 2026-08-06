@@ -14,7 +14,10 @@ export default function SmoothScroll() {
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (reduce) return;
 
-    const lenis = new Lenis({ duration: 1.15, smoothWheel: true });
+    // `anchors: true` — this page's in-page CTAs are anchor links (e.g. the
+    // hero's "Explore Our Story" → #ch02). Without it Lenis ignores them and
+    // the browser does a hard native jump that fights Lenis's own scroll state.
+    const lenis = new Lenis({ duration: 1.15, smoothWheel: true, anchors: true });
     lenis.on("scroll", ScrollTrigger.update);
 
     const tick = (time: number) => lenis.raf(time * 1000);

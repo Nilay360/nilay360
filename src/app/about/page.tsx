@@ -4,6 +4,10 @@ import { AmbientBackground } from "@/components/about/shared";
 import Hero from "@/components/about/Hero";
 import TheQuestion from "@/components/about/TheQuestion";
 import Origin from "@/components/about/Origin";
+import NivilaGroup from "@/components/about/NivilaGroup";
+import Philosophy from "@/components/about/Philosophy";
+import WhyNilay360 from "@/components/about/WhyNilay360";
+import WhatWeBuild from "@/components/about/WhatWeBuild";
 
 // IMPORTANT: the Philosophy section (checkpoint 2) pins via `position:
 // sticky`. Any ancestor here that sets `overflow` (or `overflow-x`) to
@@ -32,6 +36,10 @@ export default function AboutPage() {
           <Hero />
           <TheQuestion />
           <Origin />
+          <NivilaGroup />
+          <Philosophy />
+          <WhyNilay360 />
+          <WhatWeBuild />
         </main>
       </div>
     </>
