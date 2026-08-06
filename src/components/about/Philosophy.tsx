@@ -4,8 +4,6 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { TEAL } from "./shared";
 
-gsap.registerPlugin(ScrollTrigger);
-
 // The signature moment: "VIEW FIRST." opens out and recedes into blur while
 // "HOME NEXT." arrives from depth to replace it, scrubbed to scroll position.
 //
@@ -26,6 +24,11 @@ export default function Philosophy() {
   const glowRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    // See SmoothScroll.tsx — registering at module scope causes a hydration
+    // mismatch, because ScrollTrigger touches root element styles before
+    // React hydrates.
+    gsap.registerPlugin(ScrollTrigger);
+
     const section = sectionRef.current;
     const words = wordsRef.current;
     const a = aRef.current;

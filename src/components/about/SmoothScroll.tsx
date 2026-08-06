@@ -4,13 +4,17 @@ import Lenis from "lenis";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
-gsap.registerPlugin(ScrollTrigger);
-
 // Mounts Lenis smooth scroll and syncs it with GSAP's ticker/ScrollTrigger.
 // Skipped entirely under prefers-reduced-motion — native scroll is the
 // reduced-motion fallback for the whole page, not just individual animations.
 export default function SmoothScroll() {
   useEffect(() => {
+    // Registered here rather than at module scope: at module scope this runs
+    // during hydration and ScrollTrigger touches documentElement/body styles
+    // before React has hydrated, which produces a body style-attribute
+    // hydration mismatch.
+    gsap.registerPlugin(ScrollTrigger);
+
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (reduce) return;
 
