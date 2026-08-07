@@ -52,11 +52,6 @@ export default function Closing() {
           <a href="/contact" style={{ display: "inline-flex", alignItems: "center", gap: "12px", padding: "17px 34px", border: "1px solid rgba(255,255,255,0.18)", borderRadius: "999px", background: "rgba(255,255,255,0.03)", backdropFilter: "blur(14px)", fontFamily: "'Cal Sans', sans-serif", fontSize: "11px", fontWeight: 600, letterSpacing: "0.22em", textTransform: "uppercase", color: "#FFFFFF", textDecoration: "none" }}>Contact Us</a>
         </div>
       </Reveal>
-
-      <footer style={{ position: "relative", display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "center", gap: "16px", marginTop: "clamp(56px, 8vh, 96px)", paddingTop: "30px", borderTop: "1px solid rgba(255,255,255,0.06)", width: "100%" }}>
-        <span style={{ fontFamily: "'Cal Sans', sans-serif", fontSize: "9px", letterSpacing: "0.22em", textTransform: "uppercase", color: "rgba(255,255,255,0.26)" }}>© 2026 NIVILA Group</span>
-        <span style={{ fontFamily: "'Cal Sans', sans-serif", fontSize: "9px", letterSpacing: "0.22em", textTransform: "uppercase", color: "rgba(255,255,255,0.26)" }}>Hyderabad, India</span>
-      </footer>
     </section>
   );
 }
