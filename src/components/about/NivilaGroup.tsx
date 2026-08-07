@@ -32,7 +32,7 @@ export default function NivilaGroup() {
           <Reveal delay={0.36} y={26}>
             <GlassCard lift style={{ height: "100%", padding: "clamp(28px, 3vw, 44px)", border: "1px solid rgba(16,196,195,0.2)", background: "linear-gradient(155deg, rgba(16,196,195,0.1), rgba(255,255,255,0.012))" }}>
               <span style={{ fontFamily: "'Cal Sans', sans-serif", fontSize: "11px", fontWeight: 600, letterSpacing: "0.26em", textTransform: "uppercase", color: "rgba(255,255,255,0.5)" }}>Flagship Venture</span>
-              <img src="/nilay_logo_final.png" alt="Nilay360" style={{ margin: "26px 0 0", height: "clamp(34px, 3.4vw, 46px)", width: "auto", display: "block" }} />
+              <img src="/brand/nilay360_logo_v2_transparent_trimmed.png" alt="Nilay360" style={{ margin: "26px 0 0", height: "clamp(38px, 3.8vw, 50px)", width: "auto", display: "block" }} />
               <p style={{ margin: "22px 0 0", fontSize: "clamp(14px, 1.05vw, 16px)", lineHeight: 1.85, color: "rgba(255,255,255,0.52)" }}>Our first product. A next-generation PropTech platform — with further ventures to follow across the NIVILA ecosystem.</p>
             </GlassCard>
           </Reveal>
