@@ -1108,10 +1108,12 @@ function UserDetailModal({ user, onClose, onSave, onSubscriptionTierChange }: {
 }
 
 function UsersSection({
-  users, loading, onRoleChange, onUpdateUser, onSubscriptionTierChange,
+  users, loading, activeUsers, activeUsersLoading, onRoleChange, onUpdateUser, onSubscriptionTierChange,
 }: {
   users: UserRow[];
   loading: boolean;
+  activeUsers: number | null;
+  activeUsersLoading: boolean;
   onRoleChange: (userId: string, newRole: string) => void;
   onUpdateUser: (userId: string, changes: Partial<UserRow>) => Promise<void>;
   onSubscriptionTierChange: (userId: string, newTier: string) => void;
@@ -1141,6 +1143,15 @@ function UsersSection({
     return sorted;
   }, [users, search, roleFilter, sort]);
 
+  const roleCounts = React.useMemo(() => {
+    const counts: Record<string, number> = {};
+    for (const u of users) {
+      const r = u.role ?? "buyer";
+      counts[r] = (counts[r] ?? 0) + 1;
+    }
+    return counts;
+  }, [users]);
+
   if (loading) return <Spinner />;
 
   const filtersActive = search.trim() !== "" || roleFilter !== "all";
@@ -1148,6 +1159,23 @@ function UsersSection({
   return (
     <div>
       <SectionHeading title="All Users" subtitle="Manage user roles across the platform." count={users.length} />
+
+      {/* Summary stats */}
+      <div style={{ display: "flex", gap: "16px", flexWrap: "wrap", marginBottom: "22px" }}>
+        <StatCard
+          label="Total Users"
+          value={users.length}
+          accent="blue"
+          icon={<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>}
+        />
+        <StatCard
+          label="Active Users"
+          value={activeUsersLoading ? "…" : activeUsers ?? "—"}
+          accent="green"
+          note="Signed in within 30 days"
+          icon={<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>}
+        />
+      </div>
 
       {/* Controls */}
       <div style={{ display: "flex", flexDirection: "column", gap: "12px", marginBottom: "18px" }}>
@@ -1178,13 +1206,14 @@ function UsersSection({
         <div style={{ display: "flex", gap: "6px", flexWrap: "wrap" }}>
           {["all", ...ROLE_FILTER_OPTIONS].map(r => {
             const on = roleFilter === r;
+            const count = r === "all" ? users.length : (roleCounts[r] ?? 0);
             return (
               <button
                 key={r}
                 onClick={() => setRoleFilter(r)}
                 style={{ padding: "5px 12px", borderRadius: "100px", fontSize: "11px", fontWeight: on ? 700 : 500, letterSpacing: "0.03em", background: on ? "#10C4C3" : "rgba(255,255,255,0.06)", color: on ? "#020C1C" : "#A9B4C2", border: on ? "1.5px solid #10C4C3" : "1.5px solid rgba(255,255,255,0.12)", cursor: "pointer", fontFamily: "'Cal Sans', sans-serif", textTransform: "capitalize" as const, transition: "all 0.14s" }}
               >
-                {r === "all" ? "All" : r.replace(/_/g, " ")}
+                {r === "all" ? "All" : r.replace(/_/g, " ")} ({count})
               </button>
             );
           })}
@@ -1264,6 +1293,9 @@ function UsersSection({
 
 // ── Section: All Inquiries ─────────────────────────────────────────────────────
 
+const INQUIRY_STATUS_FILTERS = ["all", "new", "contacted", "closed", "spam"] as const;
+type InquiryStatusFilter = typeof INQUIRY_STATUS_FILTERS[number];
+
 function InquiriesSection({
   inquiries, loading, inFlight, onDelete, onMarkSpam,
 }: {
@@ -1273,17 +1305,42 @@ function InquiriesSection({
   onDelete: (id: string) => void;
   onMarkSpam: (id: string) => void;
 }) {
+  const [statusFilter, setStatusFilter] = useState<InquiryStatusFilter>("all");
+
+  const filtered = React.useMemo(() => {
+    if (statusFilter === "all") return inquiries;
+    return inquiries.filter(inq => (inq.status ?? "new") === statusFilter);
+  }, [inquiries, statusFilter]);
+
   if (loading) return <Spinner />;
   return (
     <div>
       <SectionHeading title="All Inquiries" subtitle="Platform-wide buyer inquiries." count={inquiries.length} />
-      {inquiries.length === 0 ? (
+
+      {/* Status filter pills */}
+      <div style={{ display: "flex", gap: "6px", flexWrap: "wrap", marginBottom: "18px" }}>
+        {INQUIRY_STATUS_FILTERS.map(f => {
+          const on = statusFilter === f;
+          const count = f === "all" ? inquiries.length : inquiries.filter(inq => (inq.status ?? "new") === f).length;
+          return (
+            <button
+              key={f}
+              onClick={() => setStatusFilter(f)}
+              style={{ padding: "5px 12px", borderRadius: "100px", fontSize: "11px", fontWeight: on ? 700 : 500, letterSpacing: "0.03em", background: on ? "#10C4C3" : "rgba(255,255,255,0.06)", color: on ? "#020C1C" : "#A9B4C2", border: on ? "1.5px solid #10C4C3" : "1.5px solid rgba(255,255,255,0.12)", cursor: "pointer", fontFamily: "'Cal Sans', sans-serif", textTransform: "capitalize" as const, transition: "all 0.14s" }}
+            >
+              {f === "all" ? "All" : f} ({count})
+            </button>
+          );
+        })}
+      </div>
+
+      {filtered.length === 0 ? (
         <div style={{ padding: "60px 24px", textAlign: "center", background: "rgba(255,255,255,0.05)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", borderRadius: "18px", border: "1px solid rgba(255,255,255,0.08)" }}>
-          <p style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "20px", color: "#FFFFFF" }}>No inquiries yet</p>
+          <p style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "20px", color: "#FFFFFF" }}>No {statusFilter === "all" ? "inquiries" : `${statusFilter} inquiries`} yet</p>
         </div>
       ) : (
         <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-          {inquiries.map(inq => {
+          {filtered.map(inq => {
             const isSpam = inq.status === "spam";
             const busy = inFlight === inq.id;
             return (
@@ -2020,6 +2077,8 @@ export default function AdminPage() {
   const [approvedLoading, setApprovedLoading] = useState(false);
   const [rejectedLoading, setRejectedLoading] = useState(false);
   const [usersLoading,    setUsersLoading]    = useState(false);
+  const [activeUsers,        setActiveUsers]        = useState<number | null>(null);
+  const [activeUsersLoading, setActiveUsersLoading] = useState(false);
   const [inquiriesLoading, setInquiriesLoading] = useState(false);
   const [agentAppsLoading, setAgentAppsLoading] = useState(false);
   const [auditLoading,     setAuditLoading]     = useState(false);
@@ -2156,6 +2215,14 @@ export default function AdminPage() {
           setUsers((res.data as UserRow[] | null) ?? []);
           setUsersLoading(false);
         });
+      setActiveUsersLoading(true);
+      fetch("/api/admin/user-activity")
+        .then(res => res.ok ? res.json() : null)
+        .then((data: { activeUserCount: number } | null) => {
+          setActiveUsers(data?.activeUserCount ?? null);
+          setActiveUsersLoading(false);
+        })
+        .catch(() => setActiveUsersLoading(false));
     } else if (active === "inquiries") {
       setInquiriesLoading(true);
       supabase
@@ -2708,6 +2775,8 @@ export default function AdminPage() {
       <UsersSection
         users={users}
         loading={usersLoading}
+        activeUsers={activeUsers}
+        activeUsersLoading={activeUsersLoading}
         onRoleChange={(uid, role) => void handleUserRole(uid, role)}
         onUpdateUser={handleUserUpdate}
         onSubscriptionTierChange={(uid, tier) => void handleSubscriptionTier(uid, tier)}
@@ -2815,10 +2884,12 @@ export default function AdminPage() {
             <nav style={{ flex: 1, padding: "12px 10px" }}>
               {NAV.map(item => {
                 const badge =
-                  item.id === "pending"  ? stats.pending     :
-                  item.id === "approved" ? stats.active      :
-                  item.id === "rejected" ? stats.rejected    :
-                  item.id === "reports"  ? stats.reportsOpen : 0;
+                  item.id === "pending"   ? stats.pending     :
+                  item.id === "approved"  ? stats.active      :
+                  item.id === "rejected"  ? stats.rejected    :
+                  item.id === "users"     ? stats.users       :
+                  item.id === "inquiries" ? stats.inquiries   :
+                  item.id === "reports"   ? stats.reportsOpen : 0;
                 return (
                   <button
                     key={item.id}
