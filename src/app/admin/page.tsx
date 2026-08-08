@@ -155,6 +155,21 @@ function fmtDateTime(iso: string): string {
   });
 }
 
+// Presence thresholds — approximated from last_sign_in_at, not live presence.
+const PRESENCE_ONLINE_MS = 15 * 60 * 1000;       // green: signed in within 15 min
+const PRESENCE_TODAY_MS  = 24 * 60 * 60 * 1000;  // orange: signed in within 24 hours
+
+function fmtRelativeTime(iso: string, now: number): string {
+  const diffMs = now - new Date(iso).getTime();
+  const mins = Math.floor(diffMs / 60000);
+  if (mins < 1) return "just now";
+  if (mins < 60) return `${mins} minute${mins === 1 ? "" : "s"} ago`;
+  const hours = Math.floor(mins / 60);
+  if (hours < 24) return `${hours} hour${hours === 1 ? "" : "s"} ago`;
+  const days = Math.floor(hours / 24);
+  return `${days} day${days === 1 ? "" : "s"} ago`;
+}
+
 // ── Icons ──────────────────────────────────────────────────────────────────────
 
 function Spinner({ size = 28, pad = 80 }: { size?: number; pad?: number }) {
@@ -207,6 +222,31 @@ function RoleBadge({ role }: { role: string | null }) {
     <span style={{ display: "inline-block", padding: "2px 8px", borderRadius: "100px", fontSize: "9px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" as const, background: isAdmin ? "rgba(16,196,195,0.15)" : "rgba(255,255,255,0.06)", color: isAdmin ? "#10C4C3" : "#A9B4C2", border: `1px solid ${isAdmin ? "rgba(16,196,195,0.3)" : "rgba(255,255,255,0.1)"}` }}>
       {role ?? "user"}
     </span>
+  );
+}
+
+function PresenceDot({ lastSignIn, now }: { lastSignIn: string | null | undefined; now: number }) {
+  let color = "#6B7280"; // gray
+  let title = "Never signed in";
+  if (lastSignIn) {
+    const diffMs = now - new Date(lastSignIn).getTime();
+    const relative = fmtRelativeTime(lastSignIn, now);
+    if (diffMs <= PRESENCE_ONLINE_MS) {
+      color = "#34D399"; // green
+      title = `Online now (active ${relative})`;
+    } else if (diffMs <= PRESENCE_TODAY_MS) {
+      color = "#F59E0B"; // orange
+      title = `Active ${relative}`;
+    } else {
+      title = `Last active ${relative}`;
+    }
+  }
+  return (
+    <span
+      title={title}
+      aria-label={title}
+      style={{ display: "inline-block", width: "9px", height: "9px", borderRadius: "50%", background: color, border: "1.5px solid rgba(2,12,28,0.8)", boxShadow: `0 0 0 1px ${color}55`, flexShrink: 0 }}
+    />
   );
 }
 
@@ -1108,12 +1148,13 @@ function UserDetailModal({ user, onClose, onSave, onSubscriptionTierChange }: {
 }
 
 function UsersSection({
-  users, loading, activeUsers, activeUsersLoading, onRoleChange, onUpdateUser, onSubscriptionTierChange,
+  users, loading, activeUsers, activeUsersLoading, lastSignIns, onRoleChange, onUpdateUser, onSubscriptionTierChange,
 }: {
   users: UserRow[];
   loading: boolean;
   activeUsers: number | null;
   activeUsersLoading: boolean;
+  lastSignIns: Record<string, string | null>;
   onRoleChange: (userId: string, newRole: string) => void;
   onUpdateUser: (userId: string, changes: Partial<UserRow>) => Promise<void>;
   onSubscriptionTierChange: (userId: string, newTier: string) => void;
@@ -1122,6 +1163,7 @@ function UsersSection({
   const [roleFilter, setRoleFilter] = useState<string>("all");
   const [sort,       setSort]       = useState<UserSort>("newest");
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [now] = useState(() => Date.now());
   const selected = users.find(u => u.id === selectedId) ?? null;
 
   const filtered = React.useMemo(() => {
@@ -1246,8 +1288,13 @@ function UsersSection({
               style={{ background: "rgba(255,255,255,0.05)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", borderRadius: "12px", border: "1px solid rgba(255,255,255,0.08)", padding: "16px 20px", display: "flex", alignItems: "center", gap: "16px", flexWrap: "wrap", cursor: "pointer" }}
             >
               {/* Avatar */}
-              <div style={{ width: "40px", height: "40px", borderRadius: "50%", background: "rgba(16,196,195,0.12)", border: "1.5px solid rgba(16,196,195,0.25)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, fontSize: "14px", fontWeight: 700, color: "#10C4C3", fontFamily: "'Cal Sans', sans-serif" }}>
-                {(u.full_name ?? "?").slice(0, 1).toUpperCase()}
+              <div style={{ position: "relative", flexShrink: 0 }}>
+                <div style={{ width: "40px", height: "40px", borderRadius: "50%", background: "rgba(16,196,195,0.12)", border: "1.5px solid rgba(16,196,195,0.25)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "14px", fontWeight: 700, color: "#10C4C3", fontFamily: "'Cal Sans', sans-serif" }}>
+                  {(u.full_name ?? "?").slice(0, 1).toUpperCase()}
+                </div>
+                <div style={{ position: "absolute", right: "-2px", bottom: "-2px" }}>
+                  <PresenceDot lastSignIn={lastSignIns[u.id]} now={now} />
+                </div>
               </div>
               {/* Info */}
               <div style={{ flex: 1, minWidth: 0 }}>
@@ -2079,6 +2126,7 @@ export default function AdminPage() {
   const [usersLoading,    setUsersLoading]    = useState(false);
   const [activeUsers,        setActiveUsers]        = useState<number | null>(null);
   const [activeUsersLoading, setActiveUsersLoading] = useState(false);
+  const [lastSignIns,        setLastSignIns]        = useState<Record<string, string | null>>({});
   const [inquiriesLoading, setInquiriesLoading] = useState(false);
   const [agentAppsLoading, setAgentAppsLoading] = useState(false);
   const [auditLoading,     setAuditLoading]     = useState(false);
@@ -2218,8 +2266,9 @@ export default function AdminPage() {
       setActiveUsersLoading(true);
       fetch("/api/admin/user-activity")
         .then(res => res.ok ? res.json() : null)
-        .then((data: { activeUserCount: number } | null) => {
+        .then((data: { activeUserCount: number; lastSignIns: Record<string, string | null> } | null) => {
           setActiveUsers(data?.activeUserCount ?? null);
+          setLastSignIns(data?.lastSignIns ?? {});
           setActiveUsersLoading(false);
         })
         .catch(() => setActiveUsersLoading(false));
@@ -2777,6 +2826,7 @@ export default function AdminPage() {
         loading={usersLoading}
         activeUsers={activeUsers}
         activeUsersLoading={activeUsersLoading}
+        lastSignIns={lastSignIns}
         onRoleChange={(uid, role) => void handleUserRole(uid, role)}
         onUpdateUser={handleUserUpdate}
         onSubscriptionTierChange={(uid, tier) => void handleSubscriptionTier(uid, tier)}
