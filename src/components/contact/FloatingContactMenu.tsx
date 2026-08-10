@@ -1,9 +1,13 @@
 ﻿"use client";
 
 import { useState, useRef, useEffect } from "react";
+import { usePathname } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import Link from "next/link";
 import { useCompare } from "@/context/CompareContext";
+
+const GENERIC_WHATSAPP_TEXT = "Hi, I'm interested in a property on Nilay 360";
+const GENERIC_WHATSAPP_HREF = `https://wa.me/917075792497?text=${encodeURIComponent(GENERIC_WHATSAPP_TEXT)}`;
 
 function IconPhone() {
   return (
@@ -88,7 +92,7 @@ const MENU_ITEMS = [
     label: "WhatsApp",
     icon: <IconWhatsApp />,
     color: "#25D366",
-    href: "https://wa.me/917075792497?text=Hi%2C%20I%27m%20interested%20in%20a%20property%20on%20Nilay%20360",
+    href: GENERIC_WHATSAPP_HREF,
     external: true,
   },
   {
@@ -115,9 +119,25 @@ export default function FloatingContactMenu() {
   const [callbackDone, setCallbackDone] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const { count: compareCount } = useCompare();
+  const pathname = usePathname();
+  const isPropertyPage = pathname?.startsWith("/property/") ?? false;
 
   // Lift the FAB above CompareBar when it's visible (CompareBar is ~64px at bottom:0)
   const bottomOffset = compareCount > 0 ? 88 : 24;
+
+  // On a property page, swap the generic WhatsApp message for one carrying the
+  // actual listing title + link — read after mount since document.title/location
+  // aren't available during SSR. Falls back to the generic message otherwise.
+  const [whatsappHref, setWhatsappHref] = useState(GENERIC_WHATSAPP_HREF);
+  useEffect(() => {
+    if (!isPropertyPage) {
+      setWhatsappHref(GENERIC_WHATSAPP_HREF);
+      return;
+    }
+    const propertyTitle = document.title.split(" | ")[0] || document.title;
+    const message = `Hi, I'm interested in this property on Nilay360: ${propertyTitle} - ${window.location.href}`;
+    setWhatsappHref(`https://wa.me/917075792497?text=${encodeURIComponent(message)}`);
+  }, [isPropertyPage, pathname]);
 
   useEffect(() => {
     if (!open) return;
@@ -300,7 +320,7 @@ export default function FloatingContactMenu() {
                       </button>
                     ) : "external" in item && item.external ? (
                       <a
-                        href={item.href}
+                        href={item.id === "whatsapp" ? whatsappHref : (item as { href: string }).href}
                         className="fcm-pill"
                         target="_blank"
                         rel="noopener noreferrer"
