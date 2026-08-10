@@ -31,8 +31,11 @@ export async function POST(req: NextRequest) {
     inquiryType?: string;
   };
 
-  // Seed properties have no seller email — skip silently
-  if (!sellerEmail) {
+  const adminEmail = process.env.ADMIN_EMAIL || "admin@nilay360.com";
+
+  // Seed properties have no seller email — admin should still be notified,
+  // just with no seller to CC.
+  if (!sellerEmail && !adminEmail) {
     return NextResponse.json({ skipped: true });
   }
 
@@ -109,7 +112,9 @@ export async function POST(req: NextRequest) {
         <tr>
           <td style="background:#020C1C;padding:20px 40px;border-top:1px solid #E8E3D9;">
             <p style="margin:0;font-size:12px;color:#9CA3AF;text-align:center;">
-              This email was sent to ${escHtml(sellerName ?? sellerEmail)} because you have an active listing on Nilay 360.<br>
+              ${sellerEmail
+                ? `This email was sent to ${escHtml(sellerName ?? sellerEmail)} because you have an active listing on Nilay 360.<br>`
+                : `This listing has no seller email on file — sent to the Nilay 360 admin team only.<br>`}
               © Nilay 360 Premium Real Estate
             </p>
           </td>
@@ -122,10 +127,18 @@ export async function POST(req: NextRequest) {
 </html>
 `;
 
+  // BCC the admin on every seller notification, and send admin-only when the
+  // listing has no seller_email — never silently drop the notification.
+  // Skip the BCC when it would just duplicate the "to" address (e.g. testing
+  // on a listing where the admin is also the seller of record).
+  const to = sellerEmail || adminEmail;
+  const bcc = sellerEmail && adminEmail.toLowerCase() !== sellerEmail.toLowerCase() ? adminEmail : undefined;
+
   try {
     await resend.emails.send({
       from: "Nilay 360 <contact@nilay360.com>",
-      to: sellerEmail,
+      to,
+      ...(bcc ? { bcc } : {}),
       subject,
       html,
     });
