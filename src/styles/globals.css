@@ -1,4 +1,4 @@
-@import url('https://cdn.jsdelivr.net/npm/cal-sans@1.0.1/index.css');
+@import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap");
 @import "tailwindcss";
 
 /* ── Nilay 360 Design System (navy/teal, v2) ─────────────────────── */
@@ -8,43 +8,57 @@
   --brand-white:   #FFFFFF;
 
   /* Backgrounds — never flat */
-  --bg-base:     #020C1C;
-  --bg-elevated: #0A1526;
-  --bg-surface:  #111F33;
-  --bg-card:     #182B3F;
+  /* Backgrounds — never flat */
+  --bg-base: #000000;
+  --bg-elevated: #0b0d10;
+  --bg-surface: #121519;
+  --bg-card: #161a1f;
 
   /* Text */
-  --text-primary:   #FFFFFF;
-  --text-secondary: #A9B4C2;
-  --text-muted:     #6B7686;
+  --text-primary: #ffffff;
+  --text-secondary: #aeb4bc;
+  --text-muted: #6b7280;
 
-  /* Teal — primary accent */
-  --blue:        #10C4C3;
-  --blue-bright: #3DDAD9;
-  --blue-deep:   #0B9C9B;
-  --blue-glow:   rgba(16, 196, 195, 0.25);
-  --accent:       #10C4C3;
-  --accent-hover: #3DDAD9;
-  --accent-deep:  #0B9C9B;
-  --accent-glow:  rgba(16, 196, 195, 0.25);
+  /* Electric Blue — primary accent */
+  --blue: #2ba8e0;
+  --blue-bright: #3dbef5;
+  --blue-deep: #1577b8;
+  --blue-glow: rgba(43, 168, 224, 0.25);
+
+  /* Legacy teal — still used by the brand mark & older pages (e.g. /properties) */
+  --accent: #10c4c3;
+  --accent-hover: #3ddad9;
+  --accent-deep: #0b9c9b;
+  --accent-glow: rgba(16, 196, 195, 0.25);
+
+  /* Silver metallic */
+  --silver-light: #e8eaed;
+  --silver-mid: #a8aeb5;
+  --silver-dark: #6e747c;
+  --silver-gradient: linear-gradient(
+    135deg,
+    #e8eaed 0%,
+    #a8aeb5 40%,
+    #6e747c 100%
+  );
 
   /* Borders */
-  --border:        rgba(255, 255, 255, 0.08);
-  --border-blue:   rgba(16, 196, 195, 0.30);
-  --border-hover:  rgba(255, 255, 255, 0.16);
+  --border: rgba(255, 255, 255, 0.08);
+  --border-blue: rgba(43, 168, 224, 0.3);
+  --border-hover: rgba(255, 255, 255, 0.16);
   --border-subtle: rgba(255, 255, 255, 0.08);
-  --border-accent: rgba(16, 196, 195, 0.30);
+  --border-accent: rgba(16, 196, 195, 0.3);
 
   /* Typography */
-  --font-display: 'Cal Sans', system-ui, sans-serif;
-  --font-body:    'Cal Sans', system-ui, sans-serif;
+  --font-display: "Cormorant Garamond", Georgia, serif;
+  --font-body: "DM Sans", system-ui, sans-serif;
 
   /* Spacing (4px base) */
-  --space-xs:  4px;
-  --space-sm:  8px;
-  --space-md:  16px;
-  --space-lg:  24px;
-  --space-xl:  32px;
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
   --space-2xl: 48px;
   --space-3xl: 64px;
   --space-4xl: 96px;
@@ -57,18 +71,41 @@
 
   /* Texture overlay opacity */
   --texture-opacity: 0.035;
+
+  /* Safe-area insets — populated by the browser/WebView for notched devices.
+     Use these variables throughout the app instead of hard-coding env() calls. */
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
 }
 
 /* ── Reset ───────────────────────────────────────────────────────── */
-*, *::before, *::after {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
 
 html {
+  /* Smooth scroll only on desktop with no motion preference — avoid fighting
+     native inertia scrolling on Android/iOS inside the Capacitor WebView. */
   scroll-behavior: smooth;
   -webkit-text-size-adjust: 100%;
+}
+
+/* Disable smooth scroll on native platforms (applied by PlatformProvider) */
+body.platform-android html,
+body.platform-ios html {
+  scroll-behavior: auto;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
 }
 
 /* ── Body — liquid-silk black ────────────────────────────────────── */
@@ -80,16 +117,28 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background-image:
-    radial-gradient(ellipse 120% 60% at 20% 0%,   rgba(16,196,195,0.04) 0%, transparent 60%),
-    radial-gradient(ellipse 80%  80% at 80% 100%, rgba(16,196,195,0.03) 0%, transparent 55%),
-    radial-gradient(ellipse 100% 50% at 50% 50%,  rgba(255,255,255,0.015) 0%, transparent 70%),
-    linear-gradient(160deg, #0A1526 0%, #020C1C 40%, #050709 100%);
+    radial-gradient(
+      ellipse 120% 60% at 20% 0%,
+      rgba(43, 168, 224, 0.04) 0%,
+      transparent 60%
+    ),
+    radial-gradient(
+      ellipse 80% 80% at 80% 100%,
+      rgba(43, 168, 224, 0.03) 0%,
+      transparent 55%
+    ),
+    radial-gradient(
+      ellipse 100% 50% at 50% 50%,
+      rgba(255, 255, 255, 0.015) 0%,
+      transparent 70%
+    ),
+    linear-gradient(160deg, #0b0d10 0%, #000000 40%, #050709 100%);
   background-attachment: fixed;
 }
 
 /* Silk texture overlay — performance-safe, pointer-events none */
 body::before {
-  content: '';
+  content: "";
   position: fixed;
   inset: 0;
   pointer-events: none;
@@ -101,15 +150,24 @@ body::before {
 }
 
 /* All content sits above the texture layer */
-#__next, main, [data-content] {
+#__next,
+main,
+[data-content] {
   position: relative;
   z-index: 1;
 }
 
 /* ── Typography ──────────────────────────────────────────────────── */
-.font-display { font-family: var(--font-display); }
+.font-display {
+  font-family: var(--font-display);
+}
 
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   font-family: var(--font-display);
   font-weight: 600;
   line-height: 1.2;
@@ -117,18 +175,28 @@ h1, h2, h3, h4, h5, h6 {
   letter-spacing: -0.01em;
 }
 
-h1 { font-size: clamp(2rem, 5vw, 3.5rem); }
-h2 { font-size: clamp(1.5rem, 3.5vw, 2.5rem); }
-h3 { font-size: clamp(1.25rem, 2.5vw, 1.875rem); }
+h1 {
+  font-size: clamp(2rem, 5vw, 3.5rem);
+}
+h2 {
+  font-size: clamp(1.5rem, 3.5vw, 2.5rem);
+}
+h3 {
+  font-size: clamp(1.25rem, 2.5vw, 1.875rem);
+}
 
-p { color: var(--text-secondary); }
+p {
+  color: var(--text-secondary);
+}
 
 a {
   color: var(--blue);
   text-decoration: none;
   transition: color 0.2s ease;
 }
-a:hover { color: var(--blue-bright); }
+a:hover {
+  color: var(--blue-bright);
+}
 
 /* ── Utility classes ─────────────────────────────────────────────── */
 .nilay360-container {
@@ -141,7 +209,10 @@ a:hover { color: var(--blue-bright); }
 }
 
 @media (max-width: 768px) {
-  .nilay360-container { padding-left: 20px; padding-right: 20px; }
+  .nilay360-container {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
 }
 
 .text-gradient-silver {
@@ -159,7 +230,9 @@ a:hover { color: var(--blue-bright); }
 }
 
 .blue-glow {
-  box-shadow: 0 0 24px var(--blue-glow), 0 0 48px rgba(16,196,195,0.10);
+  box-shadow:
+    0 0 24px var(--blue-glow),
+    0 0 48px rgba(43, 168, 224, 0.1);
 }
 
 /* ── Skeleton shimmer ────────────────────────────────────────────── */
@@ -169,21 +242,42 @@ a:hover { color: var(--blue-bright); }
   animation: shimmer 1.5s infinite;
 }
 @keyframes shimmer {
-  0%   { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
 }
 
 /* ── Scrollbar ───────────────────────────────────────────────────── */
-::-webkit-scrollbar { width: 6px; height: 6px; }
-::-webkit-scrollbar-track { background: var(--bg-base); }
-::-webkit-scrollbar-thumb { background: var(--border-hover); border-radius: 99px; }
-::-webkit-scrollbar-thumb:hover { background: var(--blue); }
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-base);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border-hover);
+  border-radius: 99px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--blue);
+}
 
 /* ── Selection ───────────────────────────────────────────────────── */
-::selection { background: rgba(16,196,195,0.30); color: var(--text-primary); }
+::selection {
+  background: rgba(43, 168, 224, 0.3);
+  color: var(--text-primary);
+}
 
 /* ── Focus ring ──────────────────────────────────────────────────── */
-:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; border-radius: 4px; }
+:focus-visible {
+  outline: 2px solid var(--blue);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
 
 /* ── Mobile Responsiveness ───────────────────────────────── */
 @media (max-width: 768px) {
@@ -194,27 +288,147 @@ a:hover { color: var(--blue-bright); }
   }
 
   /* Typography scale down */
-  h1 { font-size: clamp(1.8rem, 8vw, 2.5rem); }
-  h2 { font-size: clamp(1.4rem, 6vw, 2rem); }
-  h3 { font-size: clamp(1.1rem, 4vw, 1.5rem); }
+  h1 {
+    font-size: clamp(1.8rem, 8vw, 2.5rem);
+  }
+  h2 {
+    font-size: clamp(1.4rem, 6vw, 2rem);
+  }
+  h3 {
+    font-size: clamp(1.1rem, 4vw, 1.5rem);
+  }
 
   /* Hide scrollbar on mobile carousels */
-  .hide-scroll { -webkit-overflow-scrolling: touch; }
+  .hide-scroll {
+    -webkit-overflow-scrolling: touch;
+  }
 
   /* Cards full width on mobile */
-  .premium-card { width: 100% !important; }
+  .premium-card {
+    width: 100% !important;
+  }
 
   /* Category cards stack on mobile */
-  .cat-card { min-height: 200px !important; }
+  .cat-card {
+    min-height: 200px !important;
+  }
 
   /* Location cards smaller on mobile */
-  .loc-card { width: 180px !important; height: 180px !important; }
+  .loc-card {
+    width: 180px !important;
+    height: 180px !important;
+  }
 
   /* Glow dot hidden on mobile */
-  .glow-dot { display: none; }
+  .glow-dot {
+    display: none;
+  }
 
   /* Section divider thinner */
-  .section-divider { opacity: 0.5; }
+  .section-divider {
+    opacity: 0.5;
+  }
+}
+
+/* ── Mobile-First Responsive Improvements ───────────────────────── */
+
+/* Touch targets: minimum 44x44px for mobile */
+@media (max-width: 768px) {
+  button,
+  a[role="button"],
+  [role="button"],
+  input[type="checkbox"],
+  input[type="radio"] {
+    min-height: 48px !important;
+    min-width: 48px !important;
+    padding: 12px 16px !important;
+  }
+}
+
+/* Mobile-friendly container with responsive padding */
+.nilay360-container {
+  max-width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 16px;
+  padding-right: 16px;
+}
+
+@media (min-width: 640px) {
+  .nilay360-container {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .nilay360-container {
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+}
+
+/* Text scaling for mobile */
+@media (max-width: 768px) {
+  h1 {
+    font-size: clamp(1.5rem, 4vw, 2.5rem);
+    line-height: 1.2;
+  }
+
+  h2 {
+    font-size: clamp(1.25rem, 3vw, 1.875rem);
+  }
+
+  h3 {
+    font-size: clamp(1rem, 2.5vw, 1.5rem);
+  }
+
+  p {
+    font-size: 0.9375rem;
+    line-height: 1.6;
+  }
+}
+
+/* Input and form elements */
+input,
+textarea,
+select {
+  min-height: 44px;
+  font-size: 16px;
+  border-radius: 8px;
+}
+
+@media (max-width: 768px) {
+  input,
+  textarea,
+  select {
+    min-height: 48px;
+    padding: 12px 16px;
+    font-size: 16px;
+  }
+}
+
+/* Modal and dialog overlays need safe area */
+@supports (padding: max(0px)) {
+  body {
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+  }
+
+  dialog,
+  [role="dialog"] {
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+  }
+}
+
+/* Improve tap feedback */
+@media (hover: none) and (pointer: coarse) {
+  a,
+  button,
+  [role="button"] {
+    -webkit-tap-highlight-color: rgba(43, 168, 224, 0.15);
+  }
 }
 
 /* ── Thank You page — scroll-hero motif ─────────────────────────── */

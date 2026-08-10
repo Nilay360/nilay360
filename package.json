@@ -4,11 +4,24 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "dev:mobile": "next dev -H 0.0.0.0",
     "build": "next build",
-    "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "android": "cross-env CAPACITOR_DEV=true CAPACITOR_PLATFORM=android cap sync android && cap run android",
+    "android:studio": "cap open android",
+    "android:build": "cap sync android",
+    "ios": "cross-env CAPACITOR_DEV=true CAPACITOR_PLATFORM=ios cap sync ios && cap run ios",
+    "ios:studio": "cap open ios",
+    "ios:build": "cap sync ios",
+    "cap:sync": "cap sync",
+    "cap:sync:dev:android": "cross-env CAPACITOR_DEV=true CAPACITOR_PLATFORM=android cap sync android",
+    "cap:sync:dev:ios": "cross-env CAPACITOR_DEV=true CAPACITOR_PLATFORM=ios cap sync ios"
   },
   "dependencies": {
+    "@capacitor/android": "^8.4.1",
+    "@capacitor/cli": "^8.4.1",
+    "@capacitor/core": "^8.4.1",
+    "@capacitor/ios": "^8.4.1",
     "@hookform/resolvers": "^5.4.0",
     "@radix-ui/react-accordion": "^1.2.14",
     "@radix-ui/react-checkbox": "^1.3.5",
@@ -44,10 +57,12 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
+    "@capacitor/assets": "^3.0.5",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "cross-env": "^10.1.0",
     "eslint": "^9",
     "eslint-config-next": "16.2.9",
     "tailwindcss": "^4",

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Adaptive launcher icon background — matches app dark theme -->
+    <color name="ic_launcher_background">#0B0D10</color>
+
+    <!-- Material theme colors (AppTheme) — Nilay360 brand palette -->
+    <color name="colorPrimary">#2BA8E0</color>
+    <color name="colorPrimaryDark">#1577B8</color>
+    <color name="colorAccent">#3DBEF5</color>
+
+    <!-- Splash screen background — must match capacitor.config SplashScreen backgroundColor -->
+    <color name="splashBackground">#0B0D10</color>
+</resources>

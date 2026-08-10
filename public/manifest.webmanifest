@@ -1,0 +1,25 @@
+{
+  "name": "Nilay360",
+  "short_name": "Nilay360",
+  "description": "Real estate property discovery and services app",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#0B0D10",
+  "theme_color": "#0B0D10",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/nilay_logo_final.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/nilay_logo_final.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
