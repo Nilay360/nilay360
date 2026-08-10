@@ -6,6 +6,7 @@ import { CompareProvider } from "@/context/CompareContext"
 import CompareBar from "@/components/property/CompareBar"
 import { AuthProvider } from "@/context/AuthContext"
 import AuthModal from "@/components/auth/AuthModal"
+import ProfileCompletionModal from "@/components/auth/ProfileCompletionModal"
 import { PostHogProvider, PostHogPageView } from "@/components/providers/PostHogProvider"
 import FloatingContactMenu from "@/components/contact/FloatingContactMenu"
 
@@ -74,6 +75,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <FloatingContactMenu />
             </CompareProvider>
             <AuthModal />
+            <ProfileCompletionModal />
           </AuthProvider>
         </PostHogProvider>
       </body>
