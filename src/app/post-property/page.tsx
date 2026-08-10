@@ -18,6 +18,13 @@ interface UploadedPhoto {
   preview: string
 }
 
+interface UploadedFloorPlan {
+  id: string
+  file: File
+  preview: string
+  label: string
+}
+
 interface FormState {
   // Step 1
   listingType: ListingType | ''
@@ -53,6 +60,8 @@ interface FormState {
   photos: UploadedPhoto[]
   coverPhotoIndex: number
   // Step 7
+  floorPlans: UploadedFloorPlan[]
+  // Step 8
   sellerName: string
   sellerEmail: string
   sellerPhone: string
@@ -67,7 +76,10 @@ type Action =
   | { type: 'REMOVE_PHOTO'; id: string }
   | { type: 'SET_COVER'; index: number }
   | { type: 'REORDER'; photos: UploadedPhoto[]; cover: number }
-  | { type: 'LOAD_DRAFT'; partial: Partial<Omit<FormState, 'photos'>> }
+  | { type: 'ADD_FLOOR_PLANS'; floorPlans: UploadedFloorPlan[] }
+  | { type: 'REMOVE_FLOOR_PLAN'; id: string }
+  | { type: 'SET_FLOOR_PLAN_LABEL'; id: string; label: string }
+  | { type: 'LOAD_DRAFT'; partial: Partial<Omit<FormState, 'photos' | 'floorPlans'>> }
 
 const INITIAL: FormState = {
   listingType: '', propertyCategory: '',
@@ -78,6 +90,7 @@ const INITIAL: FormState = {
   price: '', isNegotiable: false, possessionStatus: '', maintenanceCharges: '',
   amenities: [], highlights: '',
   photos: [], coverPhotoIndex: 0,
+  floorPlans: [],
   sellerName: '', sellerEmail: '', sellerPhone: '', sellerWhatsapp: '',
   agreeToTerms: false,
 }
@@ -103,7 +116,11 @@ function reducer(s: FormState, a: Action): FormState {
     }
     case 'SET_COVER': return { ...s, coverPhotoIndex: a.index }
     case 'REORDER': return { ...s, photos: a.photos, coverPhotoIndex: a.cover }
-    case 'LOAD_DRAFT': return { ...s, ...a.partial, photos: [] }
+    case 'ADD_FLOOR_PLANS': return { ...s, floorPlans: [...s.floorPlans, ...a.floorPlans] }
+    case 'REMOVE_FLOOR_PLAN': return { ...s, floorPlans: s.floorPlans.filter(p => p.id !== a.id) }
+    case 'SET_FLOOR_PLAN_LABEL':
+      return { ...s, floorPlans: s.floorPlans.map(p => p.id === a.id ? { ...p, label: a.label } : p) }
+    case 'LOAD_DRAFT': return { ...s, ...a.partial, photos: [], floorPlans: [] }
     default: return s
   }
 }
@@ -299,7 +316,7 @@ const AMENITIES_LIST = [
   'High-Speed Internet', 'Air Conditioning', 'Balcony', 'Vastu Compliant',
 ]
 
-const STEP_LABELS = ['Listing Type', 'Location', 'Details', 'Pricing', 'Amenities', 'Photos', 'Review']
+const STEP_LABELS = ['Listing Type', 'Location', 'Details', 'Pricing', 'Amenities', 'Photos', 'Floor Plans', 'Review']
 
 // ─── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -1087,9 +1104,145 @@ function Step6({ state, dispatch }: { state: FormState; dispatch: React.Dispatch
   )
 }
 
-// ─── Step 7: Review & Submit ──────────────────────────────────────────────────
+// ─── Step 7: Floor Plans (optional) ───────────────────────────────────────────
 
-function Step7({
+function Step7({ state, dispatch }: { state: FormState; dispatch: React.Dispatch<Action> }) {
+  const fileRef = useRef<HTMLInputElement | null>(null)
+  const [dragOver, setDragOver] = React.useState(false)
+  const [fpError, setFpError] = React.useState('')
+
+  const MAX_BYTES = 10 * 1024 * 1024 // 10 MB
+
+  const addFiles = useCallback((files: FileList | File[]) => {
+    const incoming = Array.from(files)
+    const valid: UploadedFloorPlan[] = []
+    const rejected: string[] = []
+
+    for (const file of incoming) {
+      if (!file.type.startsWith('image/')) {
+        rejected.push(`${file.name} (not an image)`)
+        continue
+      }
+      if (file.size > MAX_BYTES) {
+        rejected.push(`${file.name} (over 10 MB)`)
+        continue
+      }
+      valid.push({ id: uid(), file, preview: URL.createObjectURL(file), label: '' })
+    }
+
+    if (valid.length) dispatch({ type: 'ADD_FLOOR_PLANS', floorPlans: valid })
+    setFpError(rejected.length ? `Skipped ${rejected.length} file(s): ${rejected.join(', ')}` : '')
+  }, [dispatch, MAX_BYTES])
+
+  const onDrop = (e: DragEvent<HTMLDivElement>) => {
+    e.preventDefault()
+    setDragOver(false)
+    if (e.dataTransfer.files) addFiles(e.dataTransfer.files)
+  }
+
+  return (
+    <div>
+      <h2 style={S.stepTitle}>Floor Plans</h2>
+      <p style={S.stepSub}>
+        Optional — add one floor plan, or several if your project has multiple unit types (e.g. &ldquo;2BHK - Type A&rdquo;, &ldquo;3BHK - Type B&rdquo;)
+      </p>
+
+      {/* Drop zone */}
+      <div
+        onDragOver={e => { e.preventDefault(); setDragOver(true) }}
+        onDragLeave={() => setDragOver(false)}
+        onDrop={onDrop}
+        onClick={() => fileRef.current?.click()}
+        style={{
+          border: `2px dashed ${dragOver ? C.gold : C.border}`,
+          borderRadius: 14, padding: '48px 24px', textAlign: 'center', cursor: 'pointer',
+          background: dragOver ? C.goldDim : C.surface2,
+          transition: 'all 0.2s', marginBottom: 24,
+        }}
+      >
+        <div style={{ fontSize: '2.25rem', marginBottom: 10 }}>📐</div>
+        <div style={{ fontFamily: FD, fontSize: '1.25rem', color: C.text, marginBottom: 6 }}>
+          {dragOver ? 'Drop floor plans here' : 'Drag & drop floor plan images'}
+        </div>
+        <div style={{ fontSize: '0.875rem', color: C.textMuted, marginBottom: 18 }}>
+          or click to browse from your device
+        </div>
+        <span style={{
+          display: 'inline-block', padding: '8px 22px',
+          border: `1px solid ${C.gold}`, borderRadius: 8,
+          color: C.gold, fontSize: '0.875rem', fontFamily: FB,
+        }}>Browse Files</span>
+        <div style={{ fontSize: '0.75rem', color: C.textMuted, marginTop: 10 }}>
+          JPG, PNG, WEBP · Max 10 MB each · Skip this step if you don&apos;t have one yet
+        </div>
+      </div>
+
+      <input
+        ref={fileRef}
+        type="file"
+        multiple
+        accept="image/*"
+        style={{ display: 'none' }}
+        onChange={e => e.target.files && addFiles(e.target.files)}
+      />
+
+      {fpError && (
+        <div style={{
+          marginBottom: 18, padding: '12px 16px',
+          background: C.errorBg, border: `1px solid ${C.errorBorder}`,
+          borderRadius: 8, color: C.error, fontSize: '0.875rem', fontFamily: FB,
+        }}>
+          {fpError}
+        </div>
+      )}
+
+      {state.floorPlans.length > 0 && (
+        <div style={{ display: 'grid', gap: 14 }}>
+          {state.floorPlans.map((plan, idx) => (
+            <div
+              key={plan.id}
+              style={{
+                display: 'flex', gap: 14, alignItems: 'center',
+                border: `1px solid ${C.border}`, borderRadius: 10, padding: 12,
+                background: C.surface2,
+              }}
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={plan.preview} alt={`Floor plan ${idx + 1}`}
+                style={{ width: 84, height: 64, objectFit: 'cover', borderRadius: 6, flexShrink: 0 }}
+              />
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <label style={S.lbl}>Label (optional)</label>
+                <input
+                  type="text"
+                  value={plan.label}
+                  onChange={e => dispatch({ type: 'SET_FLOOR_PLAN_LABEL', id: plan.id, label: e.target.value })}
+                  placeholder={`e.g. 2BHK - Type ${String.fromCharCode(65 + idx)}`}
+                  style={S.inp}
+                />
+              </div>
+              <button
+                type="button"
+                onClick={() => dispatch({ type: 'REMOVE_FLOOR_PLAN', id: plan.id })}
+                style={{
+                  width: 30, height: 30, borderRadius: '50%', flexShrink: 0,
+                  background: 'rgba(0,0,0,0.35)', border: `1px solid ${C.border}`, color: C.text,
+                  cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  fontSize: '1rem', lineHeight: 1, fontFamily: FB,
+                }}
+              >×</button>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
+// ─── Step 8: Review & Submit ──────────────────────────────────────────────────
+
+function Step8({
   state, dispatch, isSubmitting, submitError, uploadProgress,
 }: {
   state: FormState
@@ -1121,6 +1274,7 @@ function Step7({
     ['Maintenance',    state.maintenanceCharges ? `₹${Number(state.maintenanceCharges).toLocaleString('en-IN')}/mo` : '—'],
     ['Amenities',      state.amenities.length ? `${state.amenities.length} selected` : '—'],
     ['Photos',         state.photos.length ? `${state.photos.length} uploaded` : '—'],
+    ['Floor Plans',    state.floorPlans.length ? `${state.floorPlans.length} uploaded` : '—'],
   ]
 
   return (
@@ -1221,7 +1375,7 @@ function Step7({
         }}>
           <span style={{ display: 'inline-block', animation: 'spin 0.8s linear infinite' }}>⟳</span>
           {uploadProgress
-            ? `Uploading photo ${uploadProgress.current} of ${uploadProgress.total}…`
+            ? `Uploading image ${uploadProgress.current} of ${uploadProgress.total}…`
             : 'Submitting your listing…'}
         </div>
       )}
@@ -1294,7 +1448,7 @@ function validate(step: number, s: FormState): string | null {
   if (step === 6) {
     if (s.photos.length === 0) return 'Please upload at least 1 photo'
   }
-  if (step === 7) {
+  if (step === 8) {
     if (!s.sellerName.trim()) return 'Your full name is required'
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s.sellerEmail)) return 'Please enter a valid email address'
     if (!/^\d{10}$/.test(s.sellerPhone)) return 'Please enter a valid 10-digit mobile number'
@@ -1316,8 +1470,9 @@ export default function PostPropertyPage() {
 
   // Draft persistence
   useEffect(() => {
-    const { photos, ...saveable } = state
+    const { photos, floorPlans, ...saveable } = state
     void photos
+    void floorPlans
     try {
       localStorage.setItem('nilay360_post_draft', JSON.stringify({ ...saveable, _step: step }))
     } catch {}
@@ -1329,7 +1484,7 @@ export default function PostPropertyPage() {
       if (!raw) return
       const { _step, ...partial } = JSON.parse(raw)
       dispatch({ type: 'LOAD_DRAFT', partial })
-      if (typeof _step === 'number' && _step >= 1 && _step <= 7) setStep(_step)
+      if (typeof _step === 'number' && _step >= 1 && _step <= 8) setStep(_step)
     } catch {}
   }, [])
 
@@ -1337,7 +1492,7 @@ export default function PostPropertyPage() {
     const err = validate(step, state)
     if (err) { setStepError(err); return }
     setStepError('')
-    setStep(s => Math.min(s + 1, 7))
+    setStep(s => Math.min(s + 1, 8))
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
@@ -1348,7 +1503,7 @@ export default function PostPropertyPage() {
   }
 
   const handleSubmit = async () => {
-    const err = validate(7, state)
+    const err = validate(8, state)
     if (err) { setStepError(err); return }
     setStepError('')
     setSubmitting(true)
@@ -1385,6 +1540,24 @@ export default function PostPropertyPage() {
         return
       }
 
+      // Floor plans are optional — upload what we can and skip failures rather
+      // than blocking submission of an otherwise-complete listing over them.
+      const floorPlanUploads: { image_url: string; label: string | null }[] = []
+      for (let i = 0; i < state.floorPlans.length; i++) {
+        const plan = state.floorPlans[i]
+        setUploadProgress({ current: i + 1, total: state.floorPlans.length })
+        try {
+          const body = new FormData()
+          body.append('file', plan.file)
+          const res = await fetch('/api/upload-image', { method: 'POST', body })
+          const json = await res.json()
+          if (!res.ok || !json?.secure_url) throw new Error(json?.error ?? 'Upload failed')
+          floorPlanUploads.push({ image_url: json.secure_url as string, label: plan.label.trim() || null })
+        } catch (err) {
+          console.error('Floor plan upload failed:', plan.file.name, err)
+        }
+      }
+
       // Move cover photo to front
       if (state.coverPhotoIndex > 0 && imageUrls.length > state.coverPhotoIndex) {
         const [cover] = imageUrls.splice(state.coverPhotoIndex, 1)
@@ -1400,7 +1573,7 @@ export default function PostPropertyPage() {
       if (state.openParking)    parkingParts.push(`${state.openParking} Open`)
 
       const isCommTitle = COMMERCIAL_CATEGORIES.includes(state.propertyCategory)
-      const { error: insertErr } = await supabase.from('property_listings').insert([{
+      const { data: insertedListing, error: insertErr } = await supabase.from('property_listings').insert([{
         slug:               `${slugBase}-${Date.now()}`,
         title:              `${!isCommTitle && state.bedrooms ? state.bedrooms + ' BHK ' : ''}${state.propertyCategory} in ${state.locality}, ${state.city}`.trim(),
         // Schema column names (requirements-aligned)
@@ -1437,9 +1610,24 @@ export default function PostPropertyPage() {
         user_id:            authUserId,
         is_featured:        false,
         views:              0,
-      }])
+      }]).select('id').single()
 
       if (insertErr) throw insertErr
+
+      if (floorPlanUploads.length > 0 && insertedListing?.id) {
+        const { error: fpErr } = await supabase.from('property_floor_plans').insert(
+          floorPlanUploads.map((fp, idx) => ({
+            property_id: insertedListing.id,
+            image_url: fp.image_url,
+            label: fp.label,
+            display_order: idx,
+          }))
+        )
+        // The listing itself was already created successfully — don't fail
+        // the whole submission over the floor plans row insert.
+        if (fpErr) console.error('Floor plan row insert failed:', fpErr)
+      }
+
       localStorage.removeItem('nilay360_post_draft')
       setSuccess(true)
     } catch (e: unknown) {
@@ -1503,8 +1691,9 @@ export default function PostPropertyPage() {
           {step === 4 && <Step4 state={state} dispatch={dispatch} />}
           {step === 5 && <Step5 state={state} dispatch={dispatch} />}
           {step === 6 && <Step6 state={state} dispatch={dispatch} />}
-          {step === 7 && (
-            <Step7
+          {step === 7 && <Step7 state={state} dispatch={dispatch} />}
+          {step === 8 && (
+            <Step8
               state={state} dispatch={dispatch}
               isSubmitting={submitting} submitError={submitError}
               uploadProgress={uploadProgress}
@@ -1533,7 +1722,7 @@ export default function PostPropertyPage() {
               : <div />
             }
 
-            {step < 7
+            {step < 8
               ? <button onClick={goNext} style={S.btnPrimary}>Continue →</button>
               : (
                 <button
