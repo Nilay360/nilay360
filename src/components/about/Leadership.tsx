@@ -15,7 +15,7 @@ type Leader = {
 const LEADERS: Leader[] = [
   {
     name: "Ramana Murthy Akula",
-    role: "Founder & Head of Operations",
+    role: "Founder & Managing Director",
     tagline: "Building tomorrow, starting today",
     photo: "/team/ramana-murthy-akula.webp",
     bio: <>A visionary leader who believes that the best solutions are born from real experiences. With a passion for operational excellence and customer-first thinking, he is committed to building meaningful experiences where trust, simplicity, and innovation come together to redefine the future of real estate.</>,
