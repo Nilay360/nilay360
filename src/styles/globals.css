@@ -216,3 +216,20 @@ a:hover { color: var(--blue-bright); }
   /* Section divider thinner */
   .section-divider { opacity: 0.5; }
 }
+
+/* ── Thank You page — scroll-hero motif ─────────────────────────── */
+@keyframes n360spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes drawCheck {
+  0% { stroke-dashoffset: 28; }
+  100% { stroke-dashoffset: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ty-hero-orbit { animation: none !important; }
+  .ty-hero-check-path { animation: none !important; stroke-dashoffset: 0 !important; }
+}
+
