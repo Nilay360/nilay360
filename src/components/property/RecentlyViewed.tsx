@@ -23,10 +23,10 @@ export default function RecentlyViewed({ theme = "light" }: { theme?: "light" | 
   if (recentlyViewed.length === 0) return null;
 
   const dark = theme === "dark";
-  const titleColor = dark ? "#020C1C" : G.dark;
-  const cardBg = dark ? "rgba(245,242,236,0.04)" : "#fff";
-  const cardBorder = dark ? "1px solid rgba(245,242,236,0.08)" : "1px solid rgba(13,43,31,0.08)";
-  const subColor = dark ? "rgba(245,242,236,0.5)" : "#6B7C72";
+  const titleColor = dark ? "var(--text-primary)" : G.dark;
+  const cardBg = dark ? "var(--bg-card)" : "#fff";
+  const cardBorder = dark ? "1px solid var(--border)" : "1px solid rgba(13,43,31,0.08)";
+  const subColor = dark ? "var(--text-secondary)" : "#6B7C72";
 
   return (
     <Reveal>
