@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>Nilay360</title>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      body {
+        background: #0f172a;
+        color: #f8fafc;
+        font-family: 'DM Sans', system-ui, sans-serif;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100dvh;
+        text-align: center;
+        padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+      }
+      .container { padding: 2rem; max-width: 400px; }
+      .logo { font-size: 2rem; font-weight: 700; margin-bottom: 1rem; color: #f8fafc; }
+      .message { font-size: 1rem; color: #94a3b8; margin-bottom: 1.5rem; line-height: 1.6; }
+      .spinner {
+        width: 40px; height: 40px;
+        border: 3px solid #1e293b;
+        border-top-color: #f8fafc;
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+        margin: 0 auto;
+      }
+      @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="logo">Nilay360</div>
+      <p class="message">Loading the app…<br/>Please ensure you have an internet connection.</p>
+      <div class="spinner"></div>
+    </div>
+  </body>
+</html>

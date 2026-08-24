@@ -12,7 +12,7 @@ const nextConfig: NextConfig = {
   },
   typescript: { ignoreBuildErrors: true },
   devIndicators: false,
-  allowedDevOrigins: ['192.168.10.69'],
+  allowedDevOrigins: ['192.168.10.69', '192.168.10.39', '10.0.2.2', 'localhost'],
   async headers() {
     return [
       {

@@ -609,8 +609,19 @@ export function Navbar() {
   const [openMenu,          setOpenMenu]          = useState<string | null>(null)
   const [mobileExpandedMenu, setMobileExpandedMenu] = useState<string | null>(null)
   const [mounted,           setMounted]           = useState(false)
+  const [isDesktopClient,   setIsDesktopClient]   = useState(false)
 
   useEffect(() => { setMounted(true) }, [])
+
+  useEffect(() => {
+    const updateViewport = () => {
+      setIsDesktopClient(window.innerWidth >= 1024)
+    }
+
+    updateViewport()
+    window.addEventListener("resize", updateViewport)
+    return () => window.removeEventListener("resize", updateViewport)
+  }, [])
 
   const wrapperRef   = useRef<HTMLDivElement>(null)
   const dropdownRef  = useRef<HTMLDivElement>(null)
@@ -832,7 +843,7 @@ export function Navbar() {
                   </svg>
                 </button>
 
-                {dropdown && window.innerWidth >= 1024 && (
+                {dropdown && isDesktopClient && (
                   <UserDropdown
                     user={user}
                     profile={profile}
