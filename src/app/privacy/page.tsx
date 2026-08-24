@@ -159,7 +159,7 @@
             letterSpacing: '0.3px',
           }}
         >
-          Last updated: June 2025 · DPDP Act 2023 Compliant
+          Last updated: August 24, 2026
         </p>
       </section>
 
@@ -180,21 +180,8 @@
             boxShadow: '0 2px 40px rgba(0,0,0,0.06)',
           }}
         >
-          {/* Section 1 — Introduction */}
+          {/* Intro */}
           <div style={{ marginBottom: '48px' }}>
-            <h2
-              style={{
-                fontFamily: "'Cal Sans', serif",
-                fontSize: '36px',
-                fontWeight: 600,
-                color: '#020C1C',
-                borderBottom: '2px solid #10C4C3',
-                paddingBottom: '12px',
-                marginBottom: '20px',
-              }}
-            >
-              1. Introduction
-            </h2>
             <p
               style={{
                 fontFamily: "'Cal Sans', sans-serif",
@@ -204,18 +191,14 @@
                 lineHeight: 1.8,
               }}
             >
-              Nilay 360 Real Estate Technologies Private Limited (&ldquo;Nilay 360&rdquo;, &ldquo;we&rdquo;, &ldquo;our&rdquo;,
-              &ldquo;us&rdquo;) is a premium real estate discovery platform headquartered in Hyderabad, Telangana, India.
-              This Privacy Policy explains how we collect, use, disclose, and safeguard your personal information when
-              you use our website (www.nilay360.com), mobile applications, and related services (collectively, the
-              &ldquo;Platform&rdquo;). We are committed to protecting your privacy in accordance with the Digital
-              Personal Data Protection Act, 2023 (&ldquo;DPDP Act&rdquo;), the Information Technology Act, 2000, and
-              applicable rules thereunder. By accessing or using the Platform, you acknowledge that you have read and
-              understood this Privacy Policy.
+              Nilay360 (&ldquo;we,&rdquo; &ldquo;us,&rdquo; &ldquo;our&rdquo;) is a real estate platform operated by
+              NIVILA Group, based in Hyderabad, India, accessible via our website (nilay360.com) and our mobile
+              application (collectively, the &ldquo;Service&rdquo;). This policy explains what information we
+              collect, why we collect it, and how it&rsquo;s handled.
             </p>
           </div>
 
-          {/* Section 2 — Information We Collect */}
+          {/* Section 1 — Information We Collect */}
           <div style={{ marginBottom: '48px' }}>
             <h2
               style={{
@@ -228,8 +211,20 @@
                 marginBottom: '20px',
               }}
             >
-              2. Information We Collect
+              1. Information We Collect
             </h2>
+
+            <h3
+              style={{
+                fontFamily: "'Cal Sans', sans-serif",
+                fontSize: '18px',
+                fontWeight: 600,
+                color: '#020C1C',
+                marginBottom: '10px',
+              }}
+            >
+              Information you give us directly
+            </h3>
             <p
               style={{
                 fontFamily: "'Cal Sans', sans-serif",
@@ -240,8 +235,80 @@
                 marginBottom: '12px',
               }}
             >
-              We collect the following categories of personal data:
+              When you create an account or use the Service, we collect:
             </p>
+            <ul
+              style={{
+                fontFamily: "'Cal Sans', sans-serif",
+                fontSize: '16px',
+                fontWeight: 400,
+                color: '#333333',
+                lineHeight: 1.8,
+                paddingLeft: '24px',
+                marginBottom: '24px',
+              }}
+            >
+              <li style={{ marginBottom: '10px' }}>
+                <strong>Phone number</strong> — required to sign in via OTP (One-Time Password)
+              </li>
+              <li style={{ marginBottom: '10px' }}>
+                <strong>Email address</strong> — collected during Google Sign-In, or optionally added to your profile
+              </li>
+              <li style={{ marginBottom: '10px' }}>
+                <strong>Name and city</strong> — collected to complete your profile after signing in
+              </li>
+              <li style={{ marginBottom: '10px' }}>
+                <strong>Property listing details</strong> — if you list a property, including photos, price,
+                location, and description
+              </li>
+              <li style={{ marginBottom: '10px' }}>
+                <strong>Inquiry messages</strong> — if you contact a seller or agent through the platform
+              </li>
+            </ul>
+
+            <h3
+              style={{
+                fontFamily: "'Cal Sans', sans-serif",
+                fontSize: '18px',
+                fontWeight: 600,
+                color: '#020C1C',
+                marginBottom: '10px',
+              }}
+            >
+              Information collected automatically
+            </h3>
+            <ul
+              style={{
+                fontFamily: "'Cal Sans', sans-serif",
+                fontSize: '16px',
+                fontWeight: 400,
+                color: '#333333',
+                lineHeight: 1.8,
+                paddingLeft: '24px',
+                marginBottom: '24px',
+              }}
+            >
+              <li style={{ marginBottom: '10px' }}>
+                <strong>Usage data</strong> — pages visited, features used, general interaction patterns (via
+                analytics)
+              </li>
+              <li style={{ marginBottom: '10px' }}>
+                <strong>Device and technical information</strong> — browser type, device type, general diagnostic
+                information (via error monitoring)
+              </li>
+            </ul>
+
+            <h3
+              style={{
+                fontFamily: "'Cal Sans', sans-serif",
+                fontSize: '18px',
+                fontWeight: 600,
+                color: '#020C1C',
+                marginBottom: '10px',
+              }}
+            >
+              Information we do not collect
+            </h3>
             <ul
               style={{
                 fontFamily: "'Cal Sans', sans-serif",
@@ -253,33 +320,13 @@
               }}
             >
               <li style={{ marginBottom: '10px' }}>
-                <strong>Identity &amp; Contact Information:</strong> name, email address, phone number, date of birth
-                (for age verification), and PAN/Aadhaar details where required for KYC.
-              </li>
-              <li style={{ marginBottom: '10px' }}>
-                <strong>Property Preferences:</strong> search history, saved properties, budget range, preferred
-                locations, and property type preferences.
-              </li>
-              <li style={{ marginBottom: '10px' }}>
-                <strong>Device &amp; Technical Information:</strong> IP address, browser type, operating system, device
-                identifiers, and pages visited.
-              </li>
-              <li style={{ marginBottom: '10px' }}>
-                <strong>Location Data:</strong> approximate location derived from IP, and precise GPS location only if
-                you explicitly grant permission.
-              </li>
-              <li style={{ marginBottom: '10px' }}>
-                <strong>Communications:</strong> messages sent through our platform to agents or developers, support
-                enquiries, and feedback.
-              </li>
-              <li style={{ marginBottom: '10px' }}>
-                <strong>Financial Information:</strong> we do not store payment card details; transactions are processed
-                through PCI-DSS compliant third-party gateways.
+                <strong>Location data</strong> — Nilay360 does not currently request or access your device&rsquo;s
+                precise location.
               </li>
             </ul>
           </div>
 
-          {/* Section 3 — How We Use Your Information */}
+          {/* Section 2 — How We Use Your Information */}
           <div style={{ marginBottom: '48px' }}>
             <h2
               style={{
@@ -292,7 +339,7 @@
                 marginBottom: '20px',
               }}
             >
-              3. How We Use Your Information
+              2. How We Use Your Information
             </h2>
             <p
               style={{
@@ -304,7 +351,7 @@
                 marginBottom: '12px',
               }}
             >
-              We use your personal data for the following purposes:
+              We use the information collected to:
             </p>
             <ul
               style={{
@@ -314,36 +361,35 @@
                 color: '#333333',
                 lineHeight: 1.8,
                 paddingLeft: '24px',
+                marginBottom: '16px',
               }}
             >
+              <li style={{ marginBottom: '10px' }}>Create and manage your account</li>
+              <li style={{ marginBottom: '10px' }}>Verify your identity during sign-in (via OTP or Google Sign-In)</li>
+              <li style={{ marginBottom: '10px' }}>Display your profile and listings to other users, where applicable</li>
+              <li style={{ marginBottom: '10px' }}>Connect buyers/renters with sellers and agents through inquiries</li>
               <li style={{ marginBottom: '10px' }}>
-                <strong>Service Delivery:</strong> matching you with relevant properties, connecting you with verified
-                agents and developers.
+                Send transactional notifications (e.g., inquiry confirmations, listing status updates)
               </li>
+              <li style={{ marginBottom: '10px' }}>Monitor and improve the performance and reliability of the Service</li>
               <li style={{ marginBottom: '10px' }}>
-                <strong>Account Management:</strong> creating and maintaining your account, authenticating your
-                identity.
-              </li>
-              <li style={{ marginBottom: '10px' }}>
-                <strong>Communications:</strong> sending property alerts, enquiry responses, transaction updates, and
-                service announcements.
-              </li>
-              <li style={{ marginBottom: '10px' }}>
-                <strong>Analytics &amp; Improvement:</strong> understanding how users interact with the Platform to
-                improve features, fix bugs, and personalise experiences.
-              </li>
-              <li style={{ marginBottom: '10px' }}>
-                <strong>Legal Compliance:</strong> fulfilling obligations under RERA, PMLA, income tax laws, and court
-                orders.
-              </li>
-              <li style={{ marginBottom: '10px' }}>
-                <strong>Marketing (with consent):</strong> sending promotional emails about new listings, market
-                insights, and Nilay 360 services — you may opt out at any time.
+                Understand how the Service is used, in aggregate, to guide improvements
               </li>
             </ul>
+            <p
+              style={{
+                fontFamily: "'Cal Sans', sans-serif",
+                fontSize: '16px',
+                fontWeight: 400,
+                color: '#333333',
+                lineHeight: 1.8,
+              }}
+            >
+              We do not sell your personal information to third parties.
+            </p>
           </div>
 
-          {/* Section 4 — Sharing Your Information */}
+          {/* Section 3 — Third-Party Service Providers */}
           <div style={{ marginBottom: '48px' }}>
             <h2
               style={{
@@ -356,7 +402,99 @@
                 marginBottom: '20px',
               }}
             >
-              4. Sharing Your Information
+              3. Third-Party Service Providers
+            </h2>
+            <p
+              style={{
+                fontFamily: "'Cal Sans', sans-serif",
+                fontSize: '16px',
+                fontWeight: 400,
+                color: '#333333',
+                lineHeight: 1.8,
+                marginBottom: '20px',
+              }}
+            >
+              Nilay360 relies on a small number of specialist service providers to operate. Each has access only to
+              the specific data needed to perform its function:
+            </p>
+            <div style={{ overflowX: 'auto', marginBottom: '16px' }}>
+              <table
+                style={{
+                  width: '100%',
+                  borderCollapse: 'collapse',
+                  fontFamily: "'Cal Sans', sans-serif",
+                  fontSize: '14px',
+                  color: '#333333',
+                }}
+              >
+                <thead>
+                  <tr style={{ background: '#020C1C' }}>
+                    {['Provider', 'What It Does', 'Data It Processes'].map((h) => (
+                      <th
+                        key={h}
+                        style={{
+                          textAlign: 'left',
+                          padding: '12px 14px',
+                          color: '#10C4C3',
+                          fontWeight: 600,
+                          borderBottom: '2px solid #10C4C3',
+                        }}
+                      >
+                        {h}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {[
+                    ['Supabase', 'Our database, authentication system, and file storage', 'Account details, listing data, uploaded files'],
+                    ['MSG91', 'Sends the SMS one-time password (OTP) used for phone sign-in', 'Phone number'],
+                    ['Google', 'Provides the "Sign in with Google" option', 'Email address, basic profile information (only if you choose this sign-in method)'],
+                    ['Cloudinary', 'Hosts and optimizes property photos', 'Uploaded property images'],
+                    ['Resend', 'Sends transactional emails (e.g., inquiry notifications)', 'Email address, message content related to the notification'],
+                    ['Vercel', 'Hosts and serves the Nilay360 website and application', 'Standard web request data (e.g., IP address, as part of normal web traffic)'],
+                    ['Sentry', 'Monitors for technical errors so we can fix them', 'Technical diagnostic information; may incidentally include limited account context if an error occurs during your session'],
+                    ['PostHog', 'Provides anonymized usage analytics', 'General usage patterns, not tied to your identity for marketing purposes'],
+                  ].map((row) => (
+                    <tr key={row[0]} style={{ borderBottom: '1px solid #e5e5e5' }}>
+                      {row.map((cell, i) => (
+                        <td key={i} style={{ padding: '12px 14px', lineHeight: 1.6, verticalAlign: 'top' }}>
+                          {i === 0 ? <strong>{cell}</strong> : cell}
+                        </td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <p
+              style={{
+                fontFamily: "'Cal Sans', sans-serif",
+                fontSize: '16px',
+                fontWeight: 400,
+                color: '#333333',
+                lineHeight: 1.8,
+              }}
+            >
+              We do not permit these providers to use your data for their own independent purposes beyond providing
+              their service to us.
+            </p>
+          </div>
+
+          {/* Section 4 — Data Sharing */}
+          <div style={{ marginBottom: '48px' }}>
+            <h2
+              style={{
+                fontFamily: "'Cal Sans', serif",
+                fontSize: '36px',
+                fontWeight: 600,
+                color: '#020C1C',
+                borderBottom: '2px solid #10C4C3',
+                paddingBottom: '12px',
+                marginBottom: '20px',
+              }}
+            >
+              4. Data Sharing
             </h2>
             <p
               style={{
@@ -368,7 +506,7 @@
                 marginBottom: '12px',
               }}
             >
-              We do not sell your personal data. We share your information only in the following circumstances:
+              We share your information only:
             </p>
             <ul
               style={{
@@ -378,29 +516,32 @@
                 color: '#333333',
                 lineHeight: 1.8,
                 paddingLeft: '24px',
+                marginBottom: '16px',
               }}
             >
               <li style={{ marginBottom: '10px' }}>
-                <strong>Verified Agents &amp; Developers:</strong> your contact details are shared with a property
-                agent or developer only when you initiate an enquiry or explicitly consent.
+                With the third-party service providers listed above, strictly to operate the Service
               </li>
               <li style={{ marginBottom: '10px' }}>
-                <strong>Service Providers:</strong> trusted vendors (cloud hosting, email delivery, analytics, customer
-                support) who process data on our behalf under strict data processing agreements and non-disclosure
-                obligations.
+                With a seller or agent, if you submit an inquiry about their listing (your name and contact details
+                are shared so they can respond to you)
               </li>
-              <li style={{ marginBottom: '10px' }}>
-                <strong>Legal Requirements:</strong> when required by law, court order, government directive, or to
-                protect the rights, property, or safety of Nilay 360, our users, or the public.
-              </li>
-              <li style={{ marginBottom: '10px' }}>
-                <strong>Business Transfers:</strong> in connection with a merger, acquisition, or sale of assets,
-                subject to the acquirer maintaining equivalent privacy protections.
-              </li>
+              <li style={{ marginBottom: '10px' }}>If required by law, regulation, or a valid legal request</li>
             </ul>
+            <p
+              style={{
+                fontFamily: "'Cal Sans', sans-serif",
+                fontSize: '16px',
+                fontWeight: 400,
+                color: '#333333',
+                lineHeight: 1.8,
+              }}
+            >
+              We do not sell, rent, or trade your personal information to advertisers or data brokers.
+            </p>
           </div>
 
-          {/* Section 5 — Your Rights Under DPDP Act 2023 */}
+          {/* Section 5 — Data Retention */}
           <div style={{ marginBottom: '48px' }}>
             <h2
               style={{
@@ -413,7 +554,37 @@
                 marginBottom: '20px',
               }}
             >
-              5. Your Rights Under DPDP Act 2023
+              5. Data Retention
+            </h2>
+            <p
+              style={{
+                fontFamily: "'Cal Sans', sans-serif",
+                fontSize: '16px',
+                fontWeight: 400,
+                color: '#333333',
+                lineHeight: 1.8,
+              }}
+            >
+              We retain your account information for as long as your account remains active. If you delete your
+              account, we will delete or anonymize your personal information within a reasonable timeframe, except
+              where we are required to retain certain records for legal or regulatory purposes.
+            </p>
+          </div>
+
+          {/* Section 6 — Your Rights */}
+          <div style={{ marginBottom: '48px' }}>
+            <h2
+              style={{
+                fontFamily: "'Cal Sans', serif",
+                fontSize: '36px',
+                fontWeight: 600,
+                color: '#020C1C',
+                borderBottom: '2px solid #10C4C3',
+                paddingBottom: '12px',
+                marginBottom: '20px',
+              }}
+            >
+              6. Your Rights
             </h2>
             <p
               style={{
@@ -425,7 +596,7 @@
                 marginBottom: '12px',
               }}
             >
-              Under the Digital Personal Data Protection Act, 2023, you have the following rights as a Data Principal:
+              You have the right to:
             </p>
             <ul
               style={{
@@ -435,30 +606,20 @@
                 color: '#333333',
                 lineHeight: 1.8,
                 paddingLeft: '24px',
+                marginBottom: '16px',
               }}
             >
               <li style={{ marginBottom: '10px' }}>
-                <strong>Right to Access:</strong> request a summary of the personal data we hold about you and the
-                purposes for which it is processed.
+                <strong>Access</strong> the personal information we hold about you
               </li>
               <li style={{ marginBottom: '10px' }}>
-                <strong>Right to Correction:</strong> request correction of inaccurate or incomplete personal data.
+                <strong>Correct</strong> inaccurate information via your profile settings
               </li>
               <li style={{ marginBottom: '10px' }}>
-                <strong>Right to Erasure:</strong> request deletion of your personal data when it is no longer
-                necessary for the purpose it was collected, subject to legal retention obligations.
+                <strong>Delete</strong> your account and associated personal data
               </li>
               <li style={{ marginBottom: '10px' }}>
-                <strong>Right to Withdraw Consent:</strong> withdraw consent at any time for processing activities
-                based on consent — withdrawal does not affect the lawfulness of prior processing.
-              </li>
-              <li style={{ marginBottom: '10px' }}>
-                <strong>Right to Grievance Redressal:</strong> raise a complaint with our Data Protection Officer
-                (details in Section 8) within 30 days of the relevant event.
-              </li>
-              <li style={{ marginBottom: '10px' }}>
-                <strong>Right to Nominate:</strong> nominate another individual to exercise rights on your behalf in
-                the event of death or incapacity.
+                <strong>Ask questions</strong> about how your data is used
               </li>
             </ul>
             <p
@@ -468,48 +629,11 @@
                 fontWeight: 400,
                 color: '#333333',
                 lineHeight: 1.8,
-                marginTop: '16px',
               }}
             >
-              To exercise any of these rights, email{' '}
-              <a href="mailto:privacy@nilay360.com" style={{ color: '#10C4C3', textDecoration: 'none' }}>
-                privacy@nilay360.com
-              </a>{' '}
-              with the subject line &ldquo;DPDP Rights Request&rdquo; and your registered email address. We will
-              respond within 30 days.
-            </p>
-          </div>
-
-          {/* Section 6 — Cookies */}
-          <div style={{ marginBottom: '48px' }}>
-            <h2
-              style={{
-                fontFamily: "'Cal Sans', serif",
-                fontSize: '36px',
-                fontWeight: 600,
-                color: '#020C1C',
-                borderBottom: '2px solid #10C4C3',
-                paddingBottom: '12px',
-                marginBottom: '20px',
-              }}
-            >
-              6. Cookies
-            </h2>
-            <p
-              style={{
-                fontFamily: "'Cal Sans', sans-serif",
-                fontSize: '16px',
-                fontWeight: 400,
-                color: '#333333',
-                lineHeight: 1.8,
-              }}
-            >
-              We use cookies and similar tracking technologies to enhance your browsing experience, analyse traffic, and
-              personalise content. Essential cookies are necessary for the Platform to function. Analytics and marketing
-              cookies are used only with your consent. For detailed information on the types of cookies we use and how
-              to manage your preferences, please read our Cookie Policy at{' '}
-              <a href="/cookies" style={{ color: '#10C4C3', textDecoration: 'none' }}>
-                www.nilay360.com/cookies
+              To exercise any of these rights, contact us at{' '}
+              <a href="mailto:contact@nilay360.com" style={{ color: '#10C4C3', textDecoration: 'none' }}>
+                contact@nilay360.com
               </a>
               .
             </p>
@@ -540,7 +664,7 @@
                 marginBottom: '12px',
               }}
             >
-              We implement industry-standard security measures including:
+              We take reasonable technical and organizational measures to protect your information, including:
             </p>
             <ul
               style={{
@@ -553,13 +677,9 @@
                 marginBottom: '16px',
               }}
             >
-              <li style={{ marginBottom: '8px' }}>AES-256 encryption for data at rest.</li>
-              <li style={{ marginBottom: '8px' }}>TLS 1.3 encryption for data in transit.</li>
-              <li style={{ marginBottom: '8px' }}>
-                Role-based access controls limiting employee access to personal data.
-              </li>
-              <li style={{ marginBottom: '8px' }}>Regular security audits and penetration testing.</li>
-              <li style={{ marginBottom: '8px' }}>Multi-factor authentication for internal systems.</li>
+              <li style={{ marginBottom: '8px' }}>Encrypted data transmission (HTTPS) across the entire Service</li>
+              <li style={{ marginBottom: '8px' }}>Row-level database security restricting who can access which data</li>
+              <li style={{ marginBottom: '8px' }}>Restricted internal access to production systems</li>
             </ul>
             <p
               style={{
@@ -570,13 +690,100 @@
                 lineHeight: 1.8,
               }}
             >
-              In the event of a personal data breach that is likely to result in harm to Data Principals, we will
-              notify the Data Protection Board of India and affected users within 72 hours of becoming aware of the
-              breach, as required under the DPDP Act, 2023.
+              No method of transmission or storage is 100% secure, and we cannot guarantee absolute security.
             </p>
           </div>
 
-          {/* Section 8 — Contact Our Data Protection Officer */}
+          {/* Section 8 — Children's Privacy */}
+          <div style={{ marginBottom: '48px' }}>
+            <h2
+              style={{
+                fontFamily: "'Cal Sans', serif",
+                fontSize: '36px',
+                fontWeight: 600,
+                color: '#020C1C',
+                borderBottom: '2px solid #10C4C3',
+                paddingBottom: '12px',
+                marginBottom: '20px',
+              }}
+            >
+              8. Children&rsquo;s Privacy
+            </h2>
+            <p
+              style={{
+                fontFamily: "'Cal Sans', sans-serif",
+                fontSize: '16px',
+                fontWeight: 400,
+                color: '#333333',
+                lineHeight: 1.8,
+              }}
+            >
+              Nilay360 is intended for users who are at least 18 years old. We do not knowingly collect personal
+              information from children. If you believe a child has provided us with personal information, please
+              contact us so we can remove it.
+            </p>
+          </div>
+
+          {/* Section 9 — International Data Storage */}
+          <div style={{ marginBottom: '48px' }}>
+            <h2
+              style={{
+                fontFamily: "'Cal Sans', serif",
+                fontSize: '36px',
+                fontWeight: 600,
+                color: '#020C1C',
+                borderBottom: '2px solid #10C4C3',
+                paddingBottom: '12px',
+                marginBottom: '20px',
+              }}
+            >
+              9. International Data Storage
+            </h2>
+            <p
+              style={{
+                fontFamily: "'Cal Sans', sans-serif",
+                fontSize: '16px',
+                fontWeight: 400,
+                color: '#333333',
+                lineHeight: 1.8,
+              }}
+            >
+              Some of our service providers (listed in Section 3) may store or process data on servers located
+              outside India. We take steps to ensure these providers maintain appropriate data protection standards.
+            </p>
+          </div>
+
+          {/* Section 10 — Changes to This Policy */}
+          <div style={{ marginBottom: '48px' }}>
+            <h2
+              style={{
+                fontFamily: "'Cal Sans', serif",
+                fontSize: '36px',
+                fontWeight: 600,
+                color: '#020C1C',
+                borderBottom: '2px solid #10C4C3',
+                paddingBottom: '12px',
+                marginBottom: '20px',
+              }}
+            >
+              10. Changes to This Policy
+            </h2>
+            <p
+              style={{
+                fontFamily: "'Cal Sans', sans-serif",
+                fontSize: '16px',
+                fontWeight: 400,
+                color: '#333333',
+                lineHeight: 1.8,
+              }}
+            >
+              We may update this policy from time to time. If we make material changes, we will update the
+              &ldquo;Last updated&rdquo; date above. Continued use of the Service after changes take effect
+              constitutes acceptance of the updated policy.
+            </p>
+          </div>
+
+          {/* Section 11 — Contact Us */}
           <div style={{ marginBottom: '0' }}>
             <h2
               style={{
@@ -589,7 +796,7 @@
                 marginBottom: '20px',
               }}
             >
-              8. Contact Our Data Protection Officer
+              11. Contact Us
             </h2>
             <p
               style={{
@@ -601,15 +808,14 @@
                 marginBottom: '16px',
               }}
             >
-              For privacy-related queries, requests, or complaints, please contact our Data Protection Officer:
+              If you have questions about this Privacy Policy or how your data is handled, contact us at:
             </p>
             <div
               style={{
                 background: '#020C1C',
-                border: '1px solid rgba(201,168,76,0.25)',
+                border: '1px solid rgba(16,196,195,0.25)',
                 borderRadius: '2px',
                 padding: '24px 28px',
-                marginBottom: '20px',
               }}
             >
               <p
@@ -621,40 +827,16 @@
                   lineHeight: 2,
                 }}
               >
-                <strong>Name:</strong> Data Protection Officer
-                <br />
-                <strong>Organisation:</strong> Nilay 360 Real Estate Technologies Pvt. Ltd.
-                <br />
                 <strong>Email:</strong>{' '}
-                <a href="mailto:privacy@nilay360.com" style={{ color: '#10C4C3', textDecoration: 'none' }}>
-                  privacy@nilay360.com
+                <a href="mailto:contact@nilay360.com" style={{ color: '#10C4C3', textDecoration: 'none' }}>
+                  contact@nilay360.com
                 </a>
                 <br />
-                <strong>Address:</strong> 8th Floor, Prestige Cyber Towers, Hitec City, Hyderabad — 500081,
-                Telangana, India.
+                <strong>WhatsApp:</strong> +91 70757 92497
+                <br />
+                <strong>Address:</strong> NIVILA Group, Hyderabad, Telangana, India
               </p>
             </div>
-            <p
-              style={{
-                fontFamily: "'Cal Sans', sans-serif",
-                fontSize: '16px',
-                fontWeight: 400,
-                color: '#333333',
-                lineHeight: 1.8,
-              }}
-            >
-              If you are not satisfied with our response, you may lodge a complaint with the Data Protection Board of
-              India at{' '}
-              <a
-                href="https://www.dataprotection.gov.in"
-                target="_blank"
-                rel="noopener noreferrer"
-                style={{ color: '#10C4C3', textDecoration: 'none' }}
-              >
-                www.dataprotection.gov.in
-              </a>
-              .
-            </p>
           </div>
         </div>
       </section>
