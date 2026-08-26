@@ -50,6 +50,11 @@ const LEADERS: Leader[] = [
 // affordance. Swap these spans for <a href="..."> once the URLs arrive.
 const SOCIALS = ["Instagram", "LinkedIn", "X"] as const;
 
+// Temporarily hides leader photos/names/roles/bios while showing a
+// placeholder in their place. Flip back to true to restore — the LEADERS
+// data above is untouched. Reminder: this is meant to be temporary, revisit.
+const SHOW_LEADERSHIP_DETAILS = false;
+
 function SocialPlaceholders({ name }: { name: string }) {
   return (
     <div style={{ display: "flex", gap: "10px" }} aria-label={`Social profiles for ${name} — coming soon`}>
@@ -127,36 +132,46 @@ export default function Leadership() {
           <h2 style={{ margin: "0 0 clamp(40px, 5vw, 80px)", maxWidth: "22ch", fontFamily: "'Cal Sans', Georgia, serif", fontWeight: 300, fontSize: "clamp(30px, 4.4vw, 70px)", lineHeight: 1.06, letterSpacing: "-0.026em", color: "#FFFFFF" }}>Four people. One shared purpose.</h2>
         </Reveal>
 
-        <div style={{ display: "flex", flexDirection: "column" }}>
-          {LEADERS.map((leader, i) => (
-            <div key={leader.name} className={`ab-lead-row${i % 2 === 1 ? " ab-lead-row--flip" : ""}`}>
-              <Reveal className="ab-lead-portrait" y={30}>
-                <Portrait leader={leader} float={!reduce} />
-              </Reveal>
+        {SHOW_LEADERSHIP_DETAILS ? (
+          <div style={{ display: "flex", flexDirection: "column" }}>
+            {LEADERS.map((leader, i) => (
+              <div key={leader.name} className={`ab-lead-row${i % 2 === 1 ? " ab-lead-row--flip" : ""}`}>
+                <Reveal className="ab-lead-portrait" y={30}>
+                  <Portrait leader={leader} float={!reduce} />
+                </Reveal>
 
-              <div className="ab-lead-body">
-                <Reveal delay={0.08} y={16}>
-                  <div style={{ display: "flex", alignItems: "center", gap: "14px", marginBottom: "clamp(16px, 2vw, 26px)" }}>
-                    <span style={{ width: "34px", height: "1px", background: "rgba(255,255,255,0.16)" }} />
-                    <span style={{ fontFamily: "'Cal Sans', sans-serif", fontSize: "11px", fontWeight: 600, letterSpacing: "0.2em", textTransform: "uppercase", color: TEAL }}>{leader.role}</span>
-                  </div>
-                </Reveal>
-                <Reveal delay={0.14} y={24}>
-                  <h3 style={{ margin: "0 0 clamp(14px, 1.8vw, 22px)", fontFamily: "'Cal Sans', Georgia, serif", fontWeight: 300, fontSize: "clamp(26px, 3.2vw, 50px)", lineHeight: 1.06, letterSpacing: "-0.024em", color: "#FFFFFF" }}>{leader.name}</h3>
-                </Reveal>
-                <Reveal delay={0.2} y={20}>
-                  <p style={{ margin: "0 0 clamp(18px, 2.2vw, 28px)", maxWidth: "44ch", fontFamily: "'Cal Sans', Georgia, serif", fontWeight: 300, fontSize: "clamp(17px, 1.5vw, 23px)", lineHeight: 1.5, letterSpacing: "-0.008em", color: "rgba(255,255,255,0.9)" }}>{leader.tagline}</p>
-                </Reveal>
-                <Reveal delay={0.26} y={20}>
-                  <p style={{ margin: "0 0 clamp(24px, 3vw, 38px)", maxWidth: "50ch", fontSize: "clamp(14.5px, 1.1vw, 17px)", lineHeight: 1.9, color: "rgba(255,255,255,0.52)" }}>{leader.bio}</p>
-                </Reveal>
-                <Reveal delay={0.32} y={14}>
-                  <SocialPlaceholders name={leader.name} />
-                </Reveal>
+                <div className="ab-lead-body">
+                  <Reveal delay={0.08} y={16}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "14px", marginBottom: "clamp(16px, 2vw, 26px)" }}>
+                      <span style={{ width: "34px", height: "1px", background: "rgba(255,255,255,0.16)" }} />
+                      <span style={{ fontFamily: "'Cal Sans', sans-serif", fontSize: "11px", fontWeight: 600, letterSpacing: "0.2em", textTransform: "uppercase", color: TEAL }}>{leader.role}</span>
+                    </div>
+                  </Reveal>
+                  <Reveal delay={0.14} y={24}>
+                    <h3 style={{ margin: "0 0 clamp(14px, 1.8vw, 22px)", fontFamily: "'Cal Sans', Georgia, serif", fontWeight: 300, fontSize: "clamp(26px, 3.2vw, 50px)", lineHeight: 1.06, letterSpacing: "-0.024em", color: "#FFFFFF" }}>{leader.name}</h3>
+                  </Reveal>
+                  <Reveal delay={0.2} y={20}>
+                    <p style={{ margin: "0 0 clamp(18px, 2.2vw, 28px)", maxWidth: "44ch", fontFamily: "'Cal Sans', Georgia, serif", fontWeight: 300, fontSize: "clamp(17px, 1.5vw, 23px)", lineHeight: 1.5, letterSpacing: "-0.008em", color: "rgba(255,255,255,0.9)" }}>{leader.tagline}</p>
+                  </Reveal>
+                  <Reveal delay={0.26} y={20}>
+                    <p style={{ margin: "0 0 clamp(24px, 3vw, 38px)", maxWidth: "50ch", fontSize: "clamp(14.5px, 1.1vw, 17px)", lineHeight: 1.9, color: "rgba(255,255,255,0.52)" }}>{leader.bio}</p>
+                  </Reveal>
+                  <Reveal delay={0.32} y={14}>
+                    <SocialPlaceholders name={leader.name} />
+                  </Reveal>
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        ) : (
+          <div style={{ padding: "clamp(64px, 10vw, 140px) 0", textAlign: "center", borderTop: "1px solid rgba(255,255,255,0.08)", borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
+            <Reveal>
+              <p style={{ margin: 0, fontFamily: "'Cal Sans', Georgia, serif", fontWeight: 300, fontStyle: "italic", fontSize: "clamp(24px, 3.2vw, 40px)", color: TEAL }}>
+                Meet the team — coming soon
+              </p>
+            </Reveal>
+          </div>
+        )}
       </div>
     </section>
   );
