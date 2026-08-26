@@ -4,18 +4,19 @@ import { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
+import { optimizedImageUrl } from "@/lib/image-url";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
 interface Property {
-  id: number;
+  id: string;
+  slug: string;
   title: string;
   location: string;
   price: number;
   area: number;
   price_per_sqft: number;
   property_type: string;
-  yield_percent: number;
   image_url: string | null;
 }
 
@@ -109,13 +110,23 @@ function PropertyCard({ prop }: { prop: Property }) {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
+        overflow: "hidden",
       }}>
-        <span style={{ fontSize: 48, opacity: 0.35 }}>
-          {prop.property_type === "Office" ? "🏢"
-            : prop.property_type === "Retail" ? "🏪"
-            : prop.property_type === "Warehouse" ? "🏭"
-            : "🏗"}
-        </span>
+        {prop.image_url ? (
+          <img
+            src={optimizedImageUrl(prop.image_url, 500)}
+            alt={prop.title}
+            loading="lazy"
+            style={{ width: "100%", height: "100%", objectFit: "cover" }}
+          />
+        ) : (
+          <span style={{ fontSize: 48, opacity: 0.35 }}>
+            {prop.property_type === "Office" ? "🏢"
+              : prop.property_type === "Retail" ? "🏪"
+              : prop.property_type === "Warehouse" ? "🏭"
+              : "🏗"}
+          </span>
+        )}
         {/* Type badge */}
         <div style={{
           position: "absolute",
@@ -175,26 +186,7 @@ function PropertyCard({ prop }: { prop: Property }) {
           {prop.area.toLocaleString("en-IN")} sq ft &nbsp;·&nbsp; ₹{prop.price_per_sqft.toLocaleString("en-IN")} / sq ft
         </p>
 
-        {/* Yield badge */}
-        <div style={{
-          display: "inline-flex",
-          alignItems: "center",
-          gap: 6,
-          background: "rgba(13,43,31,0.08)",
-          color: "#020C1C",
-          borderRadius: 4,
-          padding: "4px 10px",
-          fontFamily: "'Cal Sans', sans-serif",
-          fontSize: 12,
-          fontWeight: 500,
-          alignSelf: "flex-start",
-          marginBottom: 20,
-        }}>
-          <span style={{ color: "#2e7d52", fontSize: 10 }}>●</span>
-          {prop.yield_percent}% Avg Yield
-        </div>
-
-        <Link href={`/property/${prop.id}`} style={{
+        <Link href={`/property/${prop.slug}`} style={{
           marginTop: "auto",
           fontFamily: "'Cal Sans', sans-serif",
           fontSize: 13,
@@ -267,10 +259,12 @@ function CommercialPageInner() {
       setLoading(true);
       try {
         const supabase = createClient();
+        // Listings live in property_listings (seller-submitted) — the old
+        // `properties` seed/catalog table this used to query is empty.
         const { data, error } = await supabase
-          .from("properties")
+          .from("property_listings")
           .select("*")
-          .eq("property_type", "Office")
+          .eq("listing_type", "commercial")
           .eq("status", "active")
           .limit(6);
 
@@ -278,7 +272,27 @@ function CommercialPageInner() {
           setProperties([]);
         } else {
           // Commercial listings are Hyderabad-only — enforced here, not just hidden in the UI.
-          setProperties((data as Property[]).filter(p => p.location?.toLowerCase().includes("hyderabad")));
+          setProperties(
+            data
+              .filter((p: any) => typeof p.city === "string" && p.city.toLowerCase().includes("hyderabad"))
+              .map((p: any): Property => {
+                const area = Number(p.built_up_area) || 0;
+                const price = Number(p.price) || 0;
+                return {
+                  id: String(p.id ?? ""),
+                  slug: typeof p.slug === "string" ? p.slug : String(p.id ?? ""),
+                  title: typeof p.title === "string" ? p.title : "Untitled Property",
+                  location: [p.locality, p.city].filter(Boolean).join(", "),
+                  price,
+                  area,
+                  price_per_sqft: area > 0 ? Math.round(price / area) : 0,
+                  property_type: typeof p.property_category === "string"
+                    ? p.property_category.charAt(0).toUpperCase() + p.property_category.slice(1)
+                    : "Office",
+                  image_url: Array.isArray(p.photo_urls) ? p.photo_urls[0] ?? null : null,
+                };
+              })
+          );
         }
       } catch {
         setProperties([]);

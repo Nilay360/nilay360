@@ -177,17 +177,27 @@ export default function CityPage() {
     async function load() {
       try {
         const supabase = createClient();
+        // Listings live in property_listings (seller-submitted) — the old
+        // `properties` seed/catalog table this used to query is empty.
         const { data } = await supabase
-          .from("properties")
-          .select(`*, neighbourhood:neighbourhoods(name)`)
+          .from("property_listings")
+          .select("*")
           .eq("status", "active")
-          .eq("approval_status", "approved")
-          .ilike("city_id", `%${cfg.name}%`)
+          .ilike("city", `%${cfg.name}%`)
           .limit(12);
         setProperties((data ?? []).map((p: any) => ({
-          ...p,
-          neighbourhood: p.neighbourhood?.name ?? null,
-          featured_image: p.images?.[0] ?? null,
+          id: String(p.id ?? ""),
+          slug: typeof p.slug === "string" ? p.slug : String(p.id ?? ""),
+          title: typeof p.title === "string" ? p.title : "Untitled Property",
+          price: Number(p.price) || 0,
+          listing_type: p.listing_type === "rent" ? "rent" : "sale",
+          property_type: typeof p.property_category === "string" ? p.property_category : "",
+          bedrooms: p.bedrooms != null ? Number(p.bedrooms) || null : null,
+          bathrooms: p.bathrooms != null ? Number(p.bathrooms) || null : null,
+          area_sqft: p.built_up_area != null ? Number(p.built_up_area) || null : null,
+          images: Array.isArray(p.photo_urls) ? p.photo_urls.filter(Boolean) : [],
+          featured_image: p.photo_urls?.[0] ?? null,
+          neighbourhood: typeof p.locality === "string" ? p.locality : undefined,
         })));
       } catch {
         setProperties([]);
