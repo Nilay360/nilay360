@@ -6,6 +6,7 @@ import Reveal from "@/components/ui/Reveal";
 import { createClient } from "@/lib/supabase/client";
 import { useSavedProperties } from "@/hooks/useSavedProperties";
 import ResultsGate from "@/components/property/ResultsGate";
+import { optimizedImageUrl } from "@/lib/image-url";
 
 /* ─── Palette ─────────────────────────────────────────────── */
 const G = {
@@ -1047,7 +1048,7 @@ export default function HomePage() {
                 style={{flexShrink:0, width:280, borderRadius:16, overflow:"hidden", display:"block", scrollSnapAlign:"start"}}>
                 {/* Image */}
                 <div style={{height:180, position:"relative", overflow:"hidden"}}>
-                  <div className="card-img" style={{position:"absolute", inset:0, backgroundImage:`url(${p.img})`, backgroundSize:"cover", backgroundPosition:"center"}} />
+                  <div className="card-img" style={{position:"absolute", inset:0, backgroundImage:`url(${optimizedImageUrl(p.img, 400)})`, backgroundSize:"cover", backgroundPosition:"center"}} />
                   <div style={{position:"absolute", inset:0, background:"linear-gradient(to top, rgba(0,0,0,0.4) 0%, transparent 50%)"}} />
                   <span className="badge-tag" style={{position:"absolute", top:12, left:12, zIndex:1}}>{p.tag}</span>
                   <button
