@@ -834,7 +834,9 @@
                 <br />
                 <strong>WhatsApp:</strong> +91 70757 92497
                 <br />
-                <strong>Address:</strong> NIVILA Group, Hyderabad, Telangana, India
+                {/* TEMPORARY: Using Hustle Hive office address (owner-confirmed, same location as an existing commercial listing), revert to Nilay360's own registered address once available */}
+                <strong>Address:</strong> 4th Floor, Trendz Techpark, Road No. 11, Kakatiya Hills, Guttala Begumpet,
+                Kavuri Hills, Madhapur, Hyderabad, Telangana 500081
               </p>
             </div>
           </div>

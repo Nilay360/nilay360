@@ -764,8 +764,9 @@
                   privacy@nilay360.com
                 </a>
                 <br />
-                <strong>Address:</strong> 8th Floor, Prestige Cyber Towers, Hitec City, Hyderabad &mdash; 500081,
-                Telangana, India.
+                {/* TEMPORARY: Using Hustle Hive office address (owner-confirmed, same location as an existing commercial listing), revert to Nilay360's own registered address once available */}
+                <strong>Address:</strong> 4th Floor, Trendz Techpark, Road No. 11, Kakatiya Hills, Guttala Begumpet,
+                Kavuri Hills, Madhapur, Hyderabad, Telangana 500081.
               </p>
             </div>
           </div>
