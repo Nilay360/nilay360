@@ -347,7 +347,8 @@ export default function ContactPage() {
                   <span style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.2em", color: "#10C4C3", textTransform: "uppercase" }}>Contact Details</span>
                 </div>
                 {[
-                  { icon: "📍", label: "Address",  value: "Jubilee Hills, Hyderabad\nTelangana — 500 033" },
+                  // TEMPORARY: Using Hustle Hive office address (owner-confirmed, same location as an existing commercial listing), revert to Nilay360's own registered address once available
+                  { icon: "📍", label: "Address",  value: "4th Floor, Trendz Techpark, Road No. 11, Kakatiya Hills\nGuttala Begumpet, Kavuri Hills, Madhapur, Hyderabad, Telangana 500081" },
                   { icon: "📞", label: "Phone",    value: "+91 7075 792497",        href: "tel:+917075792497" },
                   { icon: "✉",  label: "Email",    value: "contact@nilay360.com",   href: "mailto:contact@nilay360.com" },
                   { icon: "💬", label: "WhatsApp", value: "+91 7075 792497",         href: "https://wa.me/917075792497?text=Hi%2C%20I%27m%20interested%20in%20a%20property%20on%20Nilay%20360" },
@@ -369,12 +370,13 @@ export default function ContactPage() {
             </div>
 
             {/* Map placeholder */}
+            {/* TEMPORARY: Using Hustle Hive office address (owner-confirmed, same location as an existing commercial listing), revert to Nilay360's own registered address once available */}
             <div style={{ background: "#020C1C", borderRadius: "16px", padding: "32px", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: "200px", border: "1px solid rgba(201,168,76,0.12)", position: "relative", overflow: "hidden", cursor: "pointer" }}
-              onClick={() => window.open("https://maps.google.com/?q=Jubilee+Hills+Hyderabad", "_blank")}>
+              onClick={() => window.open("https://maps.google.com/?q=Trendz+Techpark+Kakatiya+Hills+Madhapur+Hyderabad", "_blank")}>
               <div style={{ position: "absolute", inset: 0, backgroundImage: "radial-gradient(circle at 50% 50%, rgba(201,168,76,0.06) 0%, transparent 70%)", pointerEvents: "none" }} />
               <div style={{ width: "52px", height: "52px", borderRadius: "50%", background: "rgba(201,168,76,0.15)", border: "1.5px solid rgba(201,168,76,0.3)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "24px", marginBottom: "14px" }}>📍</div>
-              <p style={{ fontSize: "14px", fontWeight: 600, color: "#020C1C", marginBottom: "4px" }}>Jubilee Hills, Hyderabad</p>
-              <p style={{ fontSize: "12px", color: "rgba(245,242,236,0.35)" }}>Telangana — 500 033</p>
+              <p style={{ fontSize: "14px", fontWeight: 600, color: "#020C1C", marginBottom: "4px" }}>Kakatiya Hills, Madhapur</p>
+              <p style={{ fontSize: "12px", color: "rgba(245,242,236,0.35)" }}>Telangana — 500081</p>
               <span style={{ marginTop: "14px", fontSize: "11px", fontWeight: 700, letterSpacing: "0.1em", color: "#10C4C3", textTransform: "uppercase", display: "flex", alignItems: "center", gap: "5px" }}>
                 Open in Maps
                 <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="7" y1="17" x2="17" y2="7" /><polyline points="7 7 17 7 17 17" /></svg>
@@ -419,7 +421,8 @@ export default function ContactPage() {
             </div>
             <div className="ct-offices-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "20px" }}>
               {[
-                { city: "Hyderabad", sub: "Headquarters", address: "Road No. 12, Jubilee Hills\nHyderabad, Telangana 500 033", phone: "+91 40 0000 0000", status: "Open", statusColor: "#059669", statusBg: "rgba(5,150,105,0.08)", main: true },
+                // TEMPORARY: Using Hustle Hive office address (owner-confirmed, same location as an existing commercial listing), revert to Nilay360's own registered address once available
+                { city: "Hyderabad", sub: "Headquarters", address: "4th Floor, Trendz Techpark, Road No. 11, Kakatiya Hills\nGuttala Begumpet, Kavuri Hills, Madhapur, Hyderabad, Telangana 500081", phone: "+91 40 0000 0000", status: "Open", statusColor: "#059669", statusBg: "rgba(5,150,105,0.08)", main: true },
                 { city: "Mumbai",    sub: "Regional Office", address: "Bandra Kurla Complex\nMumbai, Maharashtra 400 051", phone: "Coming soon",       status: "Coming Soon", statusColor: "#D97706", statusBg: "rgba(217,119,6,0.08)", main: false },
                 { city: "Bengaluru", sub: "Regional Office", address: "Koramangala, 5th Block\nBengaluru, Karnataka 560 095", phone: "Coming soon",    status: "Coming Soon", statusColor: "#D97706", statusBg: "rgba(217,119,6,0.08)", main: false },
               ].map(loc => (

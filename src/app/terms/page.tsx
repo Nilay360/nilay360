@@ -572,8 +572,9 @@ export default function TermsPage() {
                 lineHeight: 1.8,
                 marginBottom: '4px',
               }}>
-                Email: <a href="mailto:legal@nilay360.com" style={{ color: '#10C4C3', textDecoration: 'none' }}>legal@nilay360.com</a>
+                Email: <a href="mailto:contact@nilay360.com" style={{ color: '#10C4C3', textDecoration: 'none' }}>contact@nilay360.com</a>
               </p>
+              {/* TEMPORARY: Using Hustle Hive office address (owner-confirmed, same location as an existing commercial listing), revert to Nilay360's own registered address once available */}
               <p style={{
                 fontFamily: "'Cal Sans', sans-serif",
                 fontSize: '15px',
@@ -581,7 +582,7 @@ export default function TermsPage() {
                 color: '#555555',
                 lineHeight: 1.8,
               }}>
-                Address: 8th Floor, Prestige Cyber Towers, Hitec City, Hyderabad &mdash; 500081, Telangana, India
+                Address: 4th Floor, Trendz Techpark, Road No. 11, Kakatiya Hills, Guttala Begumpet, Kavuri Hills, Madhapur, Hyderabad, Telangana 500081
               </p>
               <p style={{
                 fontFamily: "'Cal Sans', sans-serif",
