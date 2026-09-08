@@ -28,7 +28,7 @@ export default function TeamPhoto() {
                 style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
               />
             ) : (
-              <p style={{ margin: 0, fontFamily: "'Cal Sans', Georgia, serif", fontWeight: 300, fontStyle: "italic", fontSize: "clamp(20px, 2.6vw, 32px)", color: "rgba(255,255,255,0.4)" }}>
+              <p style={{ margin: 0, fontFamily: "var(--font-heading-new)", fontWeight: 300, fontStyle: "italic", fontSize: "clamp(20px, 2.6vw, 32px)", color: "rgba(255,255,255,0.4)" }}>
                 Meet the team — coming soon
               </p>
             )}

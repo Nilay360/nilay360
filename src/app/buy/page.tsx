@@ -4,6 +4,7 @@ import { useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { optimizedImageUrl } from "@/lib/image-url";
 import ResultsGate from "@/components/property/ResultsGate";
+import { useLiveStats } from "@/lib/liveStats";
 
 // ── Types ─────────────────────────────────────────────────────
 type Property = {
@@ -95,12 +96,12 @@ function PropertyCard({ p }: { p: Property }) {
           <span style={{ position: "absolute", top: "12px", right: "12px", padding: "4px 10px", borderRadius: "100px", fontSize: "9px", fontWeight: 800, letterSpacing: "0.08em", textTransform: "uppercase", background: "rgba(13,43,31,0.85)", color: "#10C4C3", border: "1px solid rgba(201,168,76,0.3)", backdropFilter: "blur(8px)" }}>Premium</span>
         )}
         <div style={{ position: "absolute", bottom: "12px", left: "14px" }}>
-          <span style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "22px", fontWeight: 600, color: "#10C4C3" }}>{fmtINR(p.price)}</span>
+          <span style={{ fontFamily: "var(--font-support-new)", fontSize: "22px", fontWeight: 600, color: "#10C4C3" }}>{fmtINR(p.price)}</span>
           {p.price_per_sqft && <span style={{ fontSize: "10px", color: "rgba(245,242,236,0.6)", marginLeft: "7px" }}>₹{p.price_per_sqft.toLocaleString("en-IN")}/sqft</span>}
         </div>
       </div>
       <div style={{ padding: "18px 20px 20px" }}>
-        <h3 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "18px", fontWeight: 600, color: "#FFFFFF", lineHeight: 1.3, marginBottom: "6px" }}>{p.title}</h3>
+        <h3 style={{ fontFamily: "var(--font-heading-new)", fontSize: "18px", fontWeight: 600, color: "#FFFFFF", lineHeight: 1.3, marginBottom: "6px" }}>{p.title}</h3>
         <p style={{ display: "flex", alignItems: "center", gap: "4px", fontSize: "11.5px", color: "rgba(255,255,255,0.45)", marginBottom: "14px" }}>
           <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#10C4C3" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
           {p.neighbourhood ? `${p.neighbourhood}, ` : ""}{p.city}
@@ -125,8 +126,8 @@ function PropertyCard({ p }: { p: Property }) {
 const FOOTER_COLS = [
   { heading: "Properties", links: [["Buy","/buy"],["Rent","/rent"],["New Projects","/new-projects"],["Commercial","/commercial"],["Builders","/builders"],["Blog","/blog"]] },
   { heading: "Company",    links: [["About Us","/about"],["Our Agents","/agents"],["NRI Services","/nri"],["Careers","/careers"],["Contact","/contact"]] },
-  { heading: "Tools",      links: [["EMI Calculator","/calculator"],["Compare","/compare"],["Search","/search"],["RERA Guide","/legal-guide"]] },
-  { heading: "Legal",      links: [["Privacy Policy","/privacy"],["Terms of Service","/terms"],["Cookie Policy","/cookies"],["RERA Guide","/legal-guide"]] },
+  { heading: "Tools",      links: [["EMI Calculator","/calculator"],["Compare","/compare"],["Search","/search"],["RERA Guide","/legal-guide"],["Safety Guide","/safety-guide"]] },
+  { heading: "Legal",      links: [["Privacy Policy","/privacy"],["Terms of Service","/terms"],["Cookie Policy","/cookies"],["RERA Guide","/legal-guide"],["Agent Terms","/agent-terms"],["Grievance Redressal","/grievance-redressal"]] },
 ];
 
 // Sale is currently Hyderabad-only. A non-Hyderabad city reaching this page
@@ -137,6 +138,7 @@ const TYPE_PARAM_MAP: Record<string, string> = { apartment: "Apartment", villa: 
 // ── Main page ─────────────────────────────────────────────────
 function BuyPageInner() {
   const searchParams = useSearchParams();
+  const liveStats = useLiveStats();
   const [properties, setProperties] = useState<Property[]>([]);
   const [typeFilter, setTypeFilter] = useState("All");
   const [bhkFilter, setBhkFilter] = useState("All");
@@ -202,14 +204,14 @@ function BuyPageInner() {
     return true;
   });
 
-  const SEL_STYLE = { padding: "9px 32px 9px 14px", minHeight: "44px", boxSizing: "border-box" as const, background: "#0A1526", border: "1.5px solid rgba(255,255,255,0.1)", borderRadius: "9px", fontSize: "12px", fontWeight: 600 as const, fontFamily: "'Cal Sans', sans-serif", cursor: "pointer" as const, outline: "none", appearance: "none" as const, color: "#FFFFFF" as const, backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%23AEB4BC' stroke-width='2.5'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E")`, backgroundRepeat: "no-repeat" as const, backgroundPosition: "right 12px center" as const };
+  const SEL_STYLE = { padding: "9px 32px 9px 14px", minHeight: "44px", boxSizing: "border-box" as const, background: "#0A1526", border: "1.5px solid rgba(255,255,255,0.1)", borderRadius: "9px", fontSize: "12px", fontWeight: 600 as const, fontFamily: "var(--font-body-new)", cursor: "pointer" as const, outline: "none", appearance: "none" as const, color: "#FFFFFF" as const, backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%23AEB4BC' stroke-width='2.5'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E")`, backgroundRepeat: "no-repeat" as const, backgroundPosition: "right 12px center" as const };
 
   return (
     <>
       <style>{`
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
         html { scroll-behavior: smooth; }
-        body { font-family: 'Cal Sans', system-ui, sans-serif; background: #020C1C; overflow-x: hidden; }
+        body { font-family: var(--font-body-new); background: #020C1C; overflow-x: hidden; }
         ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-thumb { background: rgba(201,168,76,0.3); border-radius: 2px; }
         @keyframes fadeUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
@@ -246,16 +248,16 @@ function BuyPageInner() {
             <div style={{ animation: "fadeUp 0.5s ease-out both" }}>
               <Eyebrow label="Verified Listings" />
             </div>
-            <h1 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "clamp(44px, 6.5vw, 80px)", fontWeight: 300, color: "#FFFFFF", lineHeight: 1.08, marginBottom: "16px", animation: "fadeUp 0.5s 0.1s ease-out both" }}>
+            <h1 style={{ fontFamily: "var(--font-heading-new)", fontSize: "clamp(44px, 6.5vw, 80px)", fontWeight: 300, color: "#FFFFFF", lineHeight: 1.08, marginBottom: "16px", animation: "fadeUp 0.5s 0.1s ease-out both" }}>
               Buy Your Dream Property<br /><em style={{ fontStyle: "italic", color: "#10C4C3" }}>in India's Finest Addresses</em>
             </h1>
             <p style={{ fontSize: "16px", color: "rgba(245,242,236,0.5)", marginBottom: "48px", animation: "fadeUp 0.5s 0.18s ease-out both" }}>
               Curated for-sale listings with full legal due diligence, RERA verification, and expert guidance.
             </p>
             <div style={{ display: "flex", justifyContent: "center", gap: "48px", paddingTop: "28px", borderTop: "1px solid rgba(245,242,236,0.06)", animation: "fadeUp 0.5s 0.26s ease-out both" }}>
-              {[["2,400+", "For Sale"], ["14", "Cities"], ["RERA", "Verified"]].map(([v, l]) => (
+              {[[String(liveStats.listingsByType.sale), "For Sale"], [String(liveStats.cities), liveStats.cities === 1 ? "City" : "Cities"], ["RERA", "Verified"]].map(([v, l]) => (
                 <div key={l} style={{ textAlign: "center" }}>
-                  <p style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "30px", fontWeight: 600, color: "#10C4C3" }}>{v}</p>
+                  <p style={{ fontFamily: "var(--font-support-new)", fontSize: "30px", fontWeight: 600, color: "#10C4C3" }}>{v}</p>
                   <p style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.14em", color: "rgba(245,242,236,0.3)", textTransform: "uppercase" }}>{l}</p>
                 </div>
               ))}
@@ -268,7 +270,7 @@ function BuyPageInner() {
           <div style={{ maxWidth: "1280px", margin: "0 auto" }}>
             <div style={{ textAlign: "center", marginBottom: "52px" }}>
               <Eyebrow label="How It Works" />
-              <h2 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "clamp(28px, 3.5vw, 44px)", fontWeight: 300, color: "#FFFFFF", lineHeight: 1.15 }}>
+              <h2 style={{ fontFamily: "var(--font-heading-new)", fontSize: "clamp(28px, 3.5vw, 44px)", fontWeight: 300, color: "#FFFFFF", lineHeight: 1.15 }}>
                 Your Path to<br /><em style={{ fontStyle: "italic", color: "#10C4C3" }}>Home Ownership</em>
               </h2>
             </div>
@@ -285,9 +287,9 @@ function BuyPageInner() {
                 ].map((step, i) => (
                   <div key={step.n} style={{ position: "relative", textAlign: "center", padding: "0 10px" }}>
                     <div style={{ width: "52px", height: "52px", borderRadius: "50%", background: "#10C4C3", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 18px", boxShadow: "0 0 0 6px rgba(201,168,76,0.12)", position: "relative", zIndex: 1 }}>
-                      <span style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "18px", fontWeight: 700, color: "#020C1C" }}>{step.n}</span>
+                      <span style={{ fontFamily: "var(--font-support-new)", fontSize: "18px", fontWeight: 700, color: "#020C1C" }}>{step.n}</span>
                     </div>
-                    <h3 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "17px", fontWeight: 600, color: "#FFFFFF", marginBottom: "8px", lineHeight: 1.3 }}>{step.title}</h3>
+                    <h3 style={{ fontFamily: "var(--font-heading-new)", fontSize: "17px", fontWeight: 600, color: "#FFFFFF", marginBottom: "8px", lineHeight: 1.3 }}>{step.title}</h3>
                     <p style={{ fontSize: "12px", color: "rgba(245,242,236,0.38)", lineHeight: 1.7 }}>{step.desc}</p>
                   </div>
                 ))}
@@ -321,7 +323,7 @@ function BuyPageInner() {
               <option value="3-10" style={{ background: "#0A1526" }}>₹3 – 10 Cr</option>
               <option value="above10" style={{ background: "#0A1526" }}>Above ₹10 Cr</option>
             </select>
-            <button onClick={() => { setTypeFilter("All"); setBhkFilter("All"); setBudgetFilter("all"); }} style={{ padding: "9px 18px", minHeight: "44px", boxSizing: "border-box", borderRadius: "9px", border: "1.5px solid rgba(255,255,255,0.1)", background: "transparent", color: "rgba(255,255,255,0.55)", fontSize: "12px", fontWeight: 600, cursor: "pointer", fontFamily: "'Cal Sans', sans-serif" }}>Reset</button>
+            <button onClick={() => { setTypeFilter("All"); setBhkFilter("All"); setBudgetFilter("all"); }} style={{ padding: "9px 18px", minHeight: "44px", boxSizing: "border-box", borderRadius: "9px", border: "1.5px solid rgba(255,255,255,0.1)", background: "transparent", color: "rgba(255,255,255,0.55)", fontSize: "12px", fontWeight: 600, cursor: "pointer", fontFamily: "var(--font-body-new)" }}>Reset</button>
             <span style={{ marginLeft: "auto", fontSize: "12px", fontWeight: 700, color: "rgba(255,255,255,0.45)" }}>{cityNotAvailable ? 0 : filtered.length} properties</span>
           </div>
         </div>
@@ -333,7 +335,7 @@ function BuyPageInner() {
               <div style={{ width: "56px", height: "56px", borderRadius: "50%", background: "rgba(16,196,195,0.08)", border: "1.5px solid rgba(16,196,195,0.2)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 20px" }}>
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#10C4C3" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
               </div>
-              <p style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "28px", color: "#FFFFFF", marginBottom: "10px" }}>Currently only available in Hyderabad for sale</p>
+              <p style={{ fontFamily: "var(--font-heading-new)", fontSize: "28px", color: "#FFFFFF", marginBottom: "10px" }}>Currently only available in Hyderabad for sale</p>
               <p style={{ fontSize: "13px", color: "rgba(255,255,255,0.45)", marginBottom: "20px" }}>We're not listing sale properties in other cities yet. Looking to rent instead, or browse Hyderabad?</p>
               <div style={{ display: "flex", gap: "12px", justifyContent: "center", flexWrap: "wrap" }}>
                 <a href="/buy" style={{ display: "inline-flex", alignItems: "center", gap: "8px", padding: "11px 24px", background: "#10C4C3", borderRadius: "8px", color: "#020C1C", fontSize: "12px", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", textDecoration: "none" }}>Browse Hyderabad →</a>
@@ -347,14 +349,14 @@ function BuyPageInner() {
                   <div style={{ width: "56px", height: "56px", borderRadius: "50%", background: "rgba(16,196,195,0.08)", border: "1.5px solid rgba(16,196,195,0.2)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 20px" }}>
                     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#10C4C3" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
                   </div>
-                  <p style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "28px", color: "#FFFFFF", marginBottom: "10px" }}>No properties found</p>
+                  <p style={{ fontFamily: "var(--font-heading-new)", fontSize: "28px", color: "#FFFFFF", marginBottom: "10px" }}>No properties found</p>
                   <p style={{ fontSize: "13px", color: "rgba(255,255,255,0.45)", marginBottom: "20px" }}>We don't have any sale listings at the moment. Check back soon or explore our rental options.</p>
                   <a href="/rent" style={{ display: "inline-flex", alignItems: "center", gap: "8px", padding: "11px 24px", background: "#0A1526", borderRadius: "8px", color: "#10C4C3", fontSize: "12px", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", textDecoration: "none" }}>Browse Rentals →</a>
                 </>
               ) : (
                 <>
-                  <p style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "28px", color: "#FFFFFF", marginBottom: "10px" }}>No properties match your filters</p>
-                  <button onClick={() => { setTypeFilter("All"); setBhkFilter("All"); setBudgetFilter("all"); }} style={{ fontSize: "13px", fontWeight: 600, color: "#10C4C3", background: "transparent", border: "none", cursor: "pointer", fontFamily: "'Cal Sans', sans-serif" }}>Clear all filters →</button>
+                  <p style={{ fontFamily: "var(--font-heading-new)", fontSize: "28px", color: "#FFFFFF", marginBottom: "10px" }}>No properties match your filters</p>
+                  <button onClick={() => { setTypeFilter("All"); setBhkFilter("All"); setBudgetFilter("all"); }} style={{ fontSize: "13px", fontWeight: 600, color: "#10C4C3", background: "transparent", border: "none", cursor: "pointer", fontFamily: "var(--font-body-new)" }}>Clear all filters →</button>
                 </>
               )}
             </div>
@@ -373,7 +375,7 @@ function BuyPageInner() {
             {/* Left text */}
             <div>
               <Eyebrow label="EMI Calculator" />
-              <h2 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "clamp(28px, 3.5vw, 46px)", fontWeight: 400, color: "#FFFFFF", lineHeight: 1.2, marginBottom: "16px" }}>
+              <h2 style={{ fontFamily: "var(--font-heading-new)", fontSize: "clamp(28px, 3.5vw, 46px)", fontWeight: 400, color: "#FFFFFF", lineHeight: 1.2, marginBottom: "16px" }}>
                 Estimate Your<br /><em style={{ fontStyle: "italic", color: "#10C4C3" }}>Monthly EMI</em>
               </h2>
               <p style={{ fontSize: "14px", color: "rgba(255,255,255,0.45)", lineHeight: 1.75, marginBottom: "28px" }}>
@@ -411,7 +413,7 @@ function BuyPageInner() {
                 </div>
                 <div style={{ padding: "20px 22px", background: "rgba(201,168,76,0.07)", border: "1px solid rgba(201,168,76,0.18)", borderRadius: "12px", textAlign: "center" }}>
                   <p style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.14em", color: "rgba(245,242,236,0.4)", textTransform: "uppercase", marginBottom: "6px" }}>Monthly EMI</p>
-                  <p style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "38px", fontWeight: 600, color: "#10C4C3" }}>
+                  <p style={{ fontFamily: "var(--font-support-new)", fontSize: "38px", fontWeight: 600, color: "#10C4C3" }}>
                     ₹{Math.round(emi).toLocaleString("en-IN")}
                   </p>
                   <p style={{ fontSize: "11px", color: "rgba(245,242,236,0.3)", marginTop: "4px" }}>
@@ -427,20 +429,20 @@ function BuyPageInner() {
         <section className="buy-why" style={{ maxWidth: "1280px", margin: "0 auto", padding: "72px 48px" }}>
           <div style={{ textAlign: "center", marginBottom: "44px" }}>
             <Eyebrow label="Why Nilay 360" />
-            <h2 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "clamp(28px, 3.5vw, 44px)", fontWeight: 400, color: "#FFFFFF" }}>
+            <h2 style={{ fontFamily: "var(--font-heading-new)", fontSize: "clamp(28px, 3.5vw, 44px)", fontWeight: 400, color: "#FFFFFF" }}>
               Buy with<br /><em style={{ fontStyle: "italic", color: "#10C4C3" }}>Complete Confidence</em>
             </h2>
           </div>
           <div className="buy-why-grid" style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "20px" }}>
             {[
-              { icon: "🛡", color: "#059669", bg: "rgba(5,150,105,0.06)", border: "rgba(5,150,105,0.12)", title: "RERA Protected", desc: "Every listed property is verified under RERA. Builder obligations, delivery timelines, and your investment are legally safeguarded.", pts: ["Mandatory RERA number", "Escrow-protected funds", "Penalty clauses enforced"] },
-              { icon: "⚖️", color: "#10C4C3", bg: "rgba(201,168,76,0.06)", border: "rgba(201,168,76,0.18)", title: "Legal Clarity", desc: "Our in-house legal team reviews title deeds, encumbrance certificates, and ownership documents before you sign anything.", pts: ["Title deed verification", "Encumbrance check", "OC/CC reviewed"] },
-              { icon: "👤", color: "#3B82F6", bg: "rgba(59,130,246,0.06)", border: "rgba(59,130,246,0.15)", title: "Expert Agents", desc: "Work with RERA-certified agents who know the local micro-market, pricing trends, and negotiate on your behalf.", pts: ["RERA certified agents", "Local market expertise", "Negotiation support"] },
+              { icon: "🛡", color: "#059669", bg: "rgba(5,150,105,0.06)", border: "rgba(5,150,105,0.12)", title: "Know Your RERA Rights", desc: "RERA protects home buyers with mandatory disclosures, escrow-protected funds, and enforceable penalty clauses for delayed delivery.", pts: ["Mandatory disclosures", "Escrow-protected funds", "Penalty clauses enforced"] },
+              { icon: "⚖️", color: "#10C4C3", bg: "rgba(201,168,76,0.06)", border: "rgba(201,168,76,0.18)", title: "Protect Yourself Legally", desc: "Nilay 360 doesn't provide in-house legal review — we recommend engaging your own lawyer to check these essentials before you sign.", pts: ["Review the title deed", "Check the encumbrance certificate", "Verify the occupancy certificate (OC)"] },
+              { icon: "👤", color: "#3B82F6", bg: "rgba(59,130,246,0.06)", border: "rgba(59,130,246,0.15)", title: "Expert Agents", desc: "Work with agents who know the local micro-market, pricing trends, and negotiate on your behalf.", pts: ["Local market expertise", "Negotiation support", "Ongoing assistance"] },
               { icon: "💎", color: "#8B5CF6", bg: "rgba(139,92,246,0.06)", border: "rgba(139,92,246,0.15)", title: "Transparent Pricing", desc: "No hidden charges, no inflated quotes. Our pricing is straightforward with a detailed cost breakup before any commitment.", pts: ["No brokerage surprise", "Detailed cost sheet", "Zero hidden charges"] },
             ].map(b => (
               <div key={b.title} style={{ background: b.bg, border: `1.5px solid ${b.border}`, borderRadius: "18px", padding: "28px 24px" }}>
                 <div style={{ fontSize: "28px", marginBottom: "14px" }}>{b.icon}</div>
-                <h3 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "20px", fontWeight: 600, color: "#FFFFFF", marginBottom: "10px" }}>{b.title}</h3>
+                <h3 style={{ fontFamily: "var(--font-heading-new)", fontSize: "20px", fontWeight: 600, color: "#FFFFFF", marginBottom: "10px" }}>{b.title}</h3>
                 <p style={{ fontSize: "12.5px", color: "rgba(255,255,255,0.45)", lineHeight: 1.75, marginBottom: "16px" }}>{b.desc}</p>
                 <ul style={{ listStyle: "none", display: "flex", flexDirection: "column", gap: "6px" }}>
                   {b.pts.map(pt => (
@@ -461,11 +463,14 @@ function BuyPageInner() {
           <div style={{ position: "absolute", inset: 0, background: "radial-gradient(ellipse 60% 55% at 50% 110%, rgba(201,168,76,0.1) 0%, transparent 55%)", pointerEvents: "none" }} />
           <div style={{ position: "relative", zIndex: 2, maxWidth: "680px", margin: "0 auto", textAlign: "center" }}>
             <Eyebrow label="Get Started" />
-            <h2 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "clamp(34px, 5vw, 56px)", fontWeight: 300, color: "#FFFFFF", lineHeight: 1.15, marginBottom: "14px" }}>
+            <h2 style={{ fontFamily: "var(--font-heading-new)", fontSize: "clamp(34px, 5vw, 56px)", fontWeight: 300, color: "#FFFFFF", lineHeight: 1.15, marginBottom: "14px" }}>
               Start Your Property<br /><em style={{ fontStyle: "italic", color: "#10C4C3" }}>Search Today</em>
             </h2>
             <p style={{ fontSize: "15px", color: "rgba(245,242,236,0.45)", lineHeight: 1.75, marginBottom: "36px" }}>
-              Over 2,400 verified properties across 14 Indian cities. Our experts guide you from search to registration.
+              {liveStats.listingsByType.sale} {liveStats.listingsByType.sale === 1 ? "property" : "properties"} for sale
+              {liveStats.cityNames.length === 1
+                ? ` in ${liveStats.cityNames[0]}`
+                : ` across ${liveStats.cities} Indian cities`}. Our experts guide you from search to registration.
             </p>
             <div style={{ display: "flex", gap: "14px", justifyContent: "center", flexWrap: "wrap" }}>
               <a href="/properties" style={{ padding: "14px 36px", background: "#10C4C3", borderRadius: "9px", color: "#020C1C", fontSize: "13px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", textDecoration: "none", display: "inline-flex", alignItems: "center", gap: "8px" }}>
@@ -484,8 +489,8 @@ function BuyPageInner() {
           <div style={{ maxWidth: "1280px", margin: "0 auto" }}>
             <div className="buy-footer-grid" style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1fr 1fr", gap: "40px", paddingBottom: "56px", borderBottom: "1px solid rgba(245,242,236,0.06)" }}>
               <div>
-                <div style={{ fontFamily: "'Cal Sans', sans-serif", fontSize: "18px", fontWeight: 600, color: "#fff", letterSpacing: "0.16em", marginBottom: "14px" }}>Nilay 360 <span style={{ color: "#10C4C3" }}>·</span></div>
-                <p style={{ fontSize: "13px", color: "rgba(245,242,236,0.35)", lineHeight: 1.75, maxWidth: "260px", marginBottom: "20px" }}>India's most trusted premium real estate platform. Every listing verified, every project curated.</p>
+                <div style={{ fontFamily: "var(--font-support-new)", fontSize: "18px", fontWeight: 600, color: "#fff", letterSpacing: "0.16em", marginBottom: "14px" }}>Nilay 360 <span style={{ color: "#10C4C3" }}>·</span></div>
+                <p style={{ fontSize: "13px", color: "rgba(245,242,236,0.35)", lineHeight: 1.75, maxWidth: "260px", marginBottom: "20px" }}>India's premium real estate platform connecting discerning buyers with exceptional properties.</p>
                 <div style={{ display: "flex", gap: "10px" }}>
                   {[
                     { s: "IN", href: "https://www.instagram.com/nilay360_/" },
@@ -509,7 +514,6 @@ function BuyPageInner() {
             </div>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "22px 0", flexWrap: "wrap", gap: "12px" }}>
               <p style={{ fontSize: "12px", color: "rgba(245,242,236,0.2)" }}>© 2025 Nilay 360. All rights reserved.</p>
-              <span style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.1em", padding: "4px 10px", background: "rgba(201,168,76,0.08)", border: "1px solid rgba(201,168,76,0.15)", borderRadius: "4px", color: "rgba(201,168,76,0.5)" }}>RERA COMPLIANT</span>
             </div>
           </div>
         </footer>

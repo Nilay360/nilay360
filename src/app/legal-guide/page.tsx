@@ -211,7 +211,7 @@ export default function LegalGuidePage() {
   return (
     <div
       style={{
-        fontFamily: "'Cal Sans', sans-serif",
+        fontFamily: "var(--font-body-new)",
         margin: 0,
         padding: 0,
         boxSizing: "border-box",
@@ -244,7 +244,7 @@ export default function LegalGuidePage() {
         <a
           href="/"
           style={{
-            fontFamily: "'Cal Sans', serif",
+            fontFamily: "var(--font-support-new)",
             fontSize: "24px",
             color: "#10C4C3",
             fontWeight: 600,
@@ -274,7 +274,7 @@ export default function LegalGuidePage() {
               key={link.href}
               href={link.href}
               style={{
-                fontFamily: "'Cal Sans', sans-serif",
+                fontFamily: "var(--font-body-new)",
                 fontSize: "14px",
                 color: "rgba(255,255,255,0.75)",
                 textDecoration: "none",
@@ -290,7 +290,7 @@ export default function LegalGuidePage() {
           <a
             href="/login"
             style={{
-              fontFamily: "'Cal Sans', sans-serif",
+              fontFamily: "var(--font-body-new)",
               fontSize: "14px",
               color: "#10C4C3",
               border: "1px solid #10C4C3",
@@ -305,7 +305,7 @@ export default function LegalGuidePage() {
           <a
             href="/post-property"
             style={{
-              fontFamily: "'Cal Sans', sans-serif",
+              fontFamily: "var(--font-body-new)",
               fontSize: "14px",
               color: "#05080C",
               background: "#10C4C3",
@@ -332,7 +332,7 @@ export default function LegalGuidePage() {
       >
         <p
           style={{
-            fontFamily: "'Cal Sans', sans-serif",
+            fontFamily: "var(--font-support-new)",
             fontSize: "12px",
             color: "#10C4C3",
             letterSpacing: "4px",
@@ -344,7 +344,7 @@ export default function LegalGuidePage() {
         </p>
         <h1
           style={{
-            fontFamily: "'Cal Sans', serif",
+            fontFamily: "var(--font-heading-new)",
             fontSize: "64px",
             color: "#ffffff",
             fontWeight: 600,
@@ -357,7 +357,7 @@ export default function LegalGuidePage() {
         </h1>
         <p
           style={{
-            fontFamily: "'Cal Sans', sans-serif",
+            fontFamily: "var(--font-body-new)",
             fontSize: "18px",
             color: "rgba(255,255,255,0.6)",
             marginTop: "16px",
@@ -387,7 +387,7 @@ export default function LegalGuidePage() {
           <div>
             <h2
               style={{
-                fontFamily: "'Cal Sans', serif",
+                fontFamily: "var(--font-heading-new)",
                 fontSize: "44px",
                 color: "#020C1C",
                 fontWeight: 600,
@@ -399,7 +399,7 @@ export default function LegalGuidePage() {
             </h2>
             <p
               style={{
-                fontFamily: "'Cal Sans', sans-serif",
+                fontFamily: "var(--font-body-new)",
                 fontSize: "16px",
                 color: "#555555",
                 lineHeight: 1.8,
@@ -430,7 +430,7 @@ export default function LegalGuidePage() {
           >
             <h3
               style={{
-                fontFamily: "'Cal Sans', serif",
+                fontFamily: "var(--font-heading-new)",
                 fontSize: "26px",
                 color: "#020C1C",
                 fontWeight: 600,
@@ -455,7 +455,7 @@ export default function LegalGuidePage() {
                 >
                   <span
                     style={{
-                      fontFamily: "'Cal Sans', sans-serif",
+                      fontFamily: "var(--font-support-new)",
                       fontSize: "12px",
                       color: "#10C4C3",
                       fontWeight: 600,
@@ -468,7 +468,7 @@ export default function LegalGuidePage() {
                   </span>
                   <span
                     style={{
-                      fontFamily: "'Cal Sans', sans-serif",
+                      fontFamily: "var(--font-body-new)",
                       fontSize: "15px",
                       color: "#333333",
                     }}
@@ -492,7 +492,7 @@ export default function LegalGuidePage() {
         <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
           <h2
             style={{
-              fontFamily: "'Cal Sans', serif",
+              fontFamily: "var(--font-heading-new)",
               fontSize: "48px",
               color: "#020C1C",
               fontWeight: 600,
@@ -504,7 +504,7 @@ export default function LegalGuidePage() {
           </h2>
           <p
             style={{
-              fontFamily: "'Cal Sans', sans-serif",
+              fontFamily: "var(--font-body-new)",
               fontSize: "16px",
               color: "#777777",
               textAlign: "center",
@@ -534,7 +534,7 @@ export default function LegalGuidePage() {
               >
                 <h3
                   style={{
-                    fontFamily: "'Cal Sans', serif",
+                    fontFamily: "var(--font-heading-new)",
                     fontSize: "22px",
                     color: "#020C1C",
                     fontWeight: 600,
@@ -546,7 +546,7 @@ export default function LegalGuidePage() {
                 </h3>
                 <p
                   style={{
-                    fontFamily: "'Cal Sans', sans-serif",
+                    fontFamily: "var(--font-body-new)",
                     fontSize: "15px",
                     color: "#555555",
                     lineHeight: 1.7,
@@ -570,7 +570,7 @@ export default function LegalGuidePage() {
         <div style={{ maxWidth: "800px", margin: "0 auto" }}>
           <h2
             style={{
-              fontFamily: "'Cal Sans', serif",
+              fontFamily: "var(--font-heading-new)",
               fontSize: "48px",
               color: "#020C1C",
               fontWeight: 600,
@@ -582,7 +582,7 @@ export default function LegalGuidePage() {
           </h2>
           <p
             style={{
-              fontFamily: "'Cal Sans', sans-serif",
+              fontFamily: "var(--font-body-new)",
               fontSize: "16px",
               color: "#777777",
               textAlign: "center",
@@ -621,7 +621,7 @@ export default function LegalGuidePage() {
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
-                      fontFamily: "'Cal Sans', serif",
+                      fontFamily: "var(--font-support-new)",
                       fontSize: "22px",
                       fontWeight: 600,
                       flexShrink: 0,
@@ -649,7 +649,7 @@ export default function LegalGuidePage() {
                 >
                   <h3
                     style={{
-                      fontFamily: "'Cal Sans', serif",
+                      fontFamily: "var(--font-heading-new)",
                       fontSize: "22px",
                       color: "#020C1C",
                       fontWeight: 600,
@@ -660,7 +660,7 @@ export default function LegalGuidePage() {
                   </h3>
                   <p
                     style={{
-                      fontFamily: "'Cal Sans', sans-serif",
+                      fontFamily: "var(--font-body-new)",
                       fontSize: "15px",
                       color: "#555555",
                       lineHeight: 1.7,
@@ -684,7 +684,7 @@ export default function LegalGuidePage() {
           >
             <h3
               style={{
-                fontFamily: "'Cal Sans', serif",
+                fontFamily: "var(--font-heading-new)",
                 fontSize: "28px",
                 color: "#10C4C3",
                 fontWeight: 600,
@@ -718,7 +718,7 @@ export default function LegalGuidePage() {
                 >
                   <div
                     style={{
-                      fontFamily: "'Cal Sans', sans-serif",
+                      fontFamily: "var(--font-body-new)",
                       fontSize: "14px",
                       color: "#10C4C3",
                       fontWeight: 600,
@@ -729,7 +729,7 @@ export default function LegalGuidePage() {
                   </div>
                   <div
                     style={{
-                      fontFamily: "'Cal Sans', sans-serif",
+                      fontFamily: "var(--font-body-new)",
                       fontSize: "13px",
                       color: "rgba(255,255,255,0.6)",
                     }}
@@ -753,7 +753,7 @@ export default function LegalGuidePage() {
         <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
           <h2
             style={{
-              fontFamily: "'Cal Sans', serif",
+              fontFamily: "var(--font-heading-new)",
               fontSize: "48px",
               color: "#020C1C",
               fontWeight: 600,
@@ -765,7 +765,7 @@ export default function LegalGuidePage() {
           </h2>
           <p
             style={{
-              fontFamily: "'Cal Sans', sans-serif",
+              fontFamily: "var(--font-body-new)",
               fontSize: "16px",
               color: "#777777",
               textAlign: "center",
@@ -795,7 +795,7 @@ export default function LegalGuidePage() {
               >
                 <h3
                   style={{
-                    fontFamily: "'Cal Sans', serif",
+                    fontFamily: "var(--font-heading-new)",
                     fontSize: "19px",
                     color: "#020C1C",
                     fontWeight: 600,
@@ -807,7 +807,7 @@ export default function LegalGuidePage() {
                 </h3>
                 <p
                   style={{
-                    fontFamily: "'Cal Sans', sans-serif",
+                    fontFamily: "var(--font-body-new)",
                     fontSize: "14px",
                     color: "#555555",
                     lineHeight: 1.7,
@@ -831,7 +831,7 @@ export default function LegalGuidePage() {
         <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
           <h2
             style={{
-              fontFamily: "'Cal Sans', serif",
+              fontFamily: "var(--font-heading-new)",
               fontSize: "48px",
               color: "#020C1C",
               fontWeight: 600,
@@ -858,7 +858,7 @@ export default function LegalGuidePage() {
                     style={{
                       background: "#020C1C",
                       color: "#ffffff",
-                      fontFamily: "'Cal Sans', sans-serif",
+                      fontFamily: "var(--font-body-new)",
                       fontSize: "14px",
                       fontWeight: 500,
                       padding: "16px 20px",
@@ -872,7 +872,7 @@ export default function LegalGuidePage() {
                     style={{
                       background: "#020C1C",
                       color: "#ffffff",
-                      fontFamily: "'Cal Sans', sans-serif",
+                      fontFamily: "var(--font-body-new)",
                       fontSize: "14px",
                       fontWeight: 500,
                       padding: "16px 20px",
@@ -896,7 +896,7 @@ export default function LegalGuidePage() {
                       style={{
                         padding: "16px 20px",
                         border: "1px solid #E8E3D9",
-                        fontFamily: "'Cal Sans', sans-serif",
+                        fontFamily: "var(--font-body-new)",
                         fontSize: "15px",
                         color: "#020C1C",
                         fontWeight: 500,
@@ -910,7 +910,7 @@ export default function LegalGuidePage() {
                       style={{
                         padding: "16px 20px",
                         border: "1px solid #E8E3D9",
-                        fontFamily: "'Cal Sans', sans-serif",
+                        fontFamily: "var(--font-body-new)",
                         fontSize: "15px",
                         color: "#555555",
                         lineHeight: 1.7,
@@ -937,7 +937,7 @@ export default function LegalGuidePage() {
         <div style={{ maxWidth: "800px", margin: "0 auto" }}>
           <h2
             style={{
-              fontFamily: "'Cal Sans', serif",
+              fontFamily: "var(--font-heading-new)",
               fontSize: "48px",
               color: "#020C1C",
               fontWeight: 600,
@@ -971,7 +971,7 @@ export default function LegalGuidePage() {
                 >
                   <h3
                     style={{
-                      fontFamily: "'Cal Sans', serif",
+                      fontFamily: "var(--font-heading-new)",
                       fontSize: "20px",
                       color: "#020C1C",
                       fontWeight: 600,
@@ -982,7 +982,7 @@ export default function LegalGuidePage() {
                   </h3>
                   <span
                     style={{
-                      fontFamily: "'Cal Sans', sans-serif",
+                      fontFamily: "var(--font-body-new)",
                       fontSize: "22px",
                       color: "#10C4C3",
                       flexShrink: 0,
@@ -996,7 +996,7 @@ export default function LegalGuidePage() {
                 {openFaq === i && (
                   <p
                     style={{
-                      fontFamily: "'Cal Sans', sans-serif",
+                      fontFamily: "var(--font-body-new)",
                       fontSize: "15px",
                       color: "#555555",
                       lineHeight: 1.8,
@@ -1024,7 +1024,7 @@ export default function LegalGuidePage() {
       >
         <h2
           style={{
-            fontFamily: "'Cal Sans', serif",
+            fontFamily: "var(--font-heading-new)",
             fontSize: "48px",
             color: "#ffffff",
             fontWeight: 600,
@@ -1035,7 +1035,7 @@ export default function LegalGuidePage() {
         </h2>
         <p
           style={{
-            fontFamily: "'Cal Sans', sans-serif",
+            fontFamily: "var(--font-body-new)",
             fontSize: "18px",
             color: "rgba(255,255,255,0.7)",
             maxWidth: "600px",
@@ -1043,7 +1043,7 @@ export default function LegalGuidePage() {
             lineHeight: 1.7,
           }}
         >
-          Our team of legal experts and verified agents can guide you through
+          Our team of legal experts can guide you through
           every step — from RERA verification to registration.
         </p>
         <a
@@ -1053,7 +1053,7 @@ export default function LegalGuidePage() {
             background: "#10C4C3",
             color: "#05080C",
             padding: "16px 40px",
-            fontFamily: "'Cal Sans', sans-serif",
+            fontFamily: "var(--font-body-new)",
             fontSize: "15px",
             fontWeight: 600,
             letterSpacing: "1px",
@@ -1066,7 +1066,7 @@ export default function LegalGuidePage() {
         </a>
         <p
           style={{
-            fontFamily: "'Cal Sans', sans-serif",
+            fontFamily: "var(--font-body-new)",
             fontSize: "13px",
             color: "rgba(255,255,255,0.5)",
             marginTop: "16px",
@@ -1123,6 +1123,7 @@ export default function LegalGuidePage() {
                   { label: "Compare", href: "/compare" },
                   { label: "Search", href: "/search" },
                   { label: "RERA Guide", href: "/legal-guide" },
+                  { label: "Safety Guide", href: "/safety-guide" },
                 ],
               },
               {
@@ -1132,13 +1133,15 @@ export default function LegalGuidePage() {
                   { label: "Terms of Service", href: "/terms" },
                   { label: "Cookie Policy", href: "/cookies" },
                   { label: "Legal Guide", href: "/legal-guide" },
+                  { label: "Agent Terms", href: "/agent-terms" },
+                  { label: "Grievance Redressal", href: "/grievance-redressal" },
                 ],
               },
             ].map((col, i) => (
               <div key={i}>
                 <h4
                   style={{
-                    fontFamily: "'Cal Sans', serif",
+                    fontFamily: "var(--font-heading-new)",
                     fontSize: "18px",
                     color: "#10C4C3",
                     fontWeight: 600,
@@ -1154,7 +1157,7 @@ export default function LegalGuidePage() {
                       <a
                         href={link.href}
                         style={{
-                          fontFamily: "'Cal Sans', sans-serif",
+                          fontFamily: "var(--font-body-new)",
                           fontSize: "14px",
                           color: "rgba(255,255,255,0.55)",
                           textDecoration: "none",
@@ -1178,7 +1181,7 @@ export default function LegalGuidePage() {
           >
             <p
               style={{
-                fontFamily: "'Cal Sans', sans-serif",
+                fontFamily: "var(--font-body-new)",
                 fontSize: "13px",
                 color: "rgba(255,255,255,0.3)",
               }}

@@ -97,7 +97,7 @@ export default function RegisterPage() {
     background: "#fff",
     border: `1.5px solid ${focused === id ? "#0A1526" : "rgba(13,43,31,0.18)"}`,
     borderRadius: "8px",
-    fontFamily: "'Cal Sans', sans-serif",
+    fontFamily: "var(--font-body-new)",
     fontSize: "14px",
     fontWeight: 400,
     color: "#020C1C",
@@ -116,7 +116,7 @@ export default function RegisterPage() {
 
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
         html { scroll-behavior: smooth; }
-        body { font-family: 'Cal Sans', system-ui, sans-serif; background: #020C1C; overflow-x: hidden; }
+        body { font-family: var(--font-body-new); background: #020C1C; overflow-x: hidden; }
 
         .rp-root {
           display: flex;
@@ -159,7 +159,7 @@ export default function RegisterPage() {
           text-decoration: none; margin-bottom: 64px;
         }
         .rp-logo-text {
-          font-family: 'Cal Sans', sans-serif;
+          font-family: var(--font-support-new);
           font-size: 17px; font-weight: 600;
           color: #fff; letter-spacing: 0.22em;
         }
@@ -175,7 +175,7 @@ export default function RegisterPage() {
           color: #10C4C3; text-transform: uppercase;
         }
         .rp-heading {
-          font-family: 'Cal Sans', Georgia, serif;
+          font-family: var(--font-heading-new);
           font-size: 42px; font-weight: 300; line-height: 1.13;
           color: #020C1C; margin-bottom: 14px;
         }
@@ -235,7 +235,7 @@ export default function RegisterPage() {
 
         /* form header */
         .rp-form-title {
-          font-family: 'Cal Sans', Georgia, serif;
+          font-family: var(--font-heading-new);
           font-size: 32px; font-weight: 500; line-height: 1.1;
           color: #020C1C; margin-bottom: 6px;
         }
@@ -252,7 +252,7 @@ export default function RegisterPage() {
           border: 1.5px solid rgba(13,43,31,0.16);
           border-radius: 8px; cursor: pointer;
           display: flex; align-items: center; justify-content: center; gap: 10px;
-          font-family: 'Cal Sans', sans-serif;
+          font-family: var(--font-body-new);
           font-size: 13.5px; font-weight: 500; color: #020C1C;
           transition: border-color 0.18s, box-shadow 0.18s;
           margin-bottom: 22px;
@@ -404,7 +404,7 @@ export default function RegisterPage() {
         .rp-submit {
           width: 100%; padding: 13px 24px;
           background: #10C4C3; border: none; border-radius: 8px;
-          font-family: 'Cal Sans', sans-serif;
+          font-family: var(--font-body-new);
           font-size: 13.5px; font-weight: 700; letter-spacing: 0.1em;
           color: #020C1C; cursor: pointer; text-transform: uppercase;
           transition: background 0.18s, transform 0.12s, box-shadow 0.18s;
@@ -473,8 +473,8 @@ export default function RegisterPage() {
               <div className="rp-benefits">
                 {[
                   {
-                    title: "Verified Listings Only",
-                    desc: "Every property is manually reviewed and authenticated before going live.",
+                    title: "List in Minutes",
+                    desc: "Add your property details, photos, and pricing — go live right away.",
                     icon: (
                       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#10C4C3" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                         <polyline points="20 6 9 17 4 12" />
@@ -482,8 +482,8 @@ export default function RegisterPage() {
                     ),
                   },
                   {
-                    title: "RERA-Compliant Agents",
-                    desc: "All agents on Nilay 360 are verified, licensed, and RERA registered.",
+                    title: "Real Estate Experts",
+                    desc: "Connect with agents who know the local market inside out.",
                     icon: (
                       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#10C4C3" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                         <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />

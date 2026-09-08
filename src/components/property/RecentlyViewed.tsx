@@ -46,7 +46,7 @@ export default function RecentlyViewed({ theme = "light" }: { theme?: "light" | 
                   <img src={optimizedImageUrl(img, 400)} alt={p.title} loading="lazy" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
                 </div>
                 <div style={{ padding: "12px 14px" }}>
-                  <div style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "16px", fontWeight: 600, color: G.gold, marginBottom: "4px" }}>{fmt(p.price, p.listing_type)}</div>
+                  <div style={{ fontFamily: "var(--font-support-new)", fontSize: "16px", fontWeight: 600, color: G.gold, marginBottom: "4px" }}>{fmt(p.price, p.listing_type)}</div>
                   <div style={{ fontSize: "12px", fontWeight: 500, color: titleColor, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{p.title}</div>
                   <div style={{ fontSize: "11px", color: subColor, marginTop: "2px" }}>{p.city}</div>
                 </div>

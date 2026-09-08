@@ -45,12 +45,20 @@ async function getPropertyMeta(slug: string): Promise<PropertyMeta | null> {
     };
   }
 
-  // 2) Fall back to user-submitted listing (active only for metadata)
+  // 2) Fall back to a user-submitted listing. No explicit status filter
+  // here — this server client reads the real request's session cookies
+  // (@/lib/supabase/server uses @supabase/ssr), so it's under the same
+  // RLS as PropertyDetailClient.tsx's own fetch: public+active, the
+  // seller's own row, or (migration 026) the approved agent assigned to
+  // a lead referencing this property. An explicit "active only" filter
+  // here would just re-introduce the same bug PropertyDetailClient.tsx
+  // had — a redundant business-rule gate stricter than RLS, silently
+  // showing "Property Not Found" in the tab title for a listing whose
+  // real content the visitor is genuinely allowed to see.
   const { data: listing } = await supabase
     .from("property_listings")
     .select("title,highlights,property_category,listing_type,price,city,state,locality,photo_urls,bedrooms,slug")
     .eq("slug", slug)
-    .eq("status", "active")
     .maybeSingle();
 
   if (!listing) return null;

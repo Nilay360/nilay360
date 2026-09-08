@@ -5,6 +5,7 @@ import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { optimizedImageUrl } from "@/lib/image-url";
+import { useLiveStats } from "@/lib/liveStats";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -134,7 +135,7 @@ function PropertyCard({ prop }: { prop: Property }) {
           right: 14,
           background: "#10C4C3",
           color: "#020C1C",
-          fontFamily: "'Cal Sans', sans-serif",
+          fontFamily: "var(--font-support-new)",
           fontSize: 11,
           fontWeight: 600,
           letterSpacing: 1,
@@ -149,7 +150,7 @@ function PropertyCard({ prop }: { prop: Property }) {
       {/* Body */}
       <div style={{ padding: "20px 24px 24px", flex: 1, display: "flex", flexDirection: "column" }}>
         <h3 style={{
-          fontFamily: "'Cal Sans', serif",
+          fontFamily: "var(--font-heading-new)",
           fontSize: 22,
           fontWeight: 600,
           color: "#020C1C",
@@ -159,7 +160,7 @@ function PropertyCard({ prop }: { prop: Property }) {
           {prop.title}
         </h3>
         <p style={{
-          fontFamily: "'Cal Sans', sans-serif",
+          fontFamily: "var(--font-body-new)",
           fontSize: 13,
           color: "#888",
           margin: "0 0 16px",
@@ -168,7 +169,7 @@ function PropertyCard({ prop }: { prop: Property }) {
         </p>
 
         <p style={{
-          fontFamily: "'Cal Sans', serif",
+          fontFamily: "var(--font-support-new)",
           fontSize: 24,
           fontWeight: 600,
           color: "#10C4C3",
@@ -178,7 +179,7 @@ function PropertyCard({ prop }: { prop: Property }) {
         </p>
 
         <p style={{
-          fontFamily: "'Cal Sans', sans-serif",
+          fontFamily: "var(--font-support-new)",
           fontSize: 12,
           color: "#aaa",
           margin: "0 0 14px",
@@ -188,7 +189,7 @@ function PropertyCard({ prop }: { prop: Property }) {
 
         <Link href={`/property/${prop.slug}`} style={{
           marginTop: "auto",
-          fontFamily: "'Cal Sans', sans-serif",
+          fontFamily: "var(--font-body-new)",
           fontSize: 13,
           color: "#10C4C3",
           textDecoration: "none",
@@ -206,6 +207,7 @@ function PropertyCard({ prop }: { prop: Property }) {
 
 function CommercialPageInner() {
   const searchParams = useSearchParams();
+  const liveStats = useLiveStats();
 
   // ROI Calculator state
   const [propValue, setPropValue] = useState(50000000);
@@ -314,7 +316,7 @@ function CommercialPageInner() {
   });
 
   const selectStyle: React.CSSProperties = {
-    fontFamily: "'Cal Sans', sans-serif",
+    fontFamily: "var(--font-body-new)",
     fontSize: 14,
     color: "#020C1C",
     background: "#fff",
@@ -333,7 +335,7 @@ function CommercialPageInner() {
 
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
         html { scroll-behavior: smooth; }
-        body { font-family: 'Cal Sans', sans-serif; background: #020C1C; }
+        body { font-family: var(--font-body-new); background: #020C1C; }
 
         @keyframes shimmer {
           0%   { background-position: 200% 0; }
@@ -427,7 +429,7 @@ function CommercialPageInner() {
         }}>
           {/* Eyebrow */}
           <p style={{
-            fontFamily: "'Cal Sans', sans-serif",
+            fontFamily: "var(--font-support-new)",
             fontSize: 12,
             color: "#10C4C3",
             letterSpacing: 3,
@@ -439,7 +441,7 @@ function CommercialPageInner() {
 
           {/* H1 */}
           <h1 style={{
-            fontFamily: "'Cal Sans', serif",
+            fontFamily: "var(--font-heading-new)",
             fontSize: 56,
             fontWeight: 600,
             color: "#fff",
@@ -455,7 +457,7 @@ function CommercialPageInner() {
 
           {/* Subtitle */}
           <p style={{
-            fontFamily: "'Cal Sans', sans-serif",
+            fontFamily: "var(--font-body-new)",
             fontSize: 18,
             color: "#020C1C",
             maxWidth: 600,
@@ -463,7 +465,7 @@ function CommercialPageInner() {
             lineHeight: 1.65,
             opacity: 0.88,
           }}>
-            Offices, retail spaces, and industrial assets verified for quality and returns.
+            Offices, retail spaces, and industrial assets across India's growth corridors.
           </p>
 
           {/* Stats */}
@@ -475,8 +477,8 @@ function CommercialPageInner() {
             flexWrap: "wrap",
           }}>
             {[
-              { num: "310+", label: "Listings" },
-              { num: "12", label: "Cities" },
+              { num: String(liveStats.listingsByType.commercial), label: "Listings" },
+              { num: String(liveStats.cities), label: liveStats.cities === 1 ? "City" : "Cities" },
               { num: "8.5%", label: "Avg Yield" },
             ].map((stat, i) => (
               <div key={i} style={{ display: "flex", alignItems: "center" }}>
@@ -491,7 +493,7 @@ function CommercialPageInner() {
                 )}
                 <div style={{ textAlign: "center" }}>
                   <p style={{
-                    fontFamily: "'Cal Sans', serif",
+                    fontFamily: "var(--font-support-new)",
                     fontSize: 32,
                     fontWeight: 600,
                     color: "#fff",
@@ -501,7 +503,7 @@ function CommercialPageInner() {
                     {stat.num}
                   </p>
                   <p style={{
-                    fontFamily: "'Cal Sans', sans-serif",
+                    fontFamily: "var(--font-support-new)",
                     fontSize: 12,
                     color: "#10C4C3",
                     letterSpacing: 1,
@@ -523,7 +525,7 @@ function CommercialPageInner() {
       }}>
         <div style={{ maxWidth: 900, margin: "0 auto" }}>
           <h2 style={{
-            fontFamily: "'Cal Sans', serif",
+            fontFamily: "var(--font-heading-new)",
             fontSize: 40,
             fontWeight: 600,
             color: "#020C1C",
@@ -558,7 +560,7 @@ function CommercialPageInner() {
               >
                 <div style={{ fontSize: 48, marginBottom: 20 }}>{type.icon}</div>
                 <h3 style={{
-                  fontFamily: "'Cal Sans', serif",
+                  fontFamily: "var(--font-heading-new)",
                   fontSize: 28,
                   fontWeight: 600,
                   color: "#10C4C3",
@@ -567,7 +569,7 @@ function CommercialPageInner() {
                   {type.name}
                 </h3>
                 <p style={{
-                  fontFamily: "'Cal Sans', sans-serif",
+                  fontFamily: "var(--font-support-new)",
                   fontSize: 14,
                   color: "rgba(245,242,236,0.7)",
                   marginBottom: 6,
@@ -575,7 +577,7 @@ function CommercialPageInner() {
                   {type.count}
                 </p>
                 <p style={{
-                  fontFamily: "'Cal Sans', sans-serif",
+                  fontFamily: "var(--font-support-new)",
                   fontSize: 14,
                   color: "#10C4C3",
                   marginBottom: 24,
@@ -583,7 +585,7 @@ function CommercialPageInner() {
                   {type.yield}
                 </p>
                 <Link href={type.href} style={{
-                  fontFamily: "'Cal Sans', sans-serif",
+                  fontFamily: "var(--font-body-new)",
                   fontSize: 13,
                   color: "#10C4C3",
                   fontWeight: 500,
@@ -606,7 +608,7 @@ function CommercialPageInner() {
           {/* Header */}
           <div style={{ textAlign: "center", marginBottom: 56 }}>
             <h2 style={{
-              fontFamily: "'Cal Sans', serif",
+              fontFamily: "var(--font-heading-new)",
               fontSize: 40,
               fontWeight: 600,
               color: "#fff",
@@ -615,7 +617,7 @@ function CommercialPageInner() {
               ROI Calculator
             </h2>
             <p style={{
-              fontFamily: "'Cal Sans', sans-serif",
+              fontFamily: "var(--font-body-new)",
               fontSize: 16,
               color: "#10C4C3",
             }}>
@@ -644,7 +646,7 @@ function CommercialPageInner() {
                   marginBottom: 12,
                 }}>
                   <label style={{
-                    fontFamily: "'Cal Sans', sans-serif",
+                    fontFamily: "var(--font-support-new)",
                     fontSize: 12,
                     color: "#020C1C",
                     fontWeight: 600,
@@ -654,7 +656,7 @@ function CommercialPageInner() {
                     Property Value
                   </label>
                   <span style={{
-                    fontFamily: "'Cal Sans', serif",
+                    fontFamily: "var(--font-support-new)",
                     fontSize: 20,
                     fontWeight: 600,
                     color: "#10C4C3",
@@ -675,8 +677,8 @@ function CommercialPageInner() {
                   justifyContent: "space-between",
                   marginTop: 6,
                 }}>
-                  <span style={{ fontFamily: "'Cal Sans', sans-serif", fontSize: 11, color: "#888" }}>₹50 L</span>
-                  <span style={{ fontFamily: "'Cal Sans', sans-serif", fontSize: 11, color: "#888" }}>₹50 Cr</span>
+                  <span style={{ fontFamily: "var(--font-body-new)", fontSize: 11, color: "#888" }}>₹50 L</span>
+                  <span style={{ fontFamily: "var(--font-body-new)", fontSize: 11, color: "#888" }}>₹50 Cr</span>
                 </div>
               </div>
 
@@ -684,7 +686,7 @@ function CommercialPageInner() {
               <div style={{ marginBottom: 36 }}>
                 <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 12 }}>
                   <label style={{
-                    fontFamily: "'Cal Sans', sans-serif",
+                    fontFamily: "var(--font-support-new)",
                     fontSize: 12,
                     color: "#020C1C",
                     fontWeight: 600,
@@ -694,7 +696,7 @@ function CommercialPageInner() {
                     Annual Rental Yield
                   </label>
                   <span style={{
-                    fontFamily: "'Cal Sans', serif",
+                    fontFamily: "var(--font-support-new)",
                     fontSize: 20,
                     fontWeight: 600,
                     color: "#10C4C3",
@@ -711,8 +713,8 @@ function CommercialPageInner() {
                   onChange={(e) => setRentalYield(Number(e.target.value))}
                 />
                 <div style={{ display: "flex", justifyContent: "space-between", marginTop: 6 }}>
-                  <span style={{ fontFamily: "'Cal Sans', sans-serif", fontSize: 11, color: "#888" }}>4%</span>
-                  <span style={{ fontFamily: "'Cal Sans', sans-serif", fontSize: 11, color: "#888" }}>12%</span>
+                  <span style={{ fontFamily: "var(--font-body-new)", fontSize: 11, color: "#888" }}>4%</span>
+                  <span style={{ fontFamily: "var(--font-body-new)", fontSize: 11, color: "#888" }}>12%</span>
                 </div>
               </div>
 
@@ -720,7 +722,7 @@ function CommercialPageInner() {
               <div>
                 <label style={{
                   display: "block",
-                  fontFamily: "'Cal Sans', sans-serif",
+                  fontFamily: "var(--font-support-new)",
                   fontSize: 12,
                   color: "#020C1C",
                   fontWeight: 600,
@@ -742,7 +744,7 @@ function CommercialPageInner() {
                         borderRadius: 4,
                         background: loanPct === pct ? "#10C4C3" : "transparent",
                         color: loanPct === pct ? "#020C1C" : "#020C1C",
-                        fontFamily: "'Cal Sans', sans-serif",
+                        fontFamily: "var(--font-body-new)",
                         fontSize: 13,
                         fontWeight: 600,
                         cursor: "pointer",
@@ -779,7 +781,7 @@ function CommercialPageInner() {
                   }}
                 >
                   <p style={{
-                    fontFamily: "'Cal Sans', sans-serif",
+                    fontFamily: "var(--font-support-new)",
                     fontSize: 12,
                     color: "#10C4C3",
                     letterSpacing: 1.5,
@@ -789,7 +791,7 @@ function CommercialPageInner() {
                     {item.label}
                   </p>
                   <p style={{
-                    fontFamily: "'Cal Sans', serif",
+                    fontFamily: "var(--font-support-new)",
                     fontSize: 32,
                     fontWeight: 600,
                     color: "#fff",
@@ -809,7 +811,7 @@ function CommercialPageInner() {
                   color: "#020C1C",
                   border: "none",
                   borderRadius: 4,
-                  fontFamily: "'Cal Sans', sans-serif",
+                  fontFamily: "var(--font-body-new)",
                   fontSize: 13,
                   fontWeight: 600,
                   letterSpacing: 1,
@@ -831,7 +833,7 @@ function CommercialPageInner() {
       }}>
         <div style={{ maxWidth: 1200, margin: "0 auto" }}>
           <h2 style={{
-            fontFamily: "'Cal Sans', serif",
+            fontFamily: "var(--font-heading-new)",
             fontSize: 40,
             fontWeight: 600,
             color: "#020C1C",
@@ -853,7 +855,7 @@ function CommercialPageInner() {
               display: "inline-flex", alignItems: "center", gap: 6,
               padding: "10px 16px", borderRadius: 6,
               background: "rgba(16,196,195,0.08)", border: "1px solid rgba(16,196,195,0.25)",
-              color: "#10C4C3", fontSize: 14, fontWeight: 600, fontFamily: "'Cal Sans', sans-serif",
+              color: "#10C4C3", fontSize: 14, fontWeight: 600, fontFamily: "var(--font-support-new)",
             }}>
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
               Hyderabad
@@ -891,7 +893,7 @@ function CommercialPageInner() {
               : cityNotAvailable
                 ? (
                   <div style={{ gridColumn: "1 / -1", textAlign: "center", padding: "60px 0" }}>
-                    <p style={{ fontFamily: "'Cal Sans', serif", fontSize: 28, color: "#020C1C", marginBottom: 8 }}>
+                    <p style={{ fontFamily: "var(--font-heading-new)", fontSize: 28, color: "#020C1C", marginBottom: 8 }}>
                       Currently only available in Hyderabad
                     </p>
                     <p style={{ fontSize: 14, color: "#020C1C", opacity: 0.5 }}>
@@ -908,7 +910,7 @@ function CommercialPageInner() {
                     padding: "60px 0",
                   }}>
                     <p style={{
-                      fontFamily: "'Cal Sans', serif",
+                      fontFamily: "var(--font-heading-new)",
                       fontSize: 28,
                       color: "#020C1C",
                       opacity: 0.5,
@@ -928,7 +930,7 @@ function CommercialPageInner() {
       }}>
         <div style={{ maxWidth: 1100, margin: "0 auto" }}>
           <h2 style={{
-            fontFamily: "'Cal Sans', serif",
+            fontFamily: "var(--font-heading-new)",
             fontSize: 40,
             fontWeight: 600,
             color: "#fff",
@@ -962,7 +964,7 @@ function CommercialPageInner() {
               >
                 <div style={{ fontSize: 36, marginBottom: 16 }}>{item.icon}</div>
                 <h3 style={{
-                  fontFamily: "'Cal Sans', serif",
+                  fontFamily: "var(--font-heading-new)",
                   fontSize: 22,
                   fontWeight: 600,
                   color: "#020C1C",
@@ -971,7 +973,7 @@ function CommercialPageInner() {
                   {item.title}
                 </h3>
                 <p style={{
-                  fontFamily: "'Cal Sans', sans-serif",
+                  fontFamily: "var(--font-body-new)",
                   fontSize: 14,
                   color: "#555",
                   lineHeight: 1.6,
@@ -991,7 +993,7 @@ function CommercialPageInner() {
       }}>
         <div style={{ maxWidth: 900, margin: "0 auto" }}>
           <h2 style={{
-            fontFamily: "'Cal Sans', serif",
+            fontFamily: "var(--font-heading-new)",
             fontSize: 40,
             fontWeight: 600,
             color: "#020C1C",
@@ -1005,8 +1007,8 @@ function CommercialPageInner() {
             {[
               {
                 num: "01",
-                title: "Verified Listings Only",
-                desc: "Every commercial property is RERA registered and physically verified by our team.",
+                title: "Admin-Reviewed Listings",
+                desc: "Every commercial listing goes through admin review before it goes live.",
               },
               {
                 num: "02",
@@ -1038,7 +1040,7 @@ function CommercialPageInner() {
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  fontFamily: "'Cal Sans', serif",
+                  fontFamily: "var(--font-support-new)",
                   fontSize: 20,
                   fontWeight: 600,
                   color: "#10C4C3",
@@ -1049,7 +1051,7 @@ function CommercialPageInner() {
                 {/* Text */}
                 <div style={{ paddingTop: 8 }}>
                   <h3 style={{
-                    fontFamily: "'Cal Sans', serif",
+                    fontFamily: "var(--font-heading-new)",
                     fontSize: 28,
                     fontWeight: 600,
                     color: "#020C1C",
@@ -1058,7 +1060,7 @@ function CommercialPageInner() {
                     {item.title}
                   </h3>
                   <p style={{
-                    fontFamily: "'Cal Sans', sans-serif",
+                    fontFamily: "var(--font-body-new)",
                     fontSize: 16,
                     color: "#555",
                     lineHeight: 1.7,
@@ -1080,7 +1082,7 @@ function CommercialPageInner() {
         textAlign: "center",
       }}>
         <h2 style={{
-          fontFamily: "'Cal Sans', serif",
+          fontFamily: "var(--font-heading-new)",
           fontSize: 44,
           fontWeight: 600,
           color: "#fff",
@@ -1091,7 +1093,7 @@ function CommercialPageInner() {
           Ready to Invest in Commercial Property?
         </h2>
         <p style={{
-          fontFamily: "'Cal Sans', sans-serif",
+          fontFamily: "var(--font-body-new)",
           fontSize: 16,
           color: "#020C1C",
           opacity: 0.8,
@@ -1105,7 +1107,7 @@ function CommercialPageInner() {
             href="/commercial"
             className="cta-browse"
             style={{
-              fontFamily: "'Cal Sans', sans-serif",
+              fontFamily: "var(--font-body-new)",
               fontSize: 14,
               fontWeight: 600,
               color: "#020C1C",
@@ -1123,7 +1125,7 @@ function CommercialPageInner() {
             href="/contact"
             className="cta-talk"
             style={{
-              fontFamily: "'Cal Sans', sans-serif",
+              fontFamily: "var(--font-body-new)",
               fontSize: 14,
               fontWeight: 600,
               color: "#fff",
@@ -1149,7 +1151,7 @@ function CommercialPageInner() {
         {/* Logo + tagline */}
         <div style={{ marginBottom: 48 }}>
           <p style={{
-            fontFamily: "'Cal Sans', serif",
+            fontFamily: "var(--font-support-new)",
             fontSize: 24,
             fontWeight: 600,
             color: "#10C4C3",
@@ -1159,7 +1161,7 @@ function CommercialPageInner() {
             Nilay 360 ·
           </p>
           <p style={{
-            fontFamily: "'Cal Sans', sans-serif",
+            fontFamily: "var(--font-body-new)",
             fontSize: 13,
             color: "rgba(245,242,236,0.5)",
             maxWidth: 260,
@@ -1205,6 +1207,7 @@ function CommercialPageInner() {
                 { label: "Compare", href: "/compare" },
                 { label: "Search", href: "/search" },
                 { label: "RERA Guide", href: "/legal-guide" },
+                { label: "Safety Guide", href: "/safety-guide" },
               ],
             },
             {
@@ -1214,12 +1217,14 @@ function CommercialPageInner() {
                 { label: "Terms", href: "/terms" },
                 { label: "Cookie Policy", href: "/cookies" },
                 { label: "RERA Guide", href: "/legal-guide" },
+                { label: "Agent Terms", href: "/agent-terms" },
+                { label: "Grievance Redressal", href: "/grievance-redressal" },
               ],
             },
           ].map((col) => (
             <div key={col.heading}>
               <p style={{
-                fontFamily: "'Cal Sans', sans-serif",
+                fontFamily: "var(--font-support-new)",
                 fontSize: 11,
                 color: "#10C4C3",
                 letterSpacing: 2,
@@ -1236,7 +1241,7 @@ function CommercialPageInner() {
                       href={link.href}
                       className="footer-link"
                       style={{
-                        fontFamily: "'Cal Sans', sans-serif",
+                        fontFamily: "var(--font-body-new)",
                         fontSize: 14,
                         color: "rgba(245,242,236,0.6)",
                         textDecoration: "none",
@@ -1263,18 +1268,11 @@ function CommercialPageInner() {
           gap: 12,
         }}>
           <p style={{
-            fontFamily: "'Cal Sans', sans-serif",
+            fontFamily: "var(--font-body-new)",
             fontSize: 13,
             color: "rgba(245,242,236,0.4)",
           }}>
             © 2025 Nilay 360. All rights reserved.
-          </p>
-          <p style={{
-            fontFamily: "'Cal Sans', sans-serif",
-            fontSize: 13,
-            color: "rgba(245,242,236,0.4)",
-          }}>
-            RERA compliant platform
           </p>
         </div>
       </footer>

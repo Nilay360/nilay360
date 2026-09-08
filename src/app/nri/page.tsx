@@ -6,7 +6,7 @@ function FaqItem({ q, a, index }: { q: string; a: string; index: number }) {
   const [open, setOpen] = useState(false);
   return (
     <div style={{ borderBottom: "1px solid rgba(13,43,31,0.08)" }}>
-      <button onClick={() => setOpen(o => !o)} style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between", gap: "16px", padding: "22px 0", background: "transparent", border: "none", cursor: "pointer", fontFamily: "'Cal Sans', sans-serif", textAlign: "left" }}>
+      <button onClick={() => setOpen(o => !o)} style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between", gap: "16px", padding: "22px 0", background: "transparent", border: "none", cursor: "pointer", fontFamily: "var(--font-body-new)", textAlign: "left" }}>
         <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
           <span style={{ width: "28px", height: "28px", borderRadius: "8px", background: open ? "#020C1C" : "rgba(201,168,76,0.1)", border: `1px solid ${open ? "transparent" : "rgba(201,168,76,0.25)"}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "11px", fontWeight: 700, color: "#10C4C3", flexShrink: 0, transition: "background 0.2s" }}>
             {String(index + 1).padStart(2, "0")}
@@ -33,7 +33,7 @@ function StepCard({ num, title, desc, icon, last }: { num: number; title: string
         {icon}
       </div>
       <div style={{ width: "20px", height: "20px", borderRadius: "50%", background: "#10C4C3", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "9px", fontWeight: 800, color: "#020C1C", marginBottom: "10px" }}>{num}</div>
-      <h4 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "16px", fontWeight: 600, color: "#020C1C", marginBottom: "6px", lineHeight: 1.3 }}>{title}</h4>
+      <h4 style={{ fontFamily: "var(--font-heading-new)", fontSize: "16px", fontWeight: 600, color: "#020C1C", marginBottom: "6px", lineHeight: 1.3 }}>{title}</h4>
       <p style={{ fontSize: "12px", color: "rgba(245,242,236,0.45)", lineHeight: 1.65 }}>{desc}</p>
     </div>
   );
@@ -46,7 +46,7 @@ function ServiceCard({ icon, title, desc }: { icon: string; title: string; desc:
     <div onMouseEnter={() => setHover(true)} onMouseLeave={() => setHover(false)}
       style={{ background: hover ? "rgba(245,242,236,0.06)" : "rgba(245,242,236,0.03)", border: `1px solid ${hover ? "rgba(201,168,76,0.3)" : "rgba(245,242,236,0.07)"}`, borderRadius: "16px", padding: "28px 24px", cursor: "default", transition: "all 0.22s", transform: hover ? "translateY(-3px)" : "none" }}>
       <div style={{ fontSize: "28px", marginBottom: "14px" }}>{icon}</div>
-      <h4 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "18px", fontWeight: 600, color: "#020C1C", marginBottom: "8px" }}>{title}</h4>
+      <h4 style={{ fontFamily: "var(--font-heading-new)", fontSize: "18px", fontWeight: 600, color: "#020C1C", marginBottom: "8px" }}>{title}</h4>
       <p style={{ fontSize: "13px", color: "rgba(245,242,236,0.45)", lineHeight: 1.75 }}>{desc}</p>
     </div>
   );
@@ -121,7 +121,7 @@ export default function NriPage() {
   const INP: React.CSSProperties = {
     width: "100%", padding: "11px 14px", background: "#fff",
     border: "1.5px solid rgba(13,43,31,0.12)", borderRadius: "9px",
-    fontSize: "14px", color: "#020C1C", fontFamily: "'Cal Sans', sans-serif", outline: "none",
+    fontSize: "14px", color: "#020C1C", fontFamily: "var(--font-body-new)", outline: "none",
   };
   const SEL: React.CSSProperties = {
     ...INP, appearance: "none",
@@ -135,7 +135,7 @@ export default function NriPage() {
       <style>{`
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
         html { scroll-behavior: smooth; }
-        body { font-family: 'Cal Sans', system-ui, sans-serif; background: #020C1C; overflow-x: hidden; }
+        body { font-family: var(--font-body-new); background: #020C1C; overflow-x: hidden; }
         ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-thumb { background: rgba(201,168,76,0.3); border-radius: 2px; }
         @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
@@ -195,10 +195,10 @@ export default function NriPage() {
               <span style={{ fontSize: "14px" }}>🌍</span>
               <span style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.2em", color: "#10C4C3", textTransform: "uppercase" }}>NRI Property Services</span>
             </div>
-            <h1 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "clamp(38px, 5.8vw, 68px)", fontWeight: 300, color: "#020C1C", lineHeight: 1.1, marginBottom: "18px", animation: "fadeUp 0.55s 0.05s ease-out both" }}>
+            <h1 style={{ fontFamily: "var(--font-heading-new)", fontSize: "clamp(38px, 5.8vw, 68px)", fontWeight: 300, color: "#020C1C", lineHeight: 1.1, marginBottom: "18px", animation: "fadeUp 0.55s 0.05s ease-out both" }}>
               Invest in India<br />From Anywhere <em style={{ fontStyle: "italic", color: "#10C4C3" }}>in the World</em>
             </h1>
-            <p style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "clamp(18px, 2.2vw, 24px)", fontStyle: "italic", color: "rgba(201,168,76,0.75)", marginBottom: "18px", animation: "fadeUp 0.55s 0.1s ease-out both" }}>
+            <p style={{ fontFamily: "var(--font-heading-new)", fontSize: "clamp(18px, 2.2vw, 24px)", fontStyle: "italic", color: "rgba(201,168,76,0.75)", marginBottom: "18px", animation: "fadeUp 0.55s 0.1s ease-out both" }}>
               Dedicated concierge for NRI buyers
             </p>
             <p style={{ fontSize: "15px", color: "rgba(245,242,236,0.5)", lineHeight: 1.8, maxWidth: "580px", margin: "0 auto 36px", animation: "fadeUp 0.55s 0.15s ease-out both" }}>
@@ -228,7 +228,7 @@ export default function NriPage() {
           <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
             <div style={{ textAlign: "center", marginBottom: "56px" }}>
               <Eyebrow label="The Opportunity" />
-              <h2 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "clamp(32px, 4vw, 50px)", fontWeight: 400, color: "#020C1C", lineHeight: 1.15 }}>
+              <h2 style={{ fontFamily: "var(--font-heading-new)", fontSize: "clamp(32px, 4vw, 50px)", fontWeight: 400, color: "#020C1C", lineHeight: 1.15 }}>
                 Why Indian Real Estate<br /><em style={{ fontStyle: "italic", color: "#10C4C3" }}>in 2025</em>
               </h2>
               <p style={{ fontSize: "15px", color: "#6B7C72", marginTop: "14px", maxWidth: "520px", margin: "14px auto 0", lineHeight: 1.75 }}>
@@ -242,11 +242,11 @@ export default function NriPage() {
                 { num: "8.2%", label: "Avg Annual Appreciation", sub: "Premium city markets" },
                 { num: "₹43K Cr", label: "NRI Investment in 2024", sub: "Record year" },
                 { num: "14%", label: "Rental Yield Growth", sub: "Year on year" },
-                { num: "500+", label: "NRI Clients Served", sub: "Since 2024" },
+                { num: "1:1", label: "Personalized NRI Advisory", sub: "Dedicated relationship manager" },
               ].map(s => (
                 <div key={s.label} style={{ background: "#020C1C", borderRadius: "16px", padding: "28px 22px", textAlign: "center", position: "relative", overflow: "hidden" }}>
                   <div style={{ position: "absolute", inset: 0, backgroundImage: "radial-gradient(circle at 50% 100%, rgba(201,168,76,0.1) 0%, transparent 60%)", pointerEvents: "none" }} />
-                  <p style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "clamp(28px, 3.5vw, 40px)", fontWeight: 600, color: "#10C4C3", marginBottom: "6px", position: "relative", zIndex: 1 }}>{s.num}</p>
+                  <p style={{ fontFamily: "var(--font-support-new)", fontSize: "clamp(28px, 3.5vw, 40px)", fontWeight: 600, color: "#10C4C3", marginBottom: "6px", position: "relative", zIndex: 1 }}>{s.num}</p>
                   <p style={{ fontSize: "12px", fontWeight: 700, color: "#020C1C", marginBottom: "3px", position: "relative", zIndex: 1 }}>{s.label}</p>
                   <p style={{ fontSize: "10px", color: "rgba(245,242,236,0.35)", position: "relative", zIndex: 1 }}>{s.sub}</p>
                 </div>
@@ -265,7 +265,7 @@ export default function NriPage() {
                   <div key={c.title} onMouseEnter={() => setHover(true)} onMouseLeave={() => setHover(false)}
                     style={{ background: hover ? "#020C1C" : "#fff", border: "1px solid rgba(13,43,31,0.07)", borderRadius: "16px", padding: "32px 28px", transition: "all 0.22s", boxShadow: hover ? "0 20px 60px rgba(13,43,31,0.14)" : "0 1px 5px rgba(13,43,31,0.04)", transform: hover ? "translateY(-4px)" : "none" }}>
                     <div style={{ fontSize: "28px", marginBottom: "16px" }}>{c.icon}</div>
-                    <h3 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "20px", fontWeight: 600, color: hover ? "#020C1C" : "#020C1C", marginBottom: "10px", transition: "color 0.22s" }}>{c.title}</h3>
+                    <h3 style={{ fontFamily: "var(--font-heading-new)", fontSize: "20px", fontWeight: 600, color: hover ? "#020C1C" : "#020C1C", marginBottom: "10px", transition: "color 0.22s" }}>{c.title}</h3>
                     <p style={{ fontSize: "13px", color: hover ? "rgba(245,242,236,0.5)" : "#6B7C72", lineHeight: 1.8, transition: "color 0.22s" }}>{c.desc}</p>
                   </div>
                 );
@@ -280,7 +280,7 @@ export default function NriPage() {
           <div style={{ maxWidth: "1200px", margin: "0 auto", position: "relative", zIndex: 2 }}>
             <div style={{ textAlign: "center", marginBottom: "60px" }}>
               <Eyebrow label="Simple Process" dark />
-              <h2 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "clamp(32px, 4vw, 50px)", fontWeight: 400, color: "#020C1C", lineHeight: 1.15 }}>
+              <h2 style={{ fontFamily: "var(--font-heading-new)", fontSize: "clamp(32px, 4vw, 50px)", fontWeight: 400, color: "#020C1C", lineHeight: 1.15 }}>
                 Your NRI Property<br /><em style={{ fontStyle: "italic", color: "#10C4C3" }}>Journey</em>
               </h2>
               <p style={{ fontSize: "14px", color: "rgba(245,242,236,0.4)", marginTop: "12px" }}>Six steps. Zero stress. Complete from abroad.</p>
@@ -301,7 +301,7 @@ export default function NriPage() {
           <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
             <div style={{ textAlign: "center", marginBottom: "52px" }}>
               <Eyebrow label="Legal Framework" />
-              <h2 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "clamp(32px, 4vw, 50px)", fontWeight: 400, color: "#020C1C", lineHeight: 1.15 }}>
+              <h2 style={{ fontFamily: "var(--font-heading-new)", fontSize: "clamp(32px, 4vw, 50px)", fontWeight: 400, color: "#020C1C", lineHeight: 1.15 }}>
                 FEMA Compliance<br /><em style={{ fontStyle: "italic", color: "#10C4C3" }}>Made Simple</em>
               </h2>
               <p style={{ fontSize: "14px", color: "#6B7C72", marginTop: "12px", maxWidth: "480px", margin: "12px auto 0", lineHeight: 1.7 }}>
@@ -334,7 +334,7 @@ export default function NriPage() {
                 <div key={card.title} style={{ background: "#fff", border: "1px solid rgba(13,43,31,0.07)", borderRadius: "16px", padding: "32px 30px" }}>
                   <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "20px" }}>
                     <div style={{ width: "44px", height: "44px", borderRadius: "12px", background: `${card.color}14`, border: `1.5px solid ${card.color}33`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "20px", flexShrink: 0 }}>{card.icon}</div>
-                    <h3 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "22px", fontWeight: 600, color: "#020C1C" }}>{card.title}</h3>
+                    <h3 style={{ fontFamily: "var(--font-heading-new)", fontSize: "22px", fontWeight: 600, color: "#020C1C" }}>{card.title}</h3>
                   </div>
                   <ul style={{ listStyle: "none", display: "flex", flexDirection: "column", gap: "8px" }}>
                     {card.points.map((p, i) => (
@@ -360,7 +360,7 @@ export default function NriPage() {
           <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
             <div style={{ textAlign: "center", marginBottom: "52px" }}>
               <Eyebrow label="Financing" />
-              <h2 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "clamp(32px, 4vw, 50px)", fontWeight: 400, color: "#020C1C" }}>
+              <h2 style={{ fontFamily: "var(--font-heading-new)", fontSize: "clamp(32px, 4vw, 50px)", fontWeight: 400, color: "#020C1C" }}>
                 NRI Home Loan<br /><em style={{ fontStyle: "italic", color: "#10C4C3" }}>Options</em>
               </h2>
             </div>
@@ -387,7 +387,7 @@ export default function NriPage() {
                   {b.highlight && <div style={{ position: "absolute", inset: 0, backgroundImage: "linear-gradient(rgba(201,168,76,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(201,168,76,0.04) 1px, transparent 1px)", backgroundSize: "32px 32px", pointerEvents: "none" }} />}
                   <div style={{ position: "relative", zIndex: 2 }}>
                     <div style={{ width: "44px", height: "44px", borderRadius: "10px", background: b.highlight ? "rgba(201,168,76,0.15)" : "rgba(13,43,31,0.08)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "11px", fontWeight: 800, color: b.highlight ? "#10C4C3" : "#020C1C", marginBottom: "16px", letterSpacing: "0.05em" }}>{b.logo}</div>
-                    <h3 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "20px", fontWeight: 600, color: b.highlight ? "#020C1C" : "#020C1C", marginBottom: "18px" }}>{b.bank}</h3>
+                    <h3 style={{ fontFamily: "var(--font-heading-new)", fontSize: "20px", fontWeight: 600, color: b.highlight ? "#020C1C" : "#020C1C", marginBottom: "18px" }}>{b.bank}</h3>
                     <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px", marginBottom: "20px" }}>
                       {[{ l: "Interest Rate", v: b.rate }, { l: "Max Loan", v: b.maxLoan }, { l: "Tenure", v: b.tenure }].map(item => (
                         <div key={item.l} style={{ background: b.highlight ? "rgba(245,242,236,0.05)" : "rgba(13,43,31,0.04)", borderRadius: "8px", padding: "10px 12px" }}>
@@ -422,7 +422,7 @@ export default function NriPage() {
           <div style={{ maxWidth: "1200px", margin: "0 auto", position: "relative", zIndex: 2 }}>
             <div style={{ textAlign: "center", marginBottom: "52px" }}>
               <Eyebrow label="What We Do" dark />
-              <h2 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "clamp(32px, 4vw, 50px)", fontWeight: 400, color: "#020C1C", lineHeight: 1.15 }}>
+              <h2 style={{ fontFamily: "var(--font-heading-new)", fontSize: "clamp(32px, 4vw, 50px)", fontWeight: 400, color: "#020C1C", lineHeight: 1.15 }}>
                 Services We<br /><em style={{ fontStyle: "italic", color: "#10C4C3" }}>Offer</em>
               </h2>
             </div>
@@ -442,7 +442,7 @@ export default function NriPage() {
           <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
             <div style={{ textAlign: "center", marginBottom: "52px" }}>
               <Eyebrow label="NRI Stories" />
-              <h2 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "clamp(32px, 4vw, 50px)", fontWeight: 400, color: "#020C1C" }}>
+              <h2 style={{ fontFamily: "var(--font-heading-new)", fontSize: "clamp(32px, 4vw, 50px)", fontWeight: 400, color: "#020C1C" }}>
                 NRIs Who Trusted<br /><em style={{ fontStyle: "italic", color: "#10C4C3" }}>Nilay 360</em>
               </h2>
             </div>
@@ -470,7 +470,7 @@ export default function NriPage() {
           <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
             <div style={{ textAlign: "center", marginBottom: "52px" }}>
               <Eyebrow label="Free Consultation" />
-              <h2 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "clamp(32px, 4vw, 50px)", fontWeight: 400, color: "#020C1C" }}>
+              <h2 style={{ fontFamily: "var(--font-heading-new)", fontSize: "clamp(32px, 4vw, 50px)", fontWeight: 400, color: "#020C1C" }}>
                 Book Your NRI<br /><em style={{ fontStyle: "italic", color: "#10C4C3" }}>Consultation</em>
               </h2>
             </div>
@@ -480,7 +480,7 @@ export default function NriPage() {
                 <div style={{ position: "absolute", inset: 0, backgroundImage: "linear-gradient(rgba(201,168,76,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(201,168,76,0.04) 1px, transparent 1px)", backgroundSize: "36px 36px", pointerEvents: "none" }} />
                 <div style={{ position: "relative", zIndex: 2 }}>
                   <div style={{ fontSize: "32px", marginBottom: "18px" }}>🌏</div>
-                  <h3 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "26px", fontWeight: 500, color: "#020C1C", marginBottom: "10px", lineHeight: 1.25 }}>Free 30-Minute<br />NRI Advisory Call</h3>
+                  <h3 style={{ fontFamily: "var(--font-heading-new)", fontSize: "26px", fontWeight: 500, color: "#020C1C", marginBottom: "10px", lineHeight: 1.25 }}>Free 30-Minute<br />NRI Advisory Call</h3>
                   <p style={{ fontSize: "13px", color: "rgba(245,242,236,0.5)", lineHeight: 1.75, marginBottom: "32px" }}>Talk to a dedicated NRI property advisor. No obligation, no pressure — just expert guidance tailored to your goals, budget, and country of residence.</p>
                   <ul style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
                     {[
@@ -511,9 +511,9 @@ export default function NriPage() {
                 {submitted ? (
                   <div style={{ height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", textAlign: "center", padding: "40px 20px" }}>
                     <div style={{ width: "72px", height: "72px", borderRadius: "50%", background: "rgba(5,150,105,0.1)", border: "2px solid rgba(5,150,105,0.25)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 20px", fontSize: "30px" }}>✓</div>
-                    <h3 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "28px", fontWeight: 500, color: "#020C1C", marginBottom: "10px" }}>Consultation Booked!</h3>
+                    <h3 style={{ fontFamily: "var(--font-heading-new)", fontSize: "28px", fontWeight: 500, color: "#020C1C", marginBottom: "10px" }}>Consultation Booked!</h3>
                     <p style={{ fontSize: "14px", color: "#6B7C72", lineHeight: 1.7, maxWidth: "340px", margin: "0 auto 24px" }}>Thank you! Your dedicated NRI advisor will contact you within 4 business hours to confirm your appointment.</p>
-                    <button onClick={() => setSubmitted(false)} style={{ padding: "10px 24px", background: "#020C1C", border: "none", borderRadius: "8px", color: "#020C1C", fontSize: "13px", fontWeight: 600, cursor: "pointer", fontFamily: "'Cal Sans', sans-serif" }}>Submit Another</button>
+                    <button onClick={() => setSubmitted(false)} style={{ padding: "10px 24px", background: "#020C1C", border: "none", borderRadius: "8px", color: "#020C1C", fontSize: "13px", fontWeight: 600, cursor: "pointer", fontFamily: "var(--font-body-new)" }}>Submit Another</button>
                   </div>
                 ) : (
                   <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "18px" }}>
@@ -558,7 +558,7 @@ export default function NriPage() {
                       <label style={LBL}>Message</label>
                       <textarea placeholder="Tell us about your requirements, timeline, or any specific questions…" value={form.message} onChange={set("message")} rows={3} style={{ ...INP, resize: "vertical", minHeight: "80px", lineHeight: 1.65 }} />
                     </div>
-                    <button type="submit" disabled={submitting} style={{ padding: "14px", background: submitting ? "rgba(13,43,31,0.4)" : "#10C4C3", border: "none", borderRadius: "10px", color: "#020C1C", fontSize: "13px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", cursor: submitting ? "not-allowed" : "pointer", fontFamily: "'Cal Sans', sans-serif", display: "flex", alignItems: "center", justifyContent: "center", gap: "10px" }}>
+                    <button type="submit" disabled={submitting} style={{ padding: "14px", background: submitting ? "rgba(13,43,31,0.4)" : "#10C4C3", border: "none", borderRadius: "10px", color: "#020C1C", fontSize: "13px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", cursor: submitting ? "not-allowed" : "pointer", fontFamily: "var(--font-body-new)", display: "flex", alignItems: "center", justifyContent: "center", gap: "10px" }}>
                       {submitting ? "Booking…" : "Book Free Consultation"}
                       {!submitting && <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="22" y1="2" x2="11" y2="13" /><polygon points="22 2 15 22 11 13 2 9 22 2" /></svg>}
                     </button>
@@ -575,7 +575,7 @@ export default function NriPage() {
           <div style={{ maxWidth: "820px", margin: "0 auto" }}>
             <div style={{ textAlign: "center", marginBottom: "52px" }}>
               <Eyebrow label="Common Questions" />
-              <h2 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "clamp(32px, 4vw, 50px)", fontWeight: 400, color: "#020C1C", lineHeight: 1.15 }}>
+              <h2 style={{ fontFamily: "var(--font-heading-new)", fontSize: "clamp(32px, 4vw, 50px)", fontWeight: 400, color: "#020C1C", lineHeight: 1.15 }}>
                 NRI Property<br /><em style={{ fontStyle: "italic", color: "#10C4C3" }}>FAQs</em>
               </h2>
             </div>
@@ -590,11 +590,11 @@ export default function NriPage() {
           <div style={{ position: "absolute", inset: 0, backgroundImage: "linear-gradient(rgba(201,168,76,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(201,168,76,0.04) 1px, transparent 1px)", backgroundSize: "52px 52px", pointerEvents: "none" }} />
           <div style={{ position: "absolute", inset: 0, background: "radial-gradient(ellipse 60% 55% at 50% 110%, rgba(201,168,76,0.1) 0%, transparent 55%)", pointerEvents: "none" }} />
           <div style={{ position: "relative", zIndex: 2, maxWidth: "680px", margin: "0 auto", textAlign: "center" }}>
-            <h2 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "clamp(34px, 5vw, 56px)", fontWeight: 300, color: "#020C1C", lineHeight: 1.15, marginBottom: "16px" }}>
+            <h2 style={{ fontFamily: "var(--font-heading-new)", fontSize: "clamp(34px, 5vw, 56px)", fontWeight: 300, color: "#020C1C", lineHeight: 1.15, marginBottom: "16px" }}>
               Your Dream Home in India<br /><em style={{ fontStyle: "italic", color: "#10C4C3" }}>Is One Call Away</em>
             </h2>
             <p style={{ fontSize: "15px", color: "rgba(245,242,236,0.5)", lineHeight: 1.75, marginBottom: "36px" }}>
-              500+ NRI families have trusted Nilay 360 to find, verify, and manage their Indian property — from Dubai to California to London. You're next.
+              Wherever you are — Dubai, California, London, or beyond — our NRI advisory team is ready to help you find, evaluate, and manage your Indian property. Let's talk.
             </p>
             <div style={{ display: "flex", gap: "14px", justifyContent: "center", flexWrap: "wrap" }}>
               <a href="#consultation" style={{ padding: "14px 36px", background: "#10C4C3", borderRadius: "9px", color: "#020C1C", fontSize: "13px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", textDecoration: "none", display: "inline-flex", alignItems: "center", gap: "8px" }}>
@@ -613,8 +613,8 @@ export default function NriPage() {
           <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
             <div className="nri-footer-grid" style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1fr 1fr", gap: "48px", paddingBottom: "56px", borderBottom: "1px solid rgba(245,242,236,0.06)" }}>
               <div>
-                <div style={{ fontFamily: "'Cal Sans', sans-serif", fontSize: "18px", fontWeight: 600, color: "#fff", letterSpacing: "0.16em", marginBottom: "14px" }}>Nilay 360 <span style={{ color: "#10C4C3" }}>·</span></div>
-                <p style={{ fontSize: "13px", color: "rgba(245,242,236,0.35)", lineHeight: 1.75, maxWidth: "280px", marginBottom: "22px" }}>India's most trusted premium real estate platform. Verified listings, certified agents, independent legal guidance.</p>
+                <div style={{ fontFamily: "var(--font-support-new)", fontSize: "18px", fontWeight: 600, color: "#fff", letterSpacing: "0.16em", marginBottom: "14px" }}>Nilay 360 <span style={{ color: "#10C4C3" }}>·</span></div>
+                <p style={{ fontSize: "13px", color: "rgba(245,242,236,0.35)", lineHeight: 1.75, maxWidth: "280px", marginBottom: "22px" }}>India's premium real estate platform connecting discerning buyers with exceptional properties.</p>
                 <div style={{ display: "flex", gap: "10px" }}>
                   {["IG", "IN", "TW", "YT"].map(s => (
                     <div key={s} style={{ width: "34px", height: "34px", borderRadius: "8px", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.07)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "10px", color: "rgba(255,255,255,0.35)", fontWeight: 700 }}>{s}</div>
@@ -624,8 +624,8 @@ export default function NriPage() {
               {[
                 { heading: "Properties", links: [["Buy","/buy"],["Rent","/rent"],["New Projects","/new-projects"],["Commercial","/commercial"],["Builders","/builders"],["Blog","/blog"]] },
                 { heading: "Company",    links: [["About Us","/about"],["Our Agents","/agents"],["NRI Services","/nri"],["Careers","/careers"],["Contact","/contact"]] },
-                { heading: "Tools",      links: [["EMI Calculator","/calculator"],["Compare","/compare"],["Search","/search"],["RERA Guide","/legal-guide"]] },
-                { heading: "Legal",      links: [["Privacy Policy","/privacy"],["Terms of Service","/terms"],["Cookie Policy","/cookies"],["RERA Guide","/legal-guide"]] },
+                { heading: "Tools",      links: [["EMI Calculator","/calculator"],["Compare","/compare"],["Search","/search"],["RERA Guide","/legal-guide"],["Safety Guide","/safety-guide"]] },
+                { heading: "Legal",      links: [["Privacy Policy","/privacy"],["Terms of Service","/terms"],["Cookie Policy","/cookies"],["RERA Guide","/legal-guide"],["Agent Terms","/agent-terms"],["Grievance Redressal","/grievance-redressal"]] },
               ].map(col => (
                 <div key={col.heading}>
                   <h4 style={{ fontSize: "11px", fontWeight: 700, letterSpacing: "0.16em", color: "rgba(245,242,236,0.3)", textTransform: "uppercase", marginBottom: "18px" }}>{col.heading}</h4>

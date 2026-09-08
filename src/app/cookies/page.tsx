@@ -10,7 +10,7 @@
         }
 
         body {
-          font-family: 'Cal Sans', sans-serif;
+          font-family: var(--font-body-new);
         }
       `}</style>
 
@@ -36,7 +36,7 @@
         <a
           href="/"
           style={{
-            fontFamily: "'Cal Sans', serif",
+            fontFamily: "var(--font-support-new)",
             fontSize: '24px',
             fontWeight: 600,
             color: '#10C4C3',
@@ -67,7 +67,7 @@
               key={link.href}
               href={link.href}
               style={{
-                fontFamily: "'Cal Sans', sans-serif",
+                fontFamily: "var(--font-body-new)",
                 fontSize: '14px',
                 fontWeight: 400,
                 color: 'rgba(255,255,255,0.8)',
@@ -85,7 +85,7 @@
           <a
             href="/login"
             style={{
-              fontFamily: "'Cal Sans', sans-serif",
+              fontFamily: "var(--font-body-new)",
               fontSize: '14px',
               fontWeight: 500,
               color: '#10C4C3',
@@ -101,7 +101,7 @@
           <a
             href="/post-property"
             style={{
-              fontFamily: "'Cal Sans', sans-serif",
+              fontFamily: "var(--font-body-new)",
               fontSize: '14px',
               fontWeight: 500,
               color: '#05080C',
@@ -127,7 +127,7 @@
       >
         <p
           style={{
-            fontFamily: "'Cal Sans', sans-serif",
+            fontFamily: "var(--font-support-new)",
             fontSize: '12px',
             fontWeight: 500,
             color: '#10C4C3',
@@ -140,7 +140,7 @@
         </p>
         <h1
           style={{
-            fontFamily: "'Cal Sans', serif",
+            fontFamily: "var(--font-heading-new)",
             fontSize: '64px',
             fontWeight: 600,
             color: '#ffffff',
@@ -152,7 +152,7 @@
         </h1>
         <p
           style={{
-            fontFamily: "'Cal Sans', sans-serif",
+            fontFamily: "var(--font-body-new)",
             fontSize: '15px',
             fontWeight: 400,
             color: 'rgba(255,255,255,0.6)',
@@ -184,7 +184,7 @@
           <div>
             <h2
               style={{
-                fontFamily: "'Cal Sans', serif",
+                fontFamily: "var(--font-heading-new)",
                 fontSize: '36px',
                 fontWeight: 600,
                 color: '#020C1C',
@@ -197,7 +197,7 @@
             </h2>
             <p
               style={{
-                fontFamily: "'Cal Sans', sans-serif",
+                fontFamily: "var(--font-body-new)",
                 fontSize: '16px',
                 fontWeight: 400,
                 color: '#333333',
@@ -216,7 +216,7 @@
           <div style={{ marginTop: '48px' }}>
             <h2
               style={{
-                fontFamily: "'Cal Sans', serif",
+                fontFamily: "var(--font-heading-new)",
                 fontSize: '36px',
                 fontWeight: 600,
                 color: '#020C1C',
@@ -229,7 +229,7 @@
             </h2>
             <p
               style={{
-                fontFamily: "'Cal Sans', sans-serif",
+                fontFamily: "var(--font-body-new)",
                 fontSize: '16px',
                 fontWeight: 400,
                 color: '#333333',
@@ -256,7 +256,7 @@
                           color: '#ffffff',
                           padding: '14px 16px',
                           border: '1px solid #E8E3D9',
-                          fontFamily: "'Cal Sans', sans-serif",
+                          fontFamily: "var(--font-body-new)",
                           fontSize: '14px',
                           fontWeight: 500,
                           textAlign: 'left',
@@ -273,7 +273,7 @@
                       style={{
                         padding: '14px 16px',
                         border: '1px solid #E8E3D9',
-                        fontFamily: "'Cal Sans', sans-serif",
+                        fontFamily: "var(--font-body-new)",
                         fontSize: '14px',
                         color: '#333333',
                         background: '#ffffff',
@@ -286,7 +286,7 @@
                       style={{
                         padding: '14px 16px',
                         border: '1px solid #E8E3D9',
-                        fontFamily: "'Cal Sans', sans-serif",
+                        fontFamily: "var(--font-body-new)",
                         fontSize: '14px',
                         color: '#333333',
                         background: '#ffffff',
@@ -300,7 +300,7 @@
                       style={{
                         padding: '14px 16px',
                         border: '1px solid #E8E3D9',
-                        fontFamily: "'Cal Sans', sans-serif",
+                        fontFamily: "var(--font-body-new)",
                         fontSize: '14px',
                         color: '#333333',
                         background: '#ffffff',
@@ -313,7 +313,7 @@
                       style={{
                         padding: '14px 16px',
                         border: '1px solid #E8E3D9',
-                        fontFamily: "'Cal Sans', sans-serif",
+                        fontFamily: "var(--font-body-new)",
                         fontSize: '14px',
                         color: '#333333',
                         background: '#ffffff',
@@ -328,7 +328,7 @@
                       style={{
                         padding: '14px 16px',
                         border: '1px solid #E8E3D9',
-                        fontFamily: "'Cal Sans', sans-serif",
+                        fontFamily: "var(--font-body-new)",
                         fontSize: '14px',
                         color: '#333333',
                         background: '#020C1C',
@@ -341,7 +341,7 @@
                       style={{
                         padding: '14px 16px',
                         border: '1px solid #E8E3D9',
-                        fontFamily: "'Cal Sans', sans-serif",
+                        fontFamily: "var(--font-body-new)",
                         fontSize: '14px',
                         color: '#333333',
                         background: '#020C1C',
@@ -355,7 +355,7 @@
                       style={{
                         padding: '14px 16px',
                         border: '1px solid #E8E3D9',
-                        fontFamily: "'Cal Sans', sans-serif",
+                        fontFamily: "var(--font-body-new)",
                         fontSize: '14px',
                         color: '#333333',
                         background: '#020C1C',
@@ -368,7 +368,7 @@
                       style={{
                         padding: '14px 16px',
                         border: '1px solid #E8E3D9',
-                        fontFamily: "'Cal Sans', sans-serif",
+                        fontFamily: "var(--font-body-new)",
                         fontSize: '14px',
                         color: '#333333',
                         background: '#020C1C',
@@ -383,7 +383,7 @@
                       style={{
                         padding: '14px 16px',
                         border: '1px solid #E8E3D9',
-                        fontFamily: "'Cal Sans', sans-serif",
+                        fontFamily: "var(--font-body-new)",
                         fontSize: '14px',
                         color: '#333333',
                         background: '#ffffff',
@@ -396,7 +396,7 @@
                       style={{
                         padding: '14px 16px',
                         border: '1px solid #E8E3D9',
-                        fontFamily: "'Cal Sans', sans-serif",
+                        fontFamily: "var(--font-body-new)",
                         fontSize: '14px',
                         color: '#333333',
                         background: '#ffffff',
@@ -410,7 +410,7 @@
                       style={{
                         padding: '14px 16px',
                         border: '1px solid #E8E3D9',
-                        fontFamily: "'Cal Sans', sans-serif",
+                        fontFamily: "var(--font-body-new)",
                         fontSize: '14px',
                         color: '#333333',
                         background: '#ffffff',
@@ -423,7 +423,7 @@
                       style={{
                         padding: '14px 16px',
                         border: '1px solid #E8E3D9',
-                        fontFamily: "'Cal Sans', sans-serif",
+                        fontFamily: "var(--font-body-new)",
                         fontSize: '14px',
                         color: '#333333',
                         background: '#ffffff',
@@ -438,7 +438,7 @@
                       style={{
                         padding: '14px 16px',
                         border: '1px solid #E8E3D9',
-                        fontFamily: "'Cal Sans', sans-serif",
+                        fontFamily: "var(--font-body-new)",
                         fontSize: '14px',
                         color: '#333333',
                         background: '#020C1C',
@@ -451,7 +451,7 @@
                       style={{
                         padding: '14px 16px',
                         border: '1px solid #E8E3D9',
-                        fontFamily: "'Cal Sans', sans-serif",
+                        fontFamily: "var(--font-body-new)",
                         fontSize: '14px',
                         color: '#333333',
                         background: '#020C1C',
@@ -465,7 +465,7 @@
                       style={{
                         padding: '14px 16px',
                         border: '1px solid #E8E3D9',
-                        fontFamily: "'Cal Sans', sans-serif",
+                        fontFamily: "var(--font-body-new)",
                         fontSize: '14px',
                         color: '#333333',
                         background: '#020C1C',
@@ -478,7 +478,7 @@
                       style={{
                         padding: '14px 16px',
                         border: '1px solid #E8E3D9',
-                        fontFamily: "'Cal Sans', sans-serif",
+                        fontFamily: "var(--font-body-new)",
                         fontSize: '14px',
                         color: '#333333',
                         background: '#020C1C',
@@ -493,7 +493,7 @@
             </div>
             <p
               style={{
-                fontFamily: "'Cal Sans', sans-serif",
+                fontFamily: "var(--font-body-new)",
                 fontSize: '14px',
                 fontWeight: 400,
                 color: '#666666',
@@ -511,7 +511,7 @@
           <div style={{ marginTop: '48px' }}>
             <h2
               style={{
-                fontFamily: "'Cal Sans', serif",
+                fontFamily: "var(--font-heading-new)",
                 fontSize: '36px',
                 fontWeight: 600,
                 color: '#020C1C',
@@ -524,7 +524,7 @@
             </h2>
             <p
               style={{
-                fontFamily: "'Cal Sans', sans-serif",
+                fontFamily: "var(--font-body-new)",
                 fontSize: '16px',
                 fontWeight: 400,
                 color: '#333333',
@@ -537,7 +537,7 @@
             </p>
             <ul
               style={{
-                fontFamily: "'Cal Sans', sans-serif",
+                fontFamily: "var(--font-body-new)",
                 fontSize: '16px',
                 fontWeight: 400,
                 color: '#333333',
@@ -566,7 +566,7 @@
             </ul>
             <p
               style={{
-                fontFamily: "'Cal Sans', sans-serif",
+                fontFamily: "var(--font-body-new)",
                 fontSize: '16px',
                 fontWeight: 400,
                 color: '#333333',
@@ -583,7 +583,7 @@
           <div style={{ marginTop: '48px' }}>
             <h2
               style={{
-                fontFamily: "'Cal Sans', serif",
+                fontFamily: "var(--font-heading-new)",
                 fontSize: '36px',
                 fontWeight: 600,
                 color: '#020C1C',
@@ -596,7 +596,7 @@
             </h2>
             <p
               style={{
-                fontFamily: "'Cal Sans', sans-serif",
+                fontFamily: "var(--font-body-new)",
                 fontSize: '16px',
                 fontWeight: 400,
                 color: '#333333',
@@ -609,7 +609,7 @@
             </p>
             <ul
               style={{
-                fontFamily: "'Cal Sans', sans-serif",
+                fontFamily: "var(--font-body-new)",
                 fontSize: '16px',
                 fontWeight: 400,
                 color: '#333333',
@@ -671,7 +671,7 @@
             </ul>
             <p
               style={{
-                fontFamily: "'Cal Sans', sans-serif",
+                fontFamily: "var(--font-body-new)",
                 fontSize: '16px',
                 fontWeight: 400,
                 color: '#333333',
@@ -688,7 +688,7 @@
           <div style={{ marginTop: '48px' }}>
             <h2
               style={{
-                fontFamily: "'Cal Sans', serif",
+                fontFamily: "var(--font-heading-new)",
                 fontSize: '36px',
                 fontWeight: 600,
                 color: '#020C1C',
@@ -701,7 +701,7 @@
             </h2>
             <p
               style={{
-                fontFamily: "'Cal Sans', sans-serif",
+                fontFamily: "var(--font-body-new)",
                 fontSize: '16px',
                 fontWeight: 400,
                 color: '#333333',
@@ -719,7 +719,7 @@
           <div style={{ marginTop: '48px' }}>
             <h2
               style={{
-                fontFamily: "'Cal Sans', serif",
+                fontFamily: "var(--font-heading-new)",
                 fontSize: '36px',
                 fontWeight: 600,
                 color: '#020C1C',
@@ -732,7 +732,7 @@
             </h2>
             <p
               style={{
-                fontFamily: "'Cal Sans', sans-serif",
+                fontFamily: "var(--font-body-new)",
                 fontSize: '16px',
                 fontWeight: 400,
                 color: '#333333',
@@ -752,7 +752,7 @@
             >
               <p
                 style={{
-                  fontFamily: "'Cal Sans', sans-serif",
+                  fontFamily: "var(--font-body-new)",
                   fontSize: '16px',
                   fontWeight: 400,
                   color: '#333333',
@@ -764,7 +764,6 @@
                   privacy@nilay360.com
                 </a>
                 <br />
-                {/* TEMPORARY: Using Hustle Hive office address (owner-confirmed, same location as an existing commercial listing), revert to Nilay360's own registered address once available */}
                 <strong>Address:</strong> 4th Floor, Trendz Techpark, Road No. 11, Kakatiya Hills, Guttala Begumpet,
                 Kavuri Hills, Madhapur, Hyderabad, Telangana 500081.
               </p>
@@ -796,7 +795,7 @@
           <div>
             <h4
               style={{
-                fontFamily: "'Cal Sans', serif",
+                fontFamily: "var(--font-heading-new)",
                 fontSize: '18px',
                 fontWeight: 600,
                 color: '#10C4C3',
@@ -817,7 +816,7 @@
                   <a
                     href={link.href}
                     style={{
-                      fontFamily: "'Cal Sans', sans-serif",
+                      fontFamily: "var(--font-body-new)",
                       fontSize: '13px',
                       fontWeight: 400,
                       color: 'rgba(255,255,255,0.55)',
@@ -835,7 +834,7 @@
           <div>
             <h4
               style={{
-                fontFamily: "'Cal Sans', serif",
+                fontFamily: "var(--font-heading-new)",
                 fontSize: '18px',
                 fontWeight: 600,
                 color: '#10C4C3',
@@ -856,7 +855,7 @@
                   <a
                     href={link.href}
                     style={{
-                      fontFamily: "'Cal Sans', sans-serif",
+                      fontFamily: "var(--font-body-new)",
                       fontSize: '13px',
                       fontWeight: 400,
                       color: 'rgba(255,255,255,0.55)',
@@ -874,7 +873,7 @@
           <div>
             <h4
               style={{
-                fontFamily: "'Cal Sans', serif",
+                fontFamily: "var(--font-heading-new)",
                 fontSize: '18px',
                 fontWeight: 600,
                 color: '#10C4C3',
@@ -890,12 +889,13 @@
                 { label: 'Compare', href: '/compare' },
                 { label: 'Search', href: '/search' },
                 { label: 'RERA Guide', href: '/legal-guide' },
+                { label: 'Safety Guide', href: '/safety-guide' },
               ].map((link) => (
                 <li key={link.href} style={{ marginBottom: '10px' }}>
                   <a
                     href={link.href}
                     style={{
-                      fontFamily: "'Cal Sans', sans-serif",
+                      fontFamily: "var(--font-body-new)",
                       fontSize: '13px',
                       fontWeight: 400,
                       color: 'rgba(255,255,255,0.55)',
@@ -913,7 +913,7 @@
           <div>
             <h4
               style={{
-                fontFamily: "'Cal Sans', serif",
+                fontFamily: "var(--font-heading-new)",
                 fontSize: '18px',
                 fontWeight: 600,
                 color: '#10C4C3',
@@ -929,12 +929,14 @@
                 { label: 'Terms of Service', href: '/terms' },
                 { label: 'Cookie Policy', href: '/cookies' },
                 { label: 'Legal Guide', href: '/legal-guide' },
+                { label: 'Agent Terms', href: '/agent-terms' },
+                { label: 'Grievance Redressal', href: '/grievance-redressal' },
               ].map((link) => (
                 <li key={link.href} style={{ marginBottom: '10px' }}>
                   <a
                     href={link.href}
                     style={{
-                      fontFamily: "'Cal Sans', sans-serif",
+                      fontFamily: "var(--font-body-new)",
                       fontSize: '13px',
                       fontWeight: 400,
                       color: 'rgba(255,255,255,0.55)',
@@ -960,7 +962,7 @@
         >
           <p
             style={{
-              fontFamily: "'Cal Sans', sans-serif",
+              fontFamily: "var(--font-body-new)",
               fontSize: '12px',
               fontWeight: 400,
               color: 'rgba(255,255,255,0.3)',

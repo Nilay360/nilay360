@@ -30,11 +30,11 @@ export default function PricingPage() {
   const whatsappHref = `https://wa.me/${BRAND.whatsapp.replace(/\+/g, "")}?text=${encodeURIComponent("Hi, I'd like to request an upgrade to Nilay 360 Premium.")}`;
 
   return (
-    <div style={{ background: "#020C1C", minHeight: "100vh", fontFamily: "'Cal Sans', system-ui, sans-serif" }}>
+    <div style={{ background: "#020C1C", minHeight: "100vh", fontFamily: "var(--font-body-new)" }}>
       <div style={{ maxWidth: "1000px", margin: "0 auto", padding: "72px 24px 96px" }}>
         {/* Hero */}
         <div style={{ textAlign: "center", marginBottom: "56px" }}>
-          <h1 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "clamp(32px, 5vw, 48px)", fontWeight: 600, color: "#FFFFFF", lineHeight: 1.15, marginBottom: "14px" }}>
+          <h1 style={{ fontFamily: "var(--font-heading-new)", fontSize: "clamp(32px, 5vw, 48px)", fontWeight: 600, color: "#FFFFFF", lineHeight: 1.15, marginBottom: "14px" }}>
             Simple, Transparent Pricing
           </h1>
           <p style={{ fontSize: "15px", color: "#A9B4C2", maxWidth: "520px", margin: "0 auto" }}>
@@ -48,14 +48,14 @@ export default function PricingPage() {
           <Card>
             <div style={{ marginBottom: "24px" }}>
               <div style={{ fontSize: "12px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "#A9B4C2", marginBottom: "8px" }}>Free</div>
-              <div style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "34px", fontWeight: 600, color: "#FFFFFF" }}>₹0</div>
+              <div style={{ fontFamily: "var(--font-support-new)", fontSize: "34px", fontWeight: 600, color: "#FFFFFF" }}>₹0</div>
               <div style={{ fontSize: "13px", color: "rgba(255,255,255,0.45)", marginTop: "2px" }}>Forever</div>
             </div>
             <div style={{ borderTop: "1px solid rgba(255,255,255,0.08)", paddingTop: "8px", marginBottom: "28px" }}>
               <CheckItem label="Browse all property listings" />
               <CheckItem label="Save properties to your dashboard" />
               <CheckItem label="Submit inquiries to sellers and agents" />
-              <CheckItem label="Apply to become a verified agent" />
+              <CheckItem label="Apply to become an agent" />
             </div>
             <a
               href="/properties"
@@ -74,7 +74,7 @@ export default function PricingPage() {
                   Best Value
                 </span>
               </div>
-              <div style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "34px", fontWeight: 600, color: "#FFFFFF" }}>Contact Us</div>
+              <div style={{ fontFamily: "var(--font-support-new)", fontSize: "34px", fontWeight: 600, color: "#FFFFFF" }}>Contact Us</div>
               <div style={{ fontSize: "13px", color: "rgba(255,255,255,0.45)", marginTop: "2px" }}>Custom pricing — reach out to upgrade</div>
             </div>
             <div style={{ borderTop: "1px solid rgba(255,255,255,0.08)", paddingTop: "8px", marginBottom: "28px" }}>

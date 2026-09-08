@@ -67,6 +67,7 @@ interface FormState {
   sellerPhone: string
   sellerWhatsapp: string
   agreeToTerms: boolean
+  ownershipWarranty: boolean
 }
 
 type Action =
@@ -93,6 +94,7 @@ const INITIAL: FormState = {
   floorPlans: [],
   sellerName: '', sellerEmail: '', sellerPhone: '', sellerWhatsapp: '',
   agreeToTerms: false,
+  ownershipWarranty: false,
 }
 
 function reducer(s: FormState, a: Action): FormState {
@@ -145,8 +147,8 @@ const C = {
   error: '#e05555',
 } as const
 
-const FD = '"Cal Sans", Georgia, "Times New Roman", serif'
-const FB = '"Cal Sans", -apple-system, BlinkMacSystemFont, sans-serif'
+const FD = 'var(--font-heading-new)'
+const FB = 'var(--font-body-new)'
 
 // ─── Shared styles ─────────────────────────────────────────────────────────────
 
@@ -1356,6 +1358,34 @@ function Step8({
         </span>
       </button>
 
+      {/* Ownership-warranty checkbox — migration 053. Distinct from the
+          general ToS checkbox above: this is a specific factual warranty
+          Nilay 360 relies on to publish the listing, not routine platform
+          consent, so its value is persisted (ownership_warranty_confirmed /
+          _at) on submit rather than left as a client-side-only gate. */}
+      <button
+        type="button"
+        onClick={() => dispatch({ type: 'SET', field: 'ownershipWarranty', value: !state.ownershipWarranty })}
+        style={{
+          display: 'flex', alignItems: 'flex-start', gap: 12,
+          background: 'transparent', border: 'none', cursor: 'pointer',
+          padding: 0, textAlign: 'left', marginTop: 16,
+        }}
+      >
+        <div style={{
+          width: 20, height: 20, borderRadius: 5, flexShrink: 0, marginTop: 1,
+          border: `2px solid ${state.ownershipWarranty ? C.gold : C.border}`,
+          background: state.ownershipWarranty ? C.gold : 'transparent',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          transition: 'all 0.15s', color: '#0a0a0a', fontSize: '0.7rem', fontWeight: 900,
+        }}>
+          {state.ownershipWarranty ? '✓' : ''}
+        </div>
+        <span style={{ fontSize: '0.875rem', color: C.textSub, lineHeight: 1.6, fontFamily: FB }}>
+          I warrant that I have the legal right and authority to sell or let this property, and that all details in this listing are accurate to the best of my knowledge. I understand Nilay 360 relies on this warranty to publish the listing, and that a false warranty may result in the listing being removed and legal liability.
+        </span>
+      </button>
+
       {submitError && (
         <div style={{
           marginTop: 18, padding: '12px 16px',
@@ -1453,6 +1483,7 @@ function validate(step: number, s: FormState): string | null {
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s.sellerEmail)) return 'Please enter a valid email address'
     if (!/^\d{10}$/.test(s.sellerPhone)) return 'Please enter a valid 10-digit mobile number'
     if (!s.agreeToTerms) return 'Please accept the Terms of Service to continue'
+    if (!s.ownershipWarranty) return 'Please confirm the ownership warranty to continue'
   }
   return null
 }
@@ -1610,6 +1641,9 @@ export default function PostPropertyPage() {
         user_id:            authUserId,
         is_featured:        false,
         views:              0,
+        // Migration 053 — write-once at creation, per the checkbox above.
+        ownership_warranty_confirmed:    state.ownershipWarranty,
+        ownership_warranty_confirmed_at: new Date().toISOString(),
       }]).select('id').single()
 
       if (insertErr) throw insertErr
@@ -1673,7 +1707,7 @@ export default function PostPropertyPage() {
             fontWeight: 600, color: C.text, margin: '0 0 8px', lineHeight: 1.15,
           }}>Post Your Property</h1>
           <p style={{ color: C.textMuted, margin: 0, fontSize: '0.9375rem' }}>
-            Reach thousands of verified buyers &amp; tenants across India
+            Reach thousands of buyers &amp; tenants across India
           </p>
         </div>
 

@@ -91,7 +91,7 @@ export default function Hero() {
 
         <h1
           className="ab-hero-reveal"
-          style={{ animationDelay: "0.15s", margin: 0, fontFamily: "'Cal Sans', Georgia, serif", fontWeight: 300, fontSize: "clamp(38px, 6.8vw, 108px)", lineHeight: 1.04, letterSpacing: "-0.026em", color: "#FFFFFF" }}
+          style={{ animationDelay: "0.15s", margin: 0, fontFamily: "var(--font-heading-new)", fontWeight: 300, fontSize: "clamp(38px, 6.8vw, 108px)", lineHeight: 1.04, letterSpacing: "-0.026em", color: "#FFFFFF" }}
         >
           The Future of Real Estate<br />Begins Here.
         </h1>
@@ -100,15 +100,15 @@ export default function Hero() {
           className="ab-hero-reveal"
           style={{ animationDelay: "0.45s", display: "flex", alignItems: "center", gap: "clamp(14px, 2vw, 26px)" }}
         >
-          <span style={{ fontFamily: "'Cal Sans', sans-serif", fontWeight: 300, fontSize: "clamp(14px, 1.4vw, 20px)", letterSpacing: "0.28em", textTransform: "uppercase", color: "rgba(255,255,255,0.7)" }}>View First</span>
+          <span style={{ fontFamily: "var(--font-support-new)", fontWeight: 300, fontSize: "clamp(14px, 1.4vw, 20px)", letterSpacing: "0.28em", textTransform: "uppercase", color: "rgba(255,255,255,0.7)" }}>View First</span>
           <span style={{ width: "26px", height: "1px", background: TEAL, opacity: 0.6 }} />
-          <span style={{ fontFamily: "'Cal Sans', sans-serif", fontWeight: 300, fontSize: "clamp(14px, 1.4vw, 20px)", letterSpacing: "0.28em", textTransform: "uppercase", color: "rgba(255,255,255,0.7)" }}>Home Next</span>
+          <span style={{ fontFamily: "var(--font-support-new)", fontWeight: 300, fontSize: "clamp(14px, 1.4vw, 20px)", letterSpacing: "0.28em", textTransform: "uppercase", color: "rgba(255,255,255,0.7)" }}>Home Next</span>
         </div>
 
         <motion.a
           href="#ch02"
           className="ab-hero-reveal"
-          style={{ animationDelay: "0.65s", position: "relative", overflow: "hidden", display: "inline-flex", alignItems: "center", gap: "14px", marginTop: "clamp(6px, 1.5vw, 18px)", padding: "16px 32px", border: "1px solid rgba(255,255,255,0.16)", borderRadius: "999px", background: "rgba(255,255,255,0.04)", backdropFilter: "blur(16px)", fontFamily: "'Cal Sans', sans-serif", fontSize: "11px", fontWeight: 600, letterSpacing: "0.24em", textTransform: "uppercase", color: "#FFFFFF", textDecoration: "none" }}
+          style={{ animationDelay: "0.65s", position: "relative", overflow: "hidden", display: "inline-flex", alignItems: "center", gap: "14px", marginTop: "clamp(6px, 1.5vw, 18px)", padding: "16px 32px", border: "1px solid rgba(255,255,255,0.16)", borderRadius: "999px", background: "rgba(255,255,255,0.04)", backdropFilter: "blur(16px)", fontFamily: "var(--font-support-new)", fontSize: "11px", fontWeight: 600, letterSpacing: "0.24em", textTransform: "uppercase", color: "#FFFFFF", textDecoration: "none" }}
           whileHover={{ borderColor: "rgba(16,196,195,0.5)", background: "rgba(16,196,195,0.12)" }}
         >
           Explore Our Story
@@ -122,7 +122,7 @@ export default function Hero() {
         transition={{ duration: 3.4, repeat: Infinity, ease: "easeInOut" }}
         style={{ position: "absolute", bottom: "5vh", left: "50%", transform: "translateX(-50%)", display: "flex", flexDirection: "column", alignItems: "center", gap: "10px" }}
       >
-        <span style={{ fontFamily: "'Cal Sans', sans-serif", fontSize: "9px", letterSpacing: "0.32em", textTransform: "uppercase", color: "rgba(255,255,255,0.26)" }}>Scroll</span>
+        <span style={{ fontFamily: "var(--font-support-new)", fontSize: "9px", letterSpacing: "0.32em", textTransform: "uppercase", color: "rgba(255,255,255,0.26)" }}>Scroll</span>
         <span style={{ display: "block", width: "1px", height: "42px", background: "linear-gradient(180deg, rgba(255,255,255,0.34), rgba(255,255,255,0))" }} />
       </motion.div>
     </section>

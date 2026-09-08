@@ -26,7 +26,7 @@ import { BRAND, NAV_LINKS } from "@/constants"
    - Feature-tile copy (#12/#13 in the directive) consolidated into ONE trust
      section per the directive's own instruction to avoid duplication if
      they'd say the same thing. Only "Verified Listings" has a directly
-     established source phrase (STATS constant / homepage copy); "360°
+     established source phrase (homepage copy); "360°
      Experiences," "Secure Platform," and "Premium Support" are honest
      concept-level claims tied to real capabilities (Kuula tours, the
      Supabase RLS/auth work, and the real WhatsApp/call/email channels on
@@ -99,7 +99,7 @@ const FAQS = [
   },
   {
     question: "Are listings verified?",
-    answer: "Every listing on Nilay 360 goes through a verification check before it goes live on the platform.",
+    answer: "Every listing goes through admin review before it goes live on Nilay 360. Where a RERA registration number has been provided, it's shown directly on the listing.",
   },
 ]
 
@@ -514,7 +514,7 @@ export default function ConnectPage() {
 const CONNECT_STYLES = `
   .connect-main {
     position: relative; overflow: hidden;
-    background: #020C1C; min-height: 100vh; font-family: 'Cal Sans', sans-serif;
+    background: #020C1C; min-height: 100vh; font-family: var(--font-body-new);
     --gold: #D4A94F; --gold-hover: #E8C874; --gold-deep: #B8903A;
     --gold-glow: rgba(212,169,79,0.28); --gold-border: rgba(212,169,79,0.35);
   }
@@ -577,7 +577,7 @@ const CONNECT_STYLES = `
   .${BTN} {
     display: flex; align-items: center; justify-content: center; gap: 10px;
     min-height: 48px; padding: 14px 22px; border-radius: 12px;
-    font-family: 'Cal Sans', sans-serif; font-size: 15px; font-weight: 600; text-decoration: none;
+    font-family: var(--font-body-new); font-size: 15px; font-weight: 600; text-decoration: none;
     transition: transform 0.15s, box-shadow 0.2s, background 0.15s, border-color 0.15s;
   }
   .${BTN}:active { transform: scale(0.98); }
@@ -670,7 +670,7 @@ const CONNECT_STYLES = `
   .connect-newsletter-input {
     width: 100%; padding: 12px 14px; border-radius: 10px; font-size: 13px;
     background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.15); color: #fff;
-    font-family: 'Cal Sans', sans-serif; min-height: 44px; box-sizing: border-box;
+    font-family: var(--font-body-new); min-height: 44px; box-sizing: border-box;
   }
   .connect-newsletter-input::placeholder { color: rgba(255,255,255,0.35); }
   .connect-footer-newsletter-msg { font-size: 12px; color: rgba(255,255,255,0.6); line-height: 1.7; margin: 0; }

@@ -1,6 +1,7 @@
 ﻿"use client";
 import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { useLiveStats } from "@/lib/liveStats";
 
 // ── City directory ───────────────────────────────────────────
 // Real cities Nilay 360 operates in — not fake content. Per-city listing
@@ -28,6 +29,7 @@ function Eyebrow({ label, dark = false }: { label: string; dark?: boolean }) {
 }
 
 export default function LocationsPage() {
+  const liveStats = useLiveStats();
   const [counts, setCounts] = useState<Record<string, number>>({});
   const [totalListings, setTotalListings] = useState(0);
 
@@ -60,7 +62,7 @@ export default function LocationsPage() {
       <style>{`
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
         html { scroll-behavior: smooth; }
-        body { font-family: 'Cal Sans', system-ui, sans-serif; background: #020C1C; overflow-x: hidden; }
+        body { font-family: var(--font-body-new); background: #020C1C; overflow-x: hidden; }
         ::-webkit-scrollbar { width: 4px; height: 4px; }
         ::-webkit-scrollbar-thumb { background: rgba(201,168,76,0.3); border-radius: 2px; }
         @keyframes fadeUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
@@ -92,7 +94,7 @@ export default function LocationsPage() {
               <div style={{ width: "5px", height: "5px", borderRadius: "50%", background: "#10C4C3" }} />
               <span style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.2em", color: "#10C4C3", textTransform: "uppercase" }}>India-Wide Coverage</span>
             </div>
-            <h1 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "clamp(40px, 6vw, 68px)", fontWeight: 300, color: "#020C1C", lineHeight: 1.1, marginBottom: "18px", animation: "fadeUp 0.5s ease-out both" }}>
+            <h1 style={{ fontFamily: "var(--font-heading-new)", fontSize: "clamp(40px, 6vw, 68px)", fontWeight: 300, color: "#020C1C", lineHeight: 1.1, marginBottom: "18px", animation: "fadeUp 0.5s ease-out both" }}>
               Explore Properties<br /><em style={{ fontStyle: "italic", color: "#10C4C3" }}>Across India</em>
             </h1>
             <p style={{ fontSize: "15px", color: "rgba(245,242,236,0.5)", lineHeight: 1.75, marginBottom: "36px", animation: "fadeUp 0.5s 0.1s ease-out both" }}>
@@ -111,7 +113,7 @@ export default function LocationsPage() {
           <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", marginBottom: "36px", flexWrap: "wrap", gap: "12px" }}>
             <div>
               <Eyebrow label="All Markets" />
-              <h2 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "clamp(30px, 3.8vw, 46px)", fontWeight: 400, color: "#020C1C" }}>
+              <h2 style={{ fontFamily: "var(--font-heading-new)", fontSize: "clamp(30px, 3.8vw, 46px)", fontWeight: 400, color: "#020C1C" }}>
                 Browse by City
               </h2>
             </div>
@@ -129,7 +131,7 @@ export default function LocationsPage() {
                     <img src={city.img} alt={city.name} style={{ width: "100%", height: "100%", objectFit: "cover", transform: hover ? "scale(1.06)" : "scale(1)", transition: "transform 0.35s" }} />
                     <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(5,8,12,0.72) 0%, transparent 55%)" }} />
                     <div style={{ position: "absolute", bottom: "12px", left: "14px" }}>
-                      <h3 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "22px", fontWeight: 600, color: "#020C1C", lineHeight: 1.1 }}>{city.name}</h3>
+                      <h3 style={{ fontFamily: "var(--font-heading-new)", fontSize: "22px", fontWeight: 600, color: "#020C1C", lineHeight: 1.1 }}>{city.name}</h3>
                       <p style={{ fontSize: "11px", color: "rgba(245,242,236,0.55)", marginTop: "2px" }}>{city.state}</p>
                     </div>
                   </div>
@@ -155,19 +157,21 @@ export default function LocationsPage() {
           <div style={{ maxWidth: "1000px", margin: "0 auto", position: "relative", zIndex: 2 }}>
             <div style={{ textAlign: "center", marginBottom: "48px" }}>
               <Eyebrow label="Market Snapshot" dark />
-              <h2 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "clamp(28px, 3.5vw, 44px)", fontWeight: 300, color: "#020C1C" }}>
-                India Premium Real Estate<br /><em style={{ fontStyle: "italic", color: "#10C4C3" }}>Overview · Q2 2025</em>
+              <h2 style={{ fontFamily: "var(--font-heading-new)", fontSize: "clamp(28px, 3.5vw, 44px)", fontWeight: 300, color: "#020C1C" }}>
+                India Premium Real Estate<br /><em style={{ fontStyle: "italic", color: "#10C4C3" }}>Overview</em>
               </h2>
             </div>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "20px" }}>
               {[
                 { value: `${totalListings}`, label: "Verified Listings", sub: "Across all cities", icon: "🏠" },
                 { value: `${CITIES.length}`,  label: "Cities Covered",    sub: "And growing",       icon: "🗺" },
-                { value: "11.4%",              label: "Avg Price Growth",  sub: "YoY across markets", icon: "📈" },
+                liveStats.avgSalePricePerSqft !== null
+                  ? { value: `₹${liveStats.avgSalePricePerSqft.toLocaleString("en-IN")}`, label: "Avg Sale Price · Hyderabad", sub: `Based on ${liveStats.avgSalePriceSampleSize} active listing${liveStats.avgSalePriceSampleSize === 1 ? "" : "s"}`, icon: "📈" }
+                  : { value: "—", label: "Not enough listings yet", sub: "for a price snapshot", icon: "📈" },
               ].map(s => (
                 <div key={s.label} style={{ background: "rgba(245,242,236,0.04)", border: "1px solid rgba(245,242,236,0.07)", borderRadius: "16px", padding: "32px 28px", textAlign: "center" }}>
                   <div style={{ fontSize: "28px", marginBottom: "14px" }}>{s.icon}</div>
-                  <p style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "42px", fontWeight: 600, color: "#10C4C3", lineHeight: 1, marginBottom: "8px" }}>{s.value}</p>
+                  <p style={{ fontFamily: "var(--font-support-new)", fontSize: "42px", fontWeight: 600, color: "#10C4C3", lineHeight: 1, marginBottom: "8px" }}>{s.value}</p>
                   <p style={{ fontSize: "14px", fontWeight: 600, color: "#020C1C", marginBottom: "3px" }}>{s.label}</p>
                   <p style={{ fontSize: "11px", color: "rgba(245,242,236,0.35)" }}>{s.sub}</p>
                 </div>
@@ -179,7 +183,7 @@ export default function LocationsPage() {
         {/* ── CTA ────────────────────────────────────────────── */}
         <section className="loc-pg-cta" style={{ background: "#020C1C", padding: "80px 48px", textAlign: "center" }}>
           <div style={{ maxWidth: "560px", margin: "0 auto" }}>
-            <h2 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "clamp(30px, 4vw, 46px)", fontWeight: 400, color: "#020C1C", marginBottom: "14px", lineHeight: 1.2 }}>
+            <h2 style={{ fontFamily: "var(--font-heading-new)", fontSize: "clamp(30px, 4vw, 46px)", fontWeight: 400, color: "#020C1C", marginBottom: "14px", lineHeight: 1.2 }}>
               Can't find your city?<br /><em style={{ fontStyle: "italic", color: "#10C4C3" }}>We're expanding.</em>
             </h2>
             <p style={{ fontSize: "14px", color: "#6B7C72", lineHeight: 1.75, marginBottom: "28px" }}>
@@ -197,8 +201,8 @@ export default function LocationsPage() {
           <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
             <div className="loc-pg-footer-grid" style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1fr 1fr", gap: "48px", paddingBottom: "56px", borderBottom: "1px solid rgba(245,242,236,0.06)" }}>
               <div>
-                <div style={{ fontFamily: "'Cal Sans', sans-serif", fontSize: "18px", fontWeight: 600, color: "#fff", letterSpacing: "0.16em", marginBottom: "14px" }}>Nilay 360 <span style={{ color: "#10C4C3" }}>·</span></div>
-                <p style={{ fontSize: "13px", color: "rgba(245,242,236,0.35)", lineHeight: 1.75, maxWidth: "280px", marginBottom: "22px" }}>India's most trusted premium real estate platform. Verified listings, certified agents, independent legal guidance.</p>
+                <div style={{ fontFamily: "var(--font-support-new)", fontSize: "18px", fontWeight: 600, color: "#fff", letterSpacing: "0.16em", marginBottom: "14px" }}>Nilay 360 <span style={{ color: "#10C4C3" }}>·</span></div>
+                <p style={{ fontSize: "13px", color: "rgba(245,242,236,0.35)", lineHeight: 1.75, maxWidth: "280px", marginBottom: "22px" }}>India's premium real estate platform connecting discerning buyers with exceptional properties.</p>
                 <div style={{ display: "flex", gap: "10px" }}>
                   {[
                     { s: "IN", href: "https://www.instagram.com/nilay360_/" },
@@ -212,8 +216,8 @@ export default function LocationsPage() {
               {[
                 { heading: "Properties", links: [["Buy","/buy"],["Rent","/rent"],["New Projects","/new-projects"],["Commercial","/commercial"],["Builders","/builders"],["Blog","/blog"]] },
                 { heading: "Company",    links: [["About Us","/about"],["Our Agents","/agents"],["NRI Services","/nri"],["Careers","/careers"],["Contact","/contact"]] },
-                { heading: "Tools",      links: [["EMI Calculator","/calculator"],["Compare","/compare"],["Search","/search"],["RERA Guide","/legal-guide"]] },
-                { heading: "Legal",      links: [["Privacy Policy","/privacy"],["Terms of Service","/terms"],["Cookie Policy","/cookies"],["RERA Guide","/legal-guide"]] },
+                { heading: "Tools",      links: [["EMI Calculator","/calculator"],["Compare","/compare"],["Search","/search"],["RERA Guide","/legal-guide"],["Safety Guide","/safety-guide"]] },
+                { heading: "Legal",      links: [["Privacy Policy","/privacy"],["Terms of Service","/terms"],["Cookie Policy","/cookies"],["RERA Guide","/legal-guide"],["Agent Terms","/agent-terms"],["Grievance Redressal","/grievance-redressal"]] },
               ].map(col => (
                 <div key={col.heading}>
                   <h4 style={{ fontSize: "11px", fontWeight: 700, letterSpacing: "0.16em", color: "rgba(245,242,236,0.3)", textTransform: "uppercase", marginBottom: "18px" }}>{col.heading}</h4>
@@ -225,7 +229,6 @@ export default function LocationsPage() {
             </div>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "22px 0", flexWrap: "wrap", gap: "12px" }}>
               <p style={{ fontSize: "12px", color: "rgba(245,242,236,0.2)" }}>© 2025 Nilay 360. All rights reserved.</p>
-              <span style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.1em", padding: "4px 10px", background: "rgba(201,168,76,0.08)", border: "1px solid rgba(201,168,76,0.15)", borderRadius: "4px", color: "rgba(201,168,76,0.5)" }}>RERA COMPLIANT</span>
             </div>
           </div>
         </footer>

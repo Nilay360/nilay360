@@ -102,9 +102,9 @@ function SelectorSlot({
           <span style={{ position: "absolute", bottom: "10px", left: "10px", padding: "3px 10px", borderRadius: "100px", fontSize: "9px", fontWeight: 800, letterSpacing: "0.1em", textTransform: "uppercase", background: "#10C4C3", color: "#020C1C" }}>{property.listing_type === "sale" ? "For Sale" : "For Rent"}</span>
         </div>
         <div style={{ padding: "16px 18px" }}>
-          <h3 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "16px", fontWeight: 600, color: "#020C1C", marginBottom: "4px", lineHeight: 1.3, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{property.title}</h3>
+          <h3 style={{ fontFamily: "var(--font-heading-new)", fontSize: "16px", fontWeight: 600, color: "#020C1C", marginBottom: "4px", lineHeight: 1.3, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{property.title}</h3>
           <p style={{ fontSize: "11px", color: "#6B7C72", marginBottom: "8px" }}>{property.neighbourhood}, {property.city}</p>
-          <p style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "20px", fontWeight: 600, color: "#10C4C3" }}>{fmtINR(property.price, true)}</p>
+          <p style={{ fontFamily: "var(--font-support-new)", fontSize: "20px", fontWeight: 600, color: "#10C4C3" }}>{fmtINR(property.price, true)}</p>
         </div>
       </div>
     );
@@ -113,7 +113,7 @@ function SelectorSlot({
   return (
     <div style={{ flex: 1, minWidth: 0 }}>
       {!open ? (
-        <button onClick={() => setOpen(true)} style={{ width: "100%", minHeight: "280px", border: "2px dashed rgba(13,43,31,0.18)", borderRadius: "16px", background: "#fff", cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "10px", transition: "all 0.18s", fontFamily: "'Cal Sans', sans-serif" }}
+        <button onClick={() => setOpen(true)} style={{ width: "100%", minHeight: "280px", border: "2px dashed rgba(13,43,31,0.18)", borderRadius: "16px", background: "#fff", cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "10px", transition: "all 0.18s", fontFamily: "var(--font-body-new)" }}
           onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = "#10C4C3"; (e.currentTarget as HTMLButtonElement).style.background = "rgba(201,168,76,0.03)"; }}
           onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = "rgba(13,43,31,0.18)"; (e.currentTarget as HTMLButtonElement).style.background = "#fff"; }}>
           <div style={{ width: "48px", height: "48px", borderRadius: "50%", background: "rgba(201,168,76,0.1)", border: "1.5px solid rgba(201,168,76,0.3)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "22px", color: "#10C4C3" }}>+</div>
@@ -124,7 +124,7 @@ function SelectorSlot({
         <div style={{ border: "2px solid rgba(201,168,76,0.3)", borderRadius: "16px", background: "#fff", overflow: "hidden" }}>
           <div style={{ padding: "14px 16px", borderBottom: "1px solid rgba(13,43,31,0.06)" }}>
             <input autoFocus type="text" placeholder="Search properties…" value={searchQuery} onChange={e => setSearchQuery(e.target.value)}
-              style={{ width: "100%", padding: "9px 12px", background: "#F8F6F1", border: "1.5px solid rgba(13,43,31,0.12)", borderRadius: "8px", fontSize: "13px", fontFamily: "'Cal Sans', sans-serif", outline: "none", color: "#020C1C" }} />
+              style={{ width: "100%", padding: "9px 12px", background: "#F8F6F1", border: "1.5px solid rgba(13,43,31,0.12)", borderRadius: "8px", fontSize: "13px", fontFamily: "var(--font-body-new)", outline: "none", color: "#020C1C" }} />
           </div>
           <div style={{ maxHeight: "240px", overflowY: "auto" }}>
             {loading ? (
@@ -133,7 +133,7 @@ function SelectorSlot({
               <p style={{ padding: "20px", textAlign: "center", fontSize: "13px", color: "#9CA3AF" }}>No properties found</p>
             ) : filtered.map(p => (
               <button key={p.id} onClick={() => { onSelect(p); setOpen(false); setSearchQuery(""); }}
-                style={{ width: "100%", display: "flex", alignItems: "center", gap: "12px", padding: "12px 16px", background: "transparent", border: "none", borderBottom: "1px solid rgba(13,43,31,0.05)", cursor: "pointer", fontFamily: "'Cal Sans', sans-serif", textAlign: "left" }}
+                style={{ width: "100%", display: "flex", alignItems: "center", gap: "12px", padding: "12px 16px", background: "transparent", border: "none", borderBottom: "1px solid rgba(13,43,31,0.05)", cursor: "pointer", fontFamily: "var(--font-body-new)", textAlign: "left" }}
                 onMouseEnter={e => (e.currentTarget as HTMLButtonElement).style.background = "#F8F6F1"}
                 onMouseLeave={e => (e.currentTarget as HTMLButtonElement).style.background = "transparent"}>
                 <img src={optimizedImageUrl(p.featured_image, 100) || `https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=100&q=80`} alt="" loading="lazy" style={{ width: "40px", height: "40px", borderRadius: "8px", objectFit: "cover", flexShrink: 0 }} />
@@ -145,7 +145,7 @@ function SelectorSlot({
             ))}
           </div>
           <div style={{ padding: "10px 16px", borderTop: "1px solid rgba(13,43,31,0.06)" }}>
-            <button onClick={() => { setOpen(false); setSearchQuery(""); }} style={{ fontSize: "12px", color: "#9CA3AF", background: "transparent", border: "none", cursor: "pointer", fontFamily: "'Cal Sans', sans-serif" }}>Cancel</button>
+            <button onClick={() => { setOpen(false); setSearchQuery(""); }} style={{ fontSize: "12px", color: "#9CA3AF", background: "transparent", border: "none", cursor: "pointer", fontFamily: "var(--font-body-new)" }}>Cancel</button>
           </div>
         </div>
       )}
@@ -188,7 +188,7 @@ function CmpRow({ label, values, type = "text", highlight = false }: {
         if (val !== null && val !== undefined) {
           if (type === "bool") display = val ? <Tick /> : <Cross />;
           else if (type === "amenity") display = val ? <Tick /> : <Cross />;
-          else if (type === "price") display = <span style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "16px", fontWeight: 600, color: "#10C4C3" }}>{fmtINR(val as number, true)}</span>;
+          else if (type === "price") display = <span style={{ fontFamily: "var(--font-support-new)", fontSize: "16px", fontWeight: 600, color: "#10C4C3" }}>{fmtINR(val as number, true)}</span>;
           else display = String(val);
         }
         return (
@@ -223,8 +223,8 @@ function MiniCard({ p }: { p: Property }) {
       </div>
       <div style={{ padding: "16px 18px" }}>
         <p style={{ fontSize: "9px", fontWeight: 700, letterSpacing: "0.12em", color: "#10C4C3", textTransform: "uppercase", marginBottom: "5px" }}>{p.property_type} · {p.city}</p>
-        <h4 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "17px", fontWeight: 600, color: "#020C1C", marginBottom: "8px", lineHeight: 1.3, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{p.title}</h4>
-        <p style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "18px", fontWeight: 600, color: "#10C4C3" }}>{fmtINR(p.price, true)}</p>
+        <h4 style={{ fontFamily: "var(--font-heading-new)", fontSize: "17px", fontWeight: 600, color: "#020C1C", marginBottom: "8px", lineHeight: 1.3, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{p.title}</h4>
+        <p style={{ fontFamily: "var(--font-support-new)", fontSize: "18px", fontWeight: 600, color: "#10C4C3" }}>{fmtINR(p.price, true)}</p>
       </div>
     </a>
   );
@@ -389,7 +389,7 @@ export default function ComparePage() {
       <style>{`
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
         html { scroll-behavior: smooth; }
-        body { font-family: 'Cal Sans', system-ui, sans-serif; background: #020C1C; overflow-x: hidden; }
+        body { font-family: var(--font-body-new); background: #020C1C; overflow-x: hidden; }
         ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-thumb { background: rgba(201,168,76,0.3); border-radius: 2px; }
         @keyframes fadeUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
@@ -419,7 +419,7 @@ export default function ComparePage() {
               <div style={{ width: "5px", height: "5px", borderRadius: "50%", background: "#10C4C3" }} />
               <span style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.2em", color: "#10C4C3", textTransform: "uppercase" }}>Side-by-Side</span>
             </div>
-            <h1 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "clamp(42px, 6vw, 68px)", fontWeight: 300, color: "#020C1C", lineHeight: 1.1, marginBottom: "16px", animation: "fadeUp 0.5s ease-out both" }}>
+            <h1 style={{ fontFamily: "var(--font-heading-new)", fontSize: "clamp(42px, 6vw, 68px)", fontWeight: 300, color: "#020C1C", lineHeight: 1.1, marginBottom: "16px", animation: "fadeUp 0.5s ease-out both" }}>
               Compare<br /><em style={{ fontStyle: "italic", color: "#10C4C3" }}>Properties</em>
             </h1>
             <p style={{ fontSize: "15px", color: "rgba(245,242,236,0.5)", lineHeight: 1.75, animation: "fadeUp 0.5s 0.1s ease-out both" }}>
@@ -432,14 +432,14 @@ export default function ComparePage() {
         <section style={{ maxWidth: "1280px", margin: "0 auto", padding: "52px 48px 0" }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "12px", marginBottom: "24px" }}>
             <div>
-              <h2 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "26px", fontWeight: 500, color: "#020C1C" }}>Select Properties</h2>
+              <h2 style={{ fontFamily: "var(--font-heading-new)", fontSize: "26px", fontWeight: 500, color: "#020C1C" }}>Select Properties</h2>
               <p style={{ fontSize: "12px", color: "#9CA3AF", marginTop: "3px" }}>Choose up to 3 properties to compare</p>
             </div>
             <div style={{ display: "flex", gap: "10px" }}>
-              <button onClick={saveComparison} style={{ padding: "9px 20px", background: saved ? "rgba(5,150,105,0.1)" : "#fff", border: `1.5px solid ${saved ? "rgba(5,150,105,0.3)" : "rgba(13,43,31,0.15)"}`, borderRadius: "8px", fontSize: "12px", fontWeight: 700, color: saved ? "#059669" : "#020C1C", cursor: "pointer", fontFamily: "'Cal Sans', sans-serif", display: "flex", alignItems: "center", gap: "7px", letterSpacing: "0.06em", transition: "all 0.2s" }}>
+              <button onClick={saveComparison} style={{ padding: "9px 20px", background: saved ? "rgba(5,150,105,0.1)" : "#fff", border: `1.5px solid ${saved ? "rgba(5,150,105,0.3)" : "rgba(13,43,31,0.15)"}`, borderRadius: "8px", fontSize: "12px", fontWeight: 700, color: saved ? "#059669" : "#020C1C", cursor: "pointer", fontFamily: "var(--font-body-new)", display: "flex", alignItems: "center", gap: "7px", letterSpacing: "0.06em", transition: "all 0.2s" }}>
                 {saved ? "✓ Saved!" : "💾 Save"}
               </button>
-              <button onClick={shareComparison} disabled={activeCount < 2} style={{ padding: "9px 20px", background: copied ? "rgba(201,168,76,0.1)" : "#fff", border: `1.5px solid ${copied ? "rgba(201,168,76,0.35)" : "rgba(13,43,31,0.15)"}`, borderRadius: "8px", fontSize: "12px", fontWeight: 700, color: copied ? "#10C4C3" : "#020C1C", cursor: activeCount < 2 ? "not-allowed" : "pointer", fontFamily: "'Cal Sans', sans-serif", display: "flex", alignItems: "center", gap: "7px", opacity: activeCount < 2 ? 0.45 : 1, letterSpacing: "0.06em", transition: "all 0.2s" }}>
+              <button onClick={shareComparison} disabled={activeCount < 2} style={{ padding: "9px 20px", background: copied ? "rgba(201,168,76,0.1)" : "#fff", border: `1.5px solid ${copied ? "rgba(201,168,76,0.35)" : "rgba(13,43,31,0.15)"}`, borderRadius: "8px", fontSize: "12px", fontWeight: 700, color: copied ? "#10C4C3" : "#020C1C", cursor: activeCount < 2 ? "not-allowed" : "pointer", fontFamily: "var(--font-body-new)", display: "flex", alignItems: "center", gap: "7px", opacity: activeCount < 2 ? 0.45 : 1, letterSpacing: "0.06em", transition: "all 0.2s" }}>
                 {copied ? "✓ Copied!" : "🔗 Share"}
               </button>
             </div>
@@ -468,7 +468,7 @@ export default function ComparePage() {
                   <div style={{ width: "24px", height: "1.5px", background: "#10C4C3" }} />
                   <span style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.2em", color: "#10C4C3", textTransform: "uppercase" }}>Side-by-Side</span>
                 </div>
-                <h2 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "28px", fontWeight: 500, color: "#020C1C" }}>Detailed Comparison</h2>
+                <h2 style={{ fontFamily: "var(--font-heading-new)", fontSize: "28px", fontWeight: 500, color: "#020C1C" }}>Detailed Comparison</h2>
               </div>
               <span style={{ fontSize: "12px", color: "#9CA3AF" }}>🏆 = best value in category</span>
             </div>
@@ -481,7 +481,7 @@ export default function ComparePage() {
                     <th style={{ padding: "14px 16px", fontSize: "10px", fontWeight: 700, letterSpacing: "0.14em", color: "#9CA3AF", textTransform: "uppercase", textAlign: "left", minWidth: "160px", position: "sticky", left: 0, background: "#F8F6F1", zIndex: 2, borderRight: "1px solid rgba(13,43,31,0.06)" }}>Feature</th>
                     {active.map((p, i) => (
                       <th key={p.id} style={{ padding: "14px 16px", textAlign: "center", minWidth: "200px" }}>
-                        <p style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "15px", fontWeight: 600, color: "#020C1C", marginBottom: "2px", display: "-webkit-box", WebkitLineClamp: 1, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{p.title}</p>
+                        <p style={{ fontFamily: "var(--font-heading-new)", fontSize: "15px", fontWeight: 600, color: "#020C1C", marginBottom: "2px", display: "-webkit-box", WebkitLineClamp: 1, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{p.title}</p>
                         <p style={{ fontSize: "11px", color: "#9CA3AF" }}>{p.city}</p>
                       </th>
                     ))}
@@ -557,7 +557,7 @@ export default function ComparePage() {
           <div style={{ maxWidth: "520px", margin: "40px auto 0", padding: "0 48px", textAlign: "center" }}>
             <div style={{ padding: "40px", background: "#fff", borderRadius: "16px", border: "1px solid rgba(13,43,31,0.07)" }}>
               <div style={{ fontSize: "40px", marginBottom: "14px", opacity: 0.3 }}>⚖</div>
-              <h3 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "22px", fontWeight: 500, color: "#020C1C", marginBottom: "8px" }}>Select at least 2 properties</h3>
+              <h3 style={{ fontFamily: "var(--font-heading-new)", fontSize: "22px", fontWeight: 500, color: "#020C1C", marginBottom: "8px" }}>Select at least 2 properties</h3>
               <p style={{ fontSize: "13px", color: "#6B7C72", lineHeight: 1.7 }}>Use the slots above to pick properties you'd like to compare side by side.</p>
             </div>
           </div>
@@ -572,7 +572,7 @@ export default function ComparePage() {
                 <div style={{ width: "24px", height: "1.5px", background: "#10C4C3" }} />
                 <span style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.2em", color: "#10C4C3", textTransform: "uppercase" }}>Discover More</span>
               </div>
-              <h2 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "28px", fontWeight: 500, color: "#020C1C" }}>You Might Also Like</h2>
+              <h2 style={{ fontFamily: "var(--font-heading-new)", fontSize: "28px", fontWeight: 500, color: "#020C1C" }}>You Might Also Like</h2>
             </div>
             <a href="/properties" style={{ fontSize: "13px", fontWeight: 600, color: "#020C1C", textDecoration: "none", display: "flex", alignItems: "center", gap: "6px" }}>
               View All
@@ -590,7 +590,7 @@ export default function ComparePage() {
           <div style={{ position: "absolute", inset: 0, backgroundImage: "linear-gradient(rgba(201,168,76,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(201,168,76,0.04) 1px, transparent 1px)", backgroundSize: "52px 52px", pointerEvents: "none" }} />
           <div style={{ position: "absolute", inset: 0, background: "radial-gradient(ellipse 60% 55% at 50% 110%, rgba(201,168,76,0.1) 0%, transparent 55%)", pointerEvents: "none" }} />
           <div style={{ position: "relative", zIndex: 2, maxWidth: "660px", margin: "0 auto", textAlign: "center" }}>
-            <h2 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "clamp(34px, 5vw, 56px)", fontWeight: 300, color: "#020C1C", lineHeight: 1.15, marginBottom: "16px" }}>
+            <h2 style={{ fontFamily: "var(--font-heading-new)", fontSize: "clamp(34px, 5vw, 56px)", fontWeight: 300, color: "#020C1C", lineHeight: 1.15, marginBottom: "16px" }}>
               Found Your<br /><em style={{ fontStyle: "italic", color: "#10C4C3" }}>Perfect Match?</em>
             </h2>
             <p style={{ fontSize: "15px", color: "rgba(245,242,236,0.5)", lineHeight: 1.75, marginBottom: "36px" }}>
@@ -613,8 +613,8 @@ export default function ComparePage() {
           <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
             <div className="cp-footer-grid" style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1fr 1fr", gap: "48px", paddingBottom: "56px", borderBottom: "1px solid rgba(245,242,236,0.06)" }}>
               <div>
-                <div style={{ fontFamily: "'Cal Sans', sans-serif", fontSize: "18px", fontWeight: 600, color: "#fff", letterSpacing: "0.16em", marginBottom: "14px" }}>Nilay 360 <span style={{ color: "#10C4C3" }}>·</span></div>
-                <p style={{ fontSize: "13px", color: "rgba(245,242,236,0.35)", lineHeight: 1.75, maxWidth: "280px", marginBottom: "22px" }}>India's most trusted premium real estate platform. Verified listings, certified agents, independent legal guidance.</p>
+                <div style={{ fontFamily: "var(--font-support-new)", fontSize: "18px", fontWeight: 600, color: "#fff", letterSpacing: "0.16em", marginBottom: "14px" }}>Nilay 360 <span style={{ color: "#10C4C3" }}>·</span></div>
+                <p style={{ fontSize: "13px", color: "rgba(245,242,236,0.35)", lineHeight: 1.75, maxWidth: "280px", marginBottom: "22px" }}>India's premium real estate platform connecting discerning buyers with exceptional properties.</p>
                 <div style={{ display: "flex", gap: "10px" }}>
                   {["IG", "IN", "TW", "YT"].map(s => (
                     <div key={s} style={{ width: "34px", height: "34px", borderRadius: "8px", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.07)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "10px", color: "rgba(255,255,255,0.35)", fontWeight: 700 }}>{s}</div>
@@ -624,8 +624,8 @@ export default function ComparePage() {
               {[
                 { heading: "Properties", links: [["Buy","/buy"],["Rent","/rent"],["New Projects","/new-projects"],["Commercial","/commercial"],["Builders","/builders"],["Blog","/blog"]] },
                 { heading: "Company",    links: [["About Us","/about"],["Our Agents","/agents"],["NRI Services","/nri"],["Careers","/careers"],["Contact","/contact"]] },
-                { heading: "Tools",      links: [["EMI Calculator","/calculator"],["Compare","/compare"],["Search","/search"],["RERA Guide","/legal-guide"]] },
-                { heading: "Legal",      links: [["Privacy Policy","/privacy"],["Terms of Service","/terms"],["Cookie Policy","/cookies"],["RERA Guide","/legal-guide"]] },
+                { heading: "Tools",      links: [["EMI Calculator","/calculator"],["Compare","/compare"],["Search","/search"],["RERA Guide","/legal-guide"],["Safety Guide","/safety-guide"]] },
+                { heading: "Legal",      links: [["Privacy Policy","/privacy"],["Terms of Service","/terms"],["Cookie Policy","/cookies"],["RERA Guide","/legal-guide"],["Agent Terms","/agent-terms"],["Grievance Redressal","/grievance-redressal"]] },
               ].map(col => (
                 <div key={col.heading}>
                   <h4 style={{ fontSize: "11px", fontWeight: 700, letterSpacing: "0.16em", color: "rgba(245,242,236,0.3)", textTransform: "uppercase", marginBottom: "18px" }}>{col.heading}</h4>
@@ -637,10 +637,6 @@ export default function ComparePage() {
             </div>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "22px 0", flexWrap: "wrap", gap: "12px" }}>
               <p style={{ fontSize: "12px", color: "rgba(245,242,236,0.2)" }}>© 2025 Nilay 360. All rights reserved. Registered in India.</p>
-              <div style={{ display: "flex", gap: "6px" }}>
-                <span style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.1em", padding: "4px 10px", background: "rgba(201,168,76,0.08)", border: "1px solid rgba(201,168,76,0.15)", borderRadius: "4px", color: "rgba(201,168,76,0.5)" }}>RERA COMPLIANT</span>
-                <span style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.1em", padding: "4px 10px", background: "rgba(245,242,236,0.04)", border: "1px solid rgba(245,242,236,0.07)", borderRadius: "4px", color: "rgba(245,242,236,0.25)" }}>ISO 27001</span>
-              </div>
             </div>
           </div>
         </footer>

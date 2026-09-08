@@ -5,7 +5,7 @@ const AVAILABLE_NOW = [
   "Property Buying",
   "Property Selling",
   "Rental Listings",
-  "Verified Property Information",
+  "Detailed Property Information",
   "Smart Property Search",
   "Responsive Mobile Experience",
 ];
@@ -29,7 +29,7 @@ function FeatureList({ items, muted }: { items: string[]; muted: boolean }) {
             padding: "17px 0",
             borderTop: `1px solid ${muted ? "rgba(255,255,255,0.07)" : "rgba(255,255,255,0.08)"}`,
             borderBottom: i === items.length - 1 ? `1px solid ${muted ? "rgba(255,255,255,0.07)" : "rgba(255,255,255,0.08)"}` : "none",
-            fontFamily: "'Cal Sans', sans-serif", fontWeight: 300,
+            fontFamily: "var(--font-body-new)", fontWeight: 300,
             fontSize: "clamp(16px, 1.45vw, 22px)",
             color: muted ? "rgba(255,255,255,0.58)" : "rgba(255,255,255,0.9)",
           }}>{item}</div>
@@ -46,7 +46,7 @@ export default function WhatWeBuild() {
         <ChapterLabel>The Platform</ChapterLabel>
 
         <Reveal>
-          <h2 style={{ margin: "0 0 clamp(26px, 3vw, 40px)", maxWidth: "24ch", fontFamily: "'Cal Sans', Georgia, serif", fontWeight: 300, fontSize: "clamp(30px, 4.4vw, 72px)", lineHeight: 1.06, letterSpacing: "-0.026em", color: "#FFFFFF" }}>An immersive property experience, before you ever visit.</h2>
+          <h2 style={{ margin: "0 0 clamp(26px, 3vw, 40px)", maxWidth: "24ch", fontFamily: "var(--font-heading-new)", fontWeight: 300, fontSize: "clamp(30px, 4.4vw, 72px)", lineHeight: 1.06, letterSpacing: "-0.026em", color: "#FFFFFF" }}>An immersive property experience, before you ever visit.</h2>
         </Reveal>
 
         {/* Vanith-supplied "WHO WE ARE" copy — placed here as the platform
@@ -54,7 +54,7 @@ export default function WhatWeBuild() {
             feature lists say what it does. */}
         <Reveal delay={0.1}>
           <p style={{ margin: "0 0 clamp(48px, 6vw, 92px)", maxWidth: "68ch", fontSize: "clamp(15px, 1.2vw, 19px)", lineHeight: 1.9, color: "rgba(255,255,255,0.55)" }}>
-            Nilay360 is more than a property portal — it is a technology company building smarter real estate experiences through immersive technology, verified information, intuitive design and customer-first thinking, helping people make confident property decisions. Every feature exists to make property discovery effortless.
+            Nilay360 is more than a property portal — it is a technology company building smarter real estate experiences through immersive technology, detailed information, intuitive design and customer-first thinking, helping people make confident property decisions. Every feature exists to make property discovery effortless.
           </p>
         </Reveal>
 
@@ -63,7 +63,7 @@ export default function WhatWeBuild() {
             <Reveal y={14}>
               <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "26px" }}>
                 <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: TEAL, boxShadow: `0 0 14px ${TEAL}` }} />
-                <span style={{ fontFamily: "'Cal Sans', sans-serif", fontSize: "11px", fontWeight: 600, letterSpacing: "0.24em", textTransform: "uppercase", color: "rgba(255,255,255,0.6)" }}>Available Now</span>
+                <span style={{ fontFamily: "var(--font-support-new)", fontSize: "11px", fontWeight: 600, letterSpacing: "0.24em", textTransform: "uppercase", color: "rgba(255,255,255,0.6)" }}>Available Now</span>
               </div>
             </Reveal>
             <FeatureList items={AVAILABLE_NOW} muted={false} />
@@ -73,7 +73,7 @@ export default function WhatWeBuild() {
             <Reveal y={14} delay={0.08}>
               <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "26px" }}>
                 <span style={{ width: "6px", height: "6px", borderRadius: "50%", border: "1px solid rgba(16,196,195,0.6)" }} />
-                <span style={{ fontFamily: "'Cal Sans', sans-serif", fontSize: "11px", fontWeight: 600, letterSpacing: "0.24em", textTransform: "uppercase", color: "rgba(255,255,255,0.45)" }}>On The Horizon</span>
+                <span style={{ fontFamily: "var(--font-support-new)", fontSize: "11px", fontWeight: 600, letterSpacing: "0.24em", textTransform: "uppercase", color: "rgba(255,255,255,0.45)" }}>On The Horizon</span>
               </div>
             </Reveal>
             <FeatureList items={ON_THE_HORIZON} muted />

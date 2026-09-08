@@ -139,7 +139,7 @@ function DeveloperCard({ dev }: { dev: (typeof ALL_DEVELOPERS)[0] }) {
       >
         <span
           style={{
-            fontFamily: "'Cal Sans', serif",
+            fontFamily: "var(--font-body-new)",
             fontSize: 22,
             fontWeight: 700,
             color: GOLD,
@@ -152,7 +152,7 @@ function DeveloperCard({ dev }: { dev: (typeof ALL_DEVELOPERS)[0] }) {
       {/* Name */}
       <div
         style={{
-          fontFamily: "'Cal Sans', serif",
+          fontFamily: "var(--font-heading-new)",
           fontSize: 22,
           fontWeight: 600,
           color: DARK_GREEN,
@@ -166,7 +166,7 @@ function DeveloperCard({ dev }: { dev: (typeof ALL_DEVELOPERS)[0] }) {
       {/* Cities */}
       <div
         style={{
-          fontFamily: "'Cal Sans', sans-serif",
+          fontFamily: "var(--font-body-new)",
           fontSize: 12,
           color: "#888",
           marginBottom: 10,
@@ -178,7 +178,7 @@ function DeveloperCard({ dev }: { dev: (typeof ALL_DEVELOPERS)[0] }) {
       {/* Stats */}
       <div
         style={{
-          fontFamily: "'Cal Sans', sans-serif",
+          fontFamily: "var(--font-support-new)",
           fontSize: 13,
           color: "#555",
           marginBottom: 14,
@@ -187,30 +187,11 @@ function DeveloperCard({ dev }: { dev: (typeof ALL_DEVELOPERS)[0] }) {
         {dev.projects} Projects · {dev.years} Yrs
       </div>
 
-      {/* Verified badge */}
-      <div style={{ marginBottom: 16 }}>
-        <span
-          style={{
-            display: "inline-block",
-            background: "#16a34a",
-            color: "#fff",
-            fontFamily: "'Cal Sans', sans-serif",
-            fontSize: 10,
-            fontWeight: 600,
-            padding: "3px 10px",
-            borderRadius: 20,
-            letterSpacing: "0.5px",
-          }}
-        >
-          ✓ Verified
-        </span>
-      </div>
-
       {/* Link */}
       <Link
         href={`/new-projects?developer=${dev.slug}`}
         style={{
-          fontFamily: "'Cal Sans', sans-serif",
+          fontFamily: "var(--font-body-new)",
           fontSize: 13,
           fontWeight: 600,
           color: GOLD,
@@ -262,7 +243,7 @@ function FeaturedCard({ dev }: { dev: (typeof ALL_DEVELOPERS)[0] }) {
       >
         <span
           style={{
-            fontFamily: "'Cal Sans', serif",
+            fontFamily: "var(--font-body-new)",
             fontSize: 28,
             fontWeight: 700,
             color: GOLD,
@@ -276,7 +257,7 @@ function FeaturedCard({ dev }: { dev: (typeof ALL_DEVELOPERS)[0] }) {
       <div style={{ flex: 1 }}>
         <div
           style={{
-            fontFamily: "'Cal Sans', serif",
+            fontFamily: "var(--font-heading-new)",
             fontSize: 32,
             fontWeight: 600,
             color: DARK_GREEN,
@@ -288,7 +269,7 @@ function FeaturedCard({ dev }: { dev: (typeof ALL_DEVELOPERS)[0] }) {
         </div>
         <div
           style={{
-            fontFamily: "'Cal Sans', sans-serif",
+            fontFamily: "var(--font-body-new)",
             fontSize: 15,
             color: "#777",
             marginBottom: 16,
@@ -305,7 +286,7 @@ function FeaturedCard({ dev }: { dev: (typeof ALL_DEVELOPERS)[0] }) {
               style={{
                 border: `1px solid ${GOLD}`,
                 color: DARK_GREEN,
-                fontFamily: "'Cal Sans', sans-serif",
+                fontFamily: "var(--font-support-new)",
                 fontSize: 10,
                 fontWeight: 600,
                 padding: "3px 10px",
@@ -321,7 +302,7 @@ function FeaturedCard({ dev }: { dev: (typeof ALL_DEVELOPERS)[0] }) {
         {/* Stats */}
         <div
           style={{
-            fontFamily: "'Cal Sans', sans-serif",
+            fontFamily: "var(--font-support-new)",
             fontSize: 13,
             color: "#555",
             marginBottom: 20,
@@ -338,7 +319,7 @@ function FeaturedCard({ dev }: { dev: (typeof ALL_DEVELOPERS)[0] }) {
               display: "inline-block",
               background: GOLD,
               color: DARK_GREEN,
-              fontFamily: "'Cal Sans', sans-serif",
+              fontFamily: "var(--font-body-new)",
               fontSize: 13,
               fontWeight: 700,
               padding: "10px 24px",
@@ -349,20 +330,6 @@ function FeaturedCard({ dev }: { dev: (typeof ALL_DEVELOPERS)[0] }) {
           >
             View Projects →
           </Link>
-          <span
-            style={{
-              background: "#16a34a",
-              color: "#fff",
-              fontFamily: "'Cal Sans', sans-serif",
-              fontSize: 11,
-              fontWeight: 600,
-              padding: "4px 12px",
-              borderRadius: 20,
-              letterSpacing: "0.3px",
-            }}
-          >
-            ✓ RERA Verified
-          </span>
         </div>
       </div>
     </div>
@@ -415,7 +382,7 @@ export default function BuildersPage() {
   const featuredDevs = ALL_DEVELOPERS.filter((d) => d.featured);
 
   const inputStyle: React.CSSProperties = {
-    fontFamily: "'Cal Sans', sans-serif",
+    fontFamily: "var(--font-body-new)",
     fontSize: 14,
     border: "1px solid #ddd",
     borderRadius: 4,
@@ -426,7 +393,7 @@ export default function BuildersPage() {
   };
 
   const selectStyle: React.CSSProperties = {
-    fontFamily: "'Cal Sans', sans-serif",
+    fontFamily: "var(--font-body-new)",
     fontSize: 14,
     border: "1px solid #ddd",
     borderRadius: 4,
@@ -452,7 +419,7 @@ export default function BuildersPage() {
 
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
         html { scroll-behavior: smooth; }
-        body { font-family: 'Cal Sans', sans-serif; background: ${IVORY}; }
+        body { font-family: var(--font-body-new); background: ${IVORY}; }
 
         @keyframes fadeInUp {
           from { opacity: 0; transform: translateY(28px); }
@@ -469,7 +436,7 @@ export default function BuildersPage() {
         .shimmer-card { animation: pulse-gold 1.6s ease-in-out infinite; }
 
         .nav-link {
-          font-family: 'Cal Sans', sans-serif;
+          font-family: var(--font-body-new);
           font-size: 14px;
           color: rgba(255,255,255,0.85);
           text-decoration: none;
@@ -479,7 +446,7 @@ export default function BuildersPage() {
         .nav-link:hover { color: ${GOLD}; }
 
         .footer-link {
-          font-family: 'Cal Sans', sans-serif;
+          font-family: var(--font-body-new);
           font-size: 14px;
           color: rgba(245,242,236,0.6);
           text-decoration: none;
@@ -554,7 +521,7 @@ export default function BuildersPage() {
         <Link
           href="/"
           style={{
-            fontFamily: "'Cal Sans', serif",
+            fontFamily: "var(--font-support-new)",
             fontSize: 22,
             fontWeight: 700,
             color: GOLD,
@@ -580,7 +547,7 @@ export default function BuildersPage() {
           <Link
             href="/login"
             style={{
-              fontFamily: "'Cal Sans', sans-serif",
+              fontFamily: "var(--font-body-new)",
               fontSize: 14,
               color: "#fff",
               textDecoration: "none",
@@ -594,7 +561,7 @@ export default function BuildersPage() {
               display: "inline-block",
               background: GOLD,
               color: DARK_GREEN,
-              fontFamily: "'Cal Sans', sans-serif",
+              fontFamily: "var(--font-body-new)",
               fontSize: 12,
               fontWeight: 700,
               padding: "8px 18px",
@@ -628,7 +595,7 @@ export default function BuildersPage() {
         <div
           className="fade-in"
           style={{
-            fontFamily: "'Cal Sans', sans-serif",
+            fontFamily: "var(--font-support-new)",
             fontSize: 12,
             fontWeight: 600,
             color: GOLD,
@@ -644,7 +611,7 @@ export default function BuildersPage() {
         <h1
           className="fade-in-delay"
           style={{
-            fontFamily: "'Cal Sans', serif",
+            fontFamily: "var(--font-heading-new)",
             fontSize: 56,
             fontWeight: 600,
             color: "#fff",
@@ -664,7 +631,7 @@ export default function BuildersPage() {
         <p
           className="fade-in-delay-2"
           style={{
-            fontFamily: "'Cal Sans', sans-serif",
+            fontFamily: "var(--font-body-new)",
             fontSize: 18,
             color: IVORY,
             opacity: 0.85,
@@ -677,44 +644,17 @@ export default function BuildersPage() {
           projects.
         </p>
 
-        {/* Stats */}
-        <div
+        {/* Status note — honest placeholder while the developer network is still empty */}
+        <p
           className="fade-in-delay-2"
-          className="bd-hero-stats" style={{ display: "flex", gap: 64, alignItems: "flex-start" }}
+          style={{
+            fontFamily: "var(--font-body-new)",
+            fontSize: 14,
+            color: "rgba(245,242,236,0.55)",
+          }}
         >
-          {[
-            { num: "48", label: "Verified Developers" },
-            { num: "240+", label: "Active Projects" },
-            { num: "₹500Cr+", label: "Value" },
-          ].map((stat) => (
-            <div key={stat.label} style={{ textAlign: "center" }}>
-              <div
-                style={{
-                  fontFamily: "'Cal Sans', serif",
-                  fontSize: 32,
-                  fontWeight: 700,
-                  color: "#fff",
-                  lineHeight: 1,
-                  marginBottom: 6,
-                }}
-              >
-                {stat.num}
-              </div>
-              <div
-                style={{
-                  fontFamily: "'Cal Sans', sans-serif",
-                  fontSize: 12,
-                  fontWeight: 500,
-                  color: GOLD,
-                  letterSpacing: "0.5px",
-                  textTransform: "uppercase",
-                }}
-              >
-                {stat.label}
-              </div>
-            </div>
-          ))}
-        </div>
+          We're onboarding our first developer partners — check back soon.
+        </p>
       </section>
 
       {/* ══════════════════════════════════════════════════════
@@ -785,7 +725,7 @@ export default function BuildersPage() {
           {/* Result count */}
           <div
             style={{
-              fontFamily: "'Cal Sans', sans-serif",
+              fontFamily: "var(--font-body-new)",
               fontSize: 14,
               color: "#888",
             }}
@@ -804,7 +744,7 @@ export default function BuildersPage() {
         <div style={{ maxWidth: 1200, margin: "0 auto" }}>
           <h2
             style={{
-              fontFamily: "'Cal Sans', serif",
+              fontFamily: "var(--font-heading-new)",
               fontSize: 40,
               fontWeight: 600,
               color: DARK_GREEN,
@@ -836,7 +776,7 @@ export default function BuildersPage() {
         <div style={{ maxWidth: 1200, margin: "0 auto" }}>
           <h2
             style={{
-              fontFamily: "'Cal Sans', serif",
+              fontFamily: "var(--font-heading-new)",
               fontSize: 40,
               fontWeight: 600,
               color: "#fff",
@@ -875,7 +815,7 @@ export default function BuildersPage() {
                     gridColumn: "1 / -1",
                     textAlign: "center",
                     padding: "60px 0",
-                    fontFamily: "'Cal Sans', sans-serif",
+                    fontFamily: "var(--font-heading-new)",
                     fontSize: 16,
                     color: "rgba(255,255,255,0.5)",
                   }}
@@ -901,7 +841,7 @@ export default function BuildersPage() {
         >
           <h2
             style={{
-              fontFamily: "'Cal Sans', serif",
+              fontFamily: "var(--font-heading-new)",
               fontSize: 40,
               fontWeight: 600,
               color: DARK_GREEN,
@@ -912,7 +852,7 @@ export default function BuildersPage() {
           </h2>
           <p
             style={{
-              fontFamily: "'Cal Sans', sans-serif",
+              fontFamily: "var(--font-body-new)",
               fontSize: 16,
               color: "#777",
               marginBottom: 64,
@@ -1001,7 +941,7 @@ export default function BuildersPage() {
                 >
                   <span
                     style={{
-                      fontFamily: "'Cal Sans', serif",
+                      fontFamily: "var(--font-support-new)",
                       fontSize: 22,
                       fontWeight: 700,
                       color: GOLD,
@@ -1017,7 +957,7 @@ export default function BuildersPage() {
                 {/* Title */}
                 <div
                   style={{
-                    fontFamily: "'Cal Sans', serif",
+                    fontFamily: "var(--font-heading-new)",
                     fontSize: 20,
                     fontWeight: 600,
                     color: DARK_GREEN,
@@ -1031,7 +971,7 @@ export default function BuildersPage() {
                 {/* Desc */}
                 <div
                   style={{
-                    fontFamily: "'Cal Sans', sans-serif",
+                    fontFamily: "var(--font-body-new)",
                     fontSize: 13,
                     color: "#888",
                     lineHeight: 1.6,
@@ -1061,7 +1001,7 @@ export default function BuildersPage() {
         <div style={{ maxWidth: 700, margin: "0 auto" }}>
           <h2
             style={{
-              fontFamily: "'Cal Sans', serif",
+              fontFamily: "var(--font-heading-new)",
               fontSize: 44,
               fontWeight: 600,
               color: "#fff",
@@ -1073,14 +1013,14 @@ export default function BuildersPage() {
           </h2>
           <p
             style={{
-              fontFamily: "'Cal Sans', sans-serif",
+              fontFamily: "var(--font-body-new)",
               fontSize: 16,
               color: GOLD,
               marginBottom: 40,
               lineHeight: 1.6,
             }}
           >
-            Join 48 verified developers reaching serious buyers across India.
+            Be among the first developers reaching serious buyers across India.
           </p>
 
           {/* Benefits */}
@@ -1096,7 +1036,7 @@ export default function BuildersPage() {
             }}
           >
             {[
-              "Access to 50,000+ verified buyers monthly",
+              "Direct access to buyers actively searching on Nilay 360",
               "Dedicated relationship manager",
               "RERA-compliant listing support",
             ].map((benefit) => (
@@ -1127,7 +1067,7 @@ export default function BuildersPage() {
                 </span>
                 <span
                   style={{
-                    fontFamily: "'Cal Sans', sans-serif",
+                    fontFamily: "var(--font-body-new)",
                     fontSize: 15,
                     color: "rgba(245,242,236,0.9)",
                   }}
@@ -1153,7 +1093,7 @@ export default function BuildersPage() {
                 display: "inline-block",
                 background: GOLD,
                 color: DARK_GREEN,
-                fontFamily: "'Cal Sans', sans-serif",
+                fontFamily: "var(--font-body-new)",
                 fontSize: 15,
                 fontWeight: 700,
                 padding: "16px 40px",
@@ -1167,7 +1107,7 @@ export default function BuildersPage() {
             <Link
               href="/login"
               style={{
-                fontFamily: "'Cal Sans', sans-serif",
+                fontFamily: "var(--font-body-new)",
                 fontSize: 14,
                 color: "rgba(255,255,255,0.7)",
                 textDecoration: "none",
@@ -1193,7 +1133,7 @@ export default function BuildersPage() {
         <div style={{ maxWidth: 700, margin: "0 auto" }}>
           <h2
             style={{
-              fontFamily: "'Cal Sans', serif",
+              fontFamily: "var(--font-heading-new)",
               fontSize: 44,
               fontWeight: 600,
               color: DARK_GREEN,
@@ -1205,14 +1145,14 @@ export default function BuildersPage() {
           </h2>
           <p
             style={{
-              fontFamily: "'Cal Sans', sans-serif",
+              fontFamily: "var(--font-body-new)",
               fontSize: 17,
               color: "#777",
               marginBottom: 40,
               lineHeight: 1.7,
             }}
           >
-            Browse projects from India&apos;s most trusted developers.
+            Browse projects from India&apos;s leading developers.
           </p>
           <div
             style={{ display: "flex", gap: 16, justifyContent: "center", flexWrap: "wrap" }}
@@ -1223,7 +1163,7 @@ export default function BuildersPage() {
                 display: "inline-block",
                 background: DARK_GREEN,
                 color: IVORY,
-                fontFamily: "'Cal Sans', sans-serif",
+                fontFamily: "var(--font-body-new)",
                 fontSize: 14,
                 fontWeight: 600,
                 padding: "14px 32px",
@@ -1241,7 +1181,7 @@ export default function BuildersPage() {
                 border: `2px solid ${GOLD}`,
                 color: GOLD,
                 background: "transparent",
-                fontFamily: "'Cal Sans', sans-serif",
+                fontFamily: "var(--font-body-new)",
                 fontSize: 14,
                 fontWeight: 600,
                 padding: "12px 32px",
@@ -1275,7 +1215,7 @@ export default function BuildersPage() {
           <div>
             <div
               style={{
-                fontFamily: "'Cal Sans', sans-serif",
+                fontFamily: "var(--font-support-new)",
                 fontSize: 11,
                 fontWeight: 700,
                 color: GOLD,
@@ -1304,7 +1244,7 @@ export default function BuildersPage() {
           <div>
             <div
               style={{
-                fontFamily: "'Cal Sans', sans-serif",
+                fontFamily: "var(--font-support-new)",
                 fontSize: 11,
                 fontWeight: 700,
                 color: GOLD,
@@ -1332,7 +1272,7 @@ export default function BuildersPage() {
           <div>
             <div
               style={{
-                fontFamily: "'Cal Sans', sans-serif",
+                fontFamily: "var(--font-support-new)",
                 fontSize: 11,
                 fontWeight: 700,
                 color: GOLD,
@@ -1348,6 +1288,7 @@ export default function BuildersPage() {
               { label: "Compare", href: "/compare" },
               { label: "Search", href: "/search" },
               { label: "RERA Guide", href: "/legal-guide" },
+              { label: "Safety Guide", href: "/safety-guide" },
             ].map(({ label, href }) => (
               <Link key={label} href={href} className="footer-link">
                 {label}
@@ -1359,7 +1300,7 @@ export default function BuildersPage() {
           <div>
             <div
               style={{
-                fontFamily: "'Cal Sans', sans-serif",
+                fontFamily: "var(--font-support-new)",
                 fontSize: 11,
                 fontWeight: 700,
                 color: GOLD,
@@ -1375,6 +1316,8 @@ export default function BuildersPage() {
               { label: "Terms", href: "/terms" },
               { label: "Cookie Policy", href: "/cookies" },
               { label: "RERA Guide", href: "/legal-guide" },
+              { label: "Agent Terms", href: "/agent-terms" },
+              { label: "Grievance Redressal", href: "/grievance-redressal" },
             ].map(({ label, href }) => (
               <Link key={label} href={href} className="footer-link">
                 {label}
@@ -1399,21 +1342,12 @@ export default function BuildersPage() {
         >
           <span
             style={{
-              fontFamily: "'Cal Sans', sans-serif",
+              fontFamily: "var(--font-body-new)",
               fontSize: 13,
               color: "rgba(245,242,236,0.4)",
             }}
           >
             © 2025 Nilay 360. All rights reserved.
-          </span>
-          <span
-            style={{
-              fontFamily: "'Cal Sans', sans-serif",
-              fontSize: 13,
-              color: "rgba(245,242,236,0.4)",
-            }}
-          >
-            RERA compliant platform
           </span>
         </div>
       </footer>

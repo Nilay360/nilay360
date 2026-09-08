@@ -28,7 +28,7 @@ export default function Origin() {
       <div style={{ position: "relative", width: "100%", maxWidth: "1240px", margin: "0 auto" }}>
         <ChapterLabel>Origin</ChapterLabel>
         <Reveal>
-          <h2 style={{ margin: "0 0 clamp(44px, 5.5vw, 90px)", maxWidth: "20ch", fontFamily: "'Cal Sans', Georgia, serif", fontWeight: 300, fontSize: "clamp(30px, 4.4vw, 72px)", lineHeight: 1.06, letterSpacing: "-0.026em", color: "#FFFFFF" }}>Born from a real experience, not a business idea.</h2>
+          <h2 style={{ margin: "0 0 clamp(44px, 5.5vw, 90px)", maxWidth: "20ch", fontFamily: "var(--font-heading-new)", fontWeight: 300, fontSize: "clamp(30px, 4.4vw, 72px)", lineHeight: 1.06, letterSpacing: "-0.026em", color: "#FFFFFF" }}>Born from a real experience, not a business idea.</h2>
         </Reveal>
 
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(290px, 1fr))", gap: "clamp(40px, 6vw, 96px)", alignItems: "start" }}>
@@ -43,14 +43,14 @@ export default function Origin() {
               <p style={{ margin: 0, fontSize: "clamp(15px, 1.15vw, 18px)", lineHeight: 1.95, color: "rgba(255,255,255,0.56)" }}>That question sparked a larger vision. Soon after, four individuals came together with a shared purpose: to build technology that solves real-world problems through innovation, simplicity and trust.</p>
             </Reveal>
             <Reveal delay={0.3}>
-              <p style={{ margin: 0, paddingLeft: "clamp(18px, 2vw, 28px)", borderLeft: `1px solid ${TEAL}80`, fontFamily: "'Cal Sans', Georgia, serif", fontWeight: 300, fontSize: "clamp(19px, 1.9vw, 28px)", lineHeight: 1.44, letterSpacing: "-0.008em", color: "rgba(255,255,255,0.94)" }}>In May 2026 they founded NIVILA Group. The first product born from that vision became NILAY360.</p>
+              <p style={{ margin: 0, paddingLeft: "clamp(18px, 2vw, 28px)", borderLeft: `1px solid ${TEAL}80`, fontFamily: "var(--font-heading-new)", fontWeight: 300, fontSize: "clamp(19px, 1.9vw, 28px)", lineHeight: 1.44, letterSpacing: "-0.008em", color: "rgba(255,255,255,0.94)" }}>In May 2026 they founded NIVILA Group. The first product born from that vision became NILAY360.</p>
             </Reveal>
           </div>
 
           <Reveal delay={0.18} y={34}>
             <div>
               <OriginMark />
-              <p style={{ margin: "16px 0 0", fontFamily: "'Cal Sans', sans-serif", fontSize: "10px", letterSpacing: "0.2em", textTransform: "uppercase", color: TEAL }}>A home should be felt before it is found</p>
+              <p style={{ margin: "16px 0 0", fontFamily: "var(--font-support-new)", fontSize: "10px", letterSpacing: "0.2em", textTransform: "uppercase", color: TEAL }}>A home should be felt before it is found</p>
             </div>
           </Reveal>
         </div>

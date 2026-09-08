@@ -10,6 +10,7 @@ import { createClient } from "@/lib/supabase/client"
 import { useAuth } from "@/context/AuthContext"
 import type { User } from "@supabase/supabase-js"
 import { MyListingsDropdown } from "@/components/layout/MyListingsDropdown"
+import { NotificationBell } from "@/components/layout/NotificationBell"
 
 // ─── Types ─────────────────────────────────────────────────────────────────────
 
@@ -172,7 +173,7 @@ function Avatar({
         border:      ring ? "2px solid #10C4C3" : "1.5px solid rgba(16,196,195,0.45)",
         display: "flex", alignItems: "center", justifyContent: "center",
         flexShrink: 0,
-        fontFamily: "'Cal Sans', sans-serif",
+        fontFamily: "var(--font-body-new)",
         fontSize:   size * 0.4,
         fontWeight: 700,
         color:      "#10C4C3",
@@ -241,7 +242,7 @@ function UserDropdown({ user, profile, onClose, onSignOut, open, wrapperRef, dro
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{
             color: "#FFFFFF", fontWeight: 600, fontSize: 14,
-            fontFamily: "'Cal Sans', sans-serif",
+            fontFamily: "var(--font-body-new)",
             whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis",
           }}>
             {displayName}
@@ -249,7 +250,7 @@ function UserDropdown({ user, profile, onClose, onSignOut, open, wrapperRef, dro
           {city && (
             <div style={{
               color: "rgba(16,196,195,0.75)", fontSize: 11.5,
-              fontFamily: "'Cal Sans', sans-serif", marginTop: 1,
+              fontFamily: "var(--font-body-new)", marginTop: 1,
               display: "flex", alignItems: "center", gap: 4,
             }}>
               <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
@@ -264,7 +265,7 @@ function UserDropdown({ user, profile, onClose, onSignOut, open, wrapperRef, dro
           onClick={onClose}
           style={{
             fontSize: 11, fontWeight: 600, color: "#10C4C3",
-            fontFamily: "'Cal Sans', sans-serif",
+            fontFamily: "var(--font-body-new)",
             background: "rgba(16,196,195,0.1)", border: "1px solid rgba(16,196,195,0.25)",
             borderRadius: 6, padding: "4px 9px",
             textDecoration: "none", flexShrink: 0,
@@ -312,7 +313,7 @@ function UserDropdown({ user, profile, onClose, onSignOut, open, wrapperRef, dro
               background: "rgba(16,196,195,0.07)",
               borderRadius: 8,
               textDecoration: "none", fontSize: 13, fontWeight: 600,
-              fontFamily: "'Cal Sans', sans-serif",
+              fontFamily: "var(--font-body-new)",
               letterSpacing: "0.02em",
             }}
           >
@@ -333,7 +334,7 @@ function UserDropdown({ user, profile, onClose, onSignOut, open, wrapperRef, dro
             padding: "9px 10px", borderRadius: 8,
             background: "transparent", border: "none", cursor: "pointer",
             color: "#e05555", fontSize: 13, fontWeight: 500,
-            fontFamily: "'Cal Sans', sans-serif",
+            fontFamily: "var(--font-body-new)",
             transition: "background 0.15s",
           }}
           onMouseEnter={e => (e.currentTarget.style.background = "rgba(224,85,85,0.08)")}
@@ -364,7 +365,7 @@ function DropdownLink({
         color: hovered ? "#FFFFFF" : "rgba(255,255,255,0.65)",
         background: hovered ? "rgba(16,196,195,0.07)" : "transparent",
         textDecoration: "none", fontSize: 13, fontWeight: 450,
-        fontFamily: "'Cal Sans', sans-serif",
+        fontFamily: "var(--font-body-new)",
         transition: "background 0.12s, color 0.12s",
       }}
     >
@@ -398,7 +399,7 @@ function MegaLink({
         padding: featured ? "6px 0" : "4px 0",
         fontSize: 13,
         fontWeight: featured ? 500 : 400,
-        fontFamily: "'Cal Sans', sans-serif",
+        fontFamily: "var(--font-body-new)",
         textDecoration: "none",
         lineHeight: 1.55,
         color: hovered
@@ -463,7 +464,7 @@ function MegaPanel({
             letterSpacing: "0.12em",
             textTransform: "uppercase",
             marginBottom: 14,
-            fontFamily: "'Cal Sans', sans-serif",
+            fontFamily: "var(--font-support-new)",
           }}>
             {menu.leftColumn.heading}
           </div>
@@ -503,7 +504,7 @@ function MegaPanel({
                 letterSpacing: "0.12em",
                 textTransform: "uppercase",
                 marginBottom: 12,
-                fontFamily: "'Cal Sans', sans-serif",
+                fontFamily: "var(--font-support-new)",
                 paddingBottom: 8,
                 borderBottom: "1px solid rgba(16,196,195,0.15)",
                 whiteSpace: "nowrap",
@@ -560,7 +561,7 @@ function NavItem({
           borderRadius: 6,
           fontSize: 13,
           fontWeight: 500,
-          fontFamily: "'Cal Sans', sans-serif",
+          fontFamily: "var(--font-body-new)",
           textDecoration: "none",
           display: "flex",
           alignItems: "center",
@@ -788,13 +789,20 @@ export function Navbar() {
                 border: "none",
                 borderRadius: 6,
                 cursor: "pointer",
-                fontFamily: "'Cal Sans', sans-serif",
+                fontFamily: "var(--font-body-new)",
                 letterSpacing: "0.01em",
                 transition: "background 0.15s",
               }}
             >
               List Property
             </button>
+
+            {/* Notification bell — agent-only, sits beside the profile
+                dropdown. Rendered as its own sibling so its portal/z-index
+                is independent of the user dropdown's. */}
+            {mounted && user && profile?.role === "agent" && (
+              <NotificationBell userId={user.id} />
+            )}
 
             {mounted && (user ? (
               <div ref={wrapperRef} style={{ position: "relative" }}>
@@ -817,7 +825,7 @@ export function Navbar() {
                   <span style={{
                     fontSize: 13, fontWeight: 500,
                     color: "rgba(255,255,255,0.85)",
-                    fontFamily: "'Cal Sans', sans-serif",
+                    fontFamily: "var(--font-body-new)",
                     maxWidth: 110, overflow: "hidden",
                     textOverflow: "ellipsis", whiteSpace: "nowrap",
                   }}>
@@ -856,7 +864,7 @@ export function Navbar() {
                   background: "transparent",
                   borderRadius: 6,
                   cursor: "pointer",
-                  fontFamily: "'Cal Sans', sans-serif",
+                  fontFamily: "var(--font-body-new)",
                   transition: "color 0.15s, border-color 0.15s",
                 }}
               >
@@ -970,7 +978,7 @@ export function Navbar() {
                           background: currentMenu === link.label ? "rgba(16,196,195,0.08)" : "transparent",
                           border: "none", borderRadius: 10, cursor: "pointer",
                           color: currentMenu === link.label ? "#10C4C3" : "rgba(255,255,255,0.85)",
-                          fontSize: 15, fontWeight: 500, fontFamily: "'Cal Sans', sans-serif",
+                          fontSize: 15, fontWeight: 500, fontFamily: "var(--font-body-new)",
                           transition: "all 0.15s",
                         }}
                       >
@@ -1001,7 +1009,7 @@ export function Navbar() {
                       style={{
                         display: "block", padding: "14px 12px", borderRadius: 10,
                         color: "rgba(255,255,255,0.85)", fontSize: 15, fontWeight: 500,
-                        textDecoration: "none", fontFamily: "'Cal Sans', sans-serif",
+                        textDecoration: "none", fontFamily: "var(--font-body-new)",
                       }}>
                       {link.label}
                     </Link>
@@ -1097,7 +1105,7 @@ export function Navbar() {
                       width: "100%", padding: "12px 16px", borderRadius: 10,
                       background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.2)",
                       color: "#EF4444", fontSize: 14, fontWeight: 600, cursor: "pointer",
-                      fontFamily: "'Cal Sans', sans-serif",
+                      fontFamily: "var(--font-body-new)",
                     }}>
                     Sign Out
                   </button>
@@ -1109,7 +1117,7 @@ export function Navbar() {
                       width: "100%", padding: "13px 16px", borderRadius: 10,
                       background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.12)",
                       color: "#fff", fontSize: 15, fontWeight: 600, cursor: "pointer",
-                      fontFamily: "'Cal Sans', sans-serif",
+                      fontFamily: "var(--font-body-new)",
                     }}>
                     Sign In
                   </button>
@@ -1118,7 +1126,7 @@ export function Navbar() {
                       width: "100%", padding: "13px 16px", borderRadius: 10,
                       background: "linear-gradient(135deg, #10C4C3, #0B9C9B)",
                       border: "none", color: "#fff", fontSize: 15, fontWeight: 600,
-                      cursor: "pointer", fontFamily: "'Cal Sans', sans-serif",
+                      cursor: "pointer", fontFamily: "var(--font-body-new)",
                     }}>
                     List Property
                   </button>

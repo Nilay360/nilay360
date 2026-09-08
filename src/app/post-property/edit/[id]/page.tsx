@@ -1,12 +1,28 @@
 ﻿'use client'
 
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 
 // ─── Types ─────────────────────────────────────────────────────────────────────
 
+function uid() { return Math.random().toString(36).slice(2, 10) }
+
+// A single tile in the photo grid — either an already-saved photo_urls entry
+// (kind 'existing', url = its secure_url) or a newly picked file awaiting
+// upload (kind 'new', url = local blob preview, file = the raw File to
+// upload on Save). Position in this array is the display/reorder order;
+// coverIndex (tracked separately) marks which tile is the cover, mirroring
+// post-property/page.tsx's Step 6 photos + coverPhotoIndex split.
+interface PhotoItem {
+  id: string
+  url: string
+  kind: 'existing' | 'new'
+  file?: File
+}
+
 interface ListingRow {
+  photo_urls?: string[] | null;
   listing_type?: string | null; property_category?: string | null;
   address?: string | null; locality?: string | null; city?: string | null;
   state?: string | null; pincode?: string | null; landmark?: string | null;
@@ -76,8 +92,8 @@ const C = {
   text: '#F5F2EC', textSub: '#A9B4C2', textMuted: '#6B7686',
 } as const
 
-const FB = '"Cal Sans", -apple-system, BlinkMacSystemFont, sans-serif'
-const FD = '"Cal Sans", Georgia, "Times New Roman", serif'
+const FB = 'var(--font-body-new)'
+const FD = 'var(--font-heading-new)'
 
 const inp: React.CSSProperties = {
   width: '100%', background: C.surface2, border: `1px solid ${C.border}`,
@@ -164,6 +180,19 @@ export default function EditListingPage() {
   const [fpError, setFpError]           = useState<string | null>(null)
   const fpFileRef = useRef<HTMLInputElement | null>(null)
 
+  // Photo management — mirrors post-property/page.tsx's Step 6, but existing
+  // photo_urls entries load in as kind:'existing' tiles alongside any newly
+  // picked kind:'new' tiles. Uploads for 'new' tiles happen at Save time
+  // (not immediately, matching the create flow), then the merged, cover-
+  // adjusted URL list is written into the same update() payload below.
+  const [photos, setPhotos]                       = useState<PhotoItem[]>([])
+  const [coverIndex, setCoverIndex]                = useState(0)
+  const [photoError, setPhotoError]                = useState<string | null>(null)
+  const [photoUploadProgress, setPhotoUploadProgress] = useState<{ current: number; total: number } | null>(null)
+  const photoFileRef  = useRef<HTMLInputElement | null>(null)
+  const photoDragItem   = useRef<number | null>(null)
+  const photoDragTarget = useRef<number | null>(null)
+
   useEffect(() => {
     async function loadUser() {
       const { data } = await createClient().auth.getSession()
@@ -222,6 +251,9 @@ export default function EditListingPage() {
           seller_phone:       data.seller_phone       ?? '',
           seller_whatsapp:    data.seller_whatsapp    ?? '',
         })
+        const existingUrls = Array.isArray(data.photo_urls) ? data.photo_urls : []
+        setPhotos(existingUrls.map(url => ({ id: uid(), url, kind: 'existing' as const })))
+        setCoverIndex(0)
         setLoading(false)
       })
   }, [id])
@@ -294,6 +326,57 @@ export default function EditListingPage() {
     if (updErr) console.error('Floor plan label save failed:', updErr)
   }
 
+  // ── Photo management (mirrors post-property/page.tsx Step 6) ──────────────────
+
+  const MAX_PHOTO_BYTES = 10 * 1024 * 1024 // 10 MB
+
+  const addPhotoFiles = useCallback((files: FileList | File[]) => {
+    const incoming = Array.from(files)
+    const valid: PhotoItem[] = []
+    const rejected: string[] = []
+
+    for (const file of incoming) {
+      if (!file.type.startsWith('image/')) { rejected.push(`${file.name} (not an image)`); continue }
+      if (file.size > MAX_PHOTO_BYTES) { rejected.push(`${file.name} (over 10 MB)`); continue }
+      valid.push({ id: uid(), url: URL.createObjectURL(file), kind: 'new', file })
+    }
+
+    if (valid.length) setPhotos(prev => [...prev, ...valid])
+    setPhotoError(rejected.length ? `Skipped ${rejected.length} file(s): ${rejected.join(', ')}` : null)
+  }, [])
+
+  const removePhoto = (item: PhotoItem, idx: number) => {
+    if (item.kind === 'existing') {
+      if (!window.confirm('Remove this photo from the listing? This cannot be undone once you save.')) return
+    }
+    setPhotos(prev => prev.filter(p => p.id !== item.id))
+    setCoverIndex(prev => {
+      if (idx === prev) return 0
+      if (idx < prev) return prev - 1
+      return prev
+    })
+  }
+
+  const onPhotoTileDragEnd = () => {
+    const from = photoDragItem.current
+    const to = photoDragTarget.current
+    photoDragItem.current = null
+    photoDragTarget.current = null
+    if (from === null || to === null || from === to) return
+    setPhotos(prev => {
+      const arr = [...prev]
+      const [moved] = arr.splice(from, 1)
+      arr.splice(to, 0, moved)
+      return arr
+    })
+    setCoverIndex(prev => {
+      if (from === prev) return to
+      if (from < prev && to >= prev) return prev - 1
+      if (from > prev && to <= prev) return prev + 1
+      return prev
+    })
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!form.listing_type || !form.price) {
@@ -304,13 +387,67 @@ export default function EditListingPage() {
       setError('You must be signed in to edit a listing.')
       return
     }
+
+    // Cover-adjust the display order into final photo_urls order (existing
+    // convention: index 0 = cover), same "splice + unshift" step the create
+    // flow does at submit time — before touching uploads, so we can bail
+    // out early on the empty-array guard without uploading anything.
+    const orderedPhotos = (() => {
+      if (coverIndex <= 0 || coverIndex >= photos.length) return photos
+      const arr = [...photos]
+      const [cover] = arr.splice(coverIndex, 1)
+      arr.unshift(cover)
+      return arr
+    })()
+
+    if (orderedPhotos.length === 0) {
+      if (!window.confirm(
+        'This listing will be saved with zero photos — that’s a real visibility ' +
+        'downgrade for buyers. Save anyway?'
+      )) return
+    }
+
     setSaving(true)
     setError(null)
+    setPhotoError(null)
+
+    // Upload any newly picked files — try all of them (same as the create
+    // flow) and only decide whether to abort once every attempt is done, so
+    // one early failure doesn't hide problems with the rest.
+    const finalPhotoUrls: string[] = []
+    const failedUploads: string[] = []
+    const newCount = orderedPhotos.filter(p => p.kind === 'new').length
+    let uploadedSoFar = 0
+    for (const item of orderedPhotos) {
+      if (item.kind === 'existing') { finalPhotoUrls.push(item.url); continue }
+      uploadedSoFar += 1
+      setPhotoUploadProgress({ current: uploadedSoFar, total: newCount })
+      try {
+        const body = new FormData()
+        body.append('file', item.file as File)
+        const res = await fetch('/api/upload-image', { method: 'POST', body })
+        const json = await res.json()
+        if (!res.ok || !json?.secure_url) throw new Error(json?.error ?? 'Upload failed')
+        finalPhotoUrls.push(json.secure_url as string)
+      } catch (err) {
+        console.error('Photo upload failed:', item.file?.name, err)
+        failedUploads.push(item.file?.name ?? 'unnamed file')
+      }
+    }
+    setPhotoUploadProgress(null)
+
+    if (failedUploads.length > 0) {
+      setSaving(false)
+      setPhotoError(`${failedUploads.length} photo(s) failed to upload: ${failedUploads.join(', ')}. Please try again — no changes were saved.`)
+      return
+    }
+
     try {
       const supabase = createClient()
       const { error: upErr } = await supabase
         .from('property_listings')
         .update({
+          photo_urls:          finalPhotoUrls,
           listing_type:       form.listing_type       || null,
           property_category:  form.property_category  || null,
           address:            form.address            || null,
@@ -338,7 +475,6 @@ export default function EditListingPage() {
           seller_name:        form.seller_name        || null,
           seller_phone:       form.seller_phone       || null,
           seller_whatsapp:    form.seller_whatsapp    || null,
-          user_id:            userId,
           updated_at:         new Date().toISOString(),
         })
         .eq('id', id)
@@ -540,8 +676,129 @@ export default function EditListingPage() {
             </Field>
           </SectionCard>
 
-          {/* Step 6 — Contact */}
-          <SectionCard title="6. Contact Details">
+          {/* Step 6 — Photos */}
+          <SectionCard title="6. Photos">
+            <p style={{ fontSize: 13, color: C.textMuted, marginBottom: 16 }}>
+              Listings with 8+ photos receive 3× more inquiries. Click any photo to set it as the cover.
+            </p>
+
+            <div
+              onDragOver={e => { e.preventDefault() }}
+              onDrop={e => { e.preventDefault(); if (e.dataTransfer.files) addPhotoFiles(e.dataTransfer.files) }}
+              onClick={() => photoFileRef.current?.click()}
+              style={{
+                border: `2px dashed ${C.border}`,
+                borderRadius: 14, padding: '36px 24px', textAlign: 'center', cursor: 'pointer',
+                background: C.surface2, marginBottom: 20,
+              }}
+            >
+              <div style={{ fontSize: '1.75rem', marginBottom: 8 }}>📸</div>
+              <div style={{ fontFamily: FD, fontSize: '1.05rem', color: C.text, marginBottom: 4 }}>
+                Drag & drop photos, or click to browse
+              </div>
+              <div style={{ fontSize: '0.75rem', color: C.textMuted }}>
+                JPG, PNG, WEBP · Max 10 MB each
+              </div>
+            </div>
+
+            <input
+              ref={photoFileRef}
+              type="file"
+              multiple
+              accept="image/*"
+              style={{ display: 'none' }}
+              onChange={e => { if (e.target.files) addPhotoFiles(e.target.files); e.target.value = '' }}
+            />
+
+            {photoError && (
+              <div style={{ marginBottom: 16, padding: '10px 14px', background: 'rgba(224,85,85,0.1)', border: '1px solid rgba(224,85,85,0.3)', borderRadius: 8, color: '#e05555', fontSize: 13, fontFamily: FB }}>
+                {photoError}
+              </div>
+            )}
+
+            {photoUploadProgress && (
+              <div style={{ marginBottom: 16, padding: '10px 14px', background: C.goldDim, border: `1px solid ${C.goldBorder}`, borderRadius: 8, color: C.gold, fontSize: 13, fontFamily: FB }}>
+                Uploading photo {photoUploadProgress.current} of {photoUploadProgress.total}…
+              </div>
+            )}
+
+            {photos.length > 0 && (
+              <>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+                  <span style={{ fontSize: '0.875rem', color: C.textSub, fontFamily: FB }}>
+                    {photos.length} photo{photos.length > 1 ? 's' : ''} · Drag to reorder
+                  </span>
+                  <span style={{ fontSize: '0.8rem', color: C.textMuted, fontFamily: FB }}>
+                    Click any photo to set as cover
+                  </span>
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(130px, 1fr))', gap: 10 }}>
+                  {photos.map((photo, idx) => {
+                    const isCover = idx === coverIndex
+                    return (
+                      <div
+                        key={photo.id}
+                        draggable
+                        onDragStart={() => { photoDragItem.current = idx }}
+                        onDragEnter={() => { photoDragTarget.current = idx }}
+                        onDragEnd={onPhotoTileDragEnd}
+                        onDragOver={e => e.preventDefault()}
+                        onClick={() => setCoverIndex(idx)}
+                        style={{
+                          position: 'relative', borderRadius: 8, overflow: 'hidden',
+                          border: `2px solid ${isCover ? C.gold : 'transparent'}`,
+                          cursor: 'grab', aspectRatio: '4/3', userSelect: 'none',
+                          transition: 'border-color 0.15s',
+                        }}
+                      >
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={photo.url} alt={`Property photo ${idx + 1}`}
+                          style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                        />
+                        {isCover && (
+                          <div style={{
+                            position: 'absolute', top: 6, left: 6,
+                            background: C.gold, color: '#0a0a0a',
+                            fontSize: '0.6rem', fontWeight: 800, fontFamily: FB,
+                            padding: '2px 7px', borderRadius: 4, letterSpacing: '0.05em',
+                          }}>COVER</div>
+                        )}
+                        {photo.kind === 'new' && (
+                          <div style={{
+                            position: 'absolute', top: 6, right: 30,
+                            background: 'rgba(0,0,0,0.65)', color: C.gold,
+                            fontSize: '0.6rem', fontWeight: 700, fontFamily: FB,
+                            padding: '2px 6px', borderRadius: 4,
+                          }}>NEW</div>
+                        )}
+                        <button
+                          type="button"
+                          onClick={e => { e.stopPropagation(); removePhoto(photo, idx) }}
+                          style={{
+                            position: 'absolute', top: 5, right: 5,
+                            width: 22, height: 22, borderRadius: '50%',
+                            background: 'rgba(0,0,0,0.75)', border: 'none', color: '#fff',
+                            cursor: 'pointer', display: 'flex', alignItems: 'center',
+                            justifyContent: 'center', fontSize: '0.875rem', lineHeight: 1,
+                            fontFamily: FB,
+                          }}
+                        >×</button>
+                        <div style={{
+                          position: 'absolute', bottom: 4, right: 5,
+                          background: 'rgba(0,0,0,0.55)', color: '#fff',
+                          fontSize: '0.6rem', fontFamily: FB, padding: '1px 5px', borderRadius: 3,
+                        }}>{idx + 1}</div>
+                      </div>
+                    )
+                  })}
+                </div>
+              </>
+            )}
+          </SectionCard>
+
+          {/* Step 7 — Contact */}
+          <SectionCard title="7. Contact Details">
             <div style={grid2}>
               <Field label="Your Name">
                 <TInput value={form.seller_name} onChange={set('seller_name') as (v: string) => void} placeholder="Full name" />
@@ -555,8 +812,8 @@ export default function EditListingPage() {
             </div>
           </SectionCard>
 
-          {/* Step 7 — Floor Plans */}
-          <SectionCard title="7. Floor Plans">
+          {/* Step 8 — Floor Plans */}
+          <SectionCard title="8. Floor Plans">
             <p style={{ fontSize: 13, color: C.textMuted, marginBottom: 16 }}>
               Optional — add one floor plan, or several for multi-config projects (e.g. &ldquo;2BHK - Type A&rdquo;, &ldquo;3BHK - Type B&rdquo;). Changes save immediately.
             </p>

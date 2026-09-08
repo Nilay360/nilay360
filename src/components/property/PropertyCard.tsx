@@ -160,7 +160,7 @@ export function PropertyCard({
         <div className="p-4">
           {/* Price */}
           <div className="mb-1">
-            <span className="font-display text-[20px] font-semibold text-[#020C1C]">
+            <span className="text-[20px] font-semibold text-[#020C1C]" style={{ fontFamily: "var(--font-support-new)" }}>
               {priceLabel}
             </span>
           </div>

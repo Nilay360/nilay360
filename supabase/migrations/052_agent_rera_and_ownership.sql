@@ -1,0 +1,41 @@
+-- ═══════════════════════════════════════════════════════════════
+-- 052 — Agent RERA number on agent_profiles
+-- DRAFTED FOR REVIEW, NOT APPLIED. Same review discipline as every
+-- prior migration tonight: this file has not been run against the
+-- database. Do not apply until reviewed line by line.
+--
+-- Confirmed live before drafting (fresh check, this session): no
+-- rera_number column exists on agent_profiles today. Every
+-- rera_number occurrence anywhere in this repo's migration history
+-- belongs to a different table — the dead `agents` table
+-- (010_agents_baseline_documented.sql) and the dead/seed properties-
+-- adjacent schema in 001_nivila_schema.sql / 002_seed_data.sql, none
+-- of which agent_profiles inherits from or reads.
+--
+-- This is deliberately a NEW, separate column from license_number,
+-- not a rename or a reuse — per Vanith's explicit decision to keep
+-- them distinct concepts. license_number has shipped, real usage
+-- today across become-an-agent, dashboard, admin, and the public
+-- agent-facing pages (agents/page.tsx, agents/[slug]/page.tsx),
+-- generically labeled "License Number" — repurposing it as the RERA
+-- field would silently change its meaning everywhere it already
+-- renders. rera_number is additive: nullable, no CHECK, no default,
+-- no backfill — every existing agent_profiles row is unaffected.
+--
+-- No RLS change. The existing admin_/owner-scoped policies on
+-- agent_profiles (011_agent_portal_schema.sql) already grant
+-- select/update on the whole row, so a new nullable column needs no
+-- separate grant.
+--
+-- Scope note: this migration does NOT touch post-property.tsx's
+-- ownership-warranty checkbox. That is a pure application-layer
+-- question (see the accompanying persistence recommendation) with no
+-- schema dependency unless the recommendation to persist it is
+-- accepted — in which case a second, separate migration would add a
+-- boolean column to property_listings, deliberately not bundled into
+-- this file so the two concerns (agent RERA vs. listing ownership
+-- warranty) stay independently reviewable and revertible.
+-- ═══════════════════════════════════════════════════════════════
+
+ALTER TABLE public.agent_profiles
+  ADD COLUMN IF NOT EXISTS rera_number text;

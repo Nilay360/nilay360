@@ -68,14 +68,6 @@ export const NAV_LINKS = [
   { label: "Insights",     href: "/blog"         },
 ] as const
 
-export const STATS = [
-  { value: "2,400+",     label: "Verified Listings"  },
-  { value: "₹18,000 Cr", label: "Deals Facilitated"  },
-  { value: "14 Cities",  label: "Across India"       },
-  { value: "98%",        label: "Client Satisfaction"},
-  { value: "500+",       label: "Verified Agents"    },
-] as const
-
 // ── Mega-menu types ───────────────────────────────────────────────────────────
 
 export interface NavMenuLink {

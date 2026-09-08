@@ -1,6 +1,13 @@
 import type { Metadata } from "next"
 import { Suspense } from "react"
+import { Manrope, Inter, Plus_Jakarta_Sans } from "next/font/google"
 import "@/styles/globals.css"
+
+// Manrope (headings), Inter (body/UI), Plus Jakarta Sans (labels/tags/stats) —
+// the site-wide font system (replaces the legacy CDN-loaded serif font).
+const manrope = Manrope({ subsets: ["latin"], weight: ["600", "700", "800"], variable: "--font-heading-new" })
+const inter = Inter({ subsets: ["latin"], weight: ["400", "500", "600", "700"], variable: "--font-body-new" })
+const jakarta = Plus_Jakarta_Sans({ subsets: ["latin"], weight: ["500", "600", "700"], variable: "--font-support-new" })
 import { Navbar } from "@/components/layout/Navbar"
 import { CompareProvider } from "@/context/CompareContext"
 import CompareBar from "@/components/property/CompareBar"
@@ -58,11 +65,11 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" data-scroll-behavior="smooth">
+    <html lang="en" data-scroll-behavior="smooth" className={`${manrope.variable} ${inter.variable} ${jakarta.variable}`}>
       <head>
         <link rel="preconnect" href="https://cdn.jsdelivr.net" crossOrigin="anonymous" />
       </head>
-      <body className="antialiased" style={{ fontFamily: "'Cal Sans', system-ui, sans-serif" }}>
+      <body className="antialiased" style={{ fontFamily: "var(--font-body-new)" }}>
         <PostHogProvider>
           <AuthProvider>
             <CompareProvider>

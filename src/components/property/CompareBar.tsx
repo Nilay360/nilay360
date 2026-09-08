@@ -11,7 +11,7 @@ export default function CompareBar() {
   if (count === 0) return null;
 
   return (
-    <div style={{ position: "fixed", bottom: 0, left: 0, right: 0, zIndex: 250, background: G.dark, borderTop: "1px solid rgba(201,168,76,0.3)", padding: "14px 24px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: "16px", flexWrap: "wrap", boxShadow: "0 -8px 40px rgba(0,0,0,0.3)", fontFamily: "'Cal Sans', system-ui, sans-serif" }}>
+    <div style={{ position: "fixed", bottom: 0, left: 0, right: 0, zIndex: 250, background: G.dark, borderTop: "1px solid rgba(201,168,76,0.3)", padding: "14px 24px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: "16px", flexWrap: "wrap", boxShadow: "0 -8px 40px rgba(0,0,0,0.3)", fontFamily: "var(--font-body-new)" }}>
       <div style={{ display: "flex", alignItems: "center", gap: "14px", flexWrap: "wrap", minWidth: 0 }}>
         <span style={{ fontSize: "12px", color: "rgba(245,242,236,0.6)", whiteSpace: "nowrap" }}>
           Comparing <strong style={{ color: G.gold }}>{count}</strong> / {COMPARE_MAX}
@@ -27,8 +27,8 @@ export default function CompareBar() {
         </div>
       </div>
       <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
-        <button onClick={clear} style={{ padding: "9px 16px", background: "transparent", border: "1px solid rgba(245,242,236,0.2)", borderRadius: "8px", color: "rgba(245,242,236,0.6)", fontSize: "12px", fontWeight: 500, cursor: "pointer", fontFamily: "'Cal Sans', sans-serif" }}>Clear all</button>
-        <a href="/compare" style={{ padding: "9px 22px", background: G.gold, border: "none", borderRadius: "8px", color: G.dark, fontSize: "13px", fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", cursor: "pointer", textDecoration: "none", fontFamily: "'Cal Sans', sans-serif", whiteSpace: "nowrap" }}>
+        <button onClick={clear} style={{ padding: "9px 16px", background: "transparent", border: "1px solid rgba(245,242,236,0.2)", borderRadius: "8px", color: "rgba(245,242,236,0.6)", fontSize: "12px", fontWeight: 500, cursor: "pointer", fontFamily: "var(--font-body-new)" }}>Clear all</button>
+        <a href="/compare" style={{ padding: "9px 22px", background: G.gold, border: "none", borderRadius: "8px", color: G.dark, fontSize: "13px", fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", cursor: "pointer", textDecoration: "none", fontFamily: "var(--font-body-new)", whiteSpace: "nowrap" }}>
           Compare ({count}) →
         </a>
       </div>

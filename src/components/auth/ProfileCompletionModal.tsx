@@ -191,7 +191,7 @@ const styles = `
     display: flex; align-items: center; justify-content: center;
     padding: 24px;
     animation: pcmOverlayIn 0.2s ease;
-    font-family: 'Cal Sans', system-ui, sans-serif;
+    font-family: var(--font-body-new);
   }
   .pcm-card {
     position: relative;
@@ -206,7 +206,7 @@ const styles = `
   }
   .pcm-brand { display: flex; align-items: center; margin-bottom: 16px; }
   .pcm-title {
-    font-family: 'Cal Sans', Georgia, serif;
+    font-family: var(--font-heading-new);
     font-size: 26px; font-weight: 500; line-height: 1.15;
     color: #FFFFFF; margin: 0 0 6px;
   }
@@ -228,7 +228,7 @@ const styles = `
     background: rgba(255,255,255,0.04);
     border: 1.5px solid rgba(255,255,255,0.12);
     border-radius: 9px;
-    font-family: 'Cal Sans', sans-serif; font-size: 14px; color: #F5F2EC;
+    font-family: var(--font-body-new); font-size: 14px; color: #F5F2EC;
     outline: none; transition: border-color 0.18s, box-shadow 0.18s;
     -webkit-appearance: none;
   }
@@ -247,7 +247,7 @@ const styles = `
   .pcm-btn {
     width: 100%; padding: 13px 24px; margin-top: 22px;
     background: ${TEAL}; border: none; border-radius: 9px;
-    font-family: 'Cal Sans', sans-serif; font-size: 14px; font-weight: 700;
+    font-family: var(--font-body-new); font-size: 14px; font-weight: 700;
     letter-spacing: 0.04em; color: ${NAVY}; cursor: pointer;
     transition: background 0.18s, transform 0.12s, box-shadow 0.18s;
   }

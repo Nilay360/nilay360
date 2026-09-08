@@ -5,10 +5,15 @@ import { createClient } from "@/lib/supabase/client";
 import { useAuth } from "@/context/AuthContext";
 import { CITIES } from "@/constants";
 import { optimizedImageUrl } from "@/lib/image-url";
+import AgentPerformanceSection from "./AgentPerformanceSection";
+import LeaderboardSection from "./LeaderboardSection";
+import ListingsSubmittedOverTimeChart from "./ListingsSubmittedOverTimeChart";
+import AgentApplicationsOverTimeChart from "./AgentApplicationsOverTimeChart";
+import InquiriesOverTimeChart from "./InquiriesOverTimeChart";
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
-type AdminSection = "overview" | "pending" | "approved" | "rejected" | "users" | "inquiries" | "agents" | "reports" | "content" | "audit";
+type AdminSection = "overview" | "pending" | "approved" | "rejected" | "users" | "inquiries" | "agents" | "performance" | "leaderboard" | "reports" | "content" | "audit";
 
 type Stats = {
   pending: number;
@@ -93,6 +98,25 @@ type AgentApplication = {
   agent_service_cities: { city: string }[] | null;
 };
 
+// KYC Documents — same fixed 4-slot checklist as the agent's own profile
+// page (src/app/dashboard/DashboardClient.tsx's KYC_DOCUMENT_SLOTS),
+// duplicated here rather than cross-imported, matching this codebase's
+// existing per-file convention (Card/Badge etc. are similarly duplicated
+// across the leads/site-visits/deals pages instead of shared).
+const KYC_DOCUMENT_TYPES: { key: string; label: string }[] = [
+  { key: "pan",              label: "PAN" },
+  { key: "aadhaar",          label: "Aadhaar" },
+  { key: "rera_certificate", label: "RERA Certificate" },
+  { key: "address_proof",    label: "Address Proof" },
+];
+
+type AgentDocumentRow = {
+  agent_profile_id: string;
+  document_type: string;
+  file_url: string;
+  created_at: string;
+};
+
 type ProfileSearchRow = {
   id: string;
   full_name: string | null;
@@ -122,10 +146,25 @@ type ReportRow = {
   entity_id: string;
   reason: string;
   details: string | null;
-  status: "open" | "resolved" | "dismissed";
+  // Migration 051 widened this from 3 values to 6 (schema CHECK
+  // constraint updated, live). 'acknowledged' | 'frozen' | 'under_review'
+  // map to the compliance brief's Acknowledged/Frozen/Under Review
+  // states; 'open'/'resolved'/'dismissed' are unchanged.
+  status: "open" | "acknowledged" | "frozen" | "under_review" | "resolved" | "dismissed";
   created_at: string;
   resolved_at: string | null;
   resolved_by: string | null;
+  // Migration 033. Nullable, free text (no CHECK, matching document_type/
+  // event_type's precedent) — 'deletion_request' is the one real value in
+  // use so far, from the agent-side Request Deletion flow. Anything else
+  // (including null) renders as a general report, unchanged.
+  request_type: string | null;
+  // Migration 051. Plain, nullable, admin-set-manually — no trigger
+  // computes these. Only sla_acknowledge_due_at is currently stamped
+  // (by the Acknowledge action, now() + 48h); sla_resolve_due_at has
+  // no writer yet, displayed if a value is ever set some other way.
+  sla_acknowledge_due_at: string | null;
+  sla_resolve_due_at: string | null;
   profiles: { full_name: string | null; email: string | null } | null;
 };
 
@@ -199,6 +238,8 @@ function IconBuilding(){ return <svg width="13" height="13" viewBox="0 0 24 24" 
 function IconBriefcase(){ return <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>; }
 function IconAudit()  { return <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="15" y2="17"/></svg>; }
 function IconEdit()   { return <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4z"/></svg>; }
+function IconChart()  { return <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 3v18h18"/><path d="M18 17V9M13 17V5M8 17v-4"/></svg>; }
+function IconAward()  { return <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="8" r="6"/><path d="M8.21 13.89 7 23l5-3 5 3-1.21-9.12"/></svg>; }
 function IconFlag()   { return <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>; }
 function IconChevron(){ return <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"/></svg>; }
 
@@ -256,21 +297,34 @@ function StatCard({ label, value, icon, accent, note }: {
   label: string; value: number | string;
   icon: React.ReactNode; accent?: "gold" | "green" | "red" | "blue"; note?: string;
 }) {
+  // "gold" is a naming fossil — its actual color has always been teal
+  // (#10C4C3), matching the agent portal's primary accent, not gold.
+  // Left as-is here per instruction: renaming the variant key would
+  // mean touching every call site that passes accent="gold", a
+  // bigger, separate refactor from this token-value alignment pass.
   const map = {
     gold:  { bg: "rgba(16,196,195,0.12)",  color: "#10C4C3" },
-    green: { bg: "rgba(52,211,153,0.12)",  color: "#34D399" },
+    green: { bg: "rgba(74,222,128,0.12)",  color: "#4ADE80" },
     red:   { bg: "rgba(248,113,113,0.12)", color: "#F87171" },
-    blue:  { bg: "rgba(96,165,250,0.12)",  color: "#60A5FA" },
+    blue:  { bg: "rgba(59,130,246,0.12)",  color: "#3B82F6" },
   };
   const a = map[accent ?? "gold"];
+  // Icon-chip size (44x44/radius 10), the value's white→teal gradient-
+  // text treatment, and the label's uppercase/tracked styling below
+  // all now match the agent portal's StatCard (src/app/dashboard/
+  // DashboardClient.tsx) exactly — Part 1 polish, admin's own
+  // semantic 4-color accent map (icon chip only) is unchanged, since
+  // collapsing it to the agent side's plain boolean accent would lose
+  // real information (Pending/Active/Rejected/etc. are visually
+  // distinct here on purpose).
   return (
-    <div style={{ background: "rgba(255,255,255,0.05)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", borderRadius: "14px", border: "1px solid rgba(255,255,255,0.08)", boxShadow: "0 4px 24px rgba(0,0,0,0.18)", padding: "22px 24px", display: "flex", alignItems: "center", gap: "18px", flex: "1 1 160px" }}>
-      <div style={{ width: "46px", height: "46px", borderRadius: "12px", background: a.bg, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, color: a.color }}>
+    <div style={{ background: "rgba(255,255,255,0.05)", backdropFilter: "blur(24px)", WebkitBackdropFilter: "blur(24px)", borderRadius: "16px", border: "1px solid rgba(255,255,255,0.08)", boxShadow: "0 4px 24px rgba(0,0,0,0.18)", padding: "22px 24px", display: "flex", alignItems: "center", gap: "18px", flex: "1 1 160px" }}>
+      <div style={{ width: "44px", height: "44px", borderRadius: "10px", background: a.bg, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, color: a.color }}>
         {icon}
       </div>
       <div>
-        <div style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "30px", fontWeight: 600, color: "#FFFFFF", lineHeight: 1.1 }}>{value}</div>
-        <div style={{ fontSize: "12px", color: "#A9B4C2", marginTop: "2px" }}>{label}</div>
+        <div style={{ fontFamily: "var(--font-support-new)", fontSize: "28px", fontWeight: 600, lineHeight: 1.1, background: "linear-gradient(135deg, #FFFFFF 0%, #10C4C3 100%)", WebkitBackgroundClip: "text", backgroundClip: "text", WebkitTextFillColor: "transparent", color: "#FFFFFF" }}>{value}</div>
+        <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.50)", textTransform: "uppercase", letterSpacing: "0.08em", marginTop: "2px" }}>{label}</div>
         {note && <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.45)", marginTop: "2px" }}>{note}</div>}
       </div>
     </div>
@@ -281,7 +335,7 @@ function SectionHeading({ title, subtitle, count }: { title: string; subtitle?: 
   return (
     <div style={{ marginBottom: "24px", display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "12px", flexWrap: "wrap" }}>
       <div>
-        <h2 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "30px", fontWeight: 500, color: "#FFFFFF", lineHeight: 1.2 }}>{title}</h2>
+        <h2 style={{ fontFamily: "var(--font-heading-new)", fontSize: "30px", fontWeight: 500, color: "#FFFFFF", lineHeight: 1.2 }}>{title}</h2>
         {subtitle && <p style={{ fontSize: "13px", color: "#A9B4C2", marginTop: "4px" }}>{subtitle}</p>}
       </div>
       {count != null && count > 0 && (
@@ -318,7 +372,7 @@ function ListingCard({
   const loc   = [listing.locality, listing.city].filter(Boolean).join(", ");
 
   return (
-    <div style={{ background: "rgba(255,255,255,0.05)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", borderRadius: "14px", border: "1px solid rgba(255,255,255,0.08)", boxShadow: "0 4px 24px rgba(0,0,0,0.18)", overflow: "hidden", opacity: inFlight ? 0.55 : 1, transition: "opacity 0.2s" }}>
+    <div style={{ background: "rgba(255,255,255,0.05)", backdropFilter: "blur(24px)", WebkitBackdropFilter: "blur(24px)", borderRadius: "16px", border: "1px solid rgba(255,255,255,0.08)", boxShadow: "0 4px 24px rgba(0,0,0,0.18)", overflow: "hidden", opacity: inFlight ? 0.55 : 1, transition: "opacity 0.2s" }}>
       <div style={{ display: "flex", gap: 0 }}>
         {/* Thumbnail */}
         <div style={{ width: "150px", flexShrink: 0, position: "relative", background: "#0A1526", overflow: "hidden", minHeight: "140px" }}>
@@ -341,7 +395,7 @@ function ListingCard({
                 <StatusBadge status={listing.status} />
                 <span style={{ fontSize: "11px", color: "rgba(255,255,255,0.45)" }}>{fmtDate(listing.submitted_at)}</span>
               </div>
-              <h3 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "19px", fontWeight: 600, color: "#FFFFFF", lineHeight: 1.25, marginBottom: "4px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+              <h3 style={{ fontFamily: "var(--font-heading-new)", fontSize: "19px", fontWeight: 600, color: "#FFFFFF", lineHeight: 1.25, marginBottom: "4px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                 {listing.title ?? `${listing.property_category ?? "Property"} in ${listing.city ?? "—"}`}
               </h3>
               <div style={{ display: "flex", gap: "12px", fontSize: "12px", color: "#A9B4C2", flexWrap: "wrap", alignItems: "center" }}>
@@ -352,7 +406,7 @@ function ListingCard({
                     {loc}
                   </span>
                 )}
-                <span style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "15px", fontWeight: 600, color: "#FFFFFF" }}>
+                <span style={{ fontFamily: "var(--font-support-new)", fontSize: "15px", fontWeight: 600, color: "#FFFFFF" }}>
                   {fmtPrice(listing.price, listing.listing_type)}
                 </span>
               </div>
@@ -436,7 +490,7 @@ function AssignAgentControl({
           value={currentAgentId ?? ""}
           disabled={disabled}
           onChange={e => onAssign(e.target.value || null)}
-          style={{ padding: "6px 28px 6px 10px", background: "rgba(255,255,255,0.06)", border: "1.5px solid rgba(255,255,255,0.12)", borderRadius: "7px", fontSize: "12px", color: "#FFFFFF", fontFamily: "'Cal Sans', sans-serif", outline: "none", appearance: "none", cursor: disabled ? "not-allowed" : "pointer" }}
+          style={{ padding: "6px 28px 6px 10px", background: "rgba(255,255,255,0.06)", border: "1.5px solid rgba(255,255,255,0.12)", borderRadius: "7px", fontSize: "12px", color: "#FFFFFF", fontFamily: "var(--font-body-new)", outline: "none", appearance: "none", cursor: disabled ? "not-allowed" : "pointer" }}
         >
           <option value="" style={{ background: "#0A1526", color: "#FFFFFF" }}>Unassigned</option>
           {agents.map(a => (
@@ -470,12 +524,12 @@ function KuulaTourControl({
         disabled={disabled}
         onChange={e => setValue(e.target.value)}
         placeholder="https://kuula.co/share/..."
-        style={{ flex: "1 1 220px", minWidth: "160px", padding: "6px 10px", background: "rgba(255,255,255,0.06)", border: "1.5px solid rgba(255,255,255,0.12)", borderRadius: "7px", fontSize: "12px", color: "#FFFFFF", fontFamily: "'Cal Sans', sans-serif", outline: "none" }}
+        style={{ flex: "1 1 220px", minWidth: "160px", padding: "6px 10px", background: "rgba(255,255,255,0.06)", border: "1.5px solid rgba(255,255,255,0.12)", borderRadius: "7px", fontSize: "12px", color: "#FFFFFF", fontFamily: "var(--font-body-new)", outline: "none" }}
       />
       <button
         onClick={() => onSave(value.trim() || null)}
         disabled={disabled || !dirty}
-        style={{ padding: "6px 14px", borderRadius: "7px", fontSize: "11px", fontWeight: 600, background: dirty ? "#10C4C3" : "rgba(255,255,255,0.06)", color: dirty ? "#020C1C" : "rgba(255,255,255,0.4)", border: "none", cursor: disabled || !dirty ? "not-allowed" : "pointer", fontFamily: "'Cal Sans', sans-serif", flexShrink: 0 }}
+        style={{ padding: "6px 14px", borderRadius: "7px", fontSize: "11px", fontWeight: 600, background: dirty ? "#10C4C3" : "rgba(255,255,255,0.06)", color: dirty ? "#020C1C" : "rgba(255,255,255,0.4)", border: "none", cursor: disabled || !dirty ? "not-allowed" : "pointer", fontFamily: "var(--font-body-new)", flexShrink: 0 }}
       >
         Save
       </button>
@@ -506,12 +560,12 @@ function GoogleMapsUrlControl({
           disabled={disabled}
           onChange={e => setValue(e.target.value)}
           placeholder="https://www.google.com/maps/embed?pb=... (Share → Embed a map)"
-          style={{ flex: "1 1 220px", minWidth: "160px", padding: "6px 10px", background: "rgba(255,255,255,0.06)", border: "1.5px solid rgba(255,255,255,0.12)", borderRadius: "7px", fontSize: "12px", color: "#FFFFFF", fontFamily: "'Cal Sans', sans-serif", outline: "none" }}
+          style={{ flex: "1 1 220px", minWidth: "160px", padding: "6px 10px", background: "rgba(255,255,255,0.06)", border: "1.5px solid rgba(255,255,255,0.12)", borderRadius: "7px", fontSize: "12px", color: "#FFFFFF", fontFamily: "var(--font-body-new)", outline: "none" }}
         />
         <button
           onClick={() => onSave(value.trim() || null)}
           disabled={disabled || !dirty}
-          style={{ padding: "6px 14px", borderRadius: "7px", fontSize: "11px", fontWeight: 600, background: dirty ? "#10C4C3" : "rgba(255,255,255,0.06)", color: dirty ? "#020C1C" : "rgba(255,255,255,0.4)", border: "none", cursor: disabled || !dirty ? "not-allowed" : "pointer", fontFamily: "'Cal Sans', sans-serif", flexShrink: 0 }}
+          style={{ padding: "6px 14px", borderRadius: "7px", fontSize: "11px", fontWeight: 600, background: dirty ? "#10C4C3" : "rgba(255,255,255,0.06)", color: dirty ? "#020C1C" : "rgba(255,255,255,0.4)", border: "none", cursor: disabled || !dirty ? "not-allowed" : "pointer", fontFamily: "var(--font-body-new)", flexShrink: 0 }}
         >
           Save
         </button>
@@ -539,7 +593,7 @@ function SiteContentRowEditor({
   const dirty = draft !== row.value;
 
   return (
-    <div style={{ background: "rgba(255,255,255,0.05)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", borderRadius: "14px", border: "1px solid rgba(255,255,255,0.08)", padding: "20px 22px", marginBottom: "14px" }}>
+    <div style={{ background: "rgba(255,255,255,0.05)", backdropFilter: "blur(24px)", WebkitBackdropFilter: "blur(24px)", borderRadius: "16px", border: "1px solid rgba(255,255,255,0.08)", padding: "20px 22px", marginBottom: "14px" }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "8px", gap: "10px", flexWrap: "wrap" }}>
         <code style={{ fontSize: "12px", fontWeight: 700, color: "#10C4C3", background: "rgba(16,196,195,0.1)", padding: "3px 9px", borderRadius: "6px" }}>{row.key}</code>
         <span style={{ fontSize: "10px", color: "rgba(255,255,255,0.3)" }}>
@@ -549,20 +603,20 @@ function SiteContentRowEditor({
       <div style={{ display: "flex", gap: "10px", alignItems: "flex-start", flexWrap: "wrap" }}>
         <textarea
           value={draft} disabled={disabled} onChange={e => setDraft(e.target.value)} rows={2}
-          style={{ flex: "1 1 260px", minWidth: "200px", padding: "10px 12px", background: "rgba(255,255,255,0.06)", border: "1.5px solid rgba(255,255,255,0.12)", borderRadius: "8px", fontSize: "13px", color: "#FFFFFF", fontFamily: "'Cal Sans', sans-serif", outline: "none", resize: "vertical" }}
+          style={{ flex: "1 1 260px", minWidth: "200px", padding: "10px 12px", background: "rgba(255,255,255,0.06)", border: "1.5px solid rgba(255,255,255,0.12)", borderRadius: "8px", fontSize: "13px", color: "#FFFFFF", fontFamily: "var(--font-body-new)", outline: "none", resize: "vertical" }}
         />
         <div style={{ display: "flex", gap: "8px", flexShrink: 0 }}>
           <button
             onClick={() => onSave(row.key, draft)}
             disabled={disabled || !dirty}
-            style={{ padding: "9px 18px", borderRadius: "8px", fontSize: "12px", fontWeight: 700, background: dirty ? "#10C4C3" : "rgba(255,255,255,0.06)", color: dirty ? "#020C1C" : "rgba(255,255,255,0.4)", border: "none", cursor: disabled || !dirty ? "not-allowed" : "pointer", fontFamily: "'Cal Sans', sans-serif" }}
+            style={{ padding: "9px 18px", borderRadius: "8px", fontSize: "12px", fontWeight: 700, background: dirty ? "#10C4C3" : "rgba(255,255,255,0.06)", color: dirty ? "#020C1C" : "rgba(255,255,255,0.4)", border: "none", cursor: disabled || !dirty ? "not-allowed" : "pointer", fontFamily: "var(--font-body-new)" }}
           >
             Save
           </button>
           <button
             onClick={() => { if (window.confirm(`Delete key "${row.key}"? Any page reading it will fall back to its hardcoded default.`)) onDelete(row.key); }}
             disabled={disabled}
-            style={{ padding: "9px 14px", borderRadius: "8px", fontSize: "12px", fontWeight: 600, background: "rgba(248,113,113,0.1)", color: "#F87171", border: "1.5px solid rgba(248,113,113,0.3)", cursor: disabled ? "not-allowed" : "pointer", fontFamily: "'Cal Sans', sans-serif" }}
+            style={{ padding: "9px 14px", borderRadius: "8px", fontSize: "12px", fontWeight: 600, background: "rgba(248,113,113,0.1)", color: "#F87171", border: "1.5px solid rgba(248,113,113,0.3)", cursor: disabled ? "not-allowed" : "pointer", fontFamily: "var(--font-body-new)" }}
           >
             Delete
           </button>
@@ -591,17 +645,17 @@ function SiteContentAddForm({
         <input
           type="text" placeholder="key_name (e.g. about_hero_title)" value={key} disabled={disabled}
           onChange={e => setKey(e.target.value)}
-          style={{ flex: "0 1 220px", minWidth: "180px", padding: "10px 12px", background: "rgba(255,255,255,0.06)", border: "1.5px solid rgba(255,255,255,0.12)", borderRadius: "8px", fontSize: "13px", color: "#FFFFFF", fontFamily: "'Cal Sans', sans-serif", outline: "none" }}
+          style={{ flex: "0 1 220px", minWidth: "180px", padding: "10px 12px", background: "rgba(255,255,255,0.06)", border: "1.5px solid rgba(255,255,255,0.12)", borderRadius: "8px", fontSize: "13px", color: "#FFFFFF", fontFamily: "var(--font-body-new)", outline: "none" }}
         />
         <textarea
           placeholder="Value" value={value} disabled={disabled} rows={2}
           onChange={e => setValue(e.target.value)}
-          style={{ flex: "1 1 260px", minWidth: "200px", padding: "10px 12px", background: "rgba(255,255,255,0.06)", border: "1.5px solid rgba(255,255,255,0.12)", borderRadius: "8px", fontSize: "13px", color: "#FFFFFF", fontFamily: "'Cal Sans', sans-serif", outline: "none", resize: "vertical" }}
+          style={{ flex: "1 1 260px", minWidth: "200px", padding: "10px 12px", background: "rgba(255,255,255,0.06)", border: "1.5px solid rgba(255,255,255,0.12)", borderRadius: "8px", fontSize: "13px", color: "#FFFFFF", fontFamily: "var(--font-body-new)", outline: "none", resize: "vertical" }}
         />
         <button
           onClick={() => { onAdd(normalized, value.trim()); setKey(""); setValue(""); }}
           disabled={disabled || !canAdd}
-          style={{ padding: "9px 20px", borderRadius: "8px", fontSize: "12px", fontWeight: 700, background: canAdd ? "#10C4C3" : "rgba(255,255,255,0.06)", color: canAdd ? "#020C1C" : "rgba(255,255,255,0.4)", border: "none", cursor: disabled || !canAdd ? "not-allowed" : "pointer", fontFamily: "'Cal Sans', sans-serif", flexShrink: 0 }}
+          style={{ padding: "9px 20px", borderRadius: "8px", fontSize: "12px", fontWeight: 700, background: canAdd ? "#10C4C3" : "rgba(255,255,255,0.06)", color: canAdd ? "#020C1C" : "rgba(255,255,255,0.4)", border: "none", cursor: disabled || !canAdd ? "not-allowed" : "pointer", fontFamily: "var(--font-body-new)", flexShrink: 0 }}
         >
           Add
         </button>
@@ -626,7 +680,7 @@ function SiteContentSection({
       <SiteContentAddForm disabled={disabled !== null} existingKeys={rows.map(r => r.key)} onAdd={onAdd} />
       {rows.length === 0 ? (
         <div style={{ padding: "60px 24px", textAlign: "center", background: "rgba(255,255,255,0.05)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", borderRadius: "18px", border: "1px solid rgba(255,255,255,0.08)" }}>
-          <p style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "20px", color: "#FFFFFF" }}>No content keys yet</p>
+          <p style={{ fontFamily: "var(--font-heading-new)", fontSize: "20px", color: "#FFFFFF" }}>No content keys yet</p>
         </div>
       ) : (
         rows.map(row => (
@@ -707,8 +761,8 @@ function OverviewSection({ stats, loading }: { stats: Stats; loading: boolean })
       {sectionLoading ? <Spinner /> : (
         <div className="admin-overview-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "20px" }}>
           {/* Recent activity */}
-          <div style={{ background: "rgba(255,255,255,0.05)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", borderRadius: "14px", border: "1px solid rgba(255,255,255,0.08)", padding: "24px" }}>
-            <h3 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "20px", fontWeight: 500, color: "#FFFFFF", marginBottom: "18px" }}>Recent Submissions</h3>
+          <div style={{ background: "rgba(255,255,255,0.05)", backdropFilter: "blur(24px)", WebkitBackdropFilter: "blur(24px)", borderRadius: "16px", border: "1px solid rgba(255,255,255,0.08)", padding: "24px" }}>
+            <h3 style={{ fontFamily: "var(--font-heading-new)", fontSize: "16px", fontWeight: 500, color: "#FFFFFF", marginBottom: "18px" }}>Recent Submissions</h3>
             {recent.length === 0 ? (
               <p style={{ fontSize: "13px", color: "rgba(255,255,255,0.45)" }}>No listings yet.</p>
             ) : (
@@ -729,8 +783,8 @@ function OverviewSection({ stats, loading }: { stats: Stats; loading: boolean })
           </div>
 
           {/* City breakdown */}
-          <div style={{ background: "rgba(255,255,255,0.05)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", borderRadius: "14px", border: "1px solid rgba(255,255,255,0.08)", padding: "24px" }}>
-            <h3 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "20px", fontWeight: 500, color: "#FFFFFF", marginBottom: "18px" }}>Top Cities</h3>
+          <div style={{ background: "rgba(255,255,255,0.05)", backdropFilter: "blur(24px)", WebkitBackdropFilter: "blur(24px)", borderRadius: "16px", border: "1px solid rgba(255,255,255,0.08)", padding: "24px" }}>
+            <h3 style={{ fontFamily: "var(--font-heading-new)", fontSize: "16px", fontWeight: 500, color: "#FFFFFF", marginBottom: "18px" }}>Top Cities</h3>
             {cityBreakdown.length === 0 ? (
               <p style={{ fontSize: "13px", color: "rgba(255,255,255,0.45)" }}>No data yet.</p>
             ) : (
@@ -754,6 +808,13 @@ function OverviewSection({ stats, loading }: { stats: Stats; loading: boolean })
           </div>
         </div>
       )}
+
+      {/* Trend charts */}
+      <div className="admin-overview-charts-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "20px", marginTop: "20px" }}>
+        <ListingsSubmittedOverTimeChart />
+        <AgentApplicationsOverTimeChart />
+        <InquiriesOverTimeChart />
+      </div>
     </div>
   );
 }
@@ -782,7 +843,7 @@ function PendingSection({
           <div style={{ width: "52px", height: "52px", borderRadius: "50%", background: "rgba(52,211,153,0.08)", border: "1.5px solid rgba(52,211,153,0.2)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px", color: "#34D399" }}>
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75"><polyline points="20 6 9 17 4 12"/></svg>
           </div>
-          <p style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "22px", color: "#FFFFFF", marginBottom: "8px" }}>All clear</p>
+          <p style={{ fontFamily: "var(--font-heading-new)", fontSize: "22px", color: "#FFFFFF", marginBottom: "8px" }}>All clear</p>
           <p style={{ fontSize: "13px", color: "rgba(255,255,255,0.45)" }}>No listings pending review.</p>
         </div>
       ) : (
@@ -819,14 +880,14 @@ function PendingSection({
                   <button
                     onClick={() => onApprove(l.id)}
                     disabled={inFlight === l.id}
-                    style={{ display: "flex", alignItems: "center", gap: "6px", padding: "7px 16px", borderRadius: "7px", fontSize: "11px", fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase" as const, background: "#10C4C3", color: "#020C1C", border: "none", cursor: inFlight === l.id ? "not-allowed" : "pointer", fontFamily: "'Cal Sans', sans-serif", opacity: inFlight === l.id ? 0.6 : 1 }}
+                    style={{ display: "flex", alignItems: "center", gap: "6px", padding: "7px 16px", borderRadius: "7px", fontSize: "11px", fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase" as const, background: "#10C4C3", color: "#020C1C", border: "none", cursor: inFlight === l.id ? "not-allowed" : "pointer", fontFamily: "var(--font-body-new)", opacity: inFlight === l.id ? 0.6 : 1 }}
                   >
                     <IconApprove /> Approve
                   </button>
                   <button
                     onClick={() => onReject(l.id)}
                     disabled={inFlight === l.id}
-                    style={{ display: "flex", alignItems: "center", gap: "6px", padding: "7px 16px", borderRadius: "7px", fontSize: "11px", fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase" as const, background: "rgba(248,113,113,0.1)", color: "#F87171", border: "1.5px solid rgba(248,113,113,0.3)", cursor: inFlight === l.id ? "not-allowed" : "pointer", fontFamily: "'Cal Sans', sans-serif", opacity: inFlight === l.id ? 0.6 : 1 }}
+                    style={{ display: "flex", alignItems: "center", gap: "6px", padding: "7px 16px", borderRadius: "7px", fontSize: "11px", fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase" as const, background: "rgba(248,113,113,0.1)", color: "#F87171", border: "1.5px solid rgba(248,113,113,0.3)", cursor: inFlight === l.id ? "not-allowed" : "pointer", fontFamily: "var(--font-body-new)", opacity: inFlight === l.id ? 0.6 : 1 }}
                   >
                     <IconReject /> Reject
                   </button>
@@ -860,7 +921,7 @@ function ApprovedSection({
       <SectionHeading title="Approved Listings" subtitle="Currently live on the platform." count={listings.length} />
       {listings.length === 0 ? (
         <div style={{ padding: "60px 24px", textAlign: "center", background: "rgba(255,255,255,0.05)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", borderRadius: "18px", border: "1px solid rgba(255,255,255,0.08)" }}>
-          <p style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "20px", color: "#FFFFFF" }}>No active listings</p>
+          <p style={{ fontFamily: "var(--font-heading-new)", fontSize: "20px", color: "#FFFFFF" }}>No active listings</p>
         </div>
       ) : (
         <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
@@ -897,7 +958,7 @@ function ApprovedSection({
                     if (window.confirm("Unpublish this listing? It will return to pending review.")) onUnpublish(l.id);
                   }}
                   disabled={inFlight === l.id}
-                  style={{ display: "flex", alignItems: "center", gap: "6px", padding: "7px 14px", borderRadius: "7px", fontSize: "11px", fontWeight: 600, background: "rgba(245,158,11,0.1)", color: "#F59E0B", border: "1.5px solid rgba(245,158,11,0.3)", cursor: inFlight === l.id ? "not-allowed" : "pointer", fontFamily: "'Cal Sans', sans-serif", opacity: inFlight === l.id ? 0.6 : 1 }}
+                  style={{ display: "flex", alignItems: "center", gap: "6px", padding: "7px 14px", borderRadius: "7px", fontSize: "11px", fontWeight: 600, background: "rgba(245,158,11,0.1)", color: "#F59E0B", border: "1.5px solid rgba(245,158,11,0.3)", cursor: inFlight === l.id ? "not-allowed" : "pointer", fontFamily: "var(--font-body-new)", opacity: inFlight === l.id ? 0.6 : 1 }}
                 >
                   Unpublish
                 </button>
@@ -926,7 +987,7 @@ function RejectedSection({
       <SectionHeading title="Rejected Listings" subtitle="Listings that have been declined." count={listings.length} />
       {listings.length === 0 ? (
         <div style={{ padding: "60px 24px", textAlign: "center", background: "rgba(255,255,255,0.05)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", borderRadius: "18px", border: "1px solid rgba(255,255,255,0.08)" }}>
-          <p style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "20px", color: "#FFFFFF" }}>No rejected listings</p>
+          <p style={{ fontFamily: "var(--font-heading-new)", fontSize: "20px", color: "#FFFFFF" }}>No rejected listings</p>
         </div>
       ) : (
         <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
@@ -939,7 +1000,7 @@ function RejectedSection({
                 <button
                   onClick={() => onReApprove(l.id)}
                   disabled={inFlight === l.id}
-                  style={{ display: "flex", alignItems: "center", gap: "6px", padding: "7px 14px", borderRadius: "7px", fontSize: "11px", fontWeight: 700, background: "#10C4C3", color: "#020C1C", border: "none", cursor: inFlight === l.id ? "not-allowed" : "pointer", fontFamily: "'Cal Sans', sans-serif", opacity: inFlight === l.id ? 0.6 : 1 }}
+                  style={{ display: "flex", alignItems: "center", gap: "6px", padding: "7px 14px", borderRadius: "7px", fontSize: "11px", fontWeight: 700, background: "#10C4C3", color: "#020C1C", border: "none", cursor: inFlight === l.id ? "not-allowed" : "pointer", fontFamily: "var(--font-body-new)", opacity: inFlight === l.id ? 0.6 : 1 }}
                 >
                   <IconApprove /> Re-approve
                 </button>
@@ -978,7 +1039,7 @@ type UserEditableFields = Pick<UserRow, "full_name" | "city" | "phone" | "email"
 const userModalInputStyle: React.CSSProperties = {
   width: "100%", padding: "8px 12px", background: "#F8F6F1",
   border: "1.5px solid rgba(13,43,31,0.12)", borderRadius: "7px", fontSize: "13px",
-  color: "#020C1C", fontFamily: "'Cal Sans', sans-serif", outlineColor: "#10C4C3",
+  color: "#020C1C", fontFamily: "var(--font-body-new)", outlineColor: "#10C4C3",
 };
 
 function UserDetailModal({ user, onClose, onSave, onSubscriptionTierChange }: {
@@ -1054,7 +1115,7 @@ function UserDetailModal({ user, onClose, onSave, onSubscriptionTierChange }: {
     >
       <div
         onClick={e => e.stopPropagation()}
-        style={{ background: "#fff", borderRadius: "20px", border: "1px solid rgba(13,43,31,0.07)", boxShadow: "0 12px 48px rgba(0,0,0,0.22)", width: "100%", maxWidth: "480px", maxHeight: "85vh", overflowY: "auto", padding: "28px 30px", animation: "fadeSlide 0.18s ease-out", fontFamily: "'Cal Sans', sans-serif" }}
+        style={{ background: "#fff", borderRadius: "20px", border: "1px solid rgba(13,43,31,0.07)", boxShadow: "0 12px 48px rgba(0,0,0,0.22)", width: "100%", maxWidth: "480px", maxHeight: "85vh", overflowY: "auto", padding: "28px 30px", animation: "fadeSlide 0.18s ease-out", fontFamily: "var(--font-body-new)" }}
       >
         {/* Header */}
         <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "14px", marginBottom: "20px" }}>
@@ -1063,7 +1124,7 @@ function UserDetailModal({ user, onClose, onSave, onSubscriptionTierChange }: {
               {(user.full_name ?? "?").slice(0, 1).toUpperCase()}
             </div>
             <div style={{ minWidth: 0 }}>
-              <h3 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "24px", fontWeight: 600, color: "#020C1C", lineHeight: 1.2, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+              <h3 style={{ fontFamily: "var(--font-heading-new)", fontSize: "24px", fontWeight: 600, color: "#020C1C", lineHeight: 1.2, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                 {user.full_name ?? "—"}
               </h3>
               <div style={{ display: "flex", alignItems: "center", gap: "8px", marginTop: "5px", flexWrap: "wrap" }}>
@@ -1088,7 +1149,7 @@ function UserDetailModal({ user, onClose, onSave, onSubscriptionTierChange }: {
             {!editing && (
               <button
                 onClick={startEditing}
-                style={{ padding: "7px 14px", borderRadius: "8px", background: "rgba(16,196,195,0.1)", color: "#0B6E96", border: "1.5px solid rgba(16,196,195,0.3)", fontSize: "11px", fontWeight: 700, cursor: "pointer", fontFamily: "'Cal Sans', sans-serif" }}
+                style={{ padding: "7px 14px", borderRadius: "8px", background: "rgba(16,196,195,0.1)", color: "#0B6E96", border: "1.5px solid rgba(16,196,195,0.3)", fontSize: "11px", fontWeight: 700, cursor: "pointer", fontFamily: "var(--font-body-new)" }}
               >
                 Edit
               </button>
@@ -1110,7 +1171,7 @@ function UserDetailModal({ user, onClose, onSave, onSubscriptionTierChange }: {
           style={{
             width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: "8px",
             padding: "10px", borderRadius: "9px", marginBottom: "18px", fontSize: "12px", fontWeight: 700,
-            letterSpacing: "0.04em", fontFamily: "'Cal Sans', sans-serif", cursor: togglingActive ? "not-allowed" : "pointer",
+            letterSpacing: "0.04em", fontFamily: "var(--font-body-new)", cursor: togglingActive ? "not-allowed" : "pointer",
             opacity: togglingActive ? 0.6 : 1,
             background: isActive ? "rgba(239,68,68,0.08)" : "rgba(52,211,153,0.1)",
             color: isActive ? "#B91C1C" : "#065F46",
@@ -1127,7 +1188,7 @@ function UserDetailModal({ user, onClose, onSave, onSubscriptionTierChange }: {
             <select
               value={user.subscription_tier ?? "free"}
               onChange={e => onSubscriptionTierChange(user.id, e.target.value)}
-              style={{ padding: "6px 28px 6px 10px", background: "#fff", border: "1.5px solid rgba(13,43,31,0.15)", borderRadius: "7px", fontSize: "12px", fontWeight: 600, color: "#020C1C", fontFamily: "'Cal Sans', sans-serif", outline: "none", appearance: "none", cursor: "pointer" }}
+              style={{ padding: "6px 28px 6px 10px", background: "#fff", border: "1.5px solid rgba(13,43,31,0.15)", borderRadius: "7px", fontSize: "12px", fontWeight: 600, color: "#020C1C", fontFamily: "var(--font-body-new)", outline: "none", appearance: "none", cursor: "pointer" }}
             >
               <option value="free">Free</option>
               <option value="premium">Premium</option>
@@ -1169,14 +1230,14 @@ function UserDetailModal({ user, onClose, onSave, onSubscriptionTierChange }: {
             <button
               onClick={() => void handleSave()}
               disabled={saving}
-              style={{ flex: 1, padding: "10px", borderRadius: "9px", background: "#10C4C3", color: "#020C1C", border: "none", fontWeight: 700, fontSize: "12px", cursor: saving ? "not-allowed" : "pointer", opacity: saving ? 0.6 : 1, fontFamily: "'Cal Sans', sans-serif" }}
+              style={{ flex: 1, padding: "10px", borderRadius: "9px", background: "#10C4C3", color: "#020C1C", border: "none", fontWeight: 700, fontSize: "12px", cursor: saving ? "not-allowed" : "pointer", opacity: saving ? 0.6 : 1, fontFamily: "var(--font-body-new)" }}
             >
               {saving ? "Saving…" : "Save Changes"}
             </button>
             <button
               onClick={() => setEditing(false)}
               disabled={saving}
-              style={{ flex: 1, padding: "10px", borderRadius: "9px", background: "#F8F6F1", color: "#374151", border: "1px solid rgba(13,43,31,0.1)", fontWeight: 600, fontSize: "12px", cursor: "pointer", fontFamily: "'Cal Sans', sans-serif" }}
+              style={{ flex: 1, padding: "10px", borderRadius: "9px", background: "#F8F6F1", color: "#374151", border: "1px solid rgba(13,43,31,0.1)", fontWeight: 600, fontSize: "12px", cursor: "pointer", fontFamily: "var(--font-body-new)" }}
             >
               Cancel
             </button>
@@ -1276,14 +1337,14 @@ function UsersSection({
             onChange={e => setSearch(e.target.value)}
             placeholder="Search by name, phone, or email…"
             aria-label="Search users by name, phone, or email"
-            style={{ flex: "1 1 240px", padding: "10px 14px", background: "rgba(255,255,255,0.06)", border: "1.5px solid rgba(255,255,255,0.12)", borderRadius: "9px", fontSize: "13px", color: "#FFFFFF", fontFamily: "'Cal Sans', sans-serif", outlineColor: "#10C4C3" }}
+            style={{ flex: "1 1 240px", padding: "10px 14px", background: "rgba(255,255,255,0.06)", border: "1.5px solid rgba(255,255,255,0.12)", borderRadius: "9px", fontSize: "13px", color: "#FFFFFF", fontFamily: "var(--font-body-new)", outlineColor: "#10C4C3" }}
           />
           <div style={{ position: "relative", flexShrink: 0 }}>
             <select
               value={sort}
               onChange={e => setSort(e.target.value as UserSort)}
               aria-label="Sort users"
-              style={{ padding: "10px 30px 10px 12px", background: "rgba(255,255,255,0.06)", border: "1.5px solid rgba(255,255,255,0.12)", borderRadius: "9px", fontSize: "12px", color: "#FFFFFF", fontFamily: "'Cal Sans', sans-serif", outlineColor: "#10C4C3", appearance: "none", cursor: "pointer" }}
+              style={{ padding: "10px 30px 10px 12px", background: "rgba(255,255,255,0.06)", border: "1.5px solid rgba(255,255,255,0.12)", borderRadius: "9px", fontSize: "12px", color: "#FFFFFF", fontFamily: "var(--font-body-new)", outlineColor: "#10C4C3", appearance: "none", cursor: "pointer" }}
             >
               {(Object.keys(USER_SORT_LABELS) as UserSort[]).map(k => (
                 <option key={k} value={k}>{USER_SORT_LABELS[k]}</option>
@@ -1301,7 +1362,7 @@ function UsersSection({
               <button
                 key={r}
                 onClick={() => setRoleFilter(r)}
-                style={{ padding: "5px 12px", borderRadius: "100px", fontSize: "11px", fontWeight: on ? 700 : 500, letterSpacing: "0.03em", background: on ? "#10C4C3" : "rgba(255,255,255,0.06)", color: on ? "#020C1C" : "#A9B4C2", border: on ? "1.5px solid #10C4C3" : "1.5px solid rgba(255,255,255,0.12)", cursor: "pointer", fontFamily: "'Cal Sans', sans-serif", textTransform: "capitalize" as const, transition: "all 0.14s" }}
+                style={{ padding: "5px 12px", borderRadius: "100px", fontSize: "11px", fontWeight: on ? 700 : 500, letterSpacing: "0.03em", background: on ? "#10C4C3" : "rgba(255,255,255,0.06)", color: on ? "#020C1C" : "#A9B4C2", border: on ? "1.5px solid #10C4C3" : "1.5px solid rgba(255,255,255,0.12)", cursor: "pointer", fontFamily: "var(--font-support-new)", textTransform: "capitalize" as const, transition: "all 0.14s" }}
               >
                 {r === "all" ? "All" : r.replace(/_/g, " ")} ({count})
               </button>
@@ -1317,11 +1378,11 @@ function UsersSection({
 
       {users.length === 0 ? (
         <div style={{ padding: "60px 24px", textAlign: "center", background: "rgba(255,255,255,0.05)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", borderRadius: "18px", border: "1px solid rgba(255,255,255,0.08)" }}>
-          <p style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "20px", color: "#FFFFFF" }}>No users found</p>
+          <p style={{ fontFamily: "var(--font-heading-new)", fontSize: "20px", color: "#FFFFFF" }}>No users found</p>
         </div>
       ) : filtered.length === 0 ? (
         <div style={{ padding: "60px 24px", textAlign: "center", background: "rgba(255,255,255,0.05)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", borderRadius: "18px", border: "1px solid rgba(255,255,255,0.08)" }}>
-          <p style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "20px", color: "#FFFFFF", marginBottom: "6px" }}>No users match</p>
+          <p style={{ fontFamily: "var(--font-heading-new)", fontSize: "20px", color: "#FFFFFF", marginBottom: "6px" }}>No users match</p>
           <p style={{ fontSize: "13px", color: "#A9B4C2" }}>Try adjusting the search or role filter.</p>
         </div>
       ) : (
@@ -1337,7 +1398,7 @@ function UsersSection({
             >
               {/* Avatar */}
               <div style={{ position: "relative", flexShrink: 0 }}>
-                <div style={{ width: "40px", height: "40px", borderRadius: "50%", background: "rgba(16,196,195,0.12)", border: "1.5px solid rgba(16,196,195,0.25)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "14px", fontWeight: 700, color: "#10C4C3", fontFamily: "'Cal Sans', sans-serif" }}>
+                <div style={{ width: "40px", height: "40px", borderRadius: "50%", background: "rgba(16,196,195,0.12)", border: "1.5px solid rgba(16,196,195,0.25)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "14px", fontWeight: 700, color: "#10C4C3", fontFamily: "var(--font-body-new)" }}>
                   {(u.full_name ?? "?").slice(0, 1).toUpperCase()}
                 </div>
                 <div style={{ position: "absolute", right: "-2px", bottom: "-2px" }}>
@@ -1361,7 +1422,7 @@ function UsersSection({
                   value={u.role ?? "buyer"}
                   onChange={e => onRoleChange(u.id, e.target.value)}
                   onKeyDown={e => e.stopPropagation()}
-                  style={{ padding: "6px 28px 6px 10px", background: "rgba(255,255,255,0.06)", border: "1.5px solid rgba(255,255,255,0.12)", borderRadius: "7px", fontSize: "12px", color: "#FFFFFF", fontFamily: "'Cal Sans', sans-serif", outline: "none", appearance: "none", cursor: "pointer" }}
+                  style={{ padding: "6px 28px 6px 10px", background: "rgba(255,255,255,0.06)", border: "1.5px solid rgba(255,255,255,0.12)", borderRadius: "7px", fontSize: "12px", color: "#FFFFFF", fontFamily: "var(--font-body-new)", outline: "none", appearance: "none", cursor: "pointer" }}
                 >
                   {ROLE_OPTIONS.map(r => (
                     <option key={r} value={r} style={{ background: "#0A1526", color: "#FFFFFF" }}>{r}</option>
@@ -1391,6 +1452,13 @@ function UsersSection({
 const INQUIRY_STATUS_FILTERS = ["all", "new", "contacted", "closed", "spam"] as const;
 type InquiryStatusFilter = typeof INQUIRY_STATUS_FILTERS[number];
 
+type InquirySort = "newest" | "oldest";
+
+const INQUIRY_SORT_LABELS: Record<InquirySort, string> = {
+  newest: "Newest first",
+  oldest: "Oldest first",
+};
+
 function InquiriesSection({
   inquiries, loading, inFlight, onDelete, onMarkSpam,
 }: {
@@ -1401,16 +1469,59 @@ function InquiriesSection({
   onMarkSpam: (id: string) => void;
 }) {
   const [statusFilter, setStatusFilter] = useState<InquiryStatusFilter>("all");
+  const [search, setSearch] = useState("");
+  const [sort, setSort] = useState<InquirySort>("newest");
 
   const filtered = React.useMemo(() => {
-    if (statusFilter === "all") return inquiries;
-    return inquiries.filter(inq => (inq.status ?? "new") === statusFilter);
-  }, [inquiries, statusFilter]);
+    let list = inquiries;
+    if (statusFilter !== "all") list = list.filter(inq => (inq.status ?? "new") === statusFilter);
+    const q = search.trim().toLowerCase();
+    if (q) {
+      list = list.filter(inq =>
+        (inq.inquirer_name ?? "").toLowerCase().includes(q) ||
+        (inq.inquirer_email ?? "").toLowerCase().includes(q) ||
+        (inq.inquirer_phone ?? "").toLowerCase().includes(q) ||
+        (inq.property_title ?? "").toLowerCase().includes(q)
+      );
+    }
+    const sorted = [...list];
+    if (sort === "newest") sorted.sort((a, b) => (b.created_at ?? "").localeCompare(a.created_at ?? ""));
+    if (sort === "oldest") sorted.sort((a, b) => (a.created_at ?? "").localeCompare(b.created_at ?? ""));
+    return sorted;
+  }, [inquiries, statusFilter, search, sort]);
 
   if (loading) return <Spinner />;
+
+  const filtersActive = search.trim() !== "" || statusFilter !== "all";
+
   return (
     <div>
       <SectionHeading title="All Inquiries" subtitle="Platform-wide buyer inquiries." count={inquiries.length} />
+
+      {/* Search + sort */}
+      <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", alignItems: "center", marginBottom: "12px" }}>
+        <input
+          type="text"
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+          placeholder="Search by name, email, phone, or property…"
+          aria-label="Search inquiries by name, email, phone, or property"
+          style={{ flex: "1 1 240px", padding: "10px 14px", background: "rgba(255,255,255,0.06)", border: "1.5px solid rgba(255,255,255,0.12)", borderRadius: "9px", fontSize: "13px", color: "#FFFFFF", fontFamily: "var(--font-body-new)", outlineColor: "#10C4C3" }}
+        />
+        <div style={{ position: "relative", flexShrink: 0 }}>
+          <select
+            value={sort}
+            onChange={e => setSort(e.target.value as InquirySort)}
+            aria-label="Sort inquiries"
+            style={{ padding: "10px 30px 10px 12px", background: "rgba(255,255,255,0.06)", border: "1.5px solid rgba(255,255,255,0.12)", borderRadius: "9px", fontSize: "12px", color: "#FFFFFF", fontFamily: "var(--font-body-new)", outlineColor: "#10C4C3", appearance: "none", cursor: "pointer" }}
+          >
+            {(Object.keys(INQUIRY_SORT_LABELS) as InquirySort[]).map(k => (
+              <option key={k} value={k}>{INQUIRY_SORT_LABELS[k]}</option>
+            ))}
+          </select>
+          <span style={{ position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)", pointerEvents: "none", color: "rgba(255,255,255,0.45)", fontSize: 9 }}>▼</span>
+        </div>
+      </div>
 
       {/* Status filter pills */}
       <div style={{ display: "flex", gap: "6px", flexWrap: "wrap", marginBottom: "18px" }}>
@@ -1421,17 +1532,25 @@ function InquiriesSection({
             <button
               key={f}
               onClick={() => setStatusFilter(f)}
-              style={{ padding: "5px 12px", borderRadius: "100px", fontSize: "11px", fontWeight: on ? 700 : 500, letterSpacing: "0.03em", background: on ? "#10C4C3" : "rgba(255,255,255,0.06)", color: on ? "#020C1C" : "#A9B4C2", border: on ? "1.5px solid #10C4C3" : "1.5px solid rgba(255,255,255,0.12)", cursor: "pointer", fontFamily: "'Cal Sans', sans-serif", textTransform: "capitalize" as const, transition: "all 0.14s" }}
+              style={{ padding: "5px 12px", borderRadius: "100px", fontSize: "11px", fontWeight: on ? 700 : 500, letterSpacing: "0.03em", background: on ? "#10C4C3" : "rgba(255,255,255,0.06)", color: on ? "#020C1C" : "#A9B4C2", border: on ? "1.5px solid #10C4C3" : "1.5px solid rgba(255,255,255,0.12)", cursor: "pointer", fontFamily: "var(--font-support-new)", textTransform: "capitalize" as const, transition: "all 0.14s" }}
             >
               {f === "all" ? "All" : f} ({count})
             </button>
           );
         })}
       </div>
+      {filtersActive && (
+        <div style={{ fontSize: "12px", color: "#A9B4C2", marginBottom: "12px" }}>
+          {filtered.length} of {inquiries.length} inquiries
+        </div>
+      )}
 
       {filtered.length === 0 ? (
         <div style={{ padding: "60px 24px", textAlign: "center", background: "rgba(255,255,255,0.05)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", borderRadius: "18px", border: "1px solid rgba(255,255,255,0.08)" }}>
-          <p style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "20px", color: "#FFFFFF" }}>No {statusFilter === "all" ? "inquiries" : `${statusFilter} inquiries`} yet</p>
+          <p style={{ fontFamily: "var(--font-heading-new)", fontSize: "20px", color: "#FFFFFF" }}>
+            {search.trim() !== "" ? "No inquiries match" : `No ${statusFilter === "all" ? "inquiries" : `${statusFilter} inquiries`} yet`}
+          </p>
+          {search.trim() !== "" && <p style={{ fontSize: "13px", color: "#A9B4C2", marginTop: "6px" }}>Try adjusting the search or status filter.</p>}
         </div>
       ) : (
         <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
@@ -1443,7 +1562,7 @@ function InquiriesSection({
                 {/* Header */}
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: "12px", flexWrap: "wrap", marginBottom: "10px" }}>
                   <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
-                    <span style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "18px", fontWeight: 600, color: "#FFFFFF" }}>
+                    <span style={{ fontFamily: "var(--font-heading-new)", fontSize: "18px", fontWeight: 600, color: "#FFFFFF" }}>
                       {inq.inquirer_name ?? "Anonymous"}
                     </span>
                     {inq.inquiry_type && (
@@ -1487,7 +1606,7 @@ function InquiriesSection({
                     <button
                       onClick={() => onMarkSpam(inq.id)}
                       disabled={busy}
-                      style={{ display: "flex", alignItems: "center", gap: "6px", padding: "7px 14px", borderRadius: "7px", fontSize: "11px", fontWeight: 600, background: "rgba(245,158,11,0.1)", color: "#F59E0B", border: "1.5px solid rgba(245,158,11,0.3)", cursor: busy ? "not-allowed" : "pointer", fontFamily: "'Cal Sans', sans-serif", opacity: busy ? 0.6 : 1 }}
+                      style={{ display: "flex", alignItems: "center", gap: "6px", padding: "7px 14px", borderRadius: "7px", fontSize: "11px", fontWeight: 600, background: "rgba(245,158,11,0.1)", color: "#F59E0B", border: "1.5px solid rgba(245,158,11,0.3)", cursor: busy ? "not-allowed" : "pointer", fontFamily: "var(--font-body-new)", opacity: busy ? 0.6 : 1 }}
                     >
                       Mark as Spam
                     </button>
@@ -1497,7 +1616,7 @@ function InquiriesSection({
                       if (window.confirm("Permanently delete this inquiry? This cannot be undone.")) onDelete(inq.id);
                     }}
                     disabled={busy}
-                    style={{ display: "flex", alignItems: "center", gap: "6px", padding: "7px 14px", borderRadius: "7px", fontSize: "11px", fontWeight: 600, background: "rgba(248,113,113,0.1)", color: "#F87171", border: "1.5px solid rgba(248,113,113,0.3)", cursor: busy ? "not-allowed" : "pointer", fontFamily: "'Cal Sans', sans-serif", opacity: busy ? 0.6 : 1 }}
+                    style={{ display: "flex", alignItems: "center", gap: "6px", padding: "7px 14px", borderRadius: "7px", fontSize: "11px", fontWeight: 600, background: "rgba(248,113,113,0.1)", color: "#F87171", border: "1.5px solid rgba(248,113,113,0.3)", cursor: busy ? "not-allowed" : "pointer", fontFamily: "var(--font-body-new)", opacity: busy ? 0.6 : 1 }}
                   >
                     <IconReject /> Delete
                   </button>
@@ -1517,22 +1636,23 @@ const AGENT_STATUS_FILTERS = ["pending", "approved", "rejected"] as const;
 type AgentStatusFilter = typeof AGENT_STATUS_FILTERS[number];
 
 function AgentCard({
-  app, inFlight, actions,
+  app, inFlight, actions, documents,
 }: {
   app: AgentApplication;
   inFlight: boolean;
   actions: React.ReactNode;
+  documents: AgentDocumentRow[];
 }) {
   const cities = (app.agent_service_cities ?? []).map(c => c.city);
   return (
-    <div style={{ background: "rgba(255,255,255,0.05)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", borderRadius: "14px", border: "1px solid rgba(255,255,255,0.08)", boxShadow: "0 4px 24px rgba(0,0,0,0.18)", padding: "18px 22px", opacity: inFlight ? 0.55 : 1, transition: "opacity 0.2s" }}>
+    <div style={{ background: "rgba(255,255,255,0.05)", backdropFilter: "blur(24px)", WebkitBackdropFilter: "blur(24px)", borderRadius: "16px", border: "1px solid rgba(255,255,255,0.08)", boxShadow: "0 4px 24px rgba(0,0,0,0.18)", padding: "18px 22px", opacity: inFlight ? 0.55 : 1, transition: "opacity 0.2s" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: "12px", flexWrap: "wrap", marginBottom: "10px" }}>
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px", flexWrap: "wrap" }}>
             <StatusBadge status={app.status === "approved" ? "active" : app.status === "pending" ? "pending_review" : "rejected"} />
             <span style={{ fontSize: "11px", color: "rgba(255,255,255,0.45)" }}>{fmtDate(app.created_at)}</span>
           </div>
-          <h3 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "19px", fontWeight: 600, color: "#FFFFFF", lineHeight: 1.25, marginBottom: "4px" }}>
+          <h3 style={{ fontFamily: "var(--font-heading-new)", fontSize: "19px", fontWeight: 600, color: "#FFFFFF", lineHeight: 1.25, marginBottom: "4px" }}>
             {app.profiles?.full_name ?? "Unnamed applicant"}
           </h3>
           <div style={{ display: "flex", gap: "14px", fontSize: "12px", color: "#A9B4C2", flexWrap: "wrap" }}>
@@ -1564,6 +1684,32 @@ function AgentCard({
         </div>
       )}
 
+      {/* KYC Documents — visibility only, no bearing on approve/reject.
+          Same 4-item checklist as the agent's own profile page. */}
+      <div style={{ marginBottom: "10px" }}>
+        <div style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: "#6B7686", marginBottom: "6px" }}>KYC Documents</div>
+        <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+          {KYC_DOCUMENT_TYPES.map(slot => {
+            // documents is created_at desc for this agent, so the first
+            // match per type is the most recent — same logic as the
+            // agent's own profile page.
+            const doc = documents.find(d => d.document_type === slot.key);
+            return (
+              <div key={slot.key} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: "11px" }}>
+                <span style={{ color: "#A9B4C2" }}>{slot.label}</span>
+                {doc ? (
+                  <a href={doc.file_url} target="_blank" rel="noopener noreferrer" style={{ color: "#4ADE80", textDecoration: "none", fontWeight: 600 }}>
+                    ✓ Uploaded ({fmtDate(doc.created_at)})
+                  </a>
+                ) : (
+                  <span style={{ color: "#6B7686" }}>Not uploaded</span>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
       <div style={{ display: "flex", gap: "8px", alignItems: "center", flexWrap: "wrap" }}>
         {actions}
       </div>
@@ -1584,7 +1730,7 @@ function CityMultiSelect({ selected, onChange }: { selected: string[]; onChange:
             type="button"
             key={city}
             onClick={() => toggle(city)}
-            style={{ padding: "6px 14px", borderRadius: "100px", fontSize: "12px", fontWeight: on ? 700 : 500, background: on ? "#10C4C3" : "rgba(255,255,255,0.06)", color: on ? "#020C1C" : "#A9B4C2", border: on ? "1.5px solid #10C4C3" : "1.5px solid rgba(255,255,255,0.12)", cursor: "pointer", fontFamily: "'Cal Sans', sans-serif" }}
+            style={{ padding: "6px 14px", borderRadius: "100px", fontSize: "12px", fontWeight: on ? 700 : 500, background: on ? "#10C4C3" : "rgba(255,255,255,0.06)", color: on ? "#020C1C" : "#A9B4C2", border: on ? "1.5px solid #10C4C3" : "1.5px solid rgba(255,255,255,0.12)", cursor: "pointer", fontFamily: "var(--font-support-new)" }}
           >
             {city}
           </button>
@@ -1597,7 +1743,7 @@ function CityMultiSelect({ selected, onChange }: { selected: string[]; onChange:
 const inputStyle: React.CSSProperties = {
   width: "100%", padding: "10px 14px", background: "rgba(255,255,255,0.06)",
   border: "1.5px solid rgba(255,255,255,0.12)", borderRadius: "9px", fontSize: "13px",
-  color: "#FFFFFF", fontFamily: "'Cal Sans', sans-serif", outlineColor: "#10C4C3",
+  color: "#FFFFFF", fontFamily: "var(--font-body-new)", outlineColor: "#10C4C3",
 };
 
 const labelStyle: React.CSSProperties = {
@@ -1663,10 +1809,10 @@ function AddAgentModal({ onClose, onSubmit }: {
     >
       <div
         onClick={e => e.stopPropagation()}
-        style={{ background: "#0A1526", borderRadius: "18px", border: "1px solid rgba(255,255,255,0.1)", boxShadow: "0 12px 48px rgba(0,0,0,0.5)", width: "100%", maxWidth: "520px", maxHeight: "88vh", overflowY: "auto", padding: "26px 28px", animation: "fadeSlide 0.18s ease-out", fontFamily: "'Cal Sans', sans-serif" }}
+        style={{ background: "#0A1526", borderRadius: "18px", border: "1px solid rgba(255,255,255,0.1)", boxShadow: "0 12px 48px rgba(0,0,0,0.5)", width: "100%", maxWidth: "520px", maxHeight: "88vh", overflowY: "auto", padding: "26px 28px", animation: "fadeSlide 0.18s ease-out", fontFamily: "var(--font-body-new)" }}
       >
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
-          <h3 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "24px", fontWeight: 600, color: "#FFFFFF" }}>Add Agent Manually</h3>
+          <h3 style={{ fontFamily: "var(--font-heading-new)", fontSize: "24px", fontWeight: 600, color: "#FFFFFF" }}>Add Agent Manually</h3>
           <button onClick={onClose} aria-label="Close" style={{ width: "30px", height: "30px", borderRadius: "8px", background: "rgba(255,255,255,0.06)", border: "none", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: "#FFFFFF" }}>
             <IconX />
           </button>
@@ -1690,7 +1836,7 @@ function AddAgentModal({ onClose, onSubmit }: {
                   <button
                     key={r.id}
                     onClick={() => setSelectedUser(r)}
-                    style={{ textAlign: "left", padding: "10px 14px", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "9px", cursor: "pointer", color: "#FFFFFF", fontFamily: "'Cal Sans', sans-serif" }}
+                    style={{ textAlign: "left", padding: "10px 14px", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "9px", cursor: "pointer", color: "#FFFFFF", fontFamily: "var(--font-body-new)" }}
                   >
                     <div style={{ fontWeight: 600, fontSize: "13px" }}>{r.full_name ?? "—"}</div>
                     <div style={{ fontSize: "11px", color: "#A9B4C2" }}>{[r.phone, r.email].filter(Boolean).join(" · ")} {r.role && `· ${r.role}`}</div>
@@ -1709,7 +1855,7 @@ function AddAgentModal({ onClose, onSubmit }: {
                 <div style={{ fontWeight: 600, fontSize: "13px", color: "#FFFFFF" }}>{selectedUser.full_name ?? "—"}</div>
                 <div style={{ fontSize: "11px", color: "#A9B4C2" }}>{[selectedUser.phone, selectedUser.email].filter(Boolean).join(" · ")}</div>
               </div>
-              <button onClick={() => setSelectedUser(null)} style={{ fontSize: "11px", color: "#10C4C3", background: "none", border: "none", cursor: "pointer", fontFamily: "'Cal Sans', sans-serif" }}>Change</button>
+              <button onClick={() => setSelectedUser(null)} style={{ fontSize: "11px", color: "#10C4C3", background: "none", border: "none", cursor: "pointer", fontFamily: "var(--font-body-new)" }}>Change</button>
             </div>
 
             <div>
@@ -1738,7 +1884,7 @@ function AddAgentModal({ onClose, onSubmit }: {
             <button
               onClick={() => void handleSubmit()}
               disabled={submitting}
-              style={{ padding: "12px", borderRadius: "9px", background: "#10C4C3", color: "#020C1C", border: "none", fontWeight: 700, fontSize: "13px", letterSpacing: "0.04em", cursor: submitting ? "not-allowed" : "pointer", opacity: submitting ? 0.6 : 1, fontFamily: "'Cal Sans', sans-serif" }}
+              style={{ padding: "12px", borderRadius: "9px", background: "#10C4C3", color: "#020C1C", border: "none", fontWeight: 700, fontSize: "13px", letterSpacing: "0.04em", cursor: submitting ? "not-allowed" : "pointer", opacity: submitting ? 0.6 : 1, fontFamily: "var(--font-body-new)" }}
             >
               {submitting ? "Adding…" : "Add Agent"}
             </button>
@@ -1750,7 +1896,7 @@ function AddAgentModal({ onClose, onSubmit }: {
 }
 
 function AgentsSection({
-  applications, loading, inFlight, onApprove, onReject, onAddAgent,
+  applications, loading, inFlight, onApprove, onReject, onAddAgent, documentsByProfile,
 }: {
   applications: AgentApplication[];
   loading: boolean;
@@ -1761,6 +1907,7 @@ function AgentsSection({
     userId: string; licenseNumber: string; agencyName: string; bio: string;
     yearsExperience: string; cities: string[];
   }) => Promise<{ ok: boolean; error?: string }>;
+  documentsByProfile: Record<string, AgentDocumentRow[]>;
 }) {
   const [filter, setFilter] = useState<AgentStatusFilter>("pending");
   const [showAddModal, setShowAddModal] = useState(false);
@@ -1781,7 +1928,7 @@ function AgentsSection({
               <button
                 key={f}
                 onClick={() => setFilter(f)}
-                style={{ padding: "6px 14px", borderRadius: "100px", fontSize: "11px", fontWeight: on ? 700 : 500, background: on ? "#10C4C3" : "rgba(255,255,255,0.06)", color: on ? "#020C1C" : "#A9B4C2", border: on ? "1.5px solid #10C4C3" : "1.5px solid rgba(255,255,255,0.12)", cursor: "pointer", fontFamily: "'Cal Sans', sans-serif", textTransform: "capitalize" as const }}
+                style={{ padding: "6px 14px", borderRadius: "100px", fontSize: "11px", fontWeight: on ? 700 : 500, background: on ? "#10C4C3" : "rgba(255,255,255,0.06)", color: on ? "#020C1C" : "#A9B4C2", border: on ? "1.5px solid #10C4C3" : "1.5px solid rgba(255,255,255,0.12)", cursor: "pointer", fontFamily: "var(--font-support-new)", textTransform: "capitalize" as const }}
               >
                 {f} ({applications.filter(a => a.status === f).length})
               </button>
@@ -1790,7 +1937,7 @@ function AgentsSection({
         </div>
         <button
           onClick={() => setShowAddModal(true)}
-          style={{ display: "flex", alignItems: "center", gap: "6px", padding: "9px 18px", borderRadius: "8px", fontSize: "12px", fontWeight: 700, letterSpacing: "0.04em", background: "rgba(16,196,195,0.1)", color: "#10C4C3", border: "1.5px solid rgba(16,196,195,0.3)", cursor: "pointer", fontFamily: "'Cal Sans', sans-serif" }}
+          style={{ display: "flex", alignItems: "center", gap: "6px", padding: "9px 18px", borderRadius: "8px", fontSize: "12px", fontWeight: 700, letterSpacing: "0.04em", background: "rgba(16,196,195,0.1)", color: "#10C4C3", border: "1.5px solid rgba(16,196,195,0.3)", cursor: "pointer", fontFamily: "var(--font-body-new)" }}
         >
           + Add Agent Manually
         </button>
@@ -1798,7 +1945,7 @@ function AgentsSection({
 
       {filtered.length === 0 ? (
         <div style={{ padding: "60px 24px", textAlign: "center", background: "rgba(255,255,255,0.05)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", borderRadius: "18px", border: "1px solid rgba(255,255,255,0.08)" }}>
-          <p style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "20px", color: "#FFFFFF" }}>No {filter} applications</p>
+          <p style={{ fontFamily: "var(--font-heading-new)", fontSize: "20px", color: "#FFFFFF" }}>No {filter} applications</p>
         </div>
       ) : (
         <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
@@ -1807,20 +1954,21 @@ function AgentsSection({
               key={app.id}
               app={app}
               inFlight={inFlight === app.id}
+              documents={documentsByProfile[app.id] ?? []}
               actions={
                 filter === "pending" ? (
                   <>
                     <button
                       onClick={() => onApprove(app.id, app.user_id)}
                       disabled={inFlight === app.id}
-                      style={{ display: "flex", alignItems: "center", gap: "6px", padding: "7px 16px", borderRadius: "7px", fontSize: "11px", fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase" as const, background: "#10C4C3", color: "#020C1C", border: "none", cursor: inFlight === app.id ? "not-allowed" : "pointer", fontFamily: "'Cal Sans', sans-serif", opacity: inFlight === app.id ? 0.6 : 1 }}
+                      style={{ display: "flex", alignItems: "center", gap: "6px", padding: "7px 16px", borderRadius: "7px", fontSize: "11px", fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase" as const, background: "#10C4C3", color: "#020C1C", border: "none", cursor: inFlight === app.id ? "not-allowed" : "pointer", fontFamily: "var(--font-body-new)", opacity: inFlight === app.id ? 0.6 : 1 }}
                     >
                       <IconApprove /> Approve
                     </button>
                     <button
                       onClick={() => onReject(app.id)}
                       disabled={inFlight === app.id}
-                      style={{ display: "flex", alignItems: "center", gap: "6px", padding: "7px 16px", borderRadius: "7px", fontSize: "11px", fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase" as const, background: "rgba(248,113,113,0.1)", color: "#F87171", border: "1.5px solid rgba(248,113,113,0.3)", cursor: inFlight === app.id ? "not-allowed" : "pointer", fontFamily: "'Cal Sans', sans-serif", opacity: inFlight === app.id ? 0.6 : 1 }}
+                      style={{ display: "flex", alignItems: "center", gap: "6px", padding: "7px 16px", borderRadius: "7px", fontSize: "11px", fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase" as const, background: "rgba(248,113,113,0.1)", color: "#F87171", border: "1.5px solid rgba(248,113,113,0.3)", cursor: inFlight === app.id ? "not-allowed" : "pointer", fontFamily: "var(--font-body-new)", opacity: inFlight === app.id ? 0.6 : 1 }}
                     >
                       <IconReject /> Reject
                     </button>
@@ -1844,11 +1992,31 @@ function AgentsSection({
 
 // ── Section: Reports ─────────────────────────────────────────────────────────────
 
-const REPORT_STATUS_FILTERS = ["open", "resolved", "dismissed"] as const;
+// Order matches the compliance brief's flow: Received(open) ->
+// Acknowledged -> Frozen -> Under Review -> Resolved/Rejected
+// (resolved/dismissed). The original three tabs' position, label, and
+// count-badge behavior are unchanged — only three tabs were inserted.
+const REPORT_STATUS_FILTERS = ["open", "acknowledged", "frozen", "under_review", "resolved", "dismissed"] as const;
 type ReportStatusFilter = typeof REPORT_STATUS_FILTERS[number];
 
+// Badge colors for the new statuses — reusing the codebase's existing
+// blue accent (StatCard's "blue": #3B82F6, admin/page.tsx:299) for
+// Acknowledged, plus two new cool-toned colors (sky/violet) so all six
+// statuses stay visually distinct without touching the pill shape/
+// typography pattern already established for open/resolved/dismissed.
+const REPORT_STATUS_BADGE: Record<ReportRow["status"], { bg: string; color: string; border: string }> = {
+  open:          { bg: "rgba(245,158,11,0.15)",  color: "#F59E0B", border: "rgba(245,158,11,0.3)" },
+  acknowledged:  { bg: "rgba(59,130,246,0.15)",   color: "#3B82F6", border: "rgba(59,130,246,0.3)" },
+  frozen:        { bg: "rgba(56,189,248,0.15)",   color: "#38BDF8", border: "rgba(56,189,248,0.3)" },
+  under_review:  { bg: "rgba(167,139,250,0.15)",  color: "#A78BFA", border: "rgba(167,139,250,0.3)" },
+  resolved:      { bg: "rgba(52,211,153,0.15)",   color: "#34D399", border: "rgba(52,211,153,0.3)" },
+  dismissed:     { bg: "rgba(255,255,255,0.08)",  color: "#A9B4C2", border: "rgba(255,255,255,0.12)" },
+};
+
 function ReportCard({
-  report, listingPreview, profilePreview, busy, onDismiss, onResolve, onRejectListing, onDeactivateUser,
+  report, listingPreview, profilePreview, busy,
+  onDismiss, onResolve, onRejectListing, onDeactivateUser,
+  onAcknowledge, onMoveUnderReview, onFreezeListing, onUnfreezeListing,
 }: {
   report: ReportRow;
   listingPreview: ReportListingPreview | undefined;
@@ -1858,18 +2026,42 @@ function ReportCard({
   onResolve: () => void;
   onRejectListing: () => void;
   onDeactivateUser: () => void;
+  onAcknowledge: () => void;
+  onMoveUnderReview: () => void;
+  onFreezeListing: () => void;
+  onUnfreezeListing: () => void;
 }) {
   const isOpen = report.status === "open";
+  // "Actionable" broadens the old isOpen-only gate so a report doesn't
+  // become a dead end once it leaves 'open' — Resolve/Dismiss/Reject
+  // Listing/Deactivate User keep doing exactly what they did before
+  // (same transitions, same confirms, same audit log calls); they're
+  // now also reachable from the three new intermediate statuses, not
+  // just from 'open'.
+  const isActionable = report.status !== "resolved" && report.status !== "dismissed";
+  const isListingFrozen = listingPreview?.status === "frozen";
+  const badge = REPORT_STATUS_BADGE[report.status];
+  const now = Date.now();
   return (
-    <div style={{ background: "rgba(255,255,255,0.05)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", borderRadius: "14px", border: "1px solid rgba(255,255,255,0.08)", boxShadow: "0 4px 24px rgba(0,0,0,0.18)", padding: "18px 22px", opacity: busy ? 0.55 : 1, transition: "opacity 0.2s" }}>
+    <div style={{ background: "rgba(255,255,255,0.05)", backdropFilter: "blur(24px)", WebkitBackdropFilter: "blur(24px)", borderRadius: "16px", border: "1px solid rgba(255,255,255,0.08)", boxShadow: "0 4px 24px rgba(0,0,0,0.18)", padding: "18px 22px", opacity: busy ? 0.55 : 1, transition: "opacity 0.2s" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: "12px", flexWrap: "wrap", marginBottom: "10px" }}>
         <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
-          <span style={{ display: "inline-block", padding: "2px 8px", borderRadius: "100px", fontSize: "9px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" as const, background: report.status === "open" ? "rgba(245,158,11,0.15)" : report.status === "resolved" ? "rgba(52,211,153,0.15)" : "rgba(255,255,255,0.08)", color: report.status === "open" ? "#F59E0B" : report.status === "resolved" ? "#34D399" : "#A9B4C2", border: `1px solid ${report.status === "open" ? "rgba(245,158,11,0.3)" : report.status === "resolved" ? "rgba(52,211,153,0.3)" : "rgba(255,255,255,0.12)"}` }}>
-            {report.status}
+          <span style={{ display: "inline-block", padding: "2px 8px", borderRadius: "100px", fontSize: "9px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" as const, background: badge.bg, color: badge.color, border: `1px solid ${badge.border}` }}>
+            {report.status.replace("_", " ")}
           </span>
+          {isListingFrozen && report.entity_type === "listing" && (
+            <span style={{ display: "inline-block", padding: "2px 8px", borderRadius: "100px", fontSize: "9px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" as const, background: "rgba(56,189,248,0.12)", color: "#38BDF8", border: "1px solid rgba(56,189,248,0.25)" }}>
+              Listing Frozen
+            </span>
+          )}
           <span style={{ display: "inline-block", padding: "2px 8px", borderRadius: "100px", fontSize: "9px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" as const, background: "rgba(16,196,195,0.12)", color: "#10C4C3", border: "1px solid rgba(16,196,195,0.25)" }}>
             {report.entity_type}
           </span>
+          {report.request_type === "deletion_request" && (
+            <span style={{ display: "inline-block", padding: "2px 8px", borderRadius: "100px", fontSize: "9px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" as const, background: "rgba(251,191,36,0.15)", color: "#FBBF24", border: "1px solid rgba(251,191,36,0.30)" }}>
+              Deletion Request
+            </span>
+          )}
           <span style={{ fontSize: "12px", fontWeight: 600, color: "#FFFFFF" }}>{report.reason}</span>
         </div>
         <span style={{ fontSize: "11px", color: "rgba(255,255,255,0.45)", flexShrink: 0 }}>{fmtDateTime(report.created_at)}</span>
@@ -1910,19 +2102,84 @@ function ReportCard({
         </div>
       )}
 
-      {isOpen && (
+      {(report.sla_acknowledge_due_at || report.sla_resolve_due_at) && (
+        <div style={{ display: "flex", gap: "14px", flexWrap: "wrap", fontSize: "11px", marginBottom: "10px" }}>
+          {report.sla_acknowledge_due_at && (() => {
+            const overdue = isActionable && new Date(report.sla_acknowledge_due_at).getTime() < now;
+            return (
+              <span style={{ color: overdue ? "#F87171" : "rgba(255,255,255,0.45)", fontWeight: overdue ? 700 : 400 }}>
+                Acknowledge SLA: {fmtDateTime(report.sla_acknowledge_due_at)}{overdue ? " · Overdue" : ""}
+              </span>
+            );
+          })()}
+          {report.sla_resolve_due_at && (() => {
+            const overdue = isActionable && new Date(report.sla_resolve_due_at).getTime() < now;
+            return (
+              <span style={{ color: overdue ? "#F87171" : "rgba(255,255,255,0.45)", fontWeight: overdue ? 700 : 400 }}>
+                Resolve SLA: {fmtDateTime(report.sla_resolve_due_at)}{overdue ? " · Overdue" : ""}
+              </span>
+            );
+          })()}
+        </div>
+      )}
+
+      {isActionable && (
         <div style={{ display: "flex", gap: "8px", alignItems: "center", flexWrap: "wrap" }}>
+          {report.status === "open" && (
+            <button
+              onClick={onAcknowledge}
+              disabled={busy}
+              style={{ display: "flex", alignItems: "center", gap: "6px", padding: "7px 14px", borderRadius: "7px", fontSize: "11px", fontWeight: 600, background: "rgba(59,130,246,0.12)", color: "#3B82F6", border: "1.5px solid rgba(59,130,246,0.3)", cursor: busy ? "not-allowed" : "pointer", fontFamily: "var(--font-body-new)", opacity: busy ? 0.6 : 1 }}
+            >
+              Acknowledge
+            </button>
+          )}
+          {report.status !== "under_review" && (
+            <button
+              onClick={onMoveUnderReview}
+              disabled={busy}
+              style={{ display: "flex", alignItems: "center", gap: "6px", padding: "7px 14px", borderRadius: "7px", fontSize: "11px", fontWeight: 600, background: "rgba(167,139,250,0.12)", color: "#A78BFA", border: "1.5px solid rgba(167,139,250,0.3)", cursor: busy ? "not-allowed" : "pointer", fontFamily: "var(--font-body-new)", opacity: busy ? 0.6 : 1 }}
+            >
+              Move to Under Review
+            </button>
+          )}
+          {report.entity_type === "listing" && (
+            isListingFrozen ? (
+              <button
+                onClick={() => {
+                  if (window.confirm("Unfreeze this listing and restore it to active?")) onUnfreezeListing();
+                }}
+                disabled={busy}
+                style={{ display: "flex", alignItems: "center", gap: "6px", padding: "7px 14px", borderRadius: "7px", fontSize: "11px", fontWeight: 700, background: "#38BDF8", color: "#020C1C", border: "none", cursor: busy ? "not-allowed" : "pointer", fontFamily: "var(--font-body-new)", opacity: busy ? 0.6 : 1 }}
+              >
+                Unfreeze
+              </button>
+            ) : listingPreview && (
+              <button
+                onClick={() => {
+                  // Deliberately distinct from "Reject Listing" below:
+                  // freeze is reversible (Unfreeze restores 'active'),
+                  // reject is not undoable from this panel.
+                  if (window.confirm("Freeze this listing (hide it from public view, reversible) and mark the report Frozen?")) onFreezeListing();
+                }}
+                disabled={busy}
+                style={{ display: "flex", alignItems: "center", gap: "6px", padding: "7px 14px", borderRadius: "7px", fontSize: "11px", fontWeight: 600, background: "rgba(56,189,248,0.12)", color: "#38BDF8", border: "1.5px solid rgba(56,189,248,0.3)", cursor: busy ? "not-allowed" : "pointer", fontFamily: "var(--font-body-new)", opacity: busy ? 0.6 : 1 }}
+              >
+                Freeze Listing
+              </button>
+            )
+          )}
           <button
             onClick={onResolve}
             disabled={busy}
-            style={{ display: "flex", alignItems: "center", gap: "6px", padding: "7px 14px", borderRadius: "7px", fontSize: "11px", fontWeight: 700, background: "#10C4C3", color: "#020C1C", border: "none", cursor: busy ? "not-allowed" : "pointer", fontFamily: "'Cal Sans', sans-serif", opacity: busy ? 0.6 : 1 }}
+            style={{ display: "flex", alignItems: "center", gap: "6px", padding: "7px 14px", borderRadius: "7px", fontSize: "11px", fontWeight: 700, background: "#10C4C3", color: "#020C1C", border: "none", cursor: busy ? "not-allowed" : "pointer", fontFamily: "var(--font-body-new)", opacity: busy ? 0.6 : 1 }}
           >
             <IconApprove /> Resolve
           </button>
           <button
             onClick={onDismiss}
             disabled={busy}
-            style={{ display: "flex", alignItems: "center", gap: "6px", padding: "7px 14px", borderRadius: "7px", fontSize: "11px", fontWeight: 600, background: "rgba(255,255,255,0.06)", color: "#A9B4C2", border: "1.5px solid rgba(255,255,255,0.12)", cursor: busy ? "not-allowed" : "pointer", fontFamily: "'Cal Sans', sans-serif", opacity: busy ? 0.6 : 1 }}
+            style={{ display: "flex", alignItems: "center", gap: "6px", padding: "7px 14px", borderRadius: "7px", fontSize: "11px", fontWeight: 600, background: "rgba(255,255,255,0.06)", color: "#A9B4C2", border: "1.5px solid rgba(255,255,255,0.12)", cursor: busy ? "not-allowed" : "pointer", fontFamily: "var(--font-body-new)", opacity: busy ? 0.6 : 1 }}
           >
             Dismiss
           </button>
@@ -1932,7 +2189,7 @@ function ReportCard({
                 if (window.confirm("Reject this listing and resolve the report?")) onRejectListing();
               }}
               disabled={busy}
-              style={{ display: "flex", alignItems: "center", gap: "6px", padding: "7px 14px", borderRadius: "7px", fontSize: "11px", fontWeight: 600, background: "rgba(248,113,113,0.1)", color: "#F87171", border: "1.5px solid rgba(248,113,113,0.3)", cursor: busy ? "not-allowed" : "pointer", fontFamily: "'Cal Sans', sans-serif", opacity: busy ? 0.6 : 1 }}
+              style={{ display: "flex", alignItems: "center", gap: "6px", padding: "7px 14px", borderRadius: "7px", fontSize: "11px", fontWeight: 600, background: "rgba(248,113,113,0.1)", color: "#F87171", border: "1.5px solid rgba(248,113,113,0.3)", cursor: busy ? "not-allowed" : "pointer", fontFamily: "var(--font-body-new)", opacity: busy ? 0.6 : 1 }}
             >
               <IconReject /> Reject Listing
             </button>
@@ -1943,7 +2200,7 @@ function ReportCard({
                 if (window.confirm("Deactivate this user's account and resolve the report?")) onDeactivateUser();
               }}
               disabled={busy}
-              style={{ display: "flex", alignItems: "center", gap: "6px", padding: "7px 14px", borderRadius: "7px", fontSize: "11px", fontWeight: 600, background: "rgba(248,113,113,0.1)", color: "#F87171", border: "1.5px solid rgba(248,113,113,0.3)", cursor: busy ? "not-allowed" : "pointer", fontFamily: "'Cal Sans', sans-serif", opacity: busy ? 0.6 : 1 }}
+              style={{ display: "flex", alignItems: "center", gap: "6px", padding: "7px 14px", borderRadius: "7px", fontSize: "11px", fontWeight: 600, background: "rgba(248,113,113,0.1)", color: "#F87171", border: "1.5px solid rgba(248,113,113,0.3)", cursor: busy ? "not-allowed" : "pointer", fontFamily: "var(--font-body-new)", opacity: busy ? 0.6 : 1 }}
             >
               Deactivate User
             </button>
@@ -1957,6 +2214,7 @@ function ReportCard({
 function ReportsSection({
   reports, loading, inFlight, listingPreviews, profilePreviews,
   onDismiss, onResolve, onRejectListing, onDeactivateUser,
+  onAcknowledge, onMoveUnderReview, onFreezeListing, onUnfreezeListing,
 }: {
   reports: ReportRow[];
   loading: boolean;
@@ -1967,9 +2225,19 @@ function ReportsSection({
   onResolve: (id: string) => void;
   onRejectListing: (report: ReportRow) => void;
   onDeactivateUser: (report: ReportRow) => void;
+  onAcknowledge: (id: string) => void;
+  onMoveUnderReview: (id: string) => void;
+  onFreezeListing: (report: ReportRow) => void;
+  onUnfreezeListing: (report: ReportRow) => void;
 }) {
   const [filter, setFilter] = useState<ReportStatusFilter>("open");
-  const filtered = reports.filter(r => r.status === filter);
+  // Secondary, additive filter — doesn't touch the existing status tabs.
+  // "Deletion Requests" narrows to request_type = 'deletion_request'
+  // (migration 033); "All Types" (default) shows everything, general
+  // reports and deletion requests together, distinguished only by the
+  // ReportCard tag.
+  const [typeFilter, setTypeFilter] = useState<"all" | "deletion_request">("all");
+  const filtered = reports.filter(r => r.status === filter && (typeFilter === "all" || r.request_type === typeFilter));
 
   if (loading) return <Spinner />;
 
@@ -1977,16 +2245,31 @@ function ReportsSection({
     <div>
       <SectionHeading title="Reports" subtitle="User-submitted reports on listings and profiles." count={filtered.length} />
 
-      <div style={{ display: "flex", gap: "6px", flexWrap: "wrap", marginBottom: "18px" }}>
+      <div style={{ display: "flex", gap: "6px", flexWrap: "wrap", marginBottom: "10px" }}>
         {REPORT_STATUS_FILTERS.map(f => {
           const on = filter === f;
           return (
             <button
               key={f}
               onClick={() => setFilter(f)}
-              style={{ padding: "6px 14px", borderRadius: "100px", fontSize: "11px", fontWeight: on ? 700 : 500, background: on ? "#10C4C3" : "rgba(255,255,255,0.06)", color: on ? "#020C1C" : "#A9B4C2", border: on ? "1.5px solid #10C4C3" : "1.5px solid rgba(255,255,255,0.12)", cursor: "pointer", fontFamily: "'Cal Sans', sans-serif", textTransform: "capitalize" as const }}
+              style={{ padding: "6px 14px", borderRadius: "100px", fontSize: "11px", fontWeight: on ? 700 : 500, background: on ? "#10C4C3" : "rgba(255,255,255,0.06)", color: on ? "#020C1C" : "#A9B4C2", border: on ? "1.5px solid #10C4C3" : "1.5px solid rgba(255,255,255,0.12)", cursor: "pointer", fontFamily: "var(--font-support-new)", textTransform: "capitalize" as const }}
             >
-              {f} ({reports.filter(r => r.status === f).length})
+              {f.replace("_", " ")} ({reports.filter(r => r.status === f).length})
+            </button>
+          );
+        })}
+      </div>
+
+      <div style={{ display: "flex", gap: "6px", flexWrap: "wrap", marginBottom: "18px" }}>
+        {([["all", "All Types"], ["deletion_request", "Deletion Requests"]] as const).map(([v, label]) => {
+          const on = typeFilter === v;
+          return (
+            <button
+              key={v}
+              onClick={() => setTypeFilter(v)}
+              style={{ padding: "5px 12px", borderRadius: "100px", fontSize: "10px", fontWeight: on ? 700 : 500, background: on ? "rgba(251,191,36,0.15)" : "rgba(255,255,255,0.04)", color: on ? "#FBBF24" : "#6B7686", border: on ? "1.5px solid rgba(251,191,36,0.35)" : "1px solid rgba(255,255,255,0.10)", cursor: "pointer", fontFamily: "var(--font-support-new)" }}
+            >
+              {label}
             </button>
           );
         })}
@@ -1994,7 +2277,7 @@ function ReportsSection({
 
       {filtered.length === 0 ? (
         <div style={{ padding: "60px 24px", textAlign: "center", background: "rgba(255,255,255,0.05)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", borderRadius: "18px", border: "1px solid rgba(255,255,255,0.08)" }}>
-          <p style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "20px", color: "#FFFFFF" }}>No {filter} reports</p>
+          <p style={{ fontFamily: "var(--font-heading-new)", fontSize: "20px", color: "#FFFFFF" }}>No {filter} reports</p>
         </div>
       ) : (
         <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
@@ -2009,6 +2292,10 @@ function ReportsSection({
               onResolve={() => onResolve(r.id)}
               onRejectListing={() => onRejectListing(r)}
               onDeactivateUser={() => onDeactivateUser(r)}
+              onAcknowledge={() => onAcknowledge(r.id)}
+              onMoveUnderReview={() => onMoveUnderReview(r.id)}
+              onFreezeListing={() => onFreezeListing(r)}
+              onUnfreezeListing={() => onUnfreezeListing(r)}
             />
           ))}
         </div>
@@ -2025,7 +2312,7 @@ function DiffBlock({ label, data }: { label: string; data: Record<string, unknow
   return (
     <div style={{ flex: "1 1 200px", minWidth: 0 }}>
       <div style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: "rgba(255,255,255,0.45)", marginBottom: "6px" }}>{label}</div>
-      <pre style={{ margin: 0, fontSize: "11px", lineHeight: 1.6, color: "#A9B4C2", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: "8px", padding: "10px 12px", overflowX: "auto", fontFamily: "'Cal Sans', sans-serif" }}>
+      <pre style={{ margin: 0, fontSize: "11px", lineHeight: 1.6, color: "#A9B4C2", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: "8px", padding: "10px 12px", overflowX: "auto", fontFamily: "var(--font-body-new)" }}>
         {data ? JSON.stringify(data, null, 2) : "—"}
       </pre>
     </div>
@@ -2038,7 +2325,7 @@ function AuditLogRow_({ entry }: { entry: AuditLogRow }) {
     <div style={{ background: "rgba(255,255,255,0.05)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", borderRadius: "12px", border: "1px solid rgba(255,255,255,0.08)", overflow: "hidden" }}>
       <button
         onClick={() => setOpen(v => !v)}
-        style={{ width: "100%", display: "flex", alignItems: "center", gap: "14px", padding: "14px 18px", background: "transparent", border: "none", cursor: "pointer", textAlign: "left" as const, fontFamily: "'Cal Sans', sans-serif", flexWrap: "wrap" }}
+        style={{ width: "100%", display: "flex", alignItems: "center", gap: "14px", padding: "14px 18px", background: "transparent", border: "none", cursor: "pointer", textAlign: "left" as const, fontFamily: "var(--font-body-new)", flexWrap: "wrap" }}
       >
         <span style={{ fontSize: "11px", color: "rgba(255,255,255,0.45)", flexShrink: 0 }}>{fmtDateTime(entry.created_at)}</span>
         <span style={{ fontSize: "13px", fontWeight: 600, color: "#FFFFFF", flexShrink: 0 }}>{entry.profiles?.full_name ?? entry.profiles?.email ?? "Unknown admin"}</span>
@@ -2087,7 +2374,7 @@ function AuditLogSection({ entries, loading }: { entries: AuditLogRow[]; loading
             value={entityFilter}
             onChange={e => setEntityFilter(e.target.value)}
             aria-label="Filter by entity type"
-            style={{ padding: "9px 28px 9px 12px", background: "rgba(255,255,255,0.06)", border: "1.5px solid rgba(255,255,255,0.12)", borderRadius: "9px", fontSize: "12px", color: "#FFFFFF", fontFamily: "'Cal Sans', sans-serif", outline: "none", appearance: "none", cursor: "pointer" }}
+            style={{ padding: "9px 28px 9px 12px", background: "rgba(255,255,255,0.06)", border: "1.5px solid rgba(255,255,255,0.12)", borderRadius: "9px", fontSize: "12px", color: "#FFFFFF", fontFamily: "var(--font-body-new)", outline: "none", appearance: "none", cursor: "pointer" }}
           >
             <option value="all">All entity types</option>
             {AUDIT_ENTITY_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
@@ -2099,7 +2386,7 @@ function AuditLogSection({ entries, loading }: { entries: AuditLogRow[]; loading
             value={actorFilter}
             onChange={e => setActorFilter(e.target.value)}
             aria-label="Filter by actor"
-            style={{ padding: "9px 28px 9px 12px", background: "rgba(255,255,255,0.06)", border: "1.5px solid rgba(255,255,255,0.12)", borderRadius: "9px", fontSize: "12px", color: "#FFFFFF", fontFamily: "'Cal Sans', sans-serif", outline: "none", appearance: "none", cursor: "pointer" }}
+            style={{ padding: "9px 28px 9px 12px", background: "rgba(255,255,255,0.06)", border: "1.5px solid rgba(255,255,255,0.12)", borderRadius: "9px", fontSize: "12px", color: "#FFFFFF", fontFamily: "var(--font-body-new)", outline: "none", appearance: "none", cursor: "pointer" }}
           >
             <option value="all">All actors</option>
             {actors.map(([id, name]) => <option key={id} value={id}>{name}</option>)}
@@ -2110,7 +2397,7 @@ function AuditLogSection({ entries, loading }: { entries: AuditLogRow[]; loading
 
       {filtered.length === 0 ? (
         <div style={{ padding: "60px 24px", textAlign: "center", background: "rgba(255,255,255,0.05)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", borderRadius: "18px", border: "1px solid rgba(255,255,255,0.08)" }}>
-          <p style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "20px", color: "#FFFFFF" }}>No matching audit entries</p>
+          <p style={{ fontFamily: "var(--font-heading-new)", fontSize: "20px", color: "#FFFFFF" }}>No matching audit entries</p>
         </div>
       ) : (
         <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
@@ -2131,6 +2418,8 @@ const NAV: { id: AdminSection; label: string; icon: React.ReactNode }[] = [
   { id: "agents",     label: "Agent Applications", icon: <IconBriefcase /> },
   { id: "users",      label: "All Users",          icon: <IconUsers /> },
   { id: "inquiries",  label: "All Inquiries",      icon: <IconMsg /> },
+  { id: "performance", label: "Agent Performance", icon: <IconChart /> },
+  { id: "leaderboard", label: "Leaderboard",        icon: <IconAward /> },
   { id: "reports",    label: "Reports",            icon: <IconFlag /> },
   { id: "content",    label: "Site Content",       icon: <IconEdit /> },
   { id: "audit",      label: "Audit Log",          icon: <IconAudit /> },
@@ -2149,7 +2438,7 @@ export default function AdminPage() {
   const authChecking = authLoading || (!!user && profile === null) || !isAdmin;
 
   const [active,       setActive]       = useState<AdminSection>("overview");
-  const [sidebarOpen,  setSidebarOpen]  = useState(false);
+  const [sidebarOpen,  setSidebarOpen]  = useState(true);
   const [toast,        setToast]        = useState<{ ok: boolean; msg: string } | null>(null);
 
   const [stats,        setStats]        = useState<Stats>({ pending: 0, active: 0, rejected: 0, users: 0, inquiries: 0, reportsOpen: 0 });
@@ -2161,6 +2450,7 @@ export default function AdminPage() {
   const [users,            setUsers]            = useState<UserRow[]>([]);
   const [inquiries,        setInquiries]        = useState<InquiryRow[]>([]);
   const [agentApps,        setAgentApps]        = useState<AgentApplication[]>([]);
+  const [agentDocsByProfile, setAgentDocsByProfile] = useState<Record<string, AgentDocumentRow[]>>({});
   const [approvedAgents,   setApprovedAgents]   = useState<ApprovedAgentOption[]>([]);
   const [auditLog,         setAuditLog]         = useState<AuditLogRow[]>([]);
   const [reports,          setReports]          = useState<ReportRow[]>([]);
@@ -2336,9 +2626,29 @@ export default function AdminPage() {
         .from("agent_profiles")
         .select("id, user_id, license_number, agency_name, bio, years_experience, status, created_at, profiles(full_name, phone, email), agent_service_cities(city)")
         .order("created_at", { ascending: false })
-        .then((res: { data: unknown }) => {
-          setAgentApps((res.data as AgentApplication[] | null) ?? []);
+        .then(async (res: { data: unknown }) => {
+          const apps = (res.data as AgentApplication[] | null) ?? [];
+          setAgentApps(apps);
           setAgentAppsLoading(false);
+
+          // KYC documents — batched second query keyed by agent_profile_id,
+          // same "fetch then map" pattern already used elsewhere in this
+          // codebase (e.g. approvedAgents above) rather than a nested
+          // embed or a per-card fetch. Visibility only — does not affect
+          // approve/reject logic.
+          const profileIds = apps.map(a => a.id);
+          if (profileIds.length === 0) { setAgentDocsByProfile({}); return; }
+          const { data: docs } = await supabase
+            .from("documents")
+            .select("agent_profile_id, document_type, file_url, created_at")
+            .in("agent_profile_id", profileIds)
+            .in("document_type", KYC_DOCUMENT_TYPES.map(t => t.key))
+            .order("created_at", { ascending: false });
+          const grouped: Record<string, AgentDocumentRow[]> = {};
+          ((docs as AgentDocumentRow[] | null) ?? []).forEach(d => {
+            (grouped[d.agent_profile_id] ??= []).push(d);
+          });
+          setAgentDocsByProfile(grouped);
         });
     } else if (active === "audit") {
       setAuditLoading(true);
@@ -2366,7 +2676,7 @@ export default function AdminPage() {
       (async () => {
         const { data } = await supabase
           .from("reports")
-          .select("id, reporter_id, entity_type, entity_id, reason, details, status, created_at, resolved_at, resolved_by, profiles!reporter_id(full_name, email)")
+          .select("id, reporter_id, entity_type, entity_id, reason, details, status, created_at, resolved_at, resolved_by, request_type, sla_acknowledge_due_at, sla_resolve_due_at, profiles!reporter_id(full_name, email)")
           .order("created_at", { ascending: false })
           .limit(300);
         const rows = (data as ReportRow[] | null) ?? [];
@@ -2749,6 +3059,134 @@ export default function AdminPage() {
     await handleReportResolve(report.id, "resolved");
   }, [handleUserUpdate, handleReportResolve]);
 
+  // ── Migration 051 — grievance queue extension ──────────────────────────
+  // Acknowledge stamps sla_acknowledge_due_at automatically (rather than
+  // via an admin-facing checkbox) so the 48-hour commitment published in
+  // /grievance-redressal is met every time this action is used, with no
+  // chance of an admin forgetting to set it.
+  const handleReportAcknowledge = useCallback(async (id: string) => {
+    const report = reports.find(r => r.id === id);
+    if (!report) return;
+    setInFlight(id);
+    const supabase = createClient();
+    const dueAt = new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString();
+    const { error } = await supabase
+      .from("reports")
+      .update({ status: "acknowledged", sla_acknowledge_due_at: dueAt })
+      .eq("id", id);
+
+    if (error) {
+      console.error("Admin — report acknowledge error:", error);
+      setToast({ ok: false, msg: "Update failed — please try again." });
+    } else {
+      void logAdminAction("acknowledge_report", "report", id, { status: report.status }, { status: "acknowledged", sla_acknowledge_due_at: dueAt });
+      setReports(prev => prev.map(r => r.id === id ? { ...r, status: "acknowledged", sla_acknowledge_due_at: dueAt } : r));
+      setStats(s => report.status === "open" ? { ...s, reportsOpen: Math.max(0, s.reportsOpen - 1) } : s);
+      setToast({ ok: true, msg: "Report acknowledged — SLA due in 48 hours." });
+    }
+    setInFlight(null);
+    setTimeout(() => setToast(null), 2500);
+  }, [reports, logAdminAction]);
+
+  const handleReportMoveUnderReview = useCallback(async (id: string) => {
+    const report = reports.find(r => r.id === id);
+    if (!report) return;
+    setInFlight(id);
+    const supabase = createClient();
+    const { error } = await supabase.from("reports").update({ status: "under_review" }).eq("id", id);
+
+    if (error) {
+      console.error("Admin — report move-under-review error:", error);
+      setToast({ ok: false, msg: "Update failed — please try again." });
+    } else {
+      void logAdminAction("move_report_under_review", "report", id, { status: report.status }, { status: "under_review" });
+      setReports(prev => prev.map(r => r.id === id ? { ...r, status: "under_review" } : r));
+      setStats(s => report.status === "open" ? { ...s, reportsOpen: Math.max(0, s.reportsOpen - 1) } : s);
+      setToast({ ok: true, msg: "Moved to Under Review." });
+    }
+    setInFlight(null);
+    setTimeout(() => setToast(null), 2500);
+  }, [reports, logAdminAction]);
+
+  // Freeze is intentionally separate from handleListingStatus — that
+  // function owns the pending/approved/rejected bucket bookkeeping for
+  // the Pending/Approved/Rejected sections, none of which has a
+  // 'frozen' bucket. Freezing only invalidates those sections' caches
+  // (loaded.current) so they refetch with the live status next visit,
+  // same mechanism handleListingStatus itself uses. Two audit log
+  // entries are written — one for the listing, one for the report —
+  // matching the existing Reject Listing precedent (handleListingStatus
+  // + handleReportResolve, each logging separately).
+  const handleReportFreezeListing = useCallback(async (report: ReportRow) => {
+    setInFlight(report.entity_id);
+    const supabase = createClient();
+    const oldListingStatus = reportListingPreviews[report.entity_id]?.status ?? null;
+    const { error: listingErr } = await supabase
+      .from("property_listings")
+      .update({ status: "frozen" })
+      .eq("id", report.entity_id);
+
+    if (listingErr) {
+      console.error("Admin — freeze listing error:", listingErr);
+      setToast({ ok: false, msg: "Freeze failed — please try again." });
+      setInFlight(null);
+      setTimeout(() => setToast(null), 2500);
+      return;
+    }
+    void logAdminAction("freeze_listing", "property_listing", report.entity_id, { status: oldListingStatus }, { status: "frozen" });
+    setReportListingPreviews(prev => ({
+      ...prev,
+      [report.entity_id]: { ...prev[report.entity_id], id: report.entity_id, status: "frozen" },
+    }));
+    loaded.current.delete("pending");
+    loaded.current.delete("approved");
+    loaded.current.delete("rejected");
+
+    const oldReportStatus = report.status;
+    const { error: reportErr } = await supabase.from("reports").update({ status: "frozen" }).eq("id", report.id);
+    if (reportErr) {
+      console.error("Admin — freeze report status error:", reportErr);
+      setToast({ ok: false, msg: "Listing frozen, but the report status update failed." });
+    } else {
+      void logAdminAction("freeze_report", "report", report.id, { status: oldReportStatus }, { status: "frozen" });
+      setReports(prev => prev.map(r => r.id === report.id ? { ...r, status: "frozen" } : r));
+      setStats(s => oldReportStatus === "open" ? { ...s, reportsOpen: Math.max(0, s.reportsOpen - 1) } : s);
+      setToast({ ok: true, msg: "Listing frozen and report marked Frozen." });
+    }
+    setInFlight(null);
+    setTimeout(() => setToast(null), 2500);
+  }, [reportListingPreviews, logAdminAction]);
+
+  // The reversibility this whole feature exists for — restores the
+  // listing to 'active' only. Deliberately does not also change the
+  // report's own status: the admin still moves the report through
+  // Resolve/Dismiss/Under Review themselves once satisfied.
+  const handleReportUnfreezeListing = useCallback(async (report: ReportRow) => {
+    setInFlight(report.entity_id);
+    const supabase = createClient();
+    const { error } = await supabase
+      .from("property_listings")
+      .update({ status: "active" })
+      .eq("id", report.entity_id);
+
+    if (error) {
+      console.error("Admin — unfreeze listing error:", error);
+      setToast({ ok: false, msg: "Unfreeze failed — please try again." });
+    } else {
+      void logAdminAction("unfreeze_listing", "property_listing", report.entity_id, { status: "frozen" }, { status: "active" });
+      setReportListingPreviews(prev => ({
+        ...prev,
+        [report.entity_id]: { ...prev[report.entity_id], id: report.entity_id, status: "active" },
+      }));
+      loaded.current.delete("pending");
+      loaded.current.delete("approved");
+      loaded.current.delete("rejected");
+      setToast({ ok: true, msg: "Listing unfrozen and restored to active." });
+    }
+    setInFlight(null);
+    setTimeout(() => setToast(null), 2500);
+  }, [logAdminAction]);
+
   const handleAgentApprove = useCallback(async (id: string, userId: string) => {
     setInFlight(id);
     const oldStatus = agentApps.find(a => a.id === id)?.status ?? null;
@@ -2846,7 +3284,7 @@ export default function AdminPage() {
         <div style={{ minHeight: "100vh", background: "#020C1C", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "20px" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
             <div style={{ color: "#10C4C3" }}><IconShield /></div>
-            <span style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "22px", color: "#FFFFFF", letterSpacing: "0.08em" }}>Verifying access…</span>
+            <span style={{ fontFamily: "var(--font-heading-new)", fontSize: "22px", color: "#FFFFFF", letterSpacing: "0.08em" }}>Verifying access…</span>
           </div>
           <Spinner size={26} pad={0} />
         </div>
@@ -2902,6 +3340,7 @@ export default function AdminPage() {
         onApprove={(id, userId) => void handleAgentApprove(id, userId)}
         onReject={id => void handleAgentReject(id)}
         onAddAgent={handleAddAgent}
+        documentsByProfile={agentDocsByProfile}
       />
     );
   } else if (active === "users") {
@@ -2927,6 +3366,14 @@ export default function AdminPage() {
         onMarkSpam={id => void handleInquirySpam(id)}
       />
     );
+  } else if (active === "performance") {
+    // Self-fetching — see AgentPerformanceSection.tsx header for why
+    // this section doesn't go through the central per-section
+    // useEffect/state every other section above uses.
+    content = <AgentPerformanceSection />;
+  } else if (active === "leaderboard") {
+    // Self-fetching — same reasoning as AgentPerformanceSection.tsx.
+    content = <LeaderboardSection />;
   } else if (active === "reports") {
     content = (
       <ReportsSection
@@ -2939,6 +3386,10 @@ export default function AdminPage() {
         onResolve={id => void handleReportResolve(id, "resolved")}
         onRejectListing={report => void handleReportRejectListing(report)}
         onDeactivateUser={report => void handleReportDeactivateUser(report)}
+        onAcknowledge={id => void handleReportAcknowledge(id)}
+        onMoveUnderReview={id => void handleReportMoveUnderReview(id)}
+        onFreezeListing={report => void handleReportFreezeListing(report)}
+        onUnfreezeListing={report => void handleReportUnfreezeListing(report)}
       />
     );
   } else if (active === "content") {
@@ -2960,7 +3411,7 @@ export default function AdminPage() {
     <>
       <style>{`
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'Cal Sans', system-ui, sans-serif; background: #020C1C; }
+        body { font-family: var(--font-body-new); background: #020C1C; }
         ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 2px; }
         @keyframes spin { to { transform: rotate(360deg); } }
@@ -2968,32 +3419,31 @@ export default function AdminPage() {
         @keyframes toastIn { from { opacity:0; transform:translateX(20px); } to { opacity:1; transform:translateX(0); } }
         .admin-sb-btn:hover { color: #FFFFFF !important; background: rgba(255,255,255,0.06) !important; }
         @media (max-width: 840px) {
-          .admin-aside {
-            position: fixed !important; top: 0 !important; bottom: 0 !important; left: 0 !important;
-            z-index: 400 !important; height: 100dvh !important;
-            transform: translateX(-100%) !important;
-            transition: transform 0.27s cubic-bezier(.4,0,.2,1) !important;
-          }
-          .admin-aside.sb-open { transform: translateX(0) !important; }
           .admin-content { padding: 24px 18px 72px !important; }
-          .admin-mob-bar { display: flex !important; }
           .admin-overview-grid { grid-template-columns: 1fr !important; }
+          .admin-overview-charts-grid { grid-template-columns: 1fr !important; }
+        }
+        @media (max-width: 1200px) and (min-width: 841px) {
+          .admin-overview-charts-grid { grid-template-columns: 1fr 1fr !important; }
         }
       `}</style>
 
       {/* Toast */}
       {toast && (
-        <div style={{ position: "fixed", top: "88px", right: "24px", zIndex: 999, padding: "12px 20px", borderRadius: "10px", background: toast.ok ? "rgba(16,196,195,0.9)" : "rgba(248,113,113,0.9)", color: "#020C1C", fontSize: "13px", fontWeight: 600, boxShadow: "0 4px 24px rgba(0,0,0,0.4)", fontFamily: "'Cal Sans', sans-serif", display: "flex", alignItems: "center", gap: "8px", animation: "toastIn 0.2s ease-out", backdropFilter: "blur(12px)" }}>
+        <div style={{ position: "fixed", top: "88px", right: "24px", zIndex: 999, padding: "12px 20px", borderRadius: "10px", background: toast.ok ? "rgba(16,196,195,0.9)" : "rgba(248,113,113,0.9)", color: "#020C1C", fontSize: "13px", fontWeight: 600, boxShadow: "0 4px 24px rgba(0,0,0,0.4)", fontFamily: "var(--font-body-new)", display: "flex", alignItems: "center", gap: "8px", animation: "toastIn 0.2s ease-out", backdropFilter: "blur(12px)" }}>
           {toast.ok ? "✓" : "✗"} {toast.msg}
         </div>
       )}
 
       <div style={{ minHeight: "100dvh", background: "#020C1C", display: "flex", flexDirection: "column" }}>
 
-        {/* Mobile toggle bar */}
-        <div className="admin-mob-bar" style={{ display: "none", position: "sticky", top: "64px", zIndex: 200, padding: "10px 16px", background: "rgba(0,0,0,0.85)", backdropFilter: "blur(12px)", alignItems: "center", gap: "12px", borderBottom: "1px solid rgba(255,255,255,0.07)", flexShrink: 0 }}>
+        {/* Persistent sidebar toggle — part of the shell around every
+            section, so it stays visible/functional regardless of which
+            NAV item is active. */}
+        <div className="admin-toggle-bar" style={{ display: "flex", position: "sticky", top: "64px", zIndex: 200, padding: "10px 16px", background: "rgba(0,0,0,0.85)", backdropFilter: "blur(12px)", alignItems: "center", gap: "12px", borderBottom: "1px solid rgba(255,255,255,0.07)", flexShrink: 0 }}>
           <button
             onClick={() => setSidebarOpen(v => !v)}
+            aria-label="Toggle sidebar"
             style={{ display: "flex", width: "34px", height: "34px", alignItems: "center", justifyContent: "center", background: "rgba(255,255,255,0.07)", border: "none", borderRadius: "7px", cursor: "pointer", color: "#FFFFFF" }}
           >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
@@ -3003,66 +3453,65 @@ export default function AdminPage() {
 
         <div style={{ display: "flex", flex: 1, paddingTop: "64px" }}>
 
-          {/* Sidebar */}
+          {/* Sidebar — occupies its own space when open (pushes the
+              content area) rather than floating over it; collapses to
+              zero width when closed. Inner content is a fixed 260px
+              wrapper so it doesn't reflow/wrap mid-transition. */}
           <aside
-            className={`admin-aside${sidebarOpen ? " sb-open" : ""}`}
-            style={{ width: "260px", flexShrink: 0, background: "rgba(0,0,0,0.7)", backdropFilter: "blur(24px)", WebkitBackdropFilter: "blur(24px)", borderRight: "1px solid rgba(255,255,255,0.07)", height: "calc(100vh - 64px)", position: "sticky", top: "64px", display: "flex", flexDirection: "column", overflowY: "auto" }}
+            style={{ width: sidebarOpen ? "260px" : "0px", flexShrink: 0, overflow: "hidden", background: "rgba(0,0,0,0.7)", backdropFilter: "blur(24px)", WebkitBackdropFilter: "blur(24px)", borderRight: sidebarOpen ? "1px solid rgba(255,255,255,0.07)" : "none", height: "calc(100vh - 64px)", position: "sticky", top: "64px", transition: "width 0.25s cubic-bezier(.4,0,.2,1), border-color 0.25s" }}
           >
-            {/* Brand card */}
-            <div style={{ padding: "26px 18px 20px", borderBottom: "1px solid rgba(255,255,255,0.07)" }}>
-              <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "6px" }}>
-                <div style={{ color: "#10C4C3" }}><IconShield /></div>
-                <span style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "18px", fontWeight: 500, color: "#FFFFFF", letterSpacing: "0.04em" }}>Admin Panel</span>
+            <div style={{ width: "260px", height: "100%", display: "flex", flexDirection: "column", overflowY: "auto" }}>
+              {/* Brand card */}
+              <div style={{ padding: "26px 18px 20px", borderBottom: "1px solid rgba(255,255,255,0.07)" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "6px" }}>
+                  <div style={{ color: "#10C4C3" }}><IconShield /></div>
+                  <span style={{ fontFamily: "var(--font-heading-new)", fontSize: "18px", fontWeight: 500, color: "#FFFFFF", letterSpacing: "0.04em" }}>Admin Panel</span>
+                </div>
+                <span style={{ display: "inline-block", padding: "2px 9px", borderRadius: "100px", fontSize: "8px", fontWeight: 800, letterSpacing: "0.14em", textTransform: "uppercase" as const, background: "rgba(16,196,195,0.12)", color: "#10C4C3", border: "1px solid rgba(16,196,195,0.25)" }}>Nilay 360</span>
               </div>
-              <span style={{ display: "inline-block", padding: "2px 9px", borderRadius: "100px", fontSize: "8px", fontWeight: 800, letterSpacing: "0.14em", textTransform: "uppercase" as const, background: "rgba(16,196,195,0.12)", color: "#10C4C3", border: "1px solid rgba(16,196,195,0.25)" }}>Nilay 360</span>
-            </div>
 
-            {/* Nav */}
-            <nav style={{ flex: 1, padding: "12px 10px" }}>
-              {NAV.map(item => {
-                const badge =
-                  item.id === "pending"   ? stats.pending     :
-                  item.id === "approved"  ? stats.active      :
-                  item.id === "rejected"  ? stats.rejected    :
-                  item.id === "users"     ? stats.users       :
-                  item.id === "inquiries" ? stats.inquiries   :
-                  item.id === "reports"   ? stats.reportsOpen : 0;
-                return (
-                  <button
-                    key={item.id}
-                    className="admin-sb-btn"
-                    onClick={() => { setActive(item.id); setSidebarOpen(false); }}
-                    style={{ width: "100%", display: "flex", alignItems: "center", gap: "11px", padding: "10px 14px", borderRadius: "9px", marginBottom: "3px", background: active === item.id ? "rgba(16,196,195,0.1)" : "transparent", border: active === item.id ? "1px solid rgba(16,196,195,0.2)" : "1px solid transparent", color: active === item.id ? "#10C4C3" : "rgba(255,255,255,0.45)", fontSize: "13px", fontWeight: active === item.id ? 600 : 400, cursor: "pointer", fontFamily: "'Cal Sans', sans-serif", textAlign: "left" as const, transition: "all 0.14s" }}
-                  >
-                    {item.icon}
-                    <span style={{ flex: 1 }}>{item.label}</span>
-                    {badge > 0 && (
-                      <span style={{ padding: "1px 7px", borderRadius: "100px", fontSize: "9px", fontWeight: 700, background: active === item.id ? "rgba(16,196,195,0.2)" : "rgba(16,196,195,0.08)", color: "#10C4C3", border: "1px solid rgba(16,196,195,0.2)" }}>
-                        {badge}
-                      </span>
-                    )}
-                  </button>
-                );
-              })}
-            </nav>
+              {/* Nav */}
+              <nav style={{ flex: 1, padding: "12px 10px" }}>
+                {NAV.map(item => {
+                  const badge =
+                    item.id === "pending"   ? stats.pending     :
+                    item.id === "approved"  ? stats.active      :
+                    item.id === "rejected"  ? stats.rejected    :
+                    item.id === "users"     ? stats.users       :
+                    item.id === "inquiries" ? stats.inquiries   :
+                    item.id === "reports"   ? stats.reportsOpen : 0;
+                  return (
+                    <button
+                      key={item.id}
+                      className="admin-sb-btn"
+                      onClick={() => setActive(item.id)}
+                      style={{ width: "100%", display: "flex", alignItems: "center", gap: "11px", padding: "10px 14px", borderRadius: "9px", marginBottom: "3px", background: active === item.id ? "rgba(16,196,195,0.1)" : "transparent", border: active === item.id ? "1px solid rgba(16,196,195,0.2)" : "1px solid transparent", color: active === item.id ? "#10C4C3" : "rgba(255,255,255,0.45)", fontSize: "13px", fontWeight: active === item.id ? 600 : 400, cursor: "pointer", fontFamily: "var(--font-body-new)", textAlign: "left" as const, transition: "all 0.14s" }}
+                    >
+                      {item.icon}
+                      <span style={{ flex: 1 }}>{item.label}</span>
+                      {badge > 0 && (
+                        <span style={{ padding: "1px 7px", borderRadius: "100px", fontSize: "9px", fontWeight: 700, background: active === item.id ? "rgba(16,196,195,0.2)" : "rgba(16,196,195,0.08)", color: "#10C4C3", border: "1px solid rgba(16,196,195,0.2)" }}>
+                          {badge}
+                        </span>
+                      )}
+                    </button>
+                  );
+                })}
+              </nav>
 
-            {/* Footer links */}
-            <div style={{ padding: "12px 10px 18px", borderTop: "1px solid rgba(255,255,255,0.07)", display: "flex", flexDirection: "column", gap: "4px" }}>
-              <a
-                href="/dashboard"
-                style={{ display: "flex", alignItems: "center", gap: "10px", padding: "9px 14px", borderRadius: "8px", fontSize: "12px", color: "rgba(255,255,255,0.4)", textDecoration: "none", fontFamily: "'Cal Sans', sans-serif" }}
-              >
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
-                Back to Dashboard
-              </a>
-              <IconOut />
+              {/* Footer links */}
+              <div style={{ padding: "12px 10px 18px", borderTop: "1px solid rgba(255,255,255,0.07)", display: "flex", flexDirection: "column", gap: "4px" }}>
+                <a
+                  href="/dashboard"
+                  style={{ display: "flex", alignItems: "center", gap: "10px", padding: "9px 14px", borderRadius: "8px", fontSize: "12px", color: "rgba(255,255,255,0.4)", textDecoration: "none", fontFamily: "var(--font-body-new)" }}
+                >
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+                  Back to Dashboard
+                </a>
+                <IconOut />
+              </div>
             </div>
           </aside>
-
-          {/* Mobile overlay */}
-          {sidebarOpen && (
-            <div onClick={() => setSidebarOpen(false)} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.6)", zIndex: 390, backdropFilter: "blur(4px)" }} />
-          )}
 
           {/* Main content */}
           <main

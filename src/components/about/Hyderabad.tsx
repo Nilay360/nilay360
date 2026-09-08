@@ -66,10 +66,10 @@ export default function Hyderabad() {
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: "clamp(40px, 6vw, 96px)", alignItems: "center", marginBottom: "clamp(70px, 9vw, 130px)" }}>
           <div>
             <Reveal>
-              <h2 style={{ margin: "0 0 clamp(24px, 3vw, 40px)", fontFamily: "'Cal Sans', Georgia, serif", fontWeight: 300, fontSize: "clamp(32px, 5vw, 84px)", lineHeight: 1.02, letterSpacing: "-0.03em", color: "#FFFFFF" }}>Hyderabad.</h2>
+              <h2 style={{ margin: "0 0 clamp(24px, 3vw, 40px)", fontFamily: "var(--font-heading-new)", fontWeight: 300, fontSize: "clamp(32px, 5vw, 84px)", lineHeight: 1.02, letterSpacing: "-0.03em", color: "#FFFFFF" }}>Hyderabad.</h2>
             </Reveal>
             <Reveal delay={0.1}>
-              <p style={{ margin: "0 0 22px", maxWidth: "46ch", fontFamily: "'Cal Sans', Georgia, serif", fontWeight: 300, fontSize: "clamp(18px, 1.75vw, 27px)", lineHeight: 1.5, letterSpacing: "-0.008em", color: "rgba(255,255,255,0.9)" }}>This is where our story began.</p>
+              <p style={{ margin: "0 0 22px", maxWidth: "46ch", fontFamily: "var(--font-heading-new)", fontWeight: 300, fontSize: "clamp(18px, 1.75vw, 27px)", lineHeight: 1.5, letterSpacing: "-0.008em", color: "rgba(255,255,255,0.9)" }}>This is where our story began.</p>
             </Reveal>
             <Reveal delay={0.18}>
               <p style={{ margin: 0, maxWidth: "48ch", fontSize: "clamp(15px, 1.15vw, 18px)", lineHeight: 1.9, color: "rgba(255,255,255,0.54)" }}>It is where our founders lived the frustration that inspired NILAY360. Before expanding across India, we want to solve the problem completely in the city that inspired us — and carry that standard everywhere else.</p>
@@ -84,7 +84,7 @@ export default function Hyderabad() {
 
                 {/* Phase-one cities — present but deliberately quiet. */}
                 {CITIES.map(c => (
-                  <span key={c.name} style={{ position: "absolute", left: c.left, top: c.top, fontFamily: "'Cal Sans', sans-serif", fontSize: "9.5px", letterSpacing: "0.18em", textTransform: "uppercase", color: "rgba(255,255,255,0.3)", whiteSpace: "nowrap" }}>· {c.name}</span>
+                  <span key={c.name} style={{ position: "absolute", left: c.left, top: c.top, fontFamily: "var(--font-support-new)", fontSize: "9.5px", letterSpacing: "0.18em", textTransform: "uppercase", color: "rgba(255,255,255,0.3)", whiteSpace: "nowrap" }}>· {c.name}</span>
                 ))}
 
                 {/* Hyderabad — the anchor point. */}
@@ -92,9 +92,9 @@ export default function Hyderabad() {
                   <PulseRings />
                   <span style={{ position: "absolute", inset: "2.5px", borderRadius: "50%", background: TEAL, boxShadow: `0 0 20px ${TEAL}` }} />
                 </div>
-                <span style={{ position: "absolute", left: HOME.left, top: HOME.top, margin: "16px 0 0 -4px", fontFamily: "'Cal Sans', sans-serif", fontSize: "10px", fontWeight: 600, letterSpacing: "0.2em", textTransform: "uppercase", color: "#FFFFFF", whiteSpace: "nowrap" }}>Hyderabad</span>
+                <span style={{ position: "absolute", left: HOME.left, top: HOME.top, margin: "16px 0 0 -4px", fontFamily: "var(--font-support-new)", fontSize: "10px", fontWeight: 600, letterSpacing: "0.2em", textTransform: "uppercase", color: "#FFFFFF", whiteSpace: "nowrap" }}>Hyderabad</span>
               </div>
-              <p style={{ margin: "16px 0 0", fontFamily: "'Cal Sans', sans-serif", fontSize: "10px", letterSpacing: "0.2em", textTransform: "uppercase", color: TEAL }}>Full service in Hyderabad · rentals in phase-one cities</p>
+              <p style={{ margin: "16px 0 0", fontFamily: "var(--font-support-new)", fontSize: "10px", letterSpacing: "0.2em", textTransform: "uppercase", color: TEAL }}>Full service in Hyderabad · rentals in phase-one cities</p>
             </div>
           </Reveal>
         </div>
@@ -102,8 +102,8 @@ export default function Hyderabad() {
         <div className="ab-tl">
           {TIMELINE.map((t, i) => (
             <Reveal key={t.when} delay={i * 0.09} y={20} className="ab-tl-cell">
-              <span style={{ display: "block", fontFamily: "'Cal Sans', sans-serif", fontSize: "10px", fontWeight: 600, letterSpacing: "0.22em", color: t.accent ? TEAL : "rgba(255,255,255,0.38)" }}>{t.when}</span>
-              <span style={{ display: "block", marginTop: "14px", fontFamily: "'Cal Sans', Georgia, serif", fontWeight: 300, fontSize: "clamp(16px, 1.35vw, 21px)", lineHeight: 1.35, color: t.accent ? "#FFFFFF" : "rgba(255,255,255,0.88)" }}>{t.what}</span>
+              <span style={{ display: "block", fontFamily: "var(--font-support-new)", fontSize: "10px", fontWeight: 600, letterSpacing: "0.22em", color: t.accent ? TEAL : "rgba(255,255,255,0.38)" }}>{t.when}</span>
+              <span style={{ display: "block", marginTop: "14px", fontFamily: "var(--font-heading-new)", fontWeight: 300, fontSize: "clamp(16px, 1.35vw, 21px)", lineHeight: 1.35, color: t.accent ? "#FFFFFF" : "rgba(255,255,255,0.88)" }}>{t.what}</span>
             </Reveal>
           ))}
         </div>

@@ -293,7 +293,7 @@ export default function ScrollHero({ listingCount, whatsappHref }: ScrollHeroPro
           <p style={{ fontSize: "13px", fontWeight: 600, letterSpacing: "0.16em", textTransform: "uppercase", color: "#10C4C3", margin: "0 0 14px" }}>
             Enquiry Received
           </p>
-          <h1 style={{ fontFamily: "'Cal Sans', system-ui, sans-serif", fontWeight: 700, fontSize: "clamp(28px, 4.5vw, 40px)", lineHeight: 1.15, color: "#FFFFFF", margin: "0 0 14px", maxWidth: "16ch" }}>
+          <h1 style={{ fontFamily: "var(--font-heading-new)", fontWeight: 700, fontSize: "clamp(28px, 4.5vw, 40px)", lineHeight: 1.15, color: "#FFFFFF", margin: "0 0 14px", maxWidth: "16ch" }}>
             Thank you! We&apos;ve got your details.
           </h1>
           <p style={{ fontSize: "15px", lineHeight: 1.6, color: "#C9D3E0", maxWidth: "420px", margin: 0 }}>
@@ -321,7 +321,7 @@ export default function ScrollHero({ listingCount, whatsappHref }: ScrollHeroPro
           <div ref={sheenRef} aria-hidden="true" style={{ position: "absolute", inset: 0, pointerEvents: "none" }} />
           <div ref={gridRef} style={{ position: "absolute", inset: 0, display: "grid", gridTemplateColumns: "1fr auto 1fr", alignItems: "center", gap: "48px", padding: "0 64px", maxWidth: "1360px", margin: "0 auto", height: "100%" }}>
             <div ref={leftRef} style={{ opacity: 0, transform: "translateX(-30px)" }}>
-              <h2 style={{ margin: 0, fontFamily: "'Cal Sans', system-ui, sans-serif", fontSize: "clamp(36px, 5.5vw, 68px)", fontWeight: 700, letterSpacing: "-0.01em", color: "#FFFFFF", lineHeight: 1.05 }}>
+              <h2 style={{ margin: 0, fontFamily: "var(--font-heading-new)", fontSize: "clamp(36px, 5.5vw, 68px)", fontWeight: 700, letterSpacing: "-0.01em", color: "#FFFFFF", lineHeight: 1.05 }}>
                 NILAY<span style={{ color: "#10C4C3" }}>360</span>
               </h2>
               <p style={{ margin: "14px 0 0", fontSize: "13px", letterSpacing: "0.1em", textTransform: "uppercase", color: "#C9D3E0", opacity: 0.6 }}>
@@ -405,7 +405,7 @@ export default function ScrollHero({ listingCount, whatsappHref }: ScrollHeroPro
             }}
           >
             <div style={{ maxWidth: "560px", padding: "0 24px" }}>
-              <h2 style={{ margin: "0 0 14px", fontFamily: "'Cal Sans', system-ui, sans-serif", fontSize: "clamp(30px, 4vw, 44px)", color: "#FFFFFF" }}>
+              <h2 style={{ margin: "0 0 14px", fontFamily: "var(--font-heading-new)", fontSize: "clamp(30px, 4vw, 44px)", color: "#FFFFFF" }}>
                 You&apos;re all set.
               </h2>
               <p style={{ margin: "0 0 26px", color: "#C9D3E0", fontSize: "16px", lineHeight: 1.6 }}>

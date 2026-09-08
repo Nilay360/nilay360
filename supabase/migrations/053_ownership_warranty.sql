@@ -1,0 +1,59 @@
+-- ═══════════════════════════════════════════════════════════════
+-- 053 — Ownership-warranty confirmation on property_listings
+-- DRAFTED FOR REVIEW, NOT APPLIED. Same review discipline as every
+-- prior migration tonight: this file has not been run against the
+-- database. Do not apply until reviewed line by line.
+--
+-- Companion to 052 (agent RERA number) — the other half of the P1
+-- Item 4 pair, deliberately kept in a separate file so the two
+-- concerns (agent-side RERA vs. listing-side ownership warranty)
+-- stay independently reviewable and revertible.
+--
+-- WHY THIS IS PERSISTED, UNLIKE agreeToTerms:
+-- agreeToTerms (post-property.tsx's existing checkbox) is routine
+-- platform consent — already backed by the ToS page itself being
+-- binding on account use regardless of any one checkbox — and is
+-- deliberately left as a client-side-only gate, never persisted,
+-- no schema change proposed for it here.
+--
+-- The new ownership-warranty checkbox is a different kind of thing: a
+-- specific factual representation ("I have the legal right to sell/
+-- rent this exact property") that Nilay 360 explicitly relies on to
+-- publish someone's listing. If a fraudulent-listing dispute or
+-- grievance/takedown review (the same admin queue extended in 051)
+-- ever needs to establish what the seller actually claimed at listing
+-- time, an unpersisted client-side gate leaves zero evidence it was
+-- ever checked, by whom, or when. This matches the evidentiary
+-- standard the rest of tonight's work has held to (audit log entries
+-- on every admin action, resolved_by/created_at on reports, SLA
+-- timestamps on migration 051) — this is the one legally load-bearing
+-- checkbox on the listing-creation flow, so it gets a record.
+--
+-- ONE-TIME-AT-CREATION FACT, NOT RE-CONFIRMABLE (confirmed live
+-- before drafting): post-property/edit/[id]/page.tsx is a fully
+-- separate component from post-property/page.tsx — no shared import,
+-- no shared reducer/state — and contains no consent/warranty
+-- checkbox or re-validation step anywhere in the file (grepped for
+-- agreeToTerms/checkbox/confirm/ownership; the only window.confirm()
+-- calls found are unrelated native dialogs for destructive photo/
+-- listing actions). Edit never re-shows or re-validates this
+-- confirmation. Both columns below are therefore write-once at
+-- listing-creation INSERT time — no UPDATE path is expected or
+-- provided by this migration, and the edit page needs no change to
+-- support this feature.
+--
+-- Both columns nullable, no CHECK, no default, no backfill — every
+-- existing property_listings row (created before this feature
+-- existed) is simply left NULL, read as "not recorded," not as a
+-- false claim either way.
+--
+-- No RLS change. property_listings' existing insert policy ("Anyone
+-- can insert listings", 003_rls_fixes.sql) already permits the
+-- inserting party to set arbitrary column values on their own new
+-- row, including these two — no separate grant needed for a nullable
+-- additive column.
+-- ═══════════════════════════════════════════════════════════════
+
+ALTER TABLE public.property_listings
+  ADD COLUMN IF NOT EXISTS ownership_warranty_confirmed    boolean,
+  ADD COLUMN IF NOT EXISTS ownership_warranty_confirmed_at timestamptz;

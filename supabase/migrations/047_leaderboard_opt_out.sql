@@ -1,0 +1,36 @@
+-- ═══════════════════════════════════════════════════════════════
+-- 047 — agent_profiles.leaderboard_opt_out — DRAFTED FOR REVIEW, NOT
+-- APPLIED. Same review discipline as every migration tonight: this
+-- file has not been run against the database. Do not apply until
+-- reviewed line by line.
+--
+-- Re-confirmed live before drafting (this session, fresh PostgREST
+-- schema-cache check): agent_profiles' current columns are id,
+-- user_id, license_number, agency_name, bio, years_experience,
+-- status, created_at, updated_at, slug — no leaderboard/opt-out
+-- column of any name already exists.
+--
+-- No RLS change needed here, and none is added — confirmed, not
+-- assumed. agent_profiles_update_own (011_agent_portal_schema.sql,
+-- still live and unmodified: checked every later migration touching
+-- agent_profiles — only 012 touches it further, and only adds an
+-- admin INSERT policy, never UPDATE) is:
+--
+--   CREATE POLICY "agent_profiles_update_own"
+--     ON agent_profiles FOR UPDATE
+--     USING (user_id = auth.uid());
+--
+-- This is a plain row-level USING clause with no column list and no
+-- WITH CHECK restricting which fields may change. RLS policies gate
+-- whole rows, not individual columns, and this policy has no
+-- column-level restriction bolted on top of it (unlike, say,
+-- tonight's enforce_task_update_columns trigger on tasks, which is a
+-- deliberate, separate column-level gate in addition to row-level
+-- RLS). Since no such trigger or column-level restriction exists on
+-- agent_profiles, any column on the row — including this new one —
+-- is already within what an agent can set on their own row via this
+-- existing policy alone.
+-- ═══════════════════════════════════════════════════════════════
+
+ALTER TABLE agent_profiles
+  ADD COLUMN leaderboard_opt_out boolean NOT NULL DEFAULT false;

@@ -4,9 +4,23 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { useAuth } from "@/context/AuthContext";
 import { SavedSearchesList } from "@/components/dashboard/SavedSearchesList";
-import { MyListingsList } from "@/components/dashboard/MyListingsList";
+import { MyListingsList, type Listing as MLLListing } from "@/components/dashboard/MyListingsList";
 import { CITIES } from "@/constants";
 import { optimizedImageUrl } from "@/lib/image-url";
+import { loadAgentSchedule, eventToScheduleItem, isSameDay } from "@/lib/agentSchedule";
+import AgentDrawerChrome from "@/components/agent/AgentDrawerChrome";
+import { VisitStatusBadge } from "../agent/site-visits/page";
+import LeadsOverTimeChart from "./agent-overview/LeadsOverTimeChart";
+import DealsClosedChart from "./agent-overview/DealsClosedChart";
+import PerformanceTrendChart from "./agent-overview/PerformanceTrendChart";
+import ActiveDealsTable from "./agent-overview/ActiveDealsTable";
+import LeadsByCityRanked from "./agent-overview/LeadsByCityRanked";
+import CondensedCalendar from "./agent-overview/CondensedCalendar";
+import RecentActivityFeed from "./agent-overview/RecentActivityFeed";
+import { getUnreadNotificationCount } from "@/lib/notifications";
+import SavedSearchesOverTimeChart from "./buyer-overview/SavedSearchesOverTimeChart";
+import InquiriesReceivedChart from "./buyer-overview/InquiriesReceivedChart";
+import MyListingsTable from "./buyer-overview/MyListingsTable";
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
@@ -49,6 +63,7 @@ type AgentProfileData = {
   bio:              string | null;
   years_experience: number | null;
   cities:           string[];
+  leaderboard_opt_out: boolean;
 };
 
 type SaveRow = {
@@ -141,6 +156,31 @@ function IconEdit()     { return <svg width="14" height="14" viewBox="0 0 24 24"
 function IconPin()      { return <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#10C4C3" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>; }
 function IconAlert()    { return <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FBBF24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>; }
 function IconBriefcase(){ return <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>; }
+function IconTrend()    { return <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>; }
+function IconBell()     { return <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>; }
+// Sidebar nav icons for the new agent-only links (Phase 23) — same
+// shapes already used elsewhere in this codebase for these exact
+// features, resized to this sidebar's 15x15 convention, not invented:
+// IconTeam from src/app/agent/teams/page.tsx, IconChecklist from
+// src/app/agent/tasks/page.tsx, IconChart from src/app/admin/page.tsx
+// (already 15x15 there). My Leads/Site Visits/Deals/Calendar/Messages
+// all reuse icons already defined above in this same file
+// (IconMsg/IconPin/IconTrend/IconCal) — no new definitions needed for
+// those. Note: IconMsg is the same speech-bubble path this codebase
+// already uses for BOTH "Leads" (leads/page.tsx names it IconInbox)
+// and "Messages" (messages/page.tsx's own IconMsg) — there is no
+// separate icon for these two concepts anywhere in the codebase to
+// reuse instead, so both sidebar rows below intentionally share it.
+function IconTeam()      { return <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>; }
+function IconChecklist() { return <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M8 10l2 2 4-4M8 16h6"/></svg>; }
+function IconChart()     { return <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 3v18h18"/><path d="M18 17V9M13 17V5M8 17v-4"/></svg>; }
+// Leaderboard (Phase 25) — no precedent icon exists anywhere in this
+// codebase for this concept (unlike Leads/Messages/Deals/etc., which
+// all reuse an icon already used elsewhere for that same feature), so
+// this is a genuinely new small icon rather than an awkward reuse of
+// an already-claimed one (e.g. IconTrend/IconChart, both already
+// standing for Deals/Analytics).
+function IconAward()     { return <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="8" r="6"/><path d="M8.21 13.89 7 23l5-3 5 3-1.21-9.12"/></svg>; }
 
 // ── Sidebar nav ────────────────────────────────────────────────────────────────
 // Buyer/seller nav is unchanged. Agents get a distinct, shorter nav — per
@@ -148,7 +188,22 @@ function IconBriefcase(){ return <svg width="15" height="15" viewBox="0 0 24 24"
 // My Inquiries, Appointments) are hidden since an agent doesn't own listings or
 // browse as a buyer in this phase. Flagged as a judgment call, not a fixed rule.
 
-const NAV: { id: Tab; label: string; icon: React.ReactNode }[] = [
+// Shared shape for both sidebar nav lists (Phase 23). `id` selects an
+// internal Tab (existing behavior, unchanged); `href` is new — a
+// plain external route link, for the agent-only full-feature links
+// added below. Both fields are optional on one shared type rather
+// than a discriminated union so the buyer/seller NAV array below
+// doesn't need any of its existing object literals rewritten — it
+// only ever populates `id`, never `href`, so its rendering and
+// behavior are completely unchanged.
+interface SidebarNavItem {
+  id?: Tab;
+  href?: string;
+  label: string;
+  icon: React.ReactNode;
+}
+
+const NAV: SidebarNavItem[] = [
   { id: "overview",     label: "Overview",        icon: <IconHome /> },
   { id: "listings",     label: "My Listings",      icon: <IconList /> },
   { id: "saved",        label: "Saved Properties", icon: <IconHeart /> },
@@ -159,11 +214,28 @@ const NAV: { id: Tab; label: string; icon: React.ReactNode }[] = [
   { id: "settings",     label: "Settings",         icon: <IconGear /> },
 ];
 
-const NAV_AGENT: { id: Tab; label: string; icon: React.ReactNode }[] = [
-  { id: "overview",  label: "Overview",           icon: <IconHome /> },
-  { id: "assigned",  label: "Assigned Listings",   icon: <IconBriefcase /> },
-  { id: "profile",   label: "Profile",             icon: <IconUser /> },
-  { id: "settings",  label: "Settings",            icon: <IconGear /> },
+// Agent-only. Overview stays the internal tab it always was; the 8
+// new entries below it are real page links (Phase 22/23's standalone
+// agent-portal routes), not internal tabs — that's the whole point,
+// this sidebar is now full navigation, not just a shortcut to other
+// tabs within this same shell. Assigned Listings/Profile relabeled to
+// match Quick Actions' existing wording for the same destinations
+// ("View Assigned Listings" / "Edit Profile") — same internal tabs,
+// same icons, label text only.
+const NAV_AGENT: SidebarNavItem[] = [
+  { id: "overview",  label: "Overview",             icon: <IconHome /> },
+  { href: "/agent/leads",       label: "My Leads",     icon: <IconMsg /> },
+  { href: "/agent/site-visits", label: "Site Visits",  icon: <IconPin /> },
+  { href: "/agent/deals",       label: "Deals",        icon: <IconTrend /> },
+  { href: "/agent/calendar",    label: "Calendar",     icon: <IconCal /> },
+  { href: "/agent/messages",    label: "Messages",     icon: <IconMsg /> },
+  { href: "/agent/tasks",       label: "Tasks",        icon: <IconChecklist /> },
+  { href: "/agent/teams",       label: "Teams",        icon: <IconTeam /> },
+  { href: "/agent/analytics",   label: "Analytics",    icon: <IconChart /> },
+  { href: "/agent/leaderboard", label: "Leaderboard",  icon: <IconAward /> },
+  { id: "assigned",  label: "View Assigned Listings", icon: <IconBriefcase /> },
+  { id: "profile",   label: "Edit Profile",           icon: <IconUser /> },
+  { id: "settings",  label: "Settings",               icon: <IconGear /> },
 ];
 
 function CityMultiSelect({ selected, onChange }: { selected: string[]; onChange: (cities: string[]) => void }) {
@@ -179,7 +251,7 @@ function CityMultiSelect({ selected, onChange }: { selected: string[]; onChange:
             type="button"
             key={city}
             onClick={() => toggle(city)}
-            style={{ padding: "7px 15px", borderRadius: "100px", fontSize: "12px", fontWeight: on ? 700 : 500, background: on ? "#10C4C3" : "rgba(255,255,255,0.06)", color: on ? "#020C1C" : "#A9B4C2", border: on ? "1.5px solid #10C4C3" : "1.5px solid rgba(255,255,255,0.12)", cursor: "pointer", fontFamily: "'Cal Sans', sans-serif" }}
+            style={{ padding: "7px 15px", borderRadius: "100px", fontSize: "12px", fontWeight: on ? 700 : 500, background: on ? "#10C4C3" : "rgba(255,255,255,0.06)", color: on ? "#020C1C" : "#A9B4C2", border: on ? "1.5px solid #10C4C3" : "1.5px solid rgba(255,255,255,0.12)", cursor: "pointer", fontFamily: "var(--font-support-new)" }}
           >
             {city}
           </button>
@@ -202,7 +274,7 @@ function Card({ children, style }: { children: React.ReactNode; style?: React.CS
 function SectionHeading({ title, subtitle }: { title: string; subtitle?: string }) {
   return (
     <div style={{ marginBottom: "28px" }}>
-      <h2 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "32px", fontWeight: 500, color: "#FFFFFF", lineHeight: 1.2 }}>{title}</h2>
+      <h2 style={{ fontFamily: "var(--font-heading-new)", fontSize: "32px", fontWeight: 500, color: "#FFFFFF", lineHeight: 1.2 }}>{title}</h2>
       {subtitle && <p style={{ fontSize: "13px", color: "#A9B4C2", marginTop: "5px" }}>{subtitle}</p>}
     </div>
   );
@@ -216,7 +288,7 @@ function EmptyState({ icon, title, subtitle, cta, ctaHref }: {
       <div style={{ width: "56px", height: "56px", borderRadius: "50%", background: "rgba(16,196,195,0.12)", border: "1px solid rgba(16,196,195,0.25)", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: "18px", color: "#10C4C3" }}>
         {icon}
       </div>
-      <h4 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "22px", fontWeight: 500, color: "#FFFFFF", marginBottom: "8px" }}>{title}</h4>
+      <h4 style={{ fontFamily: "var(--font-heading-new)", fontSize: "22px", fontWeight: 500, color: "#FFFFFF", marginBottom: "8px" }}>{title}</h4>
       <p style={{ fontSize: "13px", color: "#A9B4C2", marginBottom: "22px", maxWidth: "310px", lineHeight: 1.65 }}>{subtitle}</p>
       {cta && ctaHref && (
         <a href={ctaHref} style={{ padding: "11px 28px", background: "#10C4C3", borderRadius: "999px", color: "#000", fontSize: "13px", fontWeight: 600, letterSpacing: "0.06em", textDecoration: "none", boxShadow: "0 10px 30px rgba(30,167,255,.35)" }}>{cta}</a>
@@ -249,20 +321,25 @@ function StatusBadge({ status }: { status: string }) {
   );
 }
 
-function StatCard({ label, value, accent, icon }: {
+function StatCard({ label, value, accent, icon, href }: {
   label: string; value: string | number; accent?: boolean; icon: React.ReactNode;
+  /** Optional — when present, the whole card navigates there on click.
+   *  Cards without it (the two pre-existing ones) render exactly as before. */
+  href?: string;
 }) {
-  return (
-    <div style={{ background: "rgba(255,255,255,0.05)", backdropFilter: "blur(24px)", WebkitBackdropFilter: "blur(24px)", borderRadius: "16px", padding: "22px 24px", border: "1px solid rgba(255,255,255,0.08)", boxShadow: "0 4px 24px rgba(0,0,0,0.18)", display: "flex", alignItems: "center", gap: "18px", flex: "1 1 155px" }}>
+  const body = (
+    <div style={{ background: "rgba(255,255,255,0.05)", backdropFilter: "blur(24px)", WebkitBackdropFilter: "blur(24px)", borderRadius: "16px", padding: "22px 24px", border: "1px solid rgba(255,255,255,0.08)", boxShadow: "0 4px 24px rgba(0,0,0,0.18)", display: "flex", alignItems: "center", gap: "18px", flex: "1 1 155px", cursor: href ? "pointer" : undefined }}>
       <div style={{ width: "44px", height: "44px", borderRadius: "10px", background: accent ? "rgba(16,196,195,0.15)" : "rgba(255,255,255,0.06)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, color: accent ? "#10C4C3" : "#A9B4C2" }}>
         {icon}
       </div>
       <div>
-        <div style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "28px", fontWeight: 600, lineHeight: 1.1, background: "linear-gradient(135deg, #FFFFFF 0%, #10C4C3 100%)", WebkitBackgroundClip: "text", backgroundClip: "text", WebkitTextFillColor: "transparent", color: "#FFFFFF" }}>{value}</div>
+        <div style={{ fontFamily: "var(--font-support-new)", fontSize: "28px", fontWeight: 600, lineHeight: 1.1, background: "linear-gradient(135deg, #FFFFFF 0%, #10C4C3 100%)", WebkitBackgroundClip: "text", backgroundClip: "text", WebkitTextFillColor: "transparent", color: "#FFFFFF" }}>{value}</div>
         <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.50)", textTransform: "uppercase", letterSpacing: "0.08em", marginTop: "2px" }}>{label}</div>
       </div>
     </div>
   );
+  if (!href) return body;
+  return <a href={href} style={{ textDecoration: "none", flex: "1 1 155px" }}>{body}</a>;
 }
 
 function FormField({ label, type = "text", value, onChange, readOnly, placeholder }: {
@@ -278,7 +355,7 @@ function FormField({ label, type = "text", value, onChange, readOnly, placeholde
         readOnly={readOnly}
         placeholder={placeholder}
         onChange={e => onChange?.(e.target.value)}
-        style={{ width: "100%", padding: "11px 14px", background: readOnly ? "rgba(255,255,255,0.03)" : "rgba(255,255,255,0.05)", border: "1.5px solid rgba(255,255,255,0.12)", borderRadius: "8px", fontSize: "14px", color: readOnly ? "rgba(255,255,255,0.45)" : "#FFFFFF", fontFamily: "'Cal Sans', sans-serif", outline: "none", boxSizing: "border-box", cursor: readOnly ? "not-allowed" : "text" }}
+        style={{ width: "100%", padding: "11px 14px", background: readOnly ? "rgba(255,255,255,0.03)" : "rgba(255,255,255,0.05)", border: "1.5px solid rgba(255,255,255,0.12)", borderRadius: "8px", fontSize: "14px", color: readOnly ? "rgba(255,255,255,0.45)" : "#FFFFFF", fontFamily: "var(--font-body-new)", outline: "none", boxSizing: "border-box", cursor: readOnly ? "not-allowed" : "text" }}
       />
     </div>
   );
@@ -286,12 +363,13 @@ function FormField({ label, type = "text", value, onChange, readOnly, placeholde
 
 // ── Tab 1: Overview ───────────────────────────────────────────────────────────
 
-function OverviewTab({ email, fullName, listings, savedItems, profile }: {
+function OverviewTab({ email, fullName, listings, savedItems, profile, userId }: {
   email: string;
   fullName?: string;
   listings: Listing[];
   savedItems: SavedItem[];
   profile: ProfileData | null;
+  userId: string;
 }) {
   const name         = fullName || email.split("@")[0];
   const activeCount  = listings.filter(l => l.status === "active").length;
@@ -301,7 +379,7 @@ function OverviewTab({ email, fullName, listings, savedItems, profile }: {
   return (
     <div>
       <div style={{ marginBottom: "32px" }}>
-        <h1 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "38px", fontWeight: 400, color: "#FFFFFF", lineHeight: 1.2, marginBottom: "6px" }}>
+        <h1 style={{ fontFamily: "var(--font-heading-new)", fontSize: "38px", fontWeight: 400, color: "#FFFFFF", lineHeight: 1.2, marginBottom: "6px" }}>
           Welcome back, <em style={{ fontStyle: "italic", color: "#10C4C3" }}>{name}</em>
         </h1>
         <p style={{ fontSize: "14px", color: "#A9B4C2" }}>Here&apos;s an overview of your activity on Nilay 360.</p>
@@ -328,7 +406,7 @@ function OverviewTab({ email, fullName, listings, savedItems, profile }: {
           <p style={{ fontSize: "12px", color: "#A9B4C2", marginTop: "8px" }}>
             Complete your profile to improve visibility.{" "}
             <button
-              style={{ background: "none", border: "none", color: "#10C4C3", fontSize: "12px", fontWeight: 600, cursor: "pointer", fontFamily: "'Cal Sans', sans-serif", padding: 0, textDecoration: "underline" }}
+              style={{ background: "none", border: "none", color: "#10C4C3", fontSize: "12px", fontWeight: 600, cursor: "pointer", fontFamily: "var(--font-body-new)", padding: 0, textDecoration: "underline" }}
               onClick={() => {
                 const el = document.querySelector("[data-tab='profile']") as HTMLButtonElement | null;
                 el?.click();
@@ -352,9 +430,23 @@ function OverviewTab({ email, fullName, listings, savedItems, profile }: {
         </Card>
       )}
 
+      {/* Charts + tables (Phase 27) — same ChartCard/table patterns
+          already built for the agent dashboard, applied here with a
+          buyer/seller-appropriate filter. No new fetch for "My
+          Listings" — it reuses the `listings` prop already loaded by
+          loadBuyerSeller() for the KPI cards above. */}
+      <div className="buyer-overview-2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px", marginBottom: "20px" }}>
+        <SavedSearchesOverTimeChart userId={userId} />
+        <InquiriesReceivedChart email={email} />
+      </div>
+
+      <div style={{ marginBottom: "20px" }}>
+        <MyListingsTable listings={listings} />
+      </div>
+
       {/* Quick actions */}
       <Card style={{ padding: "28px" }}>
-        <h3 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "20px", fontWeight: 600, color: "#FFFFFF", marginBottom: "18px" }}>Quick Actions</h3>
+        <h3 style={{ fontFamily: "var(--font-heading-new)", fontSize: "20px", fontWeight: 600, color: "#FFFFFF", marginBottom: "18px" }}>Quick Actions</h3>
         <div style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>
           <a href="/properties"    style={{ padding: "12px 24px", borderRadius: "999px", fontSize: "13px", fontWeight: 600, letterSpacing: "0.05em", textDecoration: "none", background: "#10C4C3", color: "#FFFFFF", boxShadow: "0 10px 30px rgba(30,167,255,.35)" }}>Browse Properties</a>
           <a href="/post-property" style={{ padding: "12px 24px", borderRadius: "999px", fontSize: "13px", fontWeight: 600, letterSpacing: "0.05em", textDecoration: "none", background: "rgba(255,255,255,0.05)", border: "1.5px solid rgba(255,255,255,0.15)", color: "#FFFFFF" }}>List Your Property</a>
@@ -367,45 +459,206 @@ function OverviewTab({ email, fullName, listings, savedItems, profile }: {
 
 // ── Tab 1b: Agent Overview ────────────────────────────────────────────────────
 
-function AgentOverviewTab({ fullName, email, assignedListings }: {
+// Phase 7 — real numbers for the four new stat cards below, plus the
+// unread-notification count. Self-contained (own useEffect) rather than
+// threading through the top-level component's existing agent data-load,
+// since none of these counts are needed by any other tab. assigned_to /
+// assigned_agent_id columns everywhere here reference agent_profiles.id
+// (agentProfileId), the same identity already used by /agent/leads,
+// /agent/site-visits, /agent/deals, and /agent/calendar.
+interface AgentOverviewStats {
+  openLeads: number;
+  upcomingVisits: number;
+  activeDeals: number;
+  todaySchedule: number;
+  unreadNotifications: number;
+}
+
+function useAgentOverviewStats(agentProfileId: string | null, userId: string): { stats: AgentOverviewStats | null; loading: boolean } {
+  const [stats, setStats]     = useState<AgentOverviewStats | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!agentProfileId) { setLoading(false); return; }
+    let cancelled = false;
+    const supabase = createClient();
+
+    const todayStr = (() => {
+      const d = new Date();
+      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+    })();
+    const today = new Date();
+
+    (async () => {
+      setLoading(true);
+
+      const [leadsRes, visitsRes, dealsRes, scheduleData, unreadCount] = await Promise.all([
+        supabase.from("inquiries").select("id", { count: "exact", head: true })
+          .eq("assigned_to", agentProfileId).not("status", "in", "(closed,lost,spam)"),
+        supabase.from("site_visits").select("id", { count: "exact", head: true })
+          .eq("assigned_to", agentProfileId).gte("visit_date", todayStr),
+        supabase.from("deals").select("id", { count: "exact", head: true })
+          .eq("assigned_to", agentProfileId).not("stage", "in", "(closed,lost)"),
+        loadAgentSchedule(agentProfileId),
+        getUnreadNotificationCount(userId),
+      ]);
+
+      if (cancelled) return;
+
+      if (leadsRes.error)  console.error("AgentOverviewTab — open leads count error:", leadsRes.error);
+      if (visitsRes.error) console.error("AgentOverviewTab — upcoming visits count error:", visitsRes.error);
+      if (dealsRes.error)  console.error("AgentOverviewTab — active deals count error:", dealsRes.error);
+
+      // Same three-source definition as /agent/calendar, filtered to items
+      // falling on today specifically.
+      const allScheduleItems = [
+        ...scheduleData.events.map(eventToScheduleItem),
+        ...scheduleData.siteVisitItems,
+        ...scheduleData.followUpItems,
+      ];
+      const todayCount = allScheduleItems.filter(i => isSameDay(i.date, today)).length;
+
+      setStats({
+        openLeads: leadsRes.count ?? 0,
+        upcomingVisits: visitsRes.count ?? 0,
+        activeDeals: dealsRes.count ?? 0,
+        todaySchedule: todayCount,
+        unreadNotifications: unreadCount,
+      });
+      setLoading(false);
+    })();
+
+    return () => { cancelled = true; };
+  }, [agentProfileId, userId]);
+
+  return { stats, loading };
+}
+
+function AgentOverviewTab({ fullName, email, assignedListings, agentProfileId, userId }: {
   fullName?: string;
   email: string;
   assignedListings: Listing[];
+  agentProfileId: string | null;
+  userId: string;
 }) {
   const name        = fullName || email.split("@")[0];
   const activeCount = assignedListings.filter(l => l.status === "active").length;
+  const { stats }   = useAgentOverviewStats(agentProfileId, userId);
 
   return (
     <div>
       <div style={{ marginBottom: "32px" }}>
-        <h1 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "38px", fontWeight: 400, color: "#FFFFFF", lineHeight: 1.2, marginBottom: "6px" }}>
+        <h1 style={{ fontFamily: "var(--font-heading-new)", fontSize: "38px", fontWeight: 400, color: "#FFFFFF", lineHeight: 1.2, marginBottom: "6px" }}>
           Welcome back, <em style={{ fontStyle: "italic", color: "#10C4C3" }}>{name}</em>
         </h1>
         <p style={{ fontSize: "14px", color: "#A9B4C2" }}>Here&apos;s an overview of your assigned listings.</p>
       </div>
 
       <div style={{ display: "flex", gap: "14px", flexWrap: "wrap", marginBottom: "28px" }}>
-        <StatCard label="Assigned Listings" value={assignedListings.length} accent icon={<IconBriefcase />} />
-        <StatCard label="Active"            value={activeCount}                    icon={<IconBuilding />} />
+        <StatCard label="Assigned Listings"     value={assignedListings.length}          accent icon={<IconBriefcase />} />
+        <StatCard label="Active"                value={activeCount}                             icon={<IconBuilding />} />
+        <StatCard label="Open Leads"            value={stats?.openLeads ?? "—"}                 icon={<IconMsg />}       href="/agent/leads" />
+        <StatCard label="Upcoming Site Visits"  value={stats?.upcomingVisits ?? "—"}            icon={<IconPin />}       href="/agent/site-visits" />
+        <StatCard label="Active Deals"          value={stats?.activeDeals ?? "—"}               icon={<IconTrend />}     href="/agent/deals" />
+        <StatCard label="Today's Schedule"      value={stats?.todaySchedule ?? "—"}             icon={<IconCal />}       href="/agent/calendar" />
+        <StatCard label="Notifications"         value={stats?.unreadNotifications ?? "—"}        icon={<IconBell />}      href="/notifications" />
       </div>
 
       <Card style={{ padding: "28px" }}>
-        <h3 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "20px", fontWeight: 600, color: "#FFFFFF", marginBottom: "18px" }}>Quick Actions</h3>
+        <h3 style={{ fontFamily: "var(--font-heading-new)", fontSize: "20px", fontWeight: 600, color: "#FFFFFF", marginBottom: "18px" }}>Quick Actions</h3>
         <div style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>
+          <a
+            href="/agent/leads"
+            style={{ padding: "12px 24px", borderRadius: "999px", fontSize: "13px", fontWeight: 600, letterSpacing: "0.05em", textDecoration: "none", background: "#10C4C3", color: "#FFFFFF", boxShadow: "0 10px 30px rgba(30,167,255,.35)", fontFamily: "var(--font-body-new)" }}
+          >
+            My Leads
+          </a>
+          <a
+            href="/agent/site-visits"
+            style={{ padding: "12px 24px", borderRadius: "999px", fontSize: "13px", fontWeight: 600, letterSpacing: "0.05em", background: "rgba(255,255,255,0.05)", border: "1.5px solid rgba(255,255,255,0.15)", color: "#FFFFFF", textDecoration: "none", fontFamily: "var(--font-body-new)" }}
+          >
+            Site Visits
+          </a>
+          <a
+            href="/agent/deals"
+            style={{ padding: "12px 24px", borderRadius: "999px", fontSize: "13px", fontWeight: 600, letterSpacing: "0.05em", background: "rgba(255,255,255,0.05)", border: "1.5px solid rgba(255,255,255,0.15)", color: "#FFFFFF", textDecoration: "none", fontFamily: "var(--font-body-new)" }}
+          >
+            Deals
+          </a>
+          <a
+            href="/agent/calendar"
+            style={{ padding: "12px 24px", borderRadius: "999px", fontSize: "13px", fontWeight: 600, letterSpacing: "0.05em", background: "rgba(255,255,255,0.05)", border: "1.5px solid rgba(255,255,255,0.15)", color: "#FFFFFF", textDecoration: "none", fontFamily: "var(--font-body-new)" }}
+          >
+            Calendar
+          </a>
+          <a
+            href="/agent/messages"
+            style={{ padding: "12px 24px", borderRadius: "999px", fontSize: "13px", fontWeight: 600, letterSpacing: "0.05em", background: "rgba(255,255,255,0.05)", border: "1.5px solid rgba(255,255,255,0.15)", color: "#FFFFFF", textDecoration: "none", fontFamily: "var(--font-body-new)" }}
+          >
+            Messages
+          </a>
+          <a
+            href="/agent/tasks"
+            style={{ padding: "12px 24px", borderRadius: "999px", fontSize: "13px", fontWeight: 600, letterSpacing: "0.05em", background: "rgba(255,255,255,0.05)", border: "1.5px solid rgba(255,255,255,0.15)", color: "#FFFFFF", textDecoration: "none", fontFamily: "var(--font-body-new)" }}
+          >
+            Tasks
+          </a>
+          <a
+            href="/agent/teams"
+            style={{ padding: "12px 24px", borderRadius: "999px", fontSize: "13px", fontWeight: 600, letterSpacing: "0.05em", background: "rgba(255,255,255,0.05)", border: "1.5px solid rgba(255,255,255,0.15)", color: "#FFFFFF", textDecoration: "none", fontFamily: "var(--font-body-new)" }}
+          >
+            Teams
+          </a>
+          <a
+            href="/agent/analytics"
+            style={{ padding: "12px 24px", borderRadius: "999px", fontSize: "13px", fontWeight: 600, letterSpacing: "0.05em", background: "rgba(255,255,255,0.05)", border: "1.5px solid rgba(255,255,255,0.15)", color: "#FFFFFF", textDecoration: "none", fontFamily: "var(--font-body-new)" }}
+          >
+            Analytics
+          </a>
+          <a
+            href="/agent/leaderboard"
+            style={{ padding: "12px 24px", borderRadius: "999px", fontSize: "13px", fontWeight: 600, letterSpacing: "0.05em", background: "rgba(255,255,255,0.05)", border: "1.5px solid rgba(255,255,255,0.15)", color: "#FFFFFF", textDecoration: "none", fontFamily: "var(--font-body-new)" }}
+          >
+            Leaderboard
+          </a>
           <button
             onClick={() => { const el = document.querySelector("[data-tab='assigned']") as HTMLButtonElement | null; el?.click(); }}
-            style={{ padding: "12px 24px", borderRadius: "999px", fontSize: "13px", fontWeight: 600, letterSpacing: "0.05em", background: "#10C4C3", color: "#FFFFFF", border: "none", cursor: "pointer", boxShadow: "0 10px 30px rgba(30,167,255,.35)", fontFamily: "'Cal Sans', sans-serif" }}
+            style={{ padding: "12px 24px", borderRadius: "999px", fontSize: "13px", fontWeight: 600, letterSpacing: "0.05em", background: "rgba(255,255,255,0.05)", border: "1.5px solid rgba(255,255,255,0.15)", color: "#FFFFFF", cursor: "pointer", fontFamily: "var(--font-body-new)" }}
           >
             View Assigned Listings
           </button>
           <button
             onClick={() => { const el = document.querySelector("[data-tab='profile']") as HTMLButtonElement | null; el?.click(); }}
-            style={{ padding: "12px 24px", borderRadius: "999px", fontSize: "13px", fontWeight: 600, letterSpacing: "0.05em", background: "rgba(255,255,255,0.05)", border: "1.5px solid rgba(255,255,255,0.15)", color: "#FFFFFF", cursor: "pointer", fontFamily: "'Cal Sans', sans-serif" }}
+            style={{ padding: "12px 24px", borderRadius: "999px", fontSize: "13px", fontWeight: 600, letterSpacing: "0.05em", background: "rgba(255,255,255,0.05)", border: "1.5px solid rgba(255,255,255,0.15)", color: "#FFFFFF", cursor: "pointer", fontFamily: "var(--font-body-new)" }}
           >
             Edit Profile
           </button>
         </div>
       </Card>
+
+      {/* Phase 22 re-skin content — charts/table/activity, all scoped
+          to this agent's own data. Guarded on agentProfileId since
+          every query below needs it; nothing renders until it's
+          loaded (same pattern useAgentOverviewStats already uses). */}
+      {agentProfileId && (
+        <div style={{ marginTop: "24px", display: "flex", flexDirection: "column", gap: "20px" }}>
+          <div className="agent-overview-2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "20px" }}>
+            <LeadsOverTimeChart agentId={agentProfileId} />
+            <DealsClosedChart agentId={agentProfileId} />
+          </div>
+
+          <PerformanceTrendChart agentId={agentProfileId} />
+
+          <ActiveDealsTable agentId={agentProfileId} />
+
+          <div className="agent-overview-2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "20px" }}>
+            <LeadsByCityRanked agentId={agentProfileId} />
+            <CondensedCalendar agentId={agentProfileId} />
+          </div>
+
+          <RecentActivityFeed agentId={agentProfileId} />
+        </div>
+      )}
     </div>
   );
 }
@@ -422,23 +675,170 @@ function ListingsTab({ listings, loading, onDelete }: {
   return <MyListingsList listings={listings} onDelete={onDelete} compact />;
 }
 
-// ── Tab: Assigned Listings (agent, read-only) ────────────────────────────────
+// ── Tab: Assigned Listings (agent — can Edit, cannot Delete directly) ──────────
+//
+// readOnly stays true (Delete hidden — agents don't get direct deletion,
+// per explicit instruction: removal goes through the request flow below,
+// not straight to the seller-facing Delete). canEdit is explicitly set
+// true so the same Edit button sellers use (-> /post-property/edit/[id])
+// becomes available here too, now that 033 grants the assigned agent real
+// UPDATE access via RLS.
 
-function AssignedListingsTab({ listings, loading }: { listings: Listing[]; loading: boolean }) {
+function AssignedListingsTab({ listings, loading, userId }: { listings: Listing[]; loading: boolean; userId: string }) {
+  const [deletionTarget, setDeletionTarget] = useState<MLLListing | null>(null);
+
   if (loading) return <Spinner />;
 
   return (
     <div>
       <SectionHeading title="Assigned Listings" subtitle="Properties assigned to you by the Nilay 360 team." />
-      <MyListingsList listings={listings} compact readOnly />
+      <MyListingsList
+        listings={listings}
+        compact
+        readOnly
+        canEdit
+        onRequestDeletion={listing => setDeletionTarget(listing)}
+      />
+      {deletionTarget && (
+        <RequestDeletionModal
+          listing={deletionTarget}
+          userId={userId}
+          onClose={() => setDeletionTarget(null)}
+        />
+      )}
+    </div>
+  );
+}
+
+// Deletion-request modal — mechanics mirror src/components/shared/ReportButton.tsx
+// (the closest existing precedent: fixed-overlay modal, backdrop-click to
+// close, reason + optional details, a "submitted" success state), re-themed
+// dark to match this dashboard instead of ReportButton's light public-page
+// theme. Inserts into the same `reports` table ReportButton uses, tagged via
+// request_type (migration 033) rather than a separate table/mechanism.
+function RequestDeletionModal({ listing, userId, onClose }: { listing: MLLListing; userId: string; onClose: () => void }) {
+  const [reason, setReason] = useState("");
+  const [details, setDetails] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function handleSubmit() {
+    if (!reason.trim()) { setError("Please provide a reason."); return; }
+    setSubmitting(true);
+    setError(null);
+    const supabase = createClient();
+    // reporter_id references profiles.id (same FK ReportButton.tsx already
+    // uses) — the agent's own account id, not agent_profiles.id, which
+    // would violate the FK (it points at a different table entirely).
+    const { error: err } = await supabase.from("reports").insert({
+      reporter_id: userId,
+      entity_type: "listing",
+      entity_id: listing.id,
+      reason: reason.trim(),
+      details: details.trim() || null,
+      request_type: "deletion_request",
+    });
+    setSubmitting(false);
+    if (err) { setError("Failed to submit — please try again."); return; }
+    setSubmitted(true);
+  }
+
+  return (
+    <div
+      onClick={onClose}
+      role="dialog"
+      aria-modal="true"
+      aria-label={`Request deletion — ${listing.title ?? "listing"}`}
+      style={{ position: "fixed", inset: 0, zIndex: 600, background: "rgba(0,0,0,0.55)", backdropFilter: "blur(2px)", display: "flex", alignItems: "center", justifyContent: "center", padding: "20px" }}
+    >
+      <div
+        onClick={e => e.stopPropagation()}
+        style={{ background: "#0A1526", borderRadius: "16px", border: "1px solid rgba(255,255,255,0.10)", boxShadow: "0 20px 60px rgba(0,0,0,0.55)", width: "100%", maxWidth: "420px", padding: "26px 28px", fontFamily: "var(--font-body-new)" }}
+      >
+        {submitted ? (
+          <div style={{ textAlign: "center", padding: "12px 0" }}>
+            <div style={{ fontSize: "36px", marginBottom: "10px" }}>✅</div>
+            <p style={{ fontFamily: "var(--font-heading-new)", fontSize: "20px", color: "#FFFFFF", marginBottom: "8px" }}>Deletion request submitted</p>
+            <p style={{ fontSize: "12px", color: "#A9B4C2", lineHeight: 1.7, marginBottom: "18px" }}>Our team will review this shortly.</p>
+            <button onClick={onClose} style={{ padding: "10px 20px", background: "#10C4C3", border: "none", borderRadius: "8px", color: "#020C1C", fontSize: "12px", fontWeight: 700, cursor: "pointer", fontFamily: "var(--font-body-new)" }}>Close</button>
+          </div>
+        ) : (
+          <>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "6px" }}>
+              <h3 style={{ fontFamily: "var(--font-heading-new)", fontSize: "20px", fontWeight: 600, color: "#FFFFFF" }}>Request Deletion</h3>
+              <button onClick={onClose} aria-label="Close" style={{ width: "28px", height: "28px", borderRadius: "7px", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.12)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: "#A9B4C2" }}>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              </button>
+            </div>
+            <p style={{ fontSize: "12px", color: "#A9B4C2", marginBottom: "18px" }}>{listing.title ?? "This listing"}</p>
+
+            <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
+              <div>
+                <label style={{ display: "block", fontSize: "10px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "#A9B4C2", marginBottom: "6px" }}>Reason</label>
+                <input
+                  type="text"
+                  value={reason}
+                  onChange={e => setReason(e.target.value)}
+                  placeholder="Why should this listing be removed?"
+                  style={{ width: "100%", padding: "10px 14px", background: "#111F33", border: "1px solid rgba(255,255,255,0.15)", borderRadius: "8px", color: "#FFFFFF", fontFamily: "var(--font-body-new)", fontSize: "13px", outline: "none" }}
+                />
+              </div>
+              <div>
+                <label style={{ display: "block", fontSize: "10px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "#A9B4C2", marginBottom: "6px" }}>Details (optional)</label>
+                <textarea
+                  value={details}
+                  onChange={e => setDetails(e.target.value)}
+                  rows={3}
+                  placeholder="Anything that will help our team review this…"
+                  style={{ width: "100%", padding: "10px 14px", background: "#111F33", border: "1px solid rgba(255,255,255,0.15)", borderRadius: "8px", color: "#FFFFFF", fontFamily: "var(--font-body-new)", fontSize: "13px", outline: "none", resize: "vertical" }}
+                />
+              </div>
+              {error && <div style={{ fontSize: "12px", color: "#F87171" }}>{error}</div>}
+              <button
+                onClick={() => void handleSubmit()}
+                disabled={submitting}
+                style={{ padding: "12px", background: "#10C4C3", border: "none", borderRadius: "9px", color: "#020C1C", fontSize: "12px", fontWeight: 700, letterSpacing: "0.04em", cursor: submitting ? "not-allowed" : "pointer", opacity: submitting ? 0.6 : 1, fontFamily: "var(--font-body-new)" }}
+              >
+                {submitting ? "Submitting…" : "Submit Request"}
+              </button>
+            </div>
+          </>
+        )}
+      </div>
     </div>
   );
 }
 
 // ── Tab: Agent Profile ────────────────────────────────────────────────────────
 
-function AgentProfileTab({ email, agentProfile, loading, onSave }: {
+// KYC Documents (Phase 17). Fixed 4-slot checklist, per spec — not a
+// free-form document list like the Deals feature's. Keys match the
+// document_type values this feature writes; labels are just display
+// text.
+const KYC_DOCUMENT_SLOTS: { key: string; label: string }[] = [
+  { key: "pan",               label: "PAN" },
+  { key: "aadhaar",           label: "Aadhaar" },
+  { key: "rera_certificate",  label: "RERA Certificate" },
+  { key: "address_proof",     label: "Address Proof" },
+];
+
+interface AgentDocumentRow {
+  id: string;
+  document_type: string;
+  file_url: string;
+  file_name: string | null;
+  mime_type: string | null;
+  created_at: string;
+}
+
+function fmtDocDate(iso: string): string {
+  return new Date(iso).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
+}
+
+function AgentProfileTab({ email, userId, agentProfile, loading, onSave }: {
   email: string;
+  userId: string;
   agentProfile: AgentProfileData | null;
   loading: boolean;
   onSave: (updates: Omit<AgentProfileData, "id">) => Promise<boolean>;
@@ -448,8 +848,87 @@ function AgentProfileTab({ email, agentProfile, loading, onSave }: {
   const [bio,              setBio]            = useState("");
   const [yearsExperience, setYearsExperience] = useState("");
   const [cities,           setCities]         = useState<string[]>([]);
+  // Leaderboard (Phase 25) — UI state is the positive framing
+  // ("participating"), storage is the negated column
+  // (leaderboard_opt_out) — inverted at the two boundaries (sync
+  // effect below, handleSave) rather than showing a
+  // double-negative "opt out of opting out" checkbox to the agent.
+  const [participating, setParticipating] = useState(true);
   const [saving, setSaving] = useState(false);
   const [toast,  setToast]  = useState<{ ok: boolean; msg: string } | null>(null);
+
+  // KYC documents — loaded once agentProfile.id is known. No approval-
+  // status check anywhere here, client-side or in the query, matching
+  // the RLS policy (031), which also has no status gate for an agent's
+  // own documents — deliberate, since KYC is often submitted as part of
+  // becoming approved.
+  const [documents, setDocuments] = useState<AgentDocumentRow[]>([]);
+  const [docsLoading, setDocsLoading] = useState(true);
+  const [uploadingSlot, setUploadingSlot] = useState<string | null>(null);
+  const [slotMessages, setSlotMessages] = useState<Record<string, { type: "success" | "error"; text: string } | null>>({});
+  const fileInputs = React.useRef<Record<string, HTMLInputElement | null>>({});
+
+  useEffect(() => {
+    if (!agentProfile?.id) { setDocsLoading(false); return; }
+    let cancelled = false;
+    (async () => {
+      setDocsLoading(true);
+      const supabase = createClient();
+      const { data, error } = await supabase
+        .from("documents")
+        .select("id, document_type, file_url, file_name, mime_type, created_at")
+        .eq("agent_profile_id", agentProfile.id)
+        .order("created_at", { ascending: false });
+      if (cancelled) return;
+      if (error) console.error("KYC documents query error:", error);
+      setDocuments((data as AgentDocumentRow[] | null) ?? []);
+      setDocsLoading(false);
+    })();
+    return () => { cancelled = true; };
+  }, [agentProfile?.id]);
+
+  function flashSlotMessage(slotKey: string, msg: { type: "success" | "error"; text: string } | null) {
+    setSlotMessages(prev => ({ ...prev, [slotKey]: msg }));
+    if (msg?.type === "success") {
+      setTimeout(() => setSlotMessages(prev => ({ ...prev, [slotKey]: null })), 2500);
+    }
+  }
+
+  async function handleUploadDocument(slotKey: string, file: File) {
+    if (!agentProfile?.id) return;
+    setUploadingSlot(slotKey);
+    flashSlotMessage(slotKey, null);
+    try {
+      const body = new FormData();
+      body.append("file", file);
+      const res = await fetch("/api/upload-document", { method: "POST", body });
+      const json = await res.json();
+      if (!res.ok || !json?.secure_url) throw new Error(json?.error ?? "Upload failed");
+
+      const supabase = createClient();
+      const { data, error } = await supabase
+        .from("documents")
+        .insert({
+          agent_profile_id: agentProfile.id,
+          document_type: slotKey,
+          file_url: json.secure_url as string,
+          file_name: file.name,
+          mime_type: file.type || null,
+          uploaded_by: userId,
+        })
+        .select("id, document_type, file_url, file_name, mime_type, created_at")
+        .single();
+      if (error) throw new Error(error.message);
+
+      setDocuments(prev => [data as AgentDocumentRow, ...prev]);
+      flashSlotMessage(slotKey, { type: "success", text: "Uploaded" });
+    } catch (err) {
+      console.error("KYC document upload error:", err);
+      flashSlotMessage(slotKey, { type: "error", text: err instanceof Error ? err.message : "Upload failed" });
+    } finally {
+      setUploadingSlot(null);
+    }
+  }
 
   useEffect(() => {
     if (!agentProfile) return;
@@ -458,6 +937,7 @@ function AgentProfileTab({ email, agentProfile, loading, onSave }: {
     setBio(agentProfile.bio ?? "");
     setYearsExperience(agentProfile.years_experience != null ? String(agentProfile.years_experience) : "");
     setCities(agentProfile.cities);
+    setParticipating(!agentProfile.leaderboard_opt_out);
   }, [agentProfile]);
 
   const handleSave = async () => {
@@ -469,6 +949,7 @@ function AgentProfileTab({ email, agentProfile, loading, onSave }: {
       bio:              bio.trim()           || null,
       years_experience: yearsExperience ? parseInt(yearsExperience, 10) : null,
       cities,
+      leaderboard_opt_out: !participating,
     });
     setSaving(false);
     setToast(ok ? { ok: true, msg: "Profile saved successfully" } : { ok: false, msg: "Save failed. Please try again." });
@@ -480,7 +961,7 @@ function AgentProfileTab({ email, agentProfile, loading, onSave }: {
   return (
     <div>
       {toast && (
-        <div style={{ position: "fixed", top: 88, right: 24, zIndex: 500, padding: "12px 20px", borderRadius: 16, background: "rgba(18,21,25,0.92)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", border: `1px solid ${toast.ok ? "rgba(16,196,195,0.30)" : "rgba(248,113,113,0.30)"}`, color: toast.ok ? "#FFFFFF" : "#F87171", fontSize: 13, fontWeight: 600, boxShadow: "0 4px 24px rgba(0,0,0,0.18)", fontFamily: "'Cal Sans', sans-serif", display: "flex", alignItems: "center", gap: 8 }}>
+        <div style={{ position: "fixed", top: 88, right: 24, zIndex: 500, padding: "12px 20px", borderRadius: 16, background: "rgba(18,21,25,0.92)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", border: `1px solid ${toast.ok ? "rgba(16,196,195,0.30)" : "rgba(248,113,113,0.30)"}`, color: toast.ok ? "#FFFFFF" : "#F87171", fontSize: 13, fontWeight: 600, boxShadow: "0 4px 24px rgba(0,0,0,0.18)", fontFamily: "var(--font-body-new)", display: "flex", alignItems: "center", gap: 8 }}>
           {toast.ok ? "✓" : "✗"} {toast.msg}
         </div>
       )}
@@ -490,14 +971,14 @@ function AgentProfileTab({ email, agentProfile, loading, onSave }: {
         <button
           onClick={() => void handleSave()}
           disabled={saving}
-          style={{ padding: "11px 28px", background: "#10C4C3", borderRadius: 999, color: "#000", fontSize: 13, fontWeight: 700, border: "none", cursor: saving ? "not-allowed" : "pointer", fontFamily: "'Cal Sans', sans-serif", opacity: saving ? 0.7 : 1, flexShrink: 0, boxShadow: "0 10px 30px rgba(30,167,255,.35)" }}
+          style={{ padding: "11px 28px", background: "#10C4C3", borderRadius: 999, color: "#000", fontSize: 13, fontWeight: 700, border: "none", cursor: saving ? "not-allowed" : "pointer", fontFamily: "var(--font-body-new)", opacity: saving ? 0.7 : 1, flexShrink: 0, boxShadow: "0 10px 30px rgba(30,167,255,.35)" }}
         >
           {saving ? "Saving…" : "Save Changes"}
         </button>
       </div>
 
       <Card style={{ padding: "28px 32px", marginBottom: 20 }}>
-        <h3 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: 20, fontWeight: 600, color: "#FFFFFF", marginBottom: 22, paddingBottom: 16, borderBottom: "1px solid rgba(255,255,255,0.07)" }}>Agent Details</h3>
+        <h3 style={{ fontFamily: "var(--font-heading-new)", fontSize: 20, fontWeight: 600, color: "#FFFFFF", marginBottom: 22, paddingBottom: 16, borderBottom: "1px solid rgba(255,255,255,0.07)" }}>Agent Details</h3>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "0 28px" }}>
           <FormField label="License Number"  value={licenseNumber}   onChange={setLicenseNumber} placeholder="RERA / license number" />
           <FormField label="Agency Name"     value={agencyName}      onChange={setAgencyName}    placeholder="Your agency (if any)" />
@@ -508,22 +989,91 @@ function AgentProfileTab({ email, agentProfile, loading, onSave }: {
               value={bio}
               onChange={e => setBio(e.target.value)}
               rows={3}
-              style={{ width: "100%", padding: "11px 14px", background: "rgba(255,255,255,0.05)", border: "1.5px solid rgba(255,255,255,0.12)", borderRadius: 8, fontSize: 14, color: "#FFFFFF", fontFamily: "'Cal Sans', sans-serif", outline: "none", resize: "vertical", boxSizing: "border-box", minHeight: 80 }}
+              style={{ width: "100%", padding: "11px 14px", background: "rgba(255,255,255,0.05)", border: "1.5px solid rgba(255,255,255,0.12)", borderRadius: 8, fontSize: 14, color: "#FFFFFF", fontFamily: "var(--font-body-new)", outline: "none", resize: "vertical", boxSizing: "border-box", minHeight: 80 }}
             />
           </div>
         </div>
       </Card>
 
       <Card style={{ padding: "28px 32px", marginBottom: 20 }}>
-        <h3 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: 20, fontWeight: 600, color: "#FFFFFF", marginBottom: 22, paddingBottom: 16, borderBottom: "1px solid rgba(255,255,255,0.07)" }}>Service Cities</h3>
+        <h3 style={{ fontFamily: "var(--font-heading-new)", fontSize: 20, fontWeight: 600, color: "#FFFFFF", marginBottom: 22, paddingBottom: 16, borderBottom: "1px solid rgba(255,255,255,0.07)" }}>Service Cities</h3>
         <CityMultiSelect selected={cities} onChange={setCities} />
       </Card>
 
-      <Card style={{ padding: "28px 32px" }}>
-        <h3 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: 20, fontWeight: 600, color: "#FFFFFF", marginBottom: 22, paddingBottom: 16, borderBottom: "1px solid rgba(255,255,255,0.07)" }}>Account Details</h3>
+      <Card style={{ padding: "28px 32px", marginBottom: 20 }}>
+        <h3 style={{ fontFamily: "var(--font-heading-new)", fontSize: 20, fontWeight: 600, color: "#FFFFFF", marginBottom: 22, paddingBottom: 16, borderBottom: "1px solid rgba(255,255,255,0.07)" }}>Account Details</h3>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "0 28px" }}>
           {pField("Email Address", email, () => {}, { readOnly: true })}
         </div>
+      </Card>
+
+      <Card style={{ padding: "28px 32px", marginBottom: 20 }}>
+        <h3 style={{ fontFamily: "var(--font-heading-new)", fontSize: 20, fontWeight: 600, color: "#FFFFFF", marginBottom: 22, paddingBottom: 16, borderBottom: "1px solid rgba(255,255,255,0.07)" }}>Leaderboard</h3>
+        <label style={{ display: "flex", alignItems: "center", gap: "12px", cursor: "pointer" }}>
+          <input
+            type="checkbox"
+            checked={participating}
+            onChange={e => setParticipating(e.target.checked)}
+            style={{ width: "18px", height: "18px", accentColor: "#10C4C3", cursor: "pointer" }}
+          />
+          <span style={{ fontSize: "14px", color: "#FFFFFF" }}>Show me on the team leaderboard</span>
+        </label>
+        <p style={{ fontSize: "12px", color: "#A9B4C2", marginTop: "8px", marginLeft: "30px" }}>
+          Unchecking this hides you from other agents' leaderboard view entirely — admins can still see your numbers in their own comparison view either way.
+        </p>
+      </Card>
+
+      <Card style={{ padding: "28px 32px" }}>
+        <h3 style={{ fontFamily: "var(--font-heading-new)", fontSize: 20, fontWeight: 600, color: "#FFFFFF", marginBottom: 6, paddingBottom: 16, borderBottom: "1px solid rgba(255,255,255,0.07)" }}>KYC Documents</h3>
+        <p style={{ fontSize: 13, color: "#A9B4C2", margin: "12px 0 18px" }}>
+          Upload these to complete your agent verification. Not required for approval, but the sooner they&apos;re on file the sooner our team can review them.
+        </p>
+        {docsLoading ? <Spinner /> : (
+          <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
+            {KYC_DOCUMENT_SLOTS.map(slot => {
+              const current = documents.find(d => d.document_type === slot.key); // documents is created_at desc, so first match is most recent
+              const isUploading = uploadingSlot === slot.key;
+              const message = slotMessages[slot.key];
+              return (
+                <div key={slot.key} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "12px", padding: "14px 18px", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "10px", flexWrap: "wrap" }}>
+                  <div>
+                    <div style={{ fontSize: "13px", fontWeight: 700, color: "#FFFFFF", marginBottom: "3px" }}>{slot.label}</div>
+                    {current ? (
+                      <div style={{ fontSize: "12px", color: "#A9B4C2" }}>{current.file_name ?? "Uploaded file"} · {fmtDocDate(current.created_at)}</div>
+                    ) : (
+                      <div style={{ fontSize: "12px", color: "#6B7686" }}>Not uploaded yet</div>
+                    )}
+                  </div>
+                  <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                    {message && (
+                      <span style={{ fontSize: "12px", fontWeight: 600, color: message.type === "error" ? "#F87171" : "#4ADE80", display: "inline-flex", alignItems: "center", gap: "5px" }}>
+                        {message.type === "error" ? "⚠" : "✓"} {message.text}
+                      </span>
+                    )}
+                    <input
+                      ref={el => { fileInputs.current[slot.key] = el; }}
+                      type="file"
+                      accept=".pdf,.jpg,.jpeg,.png,.webp,application/pdf,image/jpeg,image/png,image/webp"
+                      style={{ display: "none" }}
+                      onChange={e => {
+                        const file = e.target.files?.[0];
+                        if (file) void handleUploadDocument(slot.key, file);
+                        e.target.value = "";
+                      }}
+                    />
+                    <button
+                      onClick={() => fileInputs.current[slot.key]?.click()}
+                      disabled={isUploading}
+                      style={{ padding: "8px 18px", background: current ? "rgba(255,255,255,0.06)" : "#10C4C3", border: current ? "1.5px solid rgba(255,255,255,0.15)" : "none", borderRadius: "8px", color: current ? "#FFFFFF" : "#020C1C", fontSize: "12px", fontWeight: 700, cursor: isUploading ? "default" : "pointer", opacity: isUploading ? 0.6 : 1, fontFamily: "var(--font-body-new)", whiteSpace: "nowrap" }}
+                    >
+                      {isUploading ? "Uploading…" : current ? "Replace" : "Upload"}
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
       </Card>
     </div>
   );
@@ -579,7 +1129,7 @@ function SavedTab({ savedItems, loading, onRemove }: {
                           {propType}
                         </span>
                       )}
-                      <h3 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "19px", fontWeight: 600, color: "#FFFFFF", marginBottom: "4px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                      <h3 style={{ fontFamily: "var(--font-heading-new)", fontSize: "19px", fontWeight: 600, color: "#FFFFFF", marginBottom: "4px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                         {title ?? `Property ID: ${item.property_id ?? "—"}`}
                       </h3>
                       {city && (
@@ -592,13 +1142,13 @@ function SavedTab({ savedItems, loading, onRemove }: {
                   </div>
                   <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: "10px", flexShrink: 0 }}>
                     {price != null && (
-                      <div style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "22px", fontWeight: 600, color: "#FFFFFF" }}>
+                      <div style={{ fontFamily: "var(--font-support-new)", fontSize: "22px", fontWeight: 600, color: "#FFFFFF" }}>
                         {formatPrice(price, null)}
                       </div>
                     )}
                     <button
                       onClick={() => onRemove(item.id)}
-                      style={{ display: "flex", alignItems: "center", gap: "5px", padding: "6px 12px", fontSize: "12px", color: "#F87171", background: "rgba(248,113,113,0.12)", border: "1px solid rgba(248,113,113,0.30)", borderRadius: "7px", cursor: "pointer", fontFamily: "'Cal Sans', sans-serif" }}
+                      style={{ display: "flex", alignItems: "center", gap: "5px", padding: "6px 12px", fontSize: "12px", color: "#F87171", background: "rgba(248,113,113,0.12)", border: "1px solid rgba(248,113,113,0.30)", borderRadius: "7px", cursor: "pointer", fontFamily: "var(--font-body-new)" }}
                     >
                       <IconTrash /> Remove
                     </button>
@@ -632,7 +1182,7 @@ function pField(label: string, value: string, onChange: (v: string) => void, opt
         readOnly={ro}
         placeholder={opts?.placeholder}
         onChange={e => !ro && onChange(e.target.value)}
-        style={{ width: "100%", padding: "11px 14px", background: ro ? "rgba(255,255,255,0.03)" : "rgba(255,255,255,0.05)", border: "1.5px solid rgba(255,255,255,0.12)", borderRadius: 8, fontSize: 14, color: ro ? "rgba(255,255,255,0.45)" : "#FFFFFF", fontFamily: "'Cal Sans', sans-serif", outline: "none", boxSizing: "border-box" as const, cursor: ro ? "not-allowed" : "text" }}
+        style={{ width: "100%", padding: "11px 14px", background: ro ? "rgba(255,255,255,0.03)" : "rgba(255,255,255,0.05)", border: "1.5px solid rgba(255,255,255,0.12)", borderRadius: 8, fontSize: 14, color: ro ? "rgba(255,255,255,0.45)" : "#FFFFFF", fontFamily: "var(--font-body-new)", outline: "none", boxSizing: "border-box" as const, cursor: ro ? "not-allowed" : "text" }}
       />
     </div>
   );
@@ -643,7 +1193,7 @@ function pSelect(label: string, value: string, onChange: (v: string) => void, op
     <div style={{ marginBottom: 18 }}>
       <label style={{ display: "block", fontSize: "11px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" as const, color: "#A9B4C2", marginBottom: 7 }}>{label}</label>
       <div style={{ position: "relative" }}>
-        <select value={value} onChange={e => onChange(e.target.value)} style={{ width: "100%", padding: "11px 36px 11px 14px", background: "rgba(255,255,255,0.05)", border: "1.5px solid rgba(255,255,255,0.12)", borderRadius: 8, fontSize: 14, color: value ? "#FFFFFF" : "rgba(255,255,255,0.45)", fontFamily: "'Cal Sans', sans-serif", outline: "none", appearance: "none", cursor: "pointer" }}>
+        <select value={value} onChange={e => onChange(e.target.value)} style={{ width: "100%", padding: "11px 36px 11px 14px", background: "rgba(255,255,255,0.05)", border: "1.5px solid rgba(255,255,255,0.12)", borderRadius: 8, fontSize: 14, color: value ? "#FFFFFF" : "rgba(255,255,255,0.45)", fontFamily: "var(--font-body-new)", outline: "none", appearance: "none", cursor: "pointer" }}>
           {placeholder && <option value="">{placeholder}</option>}
           {options.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
         </select>
@@ -727,7 +1277,7 @@ function ProfileTab({ email, userId, profile, loading, onSave }: {
     <div>
       {/* Toast */}
       {toast && (
-        <div style={{ position: "fixed", top: 88, right: 24, zIndex: 500, padding: "12px 20px", borderRadius: 16, background: "rgba(18,21,25,0.92)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", border: `1px solid ${toast.ok ? "rgba(16,196,195,0.30)" : "rgba(248,113,113,0.30)"}`, color: toast.ok ? "#FFFFFF" : "#F87171", fontSize: 13, fontWeight: 600, boxShadow: "0 4px 24px rgba(0,0,0,0.18)", fontFamily: "'Cal Sans', sans-serif", display: "flex", alignItems: "center", gap: 8 }}>
+        <div style={{ position: "fixed", top: 88, right: 24, zIndex: 500, padding: "12px 20px", borderRadius: 16, background: "rgba(18,21,25,0.92)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", border: `1px solid ${toast.ok ? "rgba(16,196,195,0.30)" : "rgba(248,113,113,0.30)"}`, color: toast.ok ? "#FFFFFF" : "#F87171", fontSize: 13, fontWeight: 600, boxShadow: "0 4px 24px rgba(0,0,0,0.18)", fontFamily: "var(--font-body-new)", display: "flex", alignItems: "center", gap: 8 }}>
           {toast.ok ? "✓" : "✗"} {toast.msg}
         </div>
       )}
@@ -737,7 +1287,7 @@ function ProfileTab({ email, userId, profile, loading, onSave }: {
         <button
           onClick={handleSave}
           disabled={saving}
-          style={{ padding: "11px 28px", background: "#10C4C3", borderRadius: 999, color: "#000", fontSize: 13, fontWeight: 700, border: "none", cursor: saving ? "not-allowed" : "pointer", fontFamily: "'Cal Sans', sans-serif", opacity: saving ? 0.7 : 1, flexShrink: 0, boxShadow: "0 10px 30px rgba(30,167,255,.35)" }}
+          style={{ padding: "11px 28px", background: "#10C4C3", borderRadius: 999, color: "#000", fontSize: 13, fontWeight: 700, border: "none", cursor: saving ? "not-allowed" : "pointer", fontFamily: "var(--font-body-new)", opacity: saving ? 0.7 : 1, flexShrink: 0, boxShadow: "0 10px 30px rgba(30,167,255,.35)" }}
         >
           {saving ? "Saving…" : "Save Changes"}
         </button>
@@ -750,12 +1300,12 @@ function ProfileTab({ email, userId, profile, loading, onSave }: {
           <div style={{ width: 80, height: 80, borderRadius: "50%", background: avatarSrc ? "transparent" : "rgba(16,196,195,0.12)", border: "2.5px solid rgba(16,196,195,0.35)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, overflow: "hidden" }}>
             {avatarSrc
               ? <img src={optimizedImageUrl(avatarSrc, 160)} alt={displayName} loading="lazy" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-              : <span style={{ fontSize: 28, fontWeight: 700, color: "#10C4C3", fontFamily: "'Cal Sans', sans-serif" }}>{displayName[0].toUpperCase()}</span>
+              : <span style={{ fontSize: 28, fontWeight: 700, color: "#10C4C3", fontFamily: "var(--font-body-new)" }}>{displayName[0].toUpperCase()}</span>
             }
           </div>
           {/* Name + email */}
           <div style={{ flex: 1, minWidth: 200 }}>
-            <div style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: 24, fontWeight: 600, color: "#FFFFFF" }}>{displayName}</div>
+            <div style={{ fontFamily: "var(--font-heading-new)", fontSize: 24, fontWeight: 600, color: "#FFFFFF" }}>{displayName}</div>
             <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 4 }}>
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.45)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
               <span style={{ fontSize: 13, color: "#A9B4C2" }}>{email}</span>
@@ -777,7 +1327,7 @@ function ProfileTab({ email, userId, profile, loading, onSave }: {
 
       {/* Main info */}
       <Card style={{ padding: "28px 32px", marginBottom: 20 }}>
-        <h3 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: 20, fontWeight: 600, color: "#FFFFFF", marginBottom: 22, paddingBottom: 16, borderBottom: "1px solid rgba(255,255,255,0.07)" }}>Personal Information</h3>
+        <h3 style={{ fontFamily: "var(--font-heading-new)", fontSize: 20, fontWeight: 600, color: "#FFFFFF", marginBottom: 22, paddingBottom: 16, borderBottom: "1px solid rgba(255,255,255,0.07)" }}>Personal Information</h3>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "0 28px" }}>
           {pField("Full Name",    form.full_name, set("full_name") as (v: string) => void, { placeholder: "Your full name" })}
           {pField("Phone Number", form.phone,     set("phone")     as (v: string) => void, { type: "tel", placeholder: "+91 98765 43210" })}
@@ -790,7 +1340,7 @@ function ProfileTab({ email, userId, profile, loading, onSave }: {
               placeholder="A short bio about yourself"
               onChange={e => set("bio")(e.target.value)}
               rows={3}
-              style={{ width: "100%", padding: "11px 14px", background: "rgba(255,255,255,0.05)", border: "1.5px solid rgba(255,255,255,0.12)", borderRadius: 8, fontSize: 14, color: "#FFFFFF", fontFamily: "'Cal Sans', sans-serif", outline: "none", resize: "vertical", boxSizing: "border-box", minHeight: 80 }}
+              style={{ width: "100%", padding: "11px 14px", background: "rgba(255,255,255,0.05)", border: "1.5px solid rgba(255,255,255,0.12)", borderRadius: 8, fontSize: 14, color: "#FFFFFF", fontFamily: "var(--font-body-new)", outline: "none", resize: "vertical", boxSizing: "border-box", minHeight: 80 }}
             />
           </div>
         </div>
@@ -798,7 +1348,7 @@ function ProfileTab({ email, userId, profile, loading, onSave }: {
 
       {/* Additional info */}
       <Card style={{ padding: "28px 32px", marginBottom: 20 }}>
-        <h3 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: 20, fontWeight: 600, color: "#FFFFFF", marginBottom: 22, paddingBottom: 16, borderBottom: "1px solid rgba(255,255,255,0.07)" }}>Additional Information</h3>
+        <h3 style={{ fontFamily: "var(--font-heading-new)", fontSize: 20, fontWeight: 600, color: "#FFFFFF", marginBottom: 22, paddingBottom: 16, borderBottom: "1px solid rgba(255,255,255,0.07)" }}>Additional Information</h3>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "0 28px" }}>
           {pField("Date of Birth", form.date_of_birth, set("date_of_birth") as (v: string) => void, { type: "date" })}
           {pSelect("Gender", form.gender, set("gender") as (v: string) => void,
@@ -812,7 +1362,7 @@ function ProfileTab({ email, userId, profile, loading, onSave }: {
             <button
               type="button"
               onClick={() => set("is_nri")(!form.is_nri)}
-              style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 16px", background: form.is_nri ? "rgba(16,196,195,0.10)" : "rgba(255,255,255,0.04)", border: `1.5px solid ${form.is_nri ? "rgba(16,196,195,0.4)" : "rgba(255,255,255,0.12)"}`, borderRadius: 8, cursor: "pointer", fontFamily: "'Cal Sans', sans-serif", width: "100%", textAlign: "left" as const }}
+              style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 16px", background: form.is_nri ? "rgba(16,196,195,0.10)" : "rgba(255,255,255,0.04)", border: `1.5px solid ${form.is_nri ? "rgba(16,196,195,0.4)" : "rgba(255,255,255,0.12)"}`, borderRadius: 8, cursor: "pointer", fontFamily: "var(--font-body-new)", width: "100%", textAlign: "left" as const }}
             >
               <div style={{ width: 36, height: 20, borderRadius: 10, background: form.is_nri ? "#10C4C3" : "rgba(255,255,255,0.15)", position: "relative", transition: "background 0.2s", flexShrink: 0 }}>
                 <div style={{ width: 14, height: 14, borderRadius: "50%", background: "#fff", position: "absolute", top: 3, left: form.is_nri ? 19 : 3, transition: "left 0.2s", boxShadow: "0 1px 3px rgba(0,0,0,0.2)" }} />
@@ -827,7 +1377,7 @@ function ProfileTab({ email, userId, profile, loading, onSave }: {
 
       {/* Read-only account info */}
       <Card style={{ padding: "28px 32px" }}>
-        <h3 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: 20, fontWeight: 600, color: "#FFFFFF", marginBottom: 22, paddingBottom: 16, borderBottom: "1px solid rgba(255,255,255,0.07)" }}>Account Details</h3>
+        <h3 style={{ fontFamily: "var(--font-heading-new)", fontSize: 20, fontWeight: 600, color: "#FFFFFF", marginBottom: 22, paddingBottom: 16, borderBottom: "1px solid rgba(255,255,255,0.07)" }}>Account Details</h3>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "0 28px" }}>
           {pField("Email Address", email,                    () => {}, { readOnly: true })}
           {pField("Account ID",    userId.slice(0, 8) + "…", () => {}, { readOnly: true })}
@@ -921,7 +1471,7 @@ function InquiriesTab({
               {/* Header row */}
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: "12px", flexWrap: "wrap", marginBottom: "12px" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
-                  <span style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "19px", fontWeight: 600, color: "#FFFFFF" }}>
+                  <span style={{ fontFamily: "var(--font-heading-new)", fontSize: "19px", fontWeight: 600, color: "#FFFFFF" }}>
                     {inq.inquirer_name ?? "Anonymous"}
                   </span>
                   <InquiryTypeBadge type={inq.inquiry_type} />
@@ -981,7 +1531,7 @@ function InquiriesTab({
                         letterSpacing: "0.05em",
                         border: "1.5px solid",
                         cursor: isActive ? "default" : "pointer",
-                        fontFamily: "'Cal Sans', sans-serif",
+                        fontFamily: "var(--font-support-new)",
                         transition: "all 0.15s",
                         ...(isActive ? pill.activeStyle : pill.inactiveStyle),
                       }}
@@ -999,19 +1549,78 @@ function InquiriesTab({
   );
 }
 
-function AppointmentsTab() {
+// My Appointments (Phase 26) — site_visits where visitor_user_id =
+// self (048, live). Reuses VisitStatusBadge from the agent-side
+// site-visits list (src/app/agent/site-visits/page.tsx) rather than
+// redefining status colors a third time — same cross-route module-
+// import pattern already used elsewhere tonight (e.g. tasks/[id]
+// importing from messages/page). Rows booked before 048, or booked
+// signed-out, have visitor_user_id = null and correctly never appear
+// here — not a bug, per 048's own header.
+interface MyVisitRow {
+  id: string;
+  property_slug: string | null;
+  property_title: string | null;
+  visit_date: string;
+  visit_time_slot: string;
+  status: string;
+}
+
+function AppointmentsTab({ userId }: { userId: string }) {
+  const [visits, setVisits] = useState<MyVisitRow[] | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const supabase = createClient();
+      const { data, error } = await supabase
+        .from("site_visits")
+        .select("id, property_slug, property_title, visit_date, visit_time_slot, status")
+        .eq("visitor_user_id", userId)
+        .order("visit_date", { ascending: false });
+      if (error) console.error("Dashboard — my site visits query error:", error);
+      if (!cancelled) setVisits((data as MyVisitRow[] | null) ?? []);
+    })();
+    return () => { cancelled = true; };
+  }, [userId]);
+
+  if (visits === null) return <Spinner />;
+
   return (
     <div>
       <SectionHeading title="My Appointments" subtitle="Upcoming and past property viewings." />
-      <Card>
-        <EmptyState
-          icon={<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>}
-          title="No appointments scheduled"
-          subtitle="Book a viewing from any property page and it'll appear here with all the details."
-          cta="Browse Properties"
-          ctaHref="/properties"
-        />
-      </Card>
+      {visits.length === 0 ? (
+        <Card>
+          <EmptyState
+            icon={<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>}
+            title="No appointments scheduled"
+            subtitle="Book a viewing from any property page and it'll appear here with all the details."
+            cta="Browse Properties"
+            ctaHref="/properties"
+          />
+        </Card>
+      ) : (
+        <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
+          {visits.map(v => (
+            <Card key={v.id} style={{ padding: "20px 24px" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: "12px", flexWrap: "wrap", marginBottom: "10px" }}>
+                {v.property_slug ? (
+                  <a href={`/property/${v.property_slug}`} style={{ fontFamily: "var(--font-heading-new)", fontSize: "17px", fontWeight: 600, color: "#FFFFFF", textDecoration: "none" }}>
+                    {v.property_title ?? "Property"}
+                  </a>
+                ) : (
+                  <span style={{ fontFamily: "var(--font-heading-new)", fontSize: "17px", fontWeight: 600, color: "#FFFFFF" }}>{v.property_title ?? "Property"}</span>
+                )}
+                <VisitStatusBadge status={v.status} />
+              </div>
+              <div style={{ display: "flex", gap: "16px", flexWrap: "wrap", fontSize: "13px", color: "#A9B4C2" }}>
+                <span>{formatDate(v.visit_date)}</span>
+                <span>{v.visit_time_slot}</span>
+              </div>
+            </Card>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
@@ -1034,7 +1643,7 @@ function SettingsTab({ email, fullName }: { email: string; fullName?: string }) 
       <SectionHeading title="Account Settings" subtitle="Manage your preferences and security." />
 
       <Card style={{ padding: "32px", marginBottom: "20px" }}>
-        <h3 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "20px", fontWeight: 600, color: "#FFFFFF", marginBottom: "22px", paddingBottom: "16px", borderBottom: "1px solid rgba(255,255,255,0.07)" }}>Preferences</h3>
+        <h3 style={{ fontFamily: "var(--font-heading-new)", fontSize: "20px", fontWeight: 600, color: "#FFFFFF", marginBottom: "22px", paddingBottom: "16px", borderBottom: "1px solid rgba(255,255,255,0.07)" }}>Preferences</h3>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "0 24px" }}>
           <FormField label="Full Name"        value={name}      onChange={setName}      placeholder="Your full name" />
           <FormField label="Email Address"    value={email}     readOnly />
@@ -1046,14 +1655,14 @@ function SettingsTab({ email, fullName }: { email: string; fullName?: string }) 
         <div style={{ display: "flex", alignItems: "center", gap: "14px", marginTop: "4px" }}>
           <button
             onClick={() => { setProfileSaved(true); setTimeout(() => setProfileSaved(false), 2600); }}
-            style={{ padding: "11px 30px", background: "#10C4C3", border: "none", borderRadius: "999px", color: "#000", fontSize: "13px", fontWeight: 700, letterSpacing: "0.07em", textTransform: "uppercase", cursor: "pointer", fontFamily: "'Cal Sans', sans-serif", boxShadow: "0 10px 30px rgba(30,167,255,.35)" }}
+            style={{ padding: "11px 30px", background: "#10C4C3", border: "none", borderRadius: "999px", color: "#000", fontSize: "13px", fontWeight: 700, letterSpacing: "0.07em", textTransform: "uppercase", cursor: "pointer", fontFamily: "var(--font-body-new)", boxShadow: "0 10px 30px rgba(30,167,255,.35)" }}
           >Save Changes</button>
           {profileSaved && <span style={{ fontSize: "13px", color: "#10C4C3", fontWeight: 500 }}>✓ Changes saved</span>}
         </div>
       </Card>
 
       <Card style={{ padding: "32px", marginBottom: "20px" }}>
-        <h3 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "20px", fontWeight: 600, color: "#FFFFFF", marginBottom: "22px", paddingBottom: "16px", borderBottom: "1px solid rgba(255,255,255,0.07)" }}>Change Password</h3>
+        <h3 style={{ fontFamily: "var(--font-heading-new)", fontSize: "20px", fontWeight: 600, color: "#FFFFFF", marginBottom: "22px", paddingBottom: "16px", borderBottom: "1px solid rgba(255,255,255,0.07)" }}>Change Password</h3>
         <div style={{ maxWidth: "440px" }}>
           <FormField label="Current Password"     type="password" value={curPw}  onChange={setCurPw}  placeholder="Enter current password" />
           <FormField label="New Password"         type="password" value={newPw}  onChange={setNewPw}  placeholder="At least 8 characters" />
@@ -1062,24 +1671,24 @@ function SettingsTab({ email, fullName }: { email: string; fullName?: string }) 
         <div style={{ display: "flex", alignItems: "center", gap: "14px", marginTop: "4px" }}>
           <button
             onClick={() => { setPwSaved(true); setCurPw(""); setNewPw(""); setConfPw(""); setTimeout(() => setPwSaved(false), 2600); }}
-            style={{ padding: "11px 28px", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.15)", borderRadius: "8px", color: "#FFFFFF", fontSize: "13px", fontWeight: 600, cursor: "pointer", fontFamily: "'Cal Sans', sans-serif" }}
+            style={{ padding: "11px 28px", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.15)", borderRadius: "8px", color: "#FFFFFF", fontSize: "13px", fontWeight: 600, cursor: "pointer", fontFamily: "var(--font-body-new)" }}
           >Update Password</button>
           {pwSaved && <span style={{ fontSize: "13px", color: "#10C4C3", fontWeight: 500 }}>✓ Password updated</span>}
         </div>
       </Card>
 
       <Card style={{ padding: "32px", border: "1px solid rgba(248,113,113,0.25)" }}>
-        <h3 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "20px", fontWeight: 600, color: "#F87171", marginBottom: "10px" }}>Danger Zone</h3>
+        <h3 style={{ fontFamily: "var(--font-heading-new)", fontSize: "20px", fontWeight: 600, color: "#F87171", marginBottom: "10px" }}>Danger Zone</h3>
         <p style={{ fontSize: "13px", color: "#A9B4C2", marginBottom: "20px", lineHeight: 1.65 }}>
           Permanently delete your Nilay 360 account. All saved properties, inquiries, and preferences will be removed. This cannot be undone.
         </p>
         {!deleteMode ? (
-          <button onClick={() => setDeleteMode(true)} style={{ padding: "10px 22px", background: "rgba(248,113,113,0.10)", border: "1.5px solid rgba(248,113,113,0.4)", borderRadius: "8px", color: "#F87171", fontSize: "13px", fontWeight: 600, cursor: "pointer", fontFamily: "'Cal Sans', sans-serif" }}>Delete Account</button>
+          <button onClick={() => setDeleteMode(true)} style={{ padding: "10px 22px", background: "rgba(248,113,113,0.10)", border: "1.5px solid rgba(248,113,113,0.4)", borderRadius: "8px", color: "#F87171", fontSize: "13px", fontWeight: 600, cursor: "pointer", fontFamily: "var(--font-body-new)" }}>Delete Account</button>
         ) : (
           <div style={{ display: "flex", alignItems: "center", gap: "12px", flexWrap: "wrap" }}>
             <span style={{ fontSize: "13px", fontWeight: 600, color: "#F87171" }}>Are you absolutely sure?</span>
-            <button style={{ padding: "9px 20px", background: "#B91C1C", border: "none", borderRadius: "8px", color: "#FFFFFF", fontSize: "13px", fontWeight: 700, cursor: "pointer", fontFamily: "'Cal Sans', sans-serif" }}>Yes, Delete My Account</button>
-            <button onClick={() => setDeleteMode(false)} style={{ padding: "9px 20px", background: "transparent", border: "1px solid rgba(255,255,255,0.15)", borderRadius: "8px", color: "#A9B4C2", fontSize: "13px", cursor: "pointer", fontFamily: "'Cal Sans', sans-serif" }}>Cancel</button>
+            <button style={{ padding: "9px 20px", background: "#B91C1C", border: "none", borderRadius: "8px", color: "#FFFFFF", fontSize: "13px", fontWeight: 700, cursor: "pointer", fontFamily: "var(--font-body-new)" }}>Yes, Delete My Account</button>
+            <button onClick={() => setDeleteMode(false)} style={{ padding: "9px 20px", background: "transparent", border: "1px solid rgba(255,255,255,0.15)", borderRadius: "8px", color: "#A9B4C2", fontSize: "13px", cursor: "pointer", fontFamily: "var(--font-body-new)" }}>Cancel</button>
           </div>
         )}
       </Card>
@@ -1096,6 +1705,20 @@ export default function DashboardClient({ email, userId, fullName, accountType }
 
   const [active,      setActive]      = useState<Tab>("overview");
   const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  // Escape closes the sidebar drawer whenever it's open — additive,
+  // non-visual, and only acts when sidebarOpen is already true, so it
+  // changes nothing about the buyer/seller shell's layout or styling
+  // (their drawer only ever opens below 800px, same as before; it can
+  // now also be dismissed with Escape, not just outside-click).
+  useEffect(() => {
+    if (!sidebarOpen) return;
+    function onKeyDown(e: KeyboardEvent) {
+      if (e.key === "Escape") setSidebarOpen(false);
+    }
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [sidebarOpen]);
 
   // Data (buyer/seller)
   const [listings,         setListings]         = useState<Listing[]>([]);
@@ -1119,7 +1742,7 @@ export default function DashboardClient({ email, userId, fullName, accountType }
     const loadAgent = async () => {
       const { data: apRow, error: apErr } = await supabase
         .from("agent_profiles")
-        .select("id, license_number, agency_name, bio, years_experience, agent_service_cities(city)")
+        .select("id, license_number, agency_name, bio, years_experience, leaderboard_opt_out, agent_service_cities(city)")
         .eq("user_id", userId)
         .maybeSingle();
       if (apErr) console.error("Dashboard — agent_profiles query error:", apErr);
@@ -1134,6 +1757,7 @@ export default function DashboardClient({ email, userId, fullName, accountType }
           bio: apRow.bio,
           years_experience: apRow.years_experience,
           cities,
+          leaderboard_opt_out: apRow.leaderboard_opt_out,
         });
 
         const { data: listData, error: listErr } = await supabase
@@ -1265,6 +1889,7 @@ export default function DashboardClient({ email, userId, fullName, accountType }
         agency_name:      updates.agency_name,
         bio:               updates.bio,
         years_experience: updates.years_experience,
+        leaderboard_opt_out: updates.leaderboard_opt_out,
         updated_at:        new Date().toISOString(),
       })
       .eq("id", agentProfile.id);
@@ -1306,29 +1931,64 @@ export default function DashboardClient({ email, userId, fullName, accountType }
 
   const name = fullName || email.split("@")[0];
   const type = isAgent ? "Agent" : (accountType || "Individual");
-  const nav = isAgent ? NAV_AGENT : NAV;
 
   const content: Record<Tab, React.ReactNode> = {
     overview:     isAgent
-      ? <AgentOverviewTab fullName={fullName} email={email} assignedListings={assignedListings} />
-      : <OverviewTab      email={email} fullName={fullName} listings={listings} savedItems={savedItems} profile={profile} />,
+      ? <AgentOverviewTab fullName={fullName} email={email} assignedListings={assignedListings} agentProfileId={agentProfile?.id ?? null} userId={userId} />
+      : <OverviewTab      email={email} fullName={fullName} listings={listings} savedItems={savedItems} profile={profile} userId={userId} />,
     listings:     <ListingsTab     listings={listings} loading={dataLoading} onDelete={deleteListing} />,
-    assigned:     <AssignedListingsTab listings={assignedListings} loading={dataLoading} />,
+    assigned:     <AssignedListingsTab listings={assignedListings} loading={dataLoading} userId={userId} />,
     saved:        <SavedTab        savedItems={savedItems} loading={dataLoading} onRemove={removeSave} />,
     searches:     <SearchesTab />,
     profile:      isAgent
-      ? <AgentProfileTab email={email} agentProfile={agentProfile} loading={dataLoading} onSave={updateAgentProfile} />
+      ? <AgentProfileTab email={email} userId={userId} agentProfile={agentProfile} loading={dataLoading} onSave={updateAgentProfile} />
       : <ProfileTab      email={email} userId={userId} profile={profile} loading={dataLoading} onSave={updateProfile} />,
     inquiries:    <InquiriesTab    inquiries={inquiries} loading={dataLoading} onStatusChange={updateInquiryStatus} />,
-    appointments: <AppointmentsTab />,
+    appointments: <AppointmentsTab userId={userId} />,
     settings:     <SettingsTab     email={email} fullName={fullName} />,
   };
 
+  // Agent branch (Phase 24) — the drawer/toggle-bar/overlay mechanics
+  // now live in the shared AgentDrawerChrome component (also used by
+  // src/app/agent/layout.tsx for every other /agent/* page), not
+  // inlined here. Behavior is unchanged from before the extraction:
+  // same NAV_AGENT list, same tab-switching via active/setActive, same
+  // fade-in on tab change (contentKey={active}).
+  if (isAgent) {
+    return (
+      <>
+        <style>{`
+          @media (max-width: 900px) {
+            .agent-overview-2col { grid-template-columns: 1fr !important; }
+          }
+        `}</style>
+        <AgentDrawerChrome
+          nav={NAV_AGENT}
+          activeId={active}
+          onActivate={id => setActive(id)}
+          userName={name}
+          userEmail={email}
+          userType={type}
+          onSignOut={handleSignOut}
+          contentKey={active}
+        >
+          {content[active]}
+        </AgentDrawerChrome>
+      </>
+    );
+  }
+
+  // Buyer/seller branch — untouched, same markup as before this
+  // refactor (does not use AgentDrawerChrome; its own drawer only
+  // ever activates below 800px, a different behavior than the
+  // agent-only always-on drawer, so it keeps its own independent
+  // implementation rather than being forced through the same shared
+  // component).
   return (
     <>
       <style>{`
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'Cal Sans', system-ui, sans-serif; background: #020C1C; }
+        body { font-family: var(--font-body-new); background: #020C1C; }
         ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 2px; }
         @keyframes fadeSlide { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
@@ -1345,6 +2005,9 @@ export default function DashboardClient({ email, userId, fullName, accountType }
           .dash-aside.sb-open { transform: translateX(0) !important; }
           .dash-content { padding: 24px 18px 72px !important; }
           .mob-bar { display: flex !important; }
+        }
+        @media (max-width: 900px) {
+          .buyer-overview-2col { grid-template-columns: 1fr !important; }
         }
       `}</style>
 
@@ -1382,13 +2045,13 @@ export default function DashboardClient({ email, userId, fullName, accountType }
 
             {/* Nav */}
             <nav style={{ flex: 1, padding: "12px 10px" }}>
-              {nav.map(item => (
+              {NAV.map(item => (
                 <button
                   key={item.id}
                   data-tab={item.id}
                   className="dash-sb-btn"
-                  onClick={() => { setActive(item.id); setSidebarOpen(false); }}
-                  style={{ width: "100%", display: "flex", alignItems: "center", gap: "11px", padding: "10px 14px", borderRadius: "9px", marginBottom: "3px", background: active === item.id ? "rgba(16,196,195,0.11)" : "transparent", border: active === item.id ? "1px solid rgba(16,196,195,0.18)" : "1px solid transparent", color: active === item.id ? "#10C4C3" : "rgba(255,255,255,0.45)", fontSize: "13px", fontWeight: active === item.id ? 600 : 400, cursor: "pointer", fontFamily: "'Cal Sans', sans-serif", textAlign: "left", transition: "all 0.14s" }}
+                  onClick={() => { setActive(item.id!); setSidebarOpen(false); }}
+                  style={{ width: "100%", display: "flex", alignItems: "center", gap: "11px", padding: "10px 14px", borderRadius: "9px", marginBottom: "3px", background: active === item.id ? "rgba(16,196,195,0.11)" : "transparent", border: active === item.id ? "1px solid rgba(16,196,195,0.18)" : "1px solid transparent", color: active === item.id ? "#10C4C3" : "rgba(255,255,255,0.45)", fontSize: "13px", fontWeight: active === item.id ? 600 : 400, cursor: "pointer", fontFamily: "var(--font-body-new)", textAlign: "left", transition: "all 0.14s" }}
                 >
                   {item.icon}
                   {item.label}
@@ -1400,7 +2063,7 @@ export default function DashboardClient({ email, userId, fullName, accountType }
             <div style={{ padding: "12px 10px 18px", borderTop: "1px solid rgba(255,255,255,0.07)" }}>
               <button
                 onClick={handleSignOut}
-                style={{ width: "100%", display: "flex", alignItems: "center", gap: "11px", padding: "10px 14px", borderRadius: "9px", background: "rgba(248,113,113,0.12)", border: "1px solid rgba(239,68,68,0.14)", color: "rgba(252,165,165,0.75)", fontSize: "13px", fontWeight: 500, cursor: "pointer", fontFamily: "'Cal Sans', sans-serif", textAlign: "left", transition: "all 0.14s" }}
+                style={{ width: "100%", display: "flex", alignItems: "center", gap: "11px", padding: "10px 14px", borderRadius: "9px", background: "rgba(248,113,113,0.12)", border: "1px solid rgba(239,68,68,0.14)", color: "rgba(252,165,165,0.75)", fontSize: "13px", fontWeight: 500, cursor: "pointer", fontFamily: "var(--font-body-new)", textAlign: "left", transition: "all 0.14s" }}
                 onMouseEnter={e => { const b = e.currentTarget; b.style.background = "rgba(239,68,68,0.14)"; b.style.color = "#FCA5A5"; }}
                 onMouseLeave={e => { const b = e.currentTarget; b.style.background = "rgba(248,113,113,0.12)"; b.style.color = "rgba(252,165,165,0.75)"; }}
               >

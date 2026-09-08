@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 
@@ -35,7 +35,7 @@ const FAQS = [
   },
   {
     q: "Are all listings on Nilay 360 RERA verified?",
-    a: "Yes — every listing on Nilay 360 is manually verified by our ground team before going live. We check RERA registration, title documentation, builder credentials, and pricing accuracy. No ghost listings, no outdated information.",
+    a: "Every listing goes through admin review before it appears live on Nilay 360 — listings are only published after being approved. Where a seller has provided RERA registration details, they're displayed directly on the listing page for your reference.",
   },
   {
     q: "Do you assist NRI buyers?",
@@ -68,9 +68,9 @@ function Field({ label, required, children }: { label: string; required?: boolea
 }
 
 const INPUT_STYLE: React.CSSProperties = {
-  width: "100%", padding: "12px 16px", background: "#F8F6F1",
+  width: "100%", padding: "12px 16px", background: "rgba(16,196,195,0.05)",
   border: "1.5px solid rgba(13,43,31,0.12)", borderRadius: "9px",
-  fontSize: "14px", color: "#020C1C", fontFamily: "'Cal Sans', sans-serif",
+  fontSize: "14px", color: "#020C1C", fontFamily: "var(--font-body-new)",
   outline: "none", transition: "border-color 0.15s",
 };
 
@@ -81,10 +81,10 @@ function FaqItem({ q, a, index }: { q: string; a: string; index: number }) {
     <div style={{ borderBottom: "1px solid rgba(13,43,31,0.08)", overflow: "hidden" }}>
       <button
         onClick={() => setOpen(o => !o)}
-        style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between", gap: "16px", padding: "22px 0", background: "transparent", border: "none", cursor: "pointer", fontFamily: "'Cal Sans', sans-serif", textAlign: "left" }}
+        style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between", gap: "16px", padding: "22px 0", background: "transparent", border: "none", cursor: "pointer", fontFamily: "var(--font-body-new)", textAlign: "left" }}
       >
         <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
-          <span style={{ width: "28px", height: "28px", borderRadius: "8px", background: open ? "#020C1C" : "rgba(201,168,76,0.1)", border: `1px solid ${open ? "transparent" : "rgba(201,168,76,0.25)"}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "11px", fontWeight: 700, color: open ? "#10C4C3" : "#10C4C3", flexShrink: 0, transition: "background 0.2s" }}>
+          <span style={{ width: "28px", height: "28px", borderRadius: "8px", background: open ? "#020C1C" : "rgba(16,196,195,0.1)", border: `1px solid ${open ? "transparent" : "rgba(16,196,195,0.25)"}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "11px", fontWeight: 700, color: open ? "#10C4C3" : "#10C4C3", flexShrink: 0, transition: "background 0.2s" }}>
             {String(index + 1).padStart(2, "0")}
           </span>
           <span style={{ fontSize: "15px", fontWeight: 600, color: "#020C1C", lineHeight: 1.4 }}>{q}</span>
@@ -92,7 +92,7 @@ function FaqItem({ q, a, index }: { q: string; a: string; index: number }) {
         <span style={{ fontSize: "20px", color: "#10C4C3", flexShrink: 0, transform: open ? "rotate(45deg)" : "rotate(0)", transition: "transform 0.2s", lineHeight: 1 }}>+</span>
       </button>
       <div style={{ maxHeight: open ? "300px" : "0", overflow: "hidden", transition: "max-height 0.3s ease" }}>
-        <p style={{ fontSize: "14px", color: "#6B7C72", lineHeight: 1.8, padding: "0 0 22px 42px" }}>{a}</p>
+        <p style={{ fontSize: "14px", color: "#555", lineHeight: 1.8, padding: "0 0 22px 42px" }}>{a}</p>
       </div>
     </div>
   );
@@ -156,7 +156,7 @@ export default function ContactPage() {
   const inputStyle = (name: string): React.CSSProperties => ({
     ...INPUT_STYLE,
     borderColor: focusedField === name ? "#10C4C3" : "rgba(13,43,31,0.12)",
-    boxShadow: focusedField === name ? "0 0 0 3px rgba(201,168,76,0.08)" : "none",
+    boxShadow: focusedField === name ? "0 0 0 3px rgba(16,196,195,0.08)" : "none",
   });
 
   const focusHandlers = (name: string) => ({
@@ -169,9 +169,9 @@ export default function ContactPage() {
       <style>{`
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
         html { scroll-behavior: smooth; }
-        body { font-family: 'Cal Sans', system-ui, sans-serif; background: #020C1C; overflow-x: hidden; }
+        body { font-family: var(--font-body-new); background: #020C1C; overflow-x: hidden; }
         ::-webkit-scrollbar { width: 4px; }
-        ::-webkit-scrollbar-thumb { background: rgba(201,168,76,0.3); border-radius: 2px; }
+        ::-webkit-scrollbar-thumb { background: rgba(16,196,195,0.3); border-radius: 2px; }
         @keyframes fadeUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes scaleIn { from { opacity: 0; transform: scale(0.88); } to { opacity: 1; transform: scale(1); } }
         select option { background: #fff; color: #020C1C; }
@@ -197,14 +197,14 @@ export default function ContactPage() {
 
         {/* ── HERO ───────────────────────────────────────────── */}
         <section style={{ paddingTop: "64px", background: "#020C1C", position: "relative", overflow: "hidden" }}>
-          <div style={{ position: "absolute", inset: 0, backgroundImage: "linear-gradient(rgba(201,168,76,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(201,168,76,0.04) 1px, transparent 1px)", backgroundSize: "52px 52px", pointerEvents: "none" }} />
-          <div style={{ position: "absolute", inset: 0, background: "radial-gradient(ellipse 65% 70% at 85% 110%, rgba(201,168,76,0.09) 0%, transparent 55%), radial-gradient(ellipse 50% 55% at 5% -5%, rgba(45,106,79,0.25) 0%, transparent 50%)", pointerEvents: "none" }} />
+          <div style={{ position: "absolute", inset: 0, backgroundImage: "linear-gradient(rgba(16,196,195,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(16,196,195,0.04) 1px, transparent 1px)", backgroundSize: "52px 52px", pointerEvents: "none" }} />
+          <div style={{ position: "absolute", inset: 0, background: "radial-gradient(ellipse 65% 70% at 85% 110%, rgba(16,196,195,0.09) 0%, transparent 55%), radial-gradient(ellipse 50% 55% at 5% -5%, rgba(16,196,195,0.15) 0%, transparent 50%)", pointerEvents: "none" }} />
           <div className="ct-hero-inner" style={{ position: "relative", zIndex: 2, maxWidth: "800px", margin: "0 auto", padding: "72px 48px 80px", textAlign: "center" }}>
-            <div style={{ display: "inline-flex", alignItems: "center", gap: "8px", padding: "5px 16px", background: "rgba(201,168,76,0.1)", border: "1px solid rgba(201,168,76,0.25)", borderRadius: "100px", marginBottom: "24px" }}>
-              <div style={{ width: "5px", height: "5px", borderRadius: "50%", background: "#10C4C3", boxShadow: "0 0 6px rgba(201,168,76,0.5)" }} />
+            <div style={{ display: "inline-flex", alignItems: "center", gap: "8px", padding: "5px 16px", background: "rgba(16,196,195,0.1)", border: "1px solid rgba(16,196,195,0.25)", borderRadius: "100px", marginBottom: "24px" }}>
+              <div style={{ width: "5px", height: "5px", borderRadius: "50%", background: "#10C4C3", boxShadow: "0 0 6px rgba(16,196,195,0.5)" }} />
               <span style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.2em", color: "#10C4C3", textTransform: "uppercase" }}>We're Here to Help</span>
             </div>
-            <h1 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "clamp(44px, 6.5vw, 72px)", fontWeight: 300, color: "#020C1C", lineHeight: 1.1, marginBottom: "18px", animation: "fadeUp 0.55s ease-out both" }}>
+            <h1 style={{ fontFamily: "var(--font-heading-new)", fontSize: "clamp(44px, 6.5vw, 72px)", fontWeight: 300, color: "#FFFFFF", lineHeight: 1.1, marginBottom: "18px", animation: "fadeUp 0.55s ease-out both" }}>
               Get In Touch
             </h1>
             <p style={{ fontSize: "16px", color: "rgba(245,242,236,0.5)", lineHeight: 1.75, marginBottom: "36px", animation: "fadeUp 0.55s 0.1s ease-out both" }}>
@@ -218,11 +218,11 @@ export default function ContactPage() {
                 { icon: "💬", label: "WhatsApp", value: "+91 7075 792497",      href: "https://wa.me/917075792497?text=Hi%2C%20I%27m%20interested%20in%20a%20property%20on%20Nilay%20360" },
               ].map(p => (
                 <a key={p.label} href={p.href} style={{ display: "flex", alignItems: "center", gap: "10px", padding: "10px 20px", background: "rgba(245,242,236,0.06)", border: "1px solid rgba(245,242,236,0.13)", borderRadius: "100px", textDecoration: "none", transition: "border-color 0.15s" }}
-                  onMouseEnter={e => (e.currentTarget.style.borderColor = "rgba(201,168,76,0.4)")}
+                  onMouseEnter={e => (e.currentTarget.style.borderColor = "rgba(16,196,195,0.4)")}
                   onMouseLeave={e => (e.currentTarget.style.borderColor = "rgba(245,242,236,0.13)")}>
                   <span style={{ fontSize: "16px" }}>{p.icon}</span>
                   <span style={{ fontSize: "11px", fontWeight: 700, letterSpacing: "0.1em", color: "rgba(245,242,236,0.4)", textTransform: "uppercase" }}>{p.label}</span>
-                  <span style={{ fontSize: "13px", color: "#020C1C", fontWeight: 500 }}>{p.value}</span>
+                  <span style={{ fontSize: "13px", color: "#FFFFFF", fontWeight: 500 }}>{p.value}</span>
                 </a>
               ))}
             </div>
@@ -239,16 +239,16 @@ export default function ContactPage() {
                 <div style={{ width: "28px", height: "1.5px", background: "#10C4C3" }} />
                 <span style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.2em", color: "#10C4C3", textTransform: "uppercase" }}>Send a Message</span>
               </div>
-              <h2 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "32px", fontWeight: 500, color: "#020C1C", lineHeight: 1.2 }}>How Can We Help You?</h2>
-              <p style={{ fontSize: "13px", color: "#6B7C72", marginTop: "8px", lineHeight: 1.6 }}>Fields marked with <span style={{ color: "#10C4C3" }}>*</span> are required.</p>
+              <h2 style={{ fontFamily: "var(--font-heading-new)", fontSize: "32px", fontWeight: 500, color: "#020C1C", lineHeight: 1.2 }}>How Can We Help You?</h2>
+              <p style={{ fontSize: "13px", color: "#555", marginTop: "8px", lineHeight: 1.6 }}>Fields marked with <span style={{ color: "#10C4C3" }}>*</span> are required.</p>
             </div>
 
             {success ? (
               <div style={{ textAlign: "center", padding: "56px 24px", animation: "scaleIn 0.35s ease-out" }}>
                 <div style={{ width: "72px", height: "72px", borderRadius: "50%", background: "rgba(5,150,105,0.1)", border: "2px solid rgba(5,150,105,0.25)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 20px", fontSize: "32px" }}>✓</div>
-                <h3 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "28px", fontWeight: 500, color: "#020C1C", marginBottom: "10px" }}>Message Sent Successfully</h3>
-                <p style={{ fontSize: "14px", color: "#6B7C72", lineHeight: 1.7, maxWidth: "380px", margin: "0 auto 28px" }}>Thank you for reaching out. A member of our team will respond to your enquiry within 2 business hours.</p>
-                <button onClick={() => setSuccess(false)} style={{ padding: "11px 28px", background: "#020C1C", border: "none", borderRadius: "8px", color: "#020C1C", fontSize: "13px", fontWeight: 600, cursor: "pointer", fontFamily: "'Cal Sans', sans-serif", letterSpacing: "0.06em" }}>
+                <h3 style={{ fontFamily: "var(--font-heading-new)", fontSize: "28px", fontWeight: 500, color: "#020C1C", marginBottom: "10px" }}>Message Sent Successfully</h3>
+                <p style={{ fontSize: "14px", color: "#555", lineHeight: 1.7, maxWidth: "380px", margin: "0 auto 28px" }}>Thank you for reaching out. A member of our team will respond to your enquiry within 2 business hours.</p>
+                <button onClick={() => setSuccess(false)} style={{ padding: "11px 28px", background: "#020C1C", border: "none", borderRadius: "8px", color: "#FFFFFF", fontSize: "13px", fontWeight: 600, cursor: "pointer", fontFamily: "var(--font-body-new)", letterSpacing: "0.06em" }}>
                   Send Another Message
                 </button>
               </div>
@@ -267,12 +267,12 @@ export default function ContactPage() {
                 <div className="ct-form-row" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
                   <Field label="Phone Number">
                     <div style={{ position: "relative", display: "flex" }}>
-                      <span style={{ display: "flex", alignItems: "center", padding: "0 12px", background: "#F0EDE7", border: "1.5px solid rgba(13,43,31,0.12)", borderRight: "none", borderRadius: "9px 0 0 9px", fontSize: "13px", fontWeight: 600, color: "#4B5563", whiteSpace: "nowrap" }}>+91</span>
+                      <span style={{ display: "flex", alignItems: "center", padding: "0 12px", background: "rgba(16,196,195,0.05)", border: "1.5px solid rgba(13,43,31,0.12)", borderRight: "none", borderRadius: "9px 0 0 9px", fontSize: "13px", fontWeight: 600, color: "#4B5563", whiteSpace: "nowrap" }}>+91</span>
                       <input type="tel" placeholder="98765 43210" value={form.phone} onChange={set("phone")} style={{ ...inputStyle("phone"), borderRadius: "0 9px 9px 0", borderLeft: "none" }} {...focusHandlers("phone")} />
                     </div>
                   </Field>
                   <Field label="Subject" required>
-                    <select value={form.subject} onChange={set("subject")} style={{ ...inputStyle("subject"), appearance: "none", backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236B7C72' stroke-width='2.5'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E")`, backgroundRepeat: "no-repeat", backgroundPosition: "right 14px center" }} {...focusHandlers("subject")}>
+                    <select value={form.subject} onChange={set("subject")} style={{ ...inputStyle("subject"), appearance: "none", backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23555' stroke-width='2.5'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E")`, backgroundRepeat: "no-repeat", backgroundPosition: "right 14px center" }} {...focusHandlers("subject")}>
                       <option value="" disabled>Select subject…</option>
                       {SUBJECTS.map(s => <option key={s} value={s}>{s}</option>)}
                     </select>
@@ -292,13 +292,13 @@ export default function ContactPage() {
                   <p style={{ fontSize: "11px", fontWeight: 700, letterSpacing: "0.12em", color: "#9CA3AF", textTransform: "uppercase", marginBottom: "16px" }}>Optional — helps us serve you better</p>
                   <div className="ct-form-row" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
                     <Field label="Property Type">
-                      <select value={form.property_type} onChange={set("property_type")} style={{ ...inputStyle("property_type"), appearance: "none", backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236B7C72' stroke-width='2.5'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E")`, backgroundRepeat: "no-repeat", backgroundPosition: "right 14px center" }} {...focusHandlers("property_type")}>
+                      <select value={form.property_type} onChange={set("property_type")} style={{ ...inputStyle("property_type"), appearance: "none", backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23555' stroke-width='2.5'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E")`, backgroundRepeat: "no-repeat", backgroundPosition: "right 14px center" }} {...focusHandlers("property_type")}>
                         <option value="">Any type</option>
                         {PROPERTY_TYPES.map(p => <option key={p} value={p}>{p}</option>)}
                       </select>
                     </Field>
                     <Field label="Budget Range">
-                      <select value={form.budget_range} onChange={set("budget_range")} style={{ ...inputStyle("budget_range"), appearance: "none", backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236B7C72' stroke-width='2.5'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E")`, backgroundRepeat: "no-repeat", backgroundPosition: "right 14px center" }} {...focusHandlers("budget_range")}>
+                      <select value={form.budget_range} onChange={set("budget_range")} style={{ ...inputStyle("budget_range"), appearance: "none", backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23555' stroke-width='2.5'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E")`, backgroundRepeat: "no-repeat", backgroundPosition: "right 14px center" }} {...focusHandlers("budget_range")}>
                         <option value="">Any budget</option>
                         {BUDGETS.map(b => <option key={b} value={b}>{b}</option>)}
                       </select>
@@ -312,13 +312,13 @@ export default function ContactPage() {
 
                 <button
                   type="submit" disabled={submitting}
-                  style={{ padding: "15px 32px", background: submitting ? "rgba(13,43,31,0.4)" : "#020C1C", border: "none", borderRadius: "10px", color: "#020C1C", fontSize: "13px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", cursor: submitting ? "not-allowed" : "pointer", fontFamily: "'Cal Sans', sans-serif", display: "flex", alignItems: "center", justifyContent: "center", gap: "10px", transition: "background 0.2s", marginTop: "4px" }}
+                  style={{ padding: "15px 32px", background: submitting ? "rgba(13,43,31,0.4)" : "#020C1C", border: "none", borderRadius: "10px", color: "#FFFFFF", fontSize: "13px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", cursor: submitting ? "not-allowed" : "pointer", fontFamily: "var(--font-body-new)", display: "flex", alignItems: "center", justifyContent: "center", gap: "10px", transition: "background 0.2s", marginTop: "4px" }}
                   onMouseEnter={e => { if (!submitting) (e.currentTarget as HTMLButtonElement).style.background = "#10C4C3"; (e.currentTarget as HTMLButtonElement).style.color = "#020C1C"; }}
-                  onMouseLeave={e => { if (!submitting) { (e.currentTarget as HTMLButtonElement).style.background = "#020C1C"; (e.currentTarget as HTMLButtonElement).style.color = "#020C1C"; } }}
+                  onMouseLeave={e => { if (!submitting) { (e.currentTarget as HTMLButtonElement).style.background = "#020C1C"; (e.currentTarget as HTMLButtonElement).style.color = "#FFFFFF"; } }}
                 >
                   {submitting ? (
                     <>
-                      <span style={{ width: "14px", height: "14px", border: "2px solid rgba(245,242,236,0.3)", borderTopColor: "#020C1C", borderRadius: "50%", animation: "spin 0.7s linear infinite", display: "inline-block" }} />
+                      <span style={{ width: "14px", height: "14px", border: "2px solid rgba(245,242,236,0.3)", borderTopColor: "#FFFFFF", borderRadius: "50%", animation: "spin 0.7s linear infinite", display: "inline-block" }} />
                       Sending…
                     </>
                   ) : (
@@ -340,15 +340,14 @@ export default function ContactPage() {
 
             {/* Contact info card */}
             <div style={{ background: "#020C1C", borderRadius: "20px", padding: "36px 32px", position: "relative", overflow: "hidden" }}>
-              <div style={{ position: "absolute", inset: 0, backgroundImage: "linear-gradient(rgba(201,168,76,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(201,168,76,0.04) 1px, transparent 1px)", backgroundSize: "36px 36px", pointerEvents: "none" }} />
+              <div style={{ position: "absolute", inset: 0, backgroundImage: "linear-gradient(rgba(16,196,195,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(16,196,195,0.04) 1px, transparent 1px)", backgroundSize: "36px 36px", pointerEvents: "none" }} />
               <div style={{ position: "relative", zIndex: 2 }}>
                 <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "24px" }}>
                   <div style={{ width: "5px", height: "5px", borderRadius: "50%", background: "#10C4C3" }} />
                   <span style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.2em", color: "#10C4C3", textTransform: "uppercase" }}>Contact Details</span>
                 </div>
                 {[
-                  // TEMPORARY: Using Hustle Hive office address (owner-confirmed, same location as an existing commercial listing), revert to Nilay360's own registered address once available
-                  { icon: "📍", label: "Address",  value: "4th Floor, Trendz Techpark, Road No. 11, Kakatiya Hills\nGuttala Begumpet, Kavuri Hills, Madhapur, Hyderabad, Telangana 500081" },
+                  { icon: "📍", label: "Address", value: "4th Floor, Trendz Techpark, Road No. 11, Kakatiya Hills\nGuttala Begumpet, Kavuri Hills, Madhapur, Hyderabad, Telangana 500081" },
                   { icon: "📞", label: "Phone",    value: "+91 7075 792497",        href: "tel:+917075792497" },
                   { icon: "✉",  label: "Email",    value: "contact@nilay360.com",   href: "mailto:contact@nilay360.com" },
                   { icon: "💬", label: "WhatsApp", value: "+91 7075 792497",         href: "https://wa.me/917075792497?text=Hi%2C%20I%27m%20interested%20in%20a%20property%20on%20Nilay%20360" },
@@ -357,9 +356,9 @@ export default function ContactPage() {
                   <div key={item.label} style={{ display: "flex", gap: "14px", alignItems: "flex-start", padding: "14px 0", borderBottom: "1px solid rgba(245,242,236,0.06)" }}>
                     <span style={{ fontSize: "17px", flexShrink: 0, marginTop: "1px" }}>{item.icon}</span>
                     <div>
-                      <div style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.12em", color: "rgba(201,168,76,0.5)", textTransform: "uppercase", marginBottom: "3px" }}>{item.label}</div>
+                      <div style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.12em", color: "rgba(16,196,195,0.5)", textTransform: "uppercase", marginBottom: "3px" }}>{item.label}</div>
                       {item.href ? (
-                        <a href={item.href} style={{ fontSize: "13px", color: "#020C1C", textDecoration: "none", fontWeight: 500 }}>{item.value}</a>
+                        <a href={item.href} style={{ fontSize: "13px", color: "#FFFFFF", textDecoration: "none", fontWeight: 500 }}>{item.value}</a>
                       ) : (
                         <p style={{ fontSize: "13px", color: "rgba(245,242,236,0.65)", lineHeight: 1.6, whiteSpace: "pre-line" }}>{item.value}</p>
                       )}
@@ -370,12 +369,11 @@ export default function ContactPage() {
             </div>
 
             {/* Map placeholder */}
-            {/* TEMPORARY: Using Hustle Hive office address (owner-confirmed, same location as an existing commercial listing), revert to Nilay360's own registered address once available */}
-            <div style={{ background: "#020C1C", borderRadius: "16px", padding: "32px", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: "200px", border: "1px solid rgba(201,168,76,0.12)", position: "relative", overflow: "hidden", cursor: "pointer" }}
+            <div style={{ background: "#020C1C", borderRadius: "16px", padding: "32px", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: "200px", border: "1px solid rgba(16,196,195,0.12)", position: "relative", overflow: "hidden", cursor: "pointer" }}
               onClick={() => window.open("https://maps.google.com/?q=Trendz+Techpark+Kakatiya+Hills+Madhapur+Hyderabad", "_blank")}>
-              <div style={{ position: "absolute", inset: 0, backgroundImage: "radial-gradient(circle at 50% 50%, rgba(201,168,76,0.06) 0%, transparent 70%)", pointerEvents: "none" }} />
-              <div style={{ width: "52px", height: "52px", borderRadius: "50%", background: "rgba(201,168,76,0.15)", border: "1.5px solid rgba(201,168,76,0.3)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "24px", marginBottom: "14px" }}>📍</div>
-              <p style={{ fontSize: "14px", fontWeight: 600, color: "#020C1C", marginBottom: "4px" }}>Kakatiya Hills, Madhapur</p>
+              <div style={{ position: "absolute", inset: 0, backgroundImage: "radial-gradient(circle at 50% 50%, rgba(16,196,195,0.06) 0%, transparent 70%)", pointerEvents: "none" }} />
+              <div style={{ width: "52px", height: "52px", borderRadius: "50%", background: "rgba(16,196,195,0.15)", border: "1.5px solid rgba(16,196,195,0.3)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "24px", marginBottom: "14px" }}>📍</div>
+              <p style={{ fontSize: "14px", fontWeight: 600, color: "#FFFFFF", marginBottom: "4px" }}>Kakatiya Hills, Madhapur</p>
               <p style={{ fontSize: "12px", color: "rgba(245,242,236,0.35)" }}>Telangana — 500081</p>
               <span style={{ marginTop: "14px", fontSize: "11px", fontWeight: 700, letterSpacing: "0.1em", color: "#10C4C3", textTransform: "uppercase", display: "flex", alignItems: "center", gap: "5px" }}>
                 Open in Maps
@@ -388,13 +386,13 @@ export default function ContactPage() {
               <p style={{ fontSize: "11px", fontWeight: 700, letterSpacing: "0.16em", color: "#9CA3AF", textTransform: "uppercase", marginBottom: "16px" }}>Follow Us</p>
               <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
                 {[
-                  { label: "Instagram", handle: "@nilay360_",   icon: "IG", color: "#E1306C", href: "https://www.instagram.com/nilay360_/" },
-                  { label: "LinkedIn",  handle: "Nilay 360",       icon: "IN", color: "#0A66C2", href: "https://www.linkedin.com/company/nilay360" },
-                  { label: "Twitter",   handle: "@Nilay 360India", icon: "TW", color: "#1DA1F2", href: "https://twitter.com/Nilay 360India" },
-                  { label: "YouTube",   handle: "Nilay 360",    icon: "YT", color: "#FF0000", href: "https://www.youtube.com/@nilay360.digital" },
+                  { label: "Facebook",  handle: "Nilay 360",  icon: "FB", color: "#1877F2", href: "https://www.facebook.com/share/1BZJpzhaUj/" },
+                  { label: "Instagram", handle: "@nilay360_", icon: "IG", color: "#E1306C", href: "https://www.instagram.com/nilay360_/" },
+                  { label: "Threads",   handle: "@nilay360_", icon: "TH", color: "#020C1C", href: "https://www.threads.com/@nilay360_?invite=0" },
+                  { label: "YouTube",   handle: "Nilay 360",  icon: "YT", color: "#FF0000", href: "https://youtube.com/@nilay360.digital?si=RL2As_-lpIUkflhk" },
                 ].map(s => (
-                  <a key={s.label} href={s.href} target="_blank" rel="noopener noreferrer" style={{ display: "flex", alignItems: "center", gap: "8px", padding: "8px 14px", background: "#F8F6F1", borderRadius: "8px", textDecoration: "none", border: "1px solid rgba(13,43,31,0.06)", flex: "1 1 calc(50% - 5px)" }}
-                    onMouseEnter={e => (e.currentTarget.style.borderColor = "rgba(201,168,76,0.3)")}
+                  <a key={s.label} href={s.href} target="_blank" rel="noopener noreferrer" style={{ display: "flex", alignItems: "center", gap: "8px", padding: "8px 14px", background: "rgba(16,196,195,0.05)", borderRadius: "8px", textDecoration: "none", border: "1px solid rgba(13,43,31,0.06)", flex: "1 1 calc(50% - 5px)" }}
+                    onMouseEnter={e => (e.currentTarget.style.borderColor = "rgba(16,196,195,0.3)")}
                     onMouseLeave={e => (e.currentTarget.style.borderColor = "rgba(13,43,31,0.06)")}>
                     <span style={{ width: "26px", height: "26px", borderRadius: "6px", background: s.color + "18", border: `1px solid ${s.color}33`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "9px", fontWeight: 800, color: s.color }}>{s.icon}</span>
                     <div>
@@ -409,40 +407,48 @@ export default function ContactPage() {
         </section>
 
         {/* ── OFFICE LOCATIONS ───────────────────────────────── */}
-        <section className="ct-offices" style={{ background: "#F8F6F1", padding: "80px 48px", borderTop: "1px solid rgba(13,43,31,0.06)" }}>
+        <section className="ct-offices" style={{ background: "#05080C", padding: "80px 48px", borderTop: "1px solid rgba(245,242,236,0.06)" }}>
           <div style={{ maxWidth: "1280px", margin: "0 auto" }}>
             <div style={{ textAlign: "center", marginBottom: "48px" }}>
               <div style={{ display: "inline-flex", alignItems: "center", gap: "8px", marginBottom: "14px" }}>
-                <div style={{ width: "28px", height: "1px", background: "rgba(201,168,76,0.5)" }} />
+                <div style={{ width: "28px", height: "1px", background: "rgba(16,196,195,0.5)" }} />
                 <span style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.22em", color: "#10C4C3", textTransform: "uppercase" }}>Where We Operate</span>
-                <div style={{ width: "28px", height: "1px", background: "rgba(201,168,76,0.5)" }} />
+                <div style={{ width: "28px", height: "1px", background: "rgba(16,196,195,0.5)" }} />
               </div>
-              <h2 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "clamp(30px, 3.8vw, 46px)", fontWeight: 400, color: "#020C1C" }}>Our Office Locations</h2>
+              <h2 style={{ fontFamily: "var(--font-heading-new)", fontSize: "clamp(30px, 3.8vw, 46px)", fontWeight: 400, color: "#FFFFFF" }}>Our Office Locations</h2>
             </div>
-            <div className="ct-offices-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "20px" }}>
+            <div className="ct-offices-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "20px", alignItems: "start" }}>
               {[
-                // TEMPORARY: Using Hustle Hive office address (owner-confirmed, same location as an existing commercial listing), revert to Nilay360's own registered address once available
-                { city: "Hyderabad", sub: "Headquarters", address: "4th Floor, Trendz Techpark, Road No. 11, Kakatiya Hills\nGuttala Begumpet, Kavuri Hills, Madhapur, Hyderabad, Telangana 500081", phone: "+91 40 0000 0000", status: "Open", statusColor: "#059669", statusBg: "rgba(5,150,105,0.08)", main: true },
-                { city: "Mumbai",    sub: "Regional Office", address: "Bandra Kurla Complex\nMumbai, Maharashtra 400 051", phone: "Coming soon",       status: "Coming Soon", statusColor: "#D97706", statusBg: "rgba(217,119,6,0.08)", main: false },
-                { city: "Bengaluru", sub: "Regional Office", address: "Koramangala, 5th Block\nBengaluru, Karnataka 560 095", phone: "Coming soon",    status: "Coming Soon", statusColor: "#D97706", statusBg: "rgba(217,119,6,0.08)", main: false },
+                { city: "Hyderabad", sub: "Headquarters",   address: "4th Floor, Trendz Techpark, Road No. 11, Kakatiya Hills\nGuttala Begumpet, Kavuri Hills, Madhapur, Hyderabad, Telangana 500081", phone: "+91 7075 792497", status: "Open",        statusColor: "#059669", statusBg: "rgba(5,150,105,0.08)", main: true },
+                // Mumbai/Bengaluru have no address or phone yet — these offices
+                // don't exist yet, so a specific street address would be
+                // misleading. City + "Regional Office" + "Coming Soon" is the
+                // whole card for these two; the address/phone rows below are
+                // conditionally rendered and simply don't appear when absent.
+                { city: "Mumbai",    sub: "Regional Office", address: undefined as string | undefined, phone: undefined as string | undefined, status: "Coming Soon", statusColor: "#D97706", statusBg: "rgba(217,119,6,0.08)", main: false },
+                { city: "Bengaluru", sub: "Regional Office", address: undefined as string | undefined, phone: undefined as string | undefined, status: "Coming Soon", statusColor: "#D97706", statusBg: "rgba(217,119,6,0.08)", main: false },
               ].map(loc => (
                 <div key={loc.city} style={{ background: loc.main ? "#020C1C" : "#fff", borderRadius: "18px", padding: "36px 32px", border: loc.main ? "none" : "1px solid rgba(13,43,31,0.07)", position: "relative", overflow: "hidden" }}>
-                  {loc.main && <div style={{ position: "absolute", inset: 0, backgroundImage: "linear-gradient(rgba(201,168,76,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(201,168,76,0.04) 1px, transparent 1px)", backgroundSize: "36px 36px", pointerEvents: "none" }} />}
+                  {loc.main && <div style={{ position: "absolute", inset: 0, backgroundImage: "linear-gradient(rgba(16,196,195,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(16,196,195,0.04) 1px, transparent 1px)", backgroundSize: "36px 36px", pointerEvents: "none" }} />}
                   <div style={{ position: "relative", zIndex: 2 }}>
-                    <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "20px" }}>
+                    <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: loc.address ? "20px" : "0" }}>
                       <div>
-                        <h3 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "26px", fontWeight: 600, color: loc.main ? "#020C1C" : "#020C1C", marginBottom: "3px" }}>{loc.city}</h3>
-                        <p style={{ fontSize: "11px", fontWeight: 600, letterSpacing: "0.1em", color: loc.main ? "rgba(201,168,76,0.6)" : "#9CA3AF", textTransform: "uppercase" }}>{loc.sub}</p>
+                        <h3 style={{ fontFamily: "var(--font-heading-new)", fontSize: "26px", fontWeight: 600, color: loc.main ? "#FFFFFF" : "#020C1C", marginBottom: "3px" }}>{loc.city}</h3>
+                        <p style={{ fontSize: "11px", fontWeight: 600, letterSpacing: "0.1em", color: loc.main ? "rgba(16,196,195,0.6)" : "#9CA3AF", textTransform: "uppercase" }}>{loc.sub}</p>
                       </div>
                       <span style={{ padding: "4px 12px", borderRadius: "100px", fontSize: "10px", fontWeight: 700, letterSpacing: "0.08em", background: loc.main ? "rgba(5,150,105,0.15)" : loc.statusBg, color: loc.main ? "#86EFAC" : loc.statusColor, border: `1px solid ${loc.main ? "rgba(5,150,105,0.25)" : loc.statusColor + "33"}` }}>
                         {loc.status}
                       </span>
                     </div>
-                    <p style={{ fontSize: "13px", color: loc.main ? "rgba(245,242,236,0.55)" : "#6B7C72", lineHeight: 1.7, marginBottom: "16px", whiteSpace: "pre-line" }}>{loc.address}</p>
-                    <div style={{ display: "flex", alignItems: "center", gap: "8px", padding: "10px 14px", background: loc.main ? "rgba(245,242,236,0.05)" : "#F8F6F1", borderRadius: "8px", border: `1px solid ${loc.main ? "rgba(245,242,236,0.07)" : "rgba(13,43,31,0.06)"}` }}>
-                      <span style={{ fontSize: "14px" }}>📞</span>
-                      <span style={{ fontSize: "13px", fontWeight: 500, color: loc.main ? "rgba(245,242,236,0.7)" : "#4B5563" }}>{loc.phone}</span>
-                    </div>
+                    {loc.address && (
+                      <p style={{ fontSize: "13px", color: loc.main ? "rgba(245,242,236,0.55)" : "#555", lineHeight: 1.7, marginBottom: "16px", whiteSpace: "pre-line" }}>{loc.address}</p>
+                    )}
+                    {loc.phone && (
+                      <div style={{ display: "flex", alignItems: "center", gap: "8px", padding: "10px 14px", background: loc.main ? "rgba(245,242,236,0.05)" : "rgba(16,196,195,0.05)", borderRadius: "8px", border: `1px solid ${loc.main ? "rgba(245,242,236,0.07)" : "rgba(13,43,31,0.06)"}` }}>
+                        <span style={{ fontSize: "14px" }}>📞</span>
+                        <span style={{ fontSize: "13px", fontWeight: 500, color: loc.main ? "rgba(245,242,236,0.7)" : "#4B5563" }}>{loc.phone}</span>
+                      </div>
+                    )}
                   </div>
                 </div>
               ))}
@@ -455,14 +461,14 @@ export default function ContactPage() {
           <div style={{ maxWidth: "820px", margin: "0 auto" }}>
             <div style={{ textAlign: "center", marginBottom: "56px" }}>
               <div style={{ display: "inline-flex", alignItems: "center", gap: "8px", marginBottom: "14px" }}>
-                <div style={{ width: "28px", height: "1px", background: "rgba(201,168,76,0.5)" }} />
+                <div style={{ width: "28px", height: "1px", background: "rgba(16,196,195,0.5)" }} />
                 <span style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.22em", color: "#10C4C3", textTransform: "uppercase" }}>Common Questions</span>
-                <div style={{ width: "28px", height: "1px", background: "rgba(201,168,76,0.5)" }} />
+                <div style={{ width: "28px", height: "1px", background: "rgba(16,196,195,0.5)" }} />
               </div>
-              <h2 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "clamp(32px, 4vw, 50px)", fontWeight: 400, color: "#020C1C", lineHeight: 1.15 }}>
+              <h2 style={{ fontFamily: "var(--font-heading-new)", fontSize: "clamp(32px, 4vw, 50px)", fontWeight: 400, color: "#FFFFFF", lineHeight: 1.15 }}>
                 Frequently Asked<br /><em style={{ fontStyle: "italic", color: "#10C4C3" }}>Questions</em>
               </h2>
-              <p style={{ fontSize: "15px", color: "#6B7C72", marginTop: "14px", lineHeight: 1.7 }}>
+              <p style={{ fontSize: "15px", color: "rgba(245,242,236,0.5)", marginTop: "14px", lineHeight: 1.7 }}>
                 Can't find what you're looking for? <a href="mailto:contact@nilay360.com" style={{ color: "#10C4C3", textDecoration: "none", fontWeight: 600 }}>Email us directly</a>.
               </p>
             </div>
@@ -474,10 +480,10 @@ export default function ContactPage() {
 
         {/* ── CTA ────────────────────────────────────────────── */}
         <section className="ct-cta" style={{ background: "#020C1C", padding: "90px 48px", position: "relative", overflow: "hidden" }}>
-          <div style={{ position: "absolute", inset: 0, backgroundImage: "linear-gradient(rgba(201,168,76,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(201,168,76,0.04) 1px, transparent 1px)", backgroundSize: "52px 52px", pointerEvents: "none" }} />
-          <div style={{ position: "absolute", inset: 0, background: "radial-gradient(ellipse 60% 55% at 50% 110%, rgba(201,168,76,0.1) 0%, transparent 55%)", pointerEvents: "none" }} />
+          <div style={{ position: "absolute", inset: 0, backgroundImage: "linear-gradient(rgba(16,196,195,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(16,196,195,0.04) 1px, transparent 1px)", backgroundSize: "52px 52px", pointerEvents: "none" }} />
+          <div style={{ position: "absolute", inset: 0, background: "radial-gradient(ellipse 60% 55% at 50% 110%, rgba(16,196,195,0.1) 0%, transparent 55%)", pointerEvents: "none" }} />
           <div style={{ position: "relative", zIndex: 2, maxWidth: "660px", margin: "0 auto", textAlign: "center" }}>
-            <h2 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "clamp(34px, 5vw, 56px)", fontWeight: 300, color: "#020C1C", lineHeight: 1.15, marginBottom: "16px" }}>
+            <h2 style={{ fontFamily: "var(--font-heading-new)", fontSize: "clamp(34px, 5vw, 56px)", fontWeight: 300, color: "#FFFFFF", lineHeight: 1.15, marginBottom: "16px" }}>
               Ready to Find Your<br /><em style={{ fontStyle: "italic", color: "#10C4C3" }}>Perfect Property?</em>
             </h2>
             <p style={{ fontSize: "15px", color: "rgba(245,242,236,0.5)", lineHeight: 1.75, marginBottom: "36px" }}>
@@ -500,19 +506,24 @@ export default function ContactPage() {
           <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
             <div className="ct-footer-grid" style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1fr 1fr", gap: "48px", paddingBottom: "56px", borderBottom: "1px solid rgba(245,242,236,0.06)" }}>
               <div>
-                <div style={{ fontFamily: "'Cal Sans', sans-serif", fontSize: "18px", fontWeight: 600, color: "#fff", letterSpacing: "0.16em", marginBottom: "14px" }}>Nilay 360 <span style={{ color: "#10C4C3" }}>·</span></div>
-                <p style={{ fontSize: "13px", color: "rgba(245,242,236,0.35)", lineHeight: 1.75, maxWidth: "280px", marginBottom: "22px" }}>India's most trusted premium real estate platform. Verified listings, certified agents, independent legal guidance.</p>
+                <div style={{ fontFamily: "var(--font-support-new)", fontSize: "18px", fontWeight: 600, color: "#fff", letterSpacing: "0.16em", marginBottom: "14px" }}>Nilay 360 <span style={{ color: "#10C4C3" }}>·</span></div>
+                <p style={{ fontSize: "13px", color: "rgba(245,242,236,0.35)", lineHeight: 1.75, maxWidth: "280px", marginBottom: "22px" }}>India's premium real estate platform connecting discerning buyers with exceptional properties.</p>
                 <div style={{ display: "flex", gap: "10px" }}>
-                  {["IG", "IN", "TW", "YT"].map(s => (
-                    <div key={s} style={{ width: "34px", height: "34px", borderRadius: "8px", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.07)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "10px", color: "rgba(255,255,255,0.35)", fontWeight: 700, cursor: "pointer" }}>{s}</div>
+                  {[
+                    { label: "Facebook",  icon: "FB", href: "https://www.facebook.com/share/1BZJpzhaUj/" },
+                    { label: "Instagram", icon: "IG", href: "https://www.instagram.com/nilay360_/" },
+                    { label: "Threads",   icon: "TH", href: "https://www.threads.com/@nilay360_?invite=0" },
+                    { label: "YouTube",   icon: "YT", href: "https://youtube.com/@nilay360.digital?si=RL2As_-lpIUkflhk" },
+                  ].map(s => (
+                    <a key={s.label} href={s.href} target="_blank" rel="noopener noreferrer" aria-label={s.label} style={{ width: "34px", height: "34px", borderRadius: "8px", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.07)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "10px", color: "rgba(255,255,255,0.35)", fontWeight: 700, cursor: "pointer", textDecoration: "none" }}>{s.icon}</a>
                   ))}
                 </div>
               </div>
               {[
                 { heading: "Properties", links: [["Buy","/buy"],["Rent","/rent"],["New Projects","/new-projects"],["Commercial","/commercial"],["Builders","/builders"],["Blog","/blog"]] },
                 { heading: "Company",    links: [["About Us","/about"],["Our Agents","/agents"],["NRI Services","/nri"],["Careers","/careers"],["Contact","/contact"]] },
-                { heading: "Tools",      links: [["EMI Calculator","/calculator"],["Compare","/compare"],["Search","/search"],["RERA Guide","/legal-guide"]] },
-                { heading: "Legal",      links: [["Privacy Policy","/privacy"],["Terms of Service","/terms"],["Cookie Policy","/cookies"],["RERA Guide","/legal-guide"]] },
+                { heading: "Tools",      links: [["EMI Calculator","/calculator"],["Compare","/compare"],["Search","/search"],["RERA Guide","/legal-guide"],["Safety Guide","/safety-guide"]] },
+                { heading: "Legal",      links: [["Privacy Policy","/privacy"],["Terms of Service","/terms"],["Cookie Policy","/cookies"],["RERA Guide","/legal-guide"],["Agent Terms","/agent-terms"],["Grievance Redressal","/grievance-redressal"]] },
               ].map(col => (
                 <div key={col.heading}>
                   <h4 style={{ fontSize: "11px", fontWeight: 700, letterSpacing: "0.16em", color: "rgba(245,242,236,0.3)", textTransform: "uppercase", marginBottom: "18px" }}>{col.heading}</h4>
@@ -523,11 +534,7 @@ export default function ContactPage() {
               ))}
             </div>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "22px 0", flexWrap: "wrap", gap: "12px" }}>
-              <p style={{ fontSize: "12px", color: "rgba(245,242,236,0.2)" }}>© 2025 Nilay 360. All rights reserved. Registered in India.</p>
-              <div style={{ display: "flex", gap: "6px" }}>
-                <span style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.1em", padding: "4px 10px", background: "rgba(201,168,76,0.08)", border: "1px solid rgba(201,168,76,0.15)", borderRadius: "4px", color: "rgba(201,168,76,0.5)" }}>RERA COMPLIANT</span>
-                <span style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.1em", padding: "4px 10px", background: "rgba(245,242,236,0.04)", border: "1px solid rgba(245,242,236,0.07)", borderRadius: "4px", color: "rgba(245,242,236,0.25)" }}>ISO 27001</span>
-              </div>
+              <p style={{ fontSize: "12px", color: "rgba(245,242,236,0.2)" }}>© {new Date().getFullYear()} Nilay 360. All rights reserved. Registered in India.</p>
             </div>
           </div>
         </footer>

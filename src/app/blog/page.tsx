@@ -1,6 +1,7 @@
 ﻿"use client";
 import { useState, useEffect, useMemo } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { useLiveStats } from "@/lib/liveStats";
 
 // ── Types ─────────────────────────────────────────────────────
 type Post = {
@@ -71,7 +72,7 @@ function ArticleCard({ post, cats }: { post: Post; cats: Category[] }) {
         </span>
       </div>
       <div style={{ padding: "20px 22px 22px" }}>
-        <h3 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "18px", fontWeight: 600, color: "#020C1C", lineHeight: 1.35, marginBottom: "10px", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{post.title}</h3>
+        <h3 style={{ fontFamily: "var(--font-heading-new)", fontSize: "18px", fontWeight: 600, color: "#020C1C", lineHeight: 1.35, marginBottom: "10px", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{post.title}</h3>
         {post.excerpt && <p style={{ fontSize: "13px", color: "#6B7C72", lineHeight: 1.65, marginBottom: "16px", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{post.excerpt}</p>}
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", borderTop: "1px solid rgba(13,43,31,0.06)", paddingTop: "14px" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
@@ -94,6 +95,7 @@ function ArticleCard({ post, cats }: { post: Post; cats: Category[] }) {
 
 // ── Main page ─────────────────────────────────────────────────
 export default function BlogPage() {
+  const liveStats = useLiveStats();
   const [posts, setPosts] = useState<Post[]>([]);
   const [cats, setCats] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
@@ -137,19 +139,13 @@ export default function BlogPage() {
   const visiblePosts = gridPosts.slice(0, page * PAGE_SIZE);
   const hasMore = visiblePosts.length < gridPosts.length;
 
-  const MARKET_DATA = [
-    { city: "Hyderabad", price: "₹95,000/sqft", growth: "+14.2%", color: "#111F33" },
-    { city: "Mumbai",    price: "₹1,85,000/sqft", growth: "+9.8%",  color: "#111F33" },
-    { city: "Bengaluru", price: "₹1,12,000/sqft", growth: "+11.5%", color: "#111F33" },
-  ];
-
   const TRENDING = ["Jubilee Hills apartments", "3BHK Kokapet rent", "Banjara Hills villas", "Gachibowli investment", "NRI property buying"];
 
   return (
     <>
       <style>{`
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'Cal Sans', system-ui, sans-serif; background: #020C1C; overflow-x: hidden; }
+        body { font-family: var(--font-body-new); background: #020C1C; overflow-x: hidden; }
         ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-thumb { background: rgba(201,168,76,0.25); border-radius: 2px; }
         @keyframes pulse { 0%,100%{opacity:1}50%{opacity:0.4} }
@@ -177,7 +173,7 @@ export default function BlogPage() {
               <div style={{ width: "5px", height: "5px", borderRadius: "50%", background: "#10C4C3" }} />
               <span style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.2em", color: "#10C4C3", textTransform: "uppercase" }}>Market Intelligence</span>
             </div>
-            <h1 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "clamp(42px, 6vw, 68px)", fontWeight: 300, lineHeight: 1.12, color: "#020C1C", marginBottom: "18px" }}>
+            <h1 style={{ fontFamily: "var(--font-heading-new)", fontSize: "clamp(42px, 6vw, 68px)", fontWeight: 300, lineHeight: 1.12, color: "#020C1C", marginBottom: "18px" }}>
               Property Insights<br /><em style={{ fontStyle: "italic", color: "#10C4C3" }}>& Guides</em>
             </h1>
             <p style={{ fontSize: "15px", color: "rgba(245,242,236,0.55)", lineHeight: 1.75, marginBottom: "36px", maxWidth: "520px", margin: "0 auto 36px" }}>
@@ -191,15 +187,15 @@ export default function BlogPage() {
                 value={searchInput}
                 onChange={e => setSearchInput(e.target.value)}
                 onKeyDown={e => { if (e.key === "Enter") { setSearch(searchInput); setPage(1); } }}
-                style={{ flex: 1, padding: "14px 56px 14px 20px", background: "rgba(245,242,236,0.07)", border: "1px solid rgba(245,242,236,0.18)", borderRadius: "10px 0 0 10px", color: "#020C1C", fontSize: "13px", fontFamily: "'Cal Sans', sans-serif", outline: "none" }}
+                style={{ flex: 1, padding: "14px 56px 14px 20px", background: "rgba(245,242,236,0.07)", border: "1px solid rgba(245,242,236,0.18)", borderRadius: "10px 0 0 10px", color: "#020C1C", fontSize: "13px", fontFamily: "var(--font-body-new)", outline: "none" }}
               />
-              <button onClick={() => { setSearch(searchInput); setPage(1); }} style={{ padding: "0 24px", background: "#10C4C3", border: "none", borderRadius: "0 10px 10px 0", color: "#020C1C", fontSize: "13px", fontWeight: 700, cursor: "pointer", fontFamily: "'Cal Sans', sans-serif", display: "flex", alignItems: "center", gap: "7px", whiteSpace: "nowrap" }}>
+              <button onClick={() => { setSearch(searchInput); setPage(1); }} style={{ padding: "0 24px", background: "#10C4C3", border: "none", borderRadius: "0 10px 10px 0", color: "#020C1C", fontSize: "13px", fontWeight: 700, cursor: "pointer", fontFamily: "var(--font-body-new)", display: "flex", alignItems: "center", gap: "7px", whiteSpace: "nowrap" }}>
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" /></svg>
                 Search
               </button>
             </div>
             {search && (
-              <button onClick={() => { setSearch(""); setSearchInput(""); }} style={{ marginTop: "14px", fontSize: "12px", color: "rgba(201,168,76,0.7)", background: "transparent", border: "none", cursor: "pointer", fontFamily: "'Cal Sans', sans-serif", display: "inline-flex", alignItems: "center", gap: "5px" }}>
+              <button onClick={() => { setSearch(""); setSearchInput(""); }} style={{ marginTop: "14px", fontSize: "12px", color: "rgba(201,168,76,0.7)", background: "transparent", border: "none", cursor: "pointer", fontFamily: "var(--font-body-new)", display: "inline-flex", alignItems: "center", gap: "5px" }}>
                 <span style={{ fontSize: "14px" }}>×</span> Clear search: "{search}"
               </button>
             )}
@@ -224,7 +220,7 @@ export default function BlogPage() {
                     </span>
                     <span style={{ fontSize: "11px", color: "rgba(245,242,236,0.45)" }}>Featured</span>
                   </div>
-                  <h2 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "clamp(28px, 3.5vw, 44px)", fontWeight: 500, color: "#020C1C", lineHeight: 1.2, marginBottom: "16px" }}>{featured.title}</h2>
+                  <h2 style={{ fontFamily: "var(--font-heading-new)", fontSize: "clamp(28px, 3.5vw, 44px)", fontWeight: 500, color: "#020C1C", lineHeight: 1.2, marginBottom: "16px" }}>{featured.title}</h2>
                   {featured.excerpt && <p style={{ fontSize: "14px", color: "rgba(245,242,236,0.6)", lineHeight: 1.7, marginBottom: "28px", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{featured.excerpt}</p>}
                   <div style={{ display: "flex", alignItems: "center", gap: "20px", flexWrap: "wrap" }}>
                     <a href={`/blog/${featured.slug}`} style={{ padding: "12px 28px", background: "#10C4C3", border: "none", borderRadius: "8px", color: "#020C1C", fontSize: "13px", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", textDecoration: "none", display: "inline-flex", alignItems: "center", gap: "8px" }}>
@@ -256,7 +252,7 @@ export default function BlogPage() {
                 <button
                   key={c.id}
                   onClick={() => { setActiveCat(c.id); setPage(1); }}
-                  style={{ padding: "8px 18px", borderRadius: "100px", fontSize: "12px", fontWeight: 600, whiteSpace: "nowrap", background: activeCat === c.id ? "#10C4C3" : "rgba(245,242,236,0.07)", border: activeCat === c.id ? "none" : "1px solid rgba(245,242,236,0.12)", color: activeCat === c.id ? "#020C1C" : "rgba(245,242,236,0.5)", cursor: "pointer", fontFamily: "'Cal Sans', sans-serif", transition: "all 0.15s", flexShrink: 0 }}
+                  style={{ padding: "8px 18px", borderRadius: "100px", fontSize: "12px", fontWeight: 600, whiteSpace: "nowrap", background: activeCat === c.id ? "#10C4C3" : "rgba(245,242,236,0.07)", border: activeCat === c.id ? "none" : "1px solid rgba(245,242,236,0.12)", color: activeCat === c.id ? "#020C1C" : "rgba(245,242,236,0.5)", cursor: "pointer", fontFamily: "var(--font-body-new)", transition: "all 0.15s", flexShrink: 0 }}
                 >{c.name}</button>
               ))}
             </div>
@@ -274,7 +270,7 @@ export default function BlogPage() {
                 <div style={{ height: "16px", width: "180px", borderRadius: "5px", background: "#E8E4DC", animation: "pulse 1.6s ease-in-out infinite" }} />
               ) : (
                 <span style={{ fontSize: "13px", color: "#6B7C72" }}>
-                  <span style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "22px", fontWeight: 600, color: "#020C1C", marginRight: "5px" }}>{gridPosts.length}</span>
+                  <span style={{ fontFamily: "var(--font-support-new)", fontSize: "22px", fontWeight: 600, color: "#020C1C", marginRight: "5px" }}>{gridPosts.length}</span>
                   {search ? `results for "${search}"` : activeCat !== "all" ? `articles in ${catName(activeCat, cats)}` : "articles"}
                 </span>
               )}
@@ -289,12 +285,12 @@ export default function BlogPage() {
                     <div style={{ gridColumn: "1 / -1", padding: "80px 0", textAlign: "center" }}>
                       <div style={{ fontSize: "40px", opacity: 0.2, marginBottom: "14px" }}>📝</div>
                       {posts.length === 0 ? (
-                        <h3 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "26px", fontWeight: 400, color: "#020C1C", marginBottom: "8px" }}>No articles published yet</h3>
+                        <h3 style={{ fontFamily: "var(--font-heading-new)", fontSize: "26px", fontWeight: 400, color: "#020C1C", marginBottom: "8px" }}>No articles published yet</h3>
                       ) : (
                         <>
-                          <h3 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "26px", fontWeight: 400, color: "#020C1C", marginBottom: "8px" }}>No articles found</h3>
+                          <h3 style={{ fontFamily: "var(--font-heading-new)", fontSize: "26px", fontWeight: 400, color: "#020C1C", marginBottom: "8px" }}>No articles found</h3>
                           <p style={{ fontSize: "13px", color: "#6B7C72" }}>Try a different category or clear your search.</p>
-                          <button onClick={() => { setActiveCat("all"); setSearch(""); setSearchInput(""); }} style={{ marginTop: "18px", padding: "10px 24px", background: "#020C1C", border: "none", borderRadius: "8px", color: "#020C1C", fontSize: "13px", fontWeight: 600, cursor: "pointer", fontFamily: "'Cal Sans', sans-serif" }}>Show All Articles</button>
+                          <button onClick={() => { setActiveCat("all"); setSearch(""); setSearchInput(""); }} style={{ marginTop: "18px", padding: "10px 24px", background: "#020C1C", border: "none", borderRadius: "8px", color: "#020C1C", fontSize: "13px", fontWeight: 600, cursor: "pointer", fontFamily: "var(--font-body-new)" }}>Show All Articles</button>
                         </>
                       )}
                     </div>
@@ -308,7 +304,7 @@ export default function BlogPage() {
               <div style={{ textAlign: "center", marginTop: "48px" }}>
                 <button
                   onClick={() => setPage(p => p + 1)}
-                  style={{ padding: "13px 40px", background: "transparent", border: "2px solid rgba(13,43,31,0.2)", borderRadius: "8px", color: "#020C1C", fontSize: "13px", fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase", cursor: "pointer", fontFamily: "'Cal Sans', sans-serif", display: "inline-flex", alignItems: "center", gap: "10px", transition: "all 0.18s" }}
+                  style={{ padding: "13px 40px", background: "transparent", border: "2px solid rgba(13,43,31,0.2)", borderRadius: "8px", color: "#020C1C", fontSize: "13px", fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase", cursor: "pointer", fontFamily: "var(--font-body-new)", display: "inline-flex", alignItems: "center", gap: "10px", transition: "all 0.18s" }}
                   onMouseEnter={e => { const b = e.currentTarget as HTMLButtonElement; b.style.background = "#020C1C"; b.style.color = "#020C1C"; }}
                   onMouseLeave={e => { const b = e.currentTarget as HTMLButtonElement; b.style.background = "transparent"; b.style.color = "#020C1C"; }}
                 >
@@ -331,16 +327,20 @@ export default function BlogPage() {
                   <div style={{ width: "5px", height: "5px", borderRadius: "50%", background: "#10C4C3" }} />
                   <span style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.16em", color: "#10C4C3", textTransform: "uppercase" }}>Market Snapshot</span>
                 </div>
-                <p style={{ fontSize: "10px", color: "rgba(245,242,236,0.3)", marginBottom: "18px", letterSpacing: "0.05em" }}>AVG SALE PRICE · Q2 2025</p>
-                {MARKET_DATA.map(m => (
-                  <div key={m.city} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 0", borderBottom: "1px solid rgba(245,242,236,0.07)" }}>
-                    <div>
-                      <div style={{ fontSize: "13px", fontWeight: 600, color: "#020C1C", marginBottom: "2px" }}>{m.city}</div>
-                      <div style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "17px", fontWeight: 500, color: "#10C4C3" }}>{m.price}</div>
+                {liveStats.avgSalePricePerSqft !== null ? (
+                  <>
+                    <p style={{ fontSize: "10px", color: "rgba(245,242,236,0.3)", marginBottom: "18px", letterSpacing: "0.05em" }}>AVG SALE PRICE — HYDERABAD</p>
+                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 0", borderBottom: "1px solid rgba(245,242,236,0.07)" }}>
+                      <div>
+                        <div style={{ fontSize: "13px", fontWeight: 600, color: "#020C1C", marginBottom: "2px" }}>Hyderabad</div>
+                        <div style={{ fontFamily: "var(--font-support-new)", fontSize: "17px", fontWeight: 500, color: "#10C4C3" }}>₹{liveStats.avgSalePricePerSqft.toLocaleString("en-IN")}/sqft</div>
+                      </div>
                     </div>
-                    <span style={{ padding: "3px 10px", borderRadius: "100px", fontSize: "11px", fontWeight: 700, background: "rgba(45,106,79,0.18)", color: "#86EFAC", border: "1px solid rgba(45,106,79,0.3)" }}>{m.growth}</span>
-                  </div>
-                ))}
+                    <p style={{ fontSize: "10px", color: "rgba(245,242,236,0.3)", marginTop: "10px" }}>Based on {liveStats.avgSalePriceSampleSize} active sale listing{liveStats.avgSalePriceSampleSize === 1 ? "" : "s"} — not a market index.</p>
+                  </>
+                ) : (
+                  <p style={{ fontSize: "13px", color: "rgba(245,242,236,0.4)", padding: "8px 0" }}>Not enough listings yet for a price snapshot.</p>
+                )}
                 <a href="/search" style={{ display: "block", marginTop: "18px", padding: "10px", background: "rgba(201,168,76,0.1)", border: "1px solid rgba(201,168,76,0.2)", borderRadius: "8px", textAlign: "center", fontSize: "12px", fontWeight: 600, color: "#10C4C3", textDecoration: "none", letterSpacing: "0.06em" }}>
                   Explore Properties →
                 </a>
@@ -349,7 +349,7 @@ export default function BlogPage() {
 
             {/* Trending searches */}
             <div style={{ background: "#fff", borderRadius: "14px", padding: "24px", border: "1px solid rgba(13,43,31,0.07)" }}>
-              <h4 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "18px", fontWeight: 600, color: "#020C1C", marginBottom: "16px" }}>Trending Searches</h4>
+              <h4 style={{ fontFamily: "var(--font-heading-new)", fontSize: "18px", fontWeight: 600, color: "#020C1C", marginBottom: "16px" }}>Trending Searches</h4>
               <div style={{ display: "flex", flexDirection: "column", gap: "0" }}>
                 {TRENDING.map((t, i) => (
                   <a key={t} href={`/search?q=${encodeURIComponent(t)}`} style={{ display: "flex", alignItems: "center", gap: "12px", padding: "10px 0", borderBottom: i < TRENDING.length - 1 ? "1px solid rgba(13,43,31,0.06)" : "none", textDecoration: "none" }}>
@@ -363,7 +363,7 @@ export default function BlogPage() {
 
             {/* Newsletter */}
             <div style={{ background: "#fff", borderRadius: "14px", padding: "24px", border: "1px solid rgba(13,43,31,0.07)" }}>
-              <h4 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "18px", fontWeight: 600, color: "#020C1C", marginBottom: "6px" }}>Market Updates</h4>
+              <h4 style={{ fontFamily: "var(--font-heading-new)", fontSize: "18px", fontWeight: 600, color: "#020C1C", marginBottom: "6px" }}>Market Updates</h4>
               <p style={{ fontSize: "12px", color: "#6B7C72", lineHeight: 1.6, marginBottom: "16px" }}>Weekly property insights, price movements, and new listings delivered to your inbox.</p>
               {subscribed ? (
                 <div style={{ padding: "14px", background: "rgba(45,106,79,0.07)", border: "1px solid rgba(45,106,79,0.18)", borderRadius: "8px", textAlign: "center" }}>
@@ -378,11 +378,11 @@ export default function BlogPage() {
                     placeholder="your@email.com"
                     value={email}
                     onChange={e => setEmail(e.target.value)}
-                    style={{ width: "100%", padding: "10px 14px", background: "#F8F6F1", border: "1.5px solid rgba(13,43,31,0.12)", borderRadius: "8px", fontSize: "13px", color: "#020C1C", fontFamily: "'Cal Sans', sans-serif", outline: "none", marginBottom: "10px" }}
+                    style={{ width: "100%", padding: "10px 14px", background: "#F8F6F1", border: "1.5px solid rgba(13,43,31,0.12)", borderRadius: "8px", fontSize: "13px", color: "#020C1C", fontFamily: "var(--font-body-new)", outline: "none", marginBottom: "10px" }}
                   />
                   <button
                     onClick={() => { if (email.includes("@")) setSubscribed(true); }}
-                    style={{ width: "100%", padding: "11px", background: "#10C4C3", border: "none", borderRadius: "8px", color: "#020C1C", fontSize: "12px", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", cursor: "pointer", fontFamily: "'Cal Sans', sans-serif" }}
+                    style={{ width: "100%", padding: "11px", background: "#10C4C3", border: "none", borderRadius: "8px", color: "#020C1C", fontSize: "12px", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", cursor: "pointer", fontFamily: "var(--font-body-new)" }}
                   >Subscribe</button>
                   <p style={{ fontSize: "10px", color: "#9CA3AF", textAlign: "center", marginTop: "8px" }}>No spam. Unsubscribe anytime.</p>
                 </>
@@ -391,9 +391,9 @@ export default function BlogPage() {
 
             {/* Categories list */}
             <div style={{ background: "#fff", borderRadius: "14px", padding: "24px", border: "1px solid rgba(13,43,31,0.07)" }}>
-              <h4 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "18px", fontWeight: 600, color: "#020C1C", marginBottom: "16px" }}>Browse Topics</h4>
+              <h4 style={{ fontFamily: "var(--font-heading-new)", fontSize: "18px", fontWeight: 600, color: "#020C1C", marginBottom: "16px" }}>Browse Topics</h4>
               {cats.map(c => (
-                <button key={c.id} onClick={() => { setActiveCat(c.id); setPage(1); window.scrollTo({ top: 400, behavior: "smooth" }); }} style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between", padding: "9px 0", background: "transparent", border: "none", borderBottom: "1px solid rgba(13,43,31,0.06)", cursor: "pointer", fontFamily: "'Cal Sans', sans-serif" }}>
+                <button key={c.id} onClick={() => { setActiveCat(c.id); setPage(1); window.scrollTo({ top: 400, behavior: "smooth" }); }} style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between", padding: "9px 0", background: "transparent", border: "none", borderBottom: "1px solid rgba(13,43,31,0.06)", cursor: "pointer", fontFamily: "var(--font-body-new)" }}>
                   <span style={{ fontSize: "13px", color: activeCat === c.id ? "#10C4C3" : "#374151", fontWeight: activeCat === c.id ? 600 : 400 }}>{c.name}</span>
                   {c.post_count > 0 && <span style={{ fontSize: "11px", color: "#9CA3AF" }}>{c.post_count}</span>}
                 </button>
@@ -404,7 +404,7 @@ export default function BlogPage() {
 
         {/* ── FOOTER BAND ── */}
         <div className="bl-footer" style={{ background: "#020C1C", borderTop: "1px solid rgba(201,168,76,0.12)", padding: "32px 48px", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "16px" }}>
-          <span style={{ fontFamily: "'Cal Sans', sans-serif", fontSize: "14px", fontWeight: 600, color: "#fff", letterSpacing: "0.16em" }}>Nilay 360 <span style={{ color: "#10C4C3" }}>·</span></span>
+          <span style={{ fontFamily: "var(--font-support-new)", fontSize: "14px", fontWeight: 600, color: "#fff", letterSpacing: "0.16em" }}>Nilay 360 <span style={{ color: "#10C4C3" }}>·</span></span>
           <p style={{ fontSize: "12px", color: "rgba(245,242,236,0.3)" }}>© 2025 Nilay 360. Premium Real Estate Intelligence.</p>
           <div style={{ display: "flex", gap: "20px" }}>
             {[["Privacy Policy","/privacy"],["Terms of Service","/terms"],["Contact","/contact"]].map(([l,h]) => (

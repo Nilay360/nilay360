@@ -121,7 +121,7 @@ export default function ProfileEditPage() {
   if (loading) {
     return (
       <div style={{ minHeight: "100vh", background: G.ivory, paddingTop: 64, display: "flex", alignItems: "center", justifyContent: "center" }}>
-        <span style={{ color: G.dark, fontFamily: "'Cal Sans', sans-serif", fontSize: 14, opacity: 0.5 }}>Loading profile…</span>
+        <span style={{ color: G.dark, fontFamily: "var(--font-body-new)", fontSize: 14, opacity: 0.5 }}>Loading profile…</span>
       </div>
     );
   }
@@ -129,8 +129,8 @@ export default function ProfileEditPage() {
   if (!userId) {
     return (
       <div style={{ minHeight: "100vh", background: G.ivory, paddingTop: 64, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 16 }}>
-        <p style={{ color: G.dark, fontFamily: "'Cal Sans', sans-serif", fontSize: 16 }}>Please sign in to edit your profile.</p>
-        <Link href="/login" style={{ color: G.gold, fontWeight: 600, fontFamily: "'Cal Sans', sans-serif", textDecoration: "none" }}>Sign In →</Link>
+        <p style={{ color: G.dark, fontFamily: "var(--font-body-new)", fontSize: 16 }}>Please sign in to edit your profile.</p>
+        <Link href="/login" style={{ color: G.gold, fontWeight: 600, fontFamily: "var(--font-body-new)", textDecoration: "none" }}>Sign In →</Link>
       </div>
     );
   }
@@ -147,10 +147,10 @@ export default function ProfileEditPage() {
 
         <div className="pe-header" style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 36, flexWrap: "wrap", gap: 16 }}>
           <div>
-            <h1 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: 34, fontWeight: 600, color: G.dark, margin: 0, lineHeight: 1.15 }}>
+            <h1 style={{ fontFamily: "var(--font-heading-new)", fontSize: 34, fontWeight: 600, color: G.dark, margin: 0, lineHeight: 1.15 }}>
               Edit Profile
             </h1>
-            <p style={{ color: "rgba(13,43,31,0.5)", fontFamily: "'Cal Sans', sans-serif", fontSize: 14, margin: "6px 0 0" }}>
+            <p style={{ color: "rgba(13,43,31,0.5)", fontFamily: "var(--font-body-new)", fontSize: 14, margin: "6px 0 0" }}>
               {email}
             </p>
           </div>
@@ -160,7 +160,7 @@ export default function ProfileEditPage() {
               padding: "9px 16px", fontSize: 13, fontWeight: 500,
               color: G.dark, background: "transparent",
               border: "1px solid rgba(13,43,31,0.2)", borderRadius: 8,
-              cursor: "pointer", fontFamily: "'Cal Sans', sans-serif",
+              cursor: "pointer", fontFamily: "var(--font-body-new)",
             }}
           >
             ← Dashboard
@@ -209,7 +209,7 @@ export default function ProfileEditPage() {
               id="bio" rows={4}
               value={form.bio} onChange={handleChange("bio")}
               placeholder="A short bio about yourself"
-              style={{ ...inputStyle, resize: "vertical", minHeight: 100, fontFamily: "'Cal Sans', sans-serif" }}
+              style={{ ...inputStyle, resize: "vertical", minHeight: 100, fontFamily: "var(--font-body-new)" }}
             />
           </Field>
 
@@ -223,13 +223,13 @@ export default function ProfileEditPage() {
                 color: "#0a0a0a", background: G.gold,
                 border: "none", cursor: saving ? "not-allowed" : "pointer",
                 opacity: saving ? 0.7 : 1,
-                fontFamily: "'Cal Sans', sans-serif",
+                fontFamily: "var(--font-body-new)",
               }}
             >
               {saving ? "Saving…" : "Save Changes"}
             </button>
-            {saved && <span style={{ fontSize: 13, color: "#111F33", fontWeight: 500, fontFamily: "'Cal Sans', sans-serif" }}>✓ Profile saved</span>}
-            {error && <span style={{ fontSize: 13, color: "#B91C1C", fontWeight: 500, fontFamily: "'Cal Sans', sans-serif" }}>{error}</span>}
+            {saved && <span style={{ fontSize: 13, color: "#111F33", fontWeight: 500, fontFamily: "var(--font-body-new)" }}>✓ Profile saved</span>}
+            {error && <span style={{ fontSize: 13, color: "#B91C1C", fontWeight: 500, fontFamily: "var(--font-body-new)" }}>{error}</span>}
           </div>
         </form>
       </div>
@@ -242,7 +242,7 @@ const inputStyle: React.CSSProperties = {
   background: "#ffffff",
   border: "1.5px solid rgba(13,43,31,0.12)",
   borderRadius: 8, fontSize: 14, color: "#020C1C",
-  fontFamily: "'Cal Sans', sans-serif",
+  fontFamily: "var(--font-body-new)",
   outline: "none", boxSizing: "border-box",
 };
 
@@ -255,7 +255,7 @@ function Field({ label, htmlFor, children }: { label: string; htmlFor: string; c
           display: "block", fontSize: 11, fontWeight: 700,
           letterSpacing: "0.1em", textTransform: "uppercase",
           color: "#6B7C72", marginBottom: 7,
-          fontFamily: "'Cal Sans', sans-serif",
+          fontFamily: "var(--font-support-new)",
         }}
       >
         {label}

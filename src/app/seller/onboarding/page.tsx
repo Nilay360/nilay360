@@ -11,12 +11,12 @@ export default function SellerOnboardingPage() {
       bullets={[
         { t:"1 · Create Account", d:"Sign up with your email or phone. Verify to unlock the seller dashboard." },
         { t:"2 · Add Property Details", d:"Enter location, type, size, pricing and amenities. Add high-quality photos." },
-        { t:"3 · RERA & Verification", d:"Provide RERA details where applicable so buyers see the verified badge." },
-        { t:"4 · Publish & Get Leads", d:"Go live and start receiving verified enquiries from serious buyers and tenants." },
+        { t:"3 · RERA Details", d:"If your property has RERA registration, let us know — we'll add it to your listing." },
+        { t:"4 · Publish & Get Leads", d:"Go live and start receiving enquiries from serious buyers and tenants." },
       ]}
     >
       <div style={{ textAlign:"center", maxWidth:600, margin:"0 auto 8px" }}>
-        <h2 style={{ fontFamily:"'Cal Sans',Georgia,serif", fontSize:32, fontWeight:700, color:"#020C1C", marginBottom:14 }}>Begin onboarding</h2>
+        <h2 style={{ fontFamily:"var(--font-heading-new)", fontSize:32, fontWeight:700, color:"#020C1C", marginBottom:14 }}>Begin onboarding</h2>
         <p style={{ fontSize:15, color:"#666", lineHeight:1.7, marginBottom:24 }}>
           Create your account or head to the dashboard to publish your first listing.
         </p>

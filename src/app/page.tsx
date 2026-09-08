@@ -5,6 +5,7 @@ import { motion, useScroll, useTransform } from "framer-motion";
 import Reveal from "@/components/ui/Reveal";
 import { createClient } from "@/lib/supabase/client";
 import { useSavedProperties } from "@/hooks/useSavedProperties";
+import { useLiveStats } from "@/lib/liveStats";
 import ResultsGate from "@/components/property/ResultsGate";
 import { optimizedImageUrl } from "@/lib/image-url";
 
@@ -142,7 +143,7 @@ type Testimonial = { id: string; name: string; role: string; rating: number; tex
 const DEFAULT_SITE_CONTENT: Record<string, string> = {
   hero_line1: "Find Your Dream Property",
   hero_line2: "Now in Hyderabad",
-  hero_subtitle: "From search to possession — India's most trusted premium platform",
+  hero_subtitle: "From search to possession — India's premium real estate platform",
   trust_bar_note: "",
 };
 
@@ -190,22 +191,7 @@ export default function HomePage() {
     loadSiteContent();
   }, []);
 
-  const [liveStats, setLiveStats] = useState({ listings: 0, agents: 0, cities: 0 });
-  useEffect(() => {
-    async function loadLiveStats() {
-      try {
-        const supabase = createClient();
-        const [{ count: listingsCount }, { count: agentsCount }, { data: cityRows }] = await Promise.all([
-          supabase.from("property_listings").select("*", { count: "exact", head: true }).eq("status", "active"),
-          supabase.from("agent_profiles").select("*", { count: "exact", head: true }).eq("status", "approved"),
-          supabase.from("property_listings").select("city").eq("status", "active"),
-        ]);
-        const uniqueCities = new Set((cityRows ?? []).map((r: any) => r.city).filter(Boolean)).size;
-        setLiveStats({ listings: listingsCount ?? 0, agents: agentsCount ?? 0, cities: uniqueCities });
-      } catch (_) {}
-    }
-    loadLiveStats();
-  }, []);
+  const liveStats = useLiveStats();
 
   const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
   useEffect(() => {
@@ -406,14 +392,14 @@ export default function HomePage() {
       <style>{`
         *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
         html { scroll-behavior:smooth; }
-        body { font-family:'Cal Sans',system-ui,sans-serif; background:#020C1C; color:#FFFFFF; overflow-x:hidden; }
+        body { font-family:var(--font-body-new); background:#020C1C; color:#FFFFFF; overflow-x:hidden; }
         html, body { max-width: 100vw; overflow-x: hidden !important; }
         #__next, main { max-width: 100vw; overflow-x: hidden; }
         section { max-width: 100vw; overflow-x: clip; }
         .hero-section { overflow: visible !important; }
         * { max-width: 100%; }
         a { color:inherit; text-decoration:none; }
-        button { font-family:'Cal Sans',system-ui,sans-serif; }
+        button { font-family:var(--font-body-new); }
 
         .hide-scroll::-webkit-scrollbar { display:none; }
         .hide-scroll { -ms-overflow-style:none; scrollbar-width:none; }
@@ -854,7 +840,7 @@ export default function HomePage() {
           style={{position:"relative", zIndex:2, padding:"0 16px 270px", maxWidth:"min(980px, 100%)", margin:"0 auto", textAlign:"center", width:"100%", boxSizing:"border-box"}}
         >
           {/* 2 — Headline */}
-          <h1 className="hero-h1" style={{fontFamily:"'Cal Sans',Georgia,serif", fontSize:"clamp(42px,9vw,92px)", fontWeight:300, color:"#fff", lineHeight:1.05, marginBottom:16, letterSpacing:"-0.01em", wordBreak:"break-word", maxWidth:"100%"}}>
+          <h1 className="hero-h1" style={{fontFamily:"var(--font-heading-new)", fontSize:"clamp(42px,9vw,92px)", fontWeight:300, color:"#fff", lineHeight:1.05, marginBottom:16, letterSpacing:"-0.01em", wordBreak:"break-word", maxWidth:"100%"}}>
             {siteContent.hero_line1}
             <em style={{display:"block", color:G.goldLt, fontStyle:"italic", fontWeight:400, fontSize:"clamp(20px,4vw,38px)", marginTop:6}}>{siteContent.hero_line2}</em>
           </h1>
@@ -868,7 +854,7 @@ export default function HomePage() {
           <div className="hero-stats" style={{display:"flex", flexWrap:"wrap", justifyContent:"center", gap:"12px", width:"100%", maxWidth:"100%", boxSizing:"border-box", marginTop:32, marginBottom:40, paddingBottom:32, borderBottom:"1px solid rgba(16,196,195,0.12)", position:"relative", zIndex:2}}>
             {[[liveStats.listings.toLocaleString("en-IN"),"Listings"],[liveStats.agents.toLocaleString("en-IN"),"Agents"],[String(liveStats.cities),"Cities"]].map(([v,l])=>(
               <div key={l} className="hero-stat" style={{background:"rgba(255,255,255,0.04)", backdropFilter:"blur(12px)", WebkitBackdropFilter:"blur(12px)", border:"1px solid rgba(16,196,195,0.12)", borderRadius:12, flex:"0 0 auto"}}>
-                <div className="stat-value" style={{fontFamily:"'Cal Sans',Georgia,serif", fontSize:19, fontWeight:600, background:"linear-gradient(135deg, #FFFFFF 0%, #10C4C3 100%)", WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent"}}>{v}</div>
+                <div className="stat-value" style={{fontFamily:"var(--font-support-new)", fontSize:19, fontWeight:600, background:"linear-gradient(135deg, #FFFFFF 0%, #10C4C3 100%)", WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent"}}>{v}</div>
                 <div style={{fontSize:9.5, color:"rgba(255,255,255,0.50)", marginTop:2, letterSpacing:"0.06em", textTransform:"uppercase"}}>{l}</div>
               </div>
             ))}
@@ -892,7 +878,7 @@ export default function HomePage() {
                 <button
                   type="button"
                   onClick={()=>setCityOpen(o=>!o)}
-                  style={{width:"100%", height:"100%", minHeight:56, background:"transparent", border:"none", padding:"0 14px 0 16px", display:"flex", alignItems:"center", justifyContent:"space-between", gap:6, cursor:"pointer", fontFamily:"'Cal Sans',sans-serif", fontSize:15, color: searchCity ? "#fff" : "rgba(255,255,255,0.45)", outline:"none"}}
+                  style={{width:"100%", height:"100%", minHeight:56, background:"transparent", border:"none", padding:"0 14px 0 16px", display:"flex", alignItems:"center", justifyContent:"space-between", gap:6, cursor:"pointer", fontFamily:"var(--font-body-new)", fontSize:15, color: searchCity ? "#fff" : "rgba(255,255,255,0.45)", outline:"none"}}
                 >
                   <span style={{overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap"}}>{searchCity || "Select City"}</span>
                   <svg width="12" height="12" viewBox="0 0 12 12" fill="none" style={{flexShrink:0, transition:"transform 0.2s", transform: cityOpen ? "rotate(180deg)" : "rotate(0deg)"}}>
@@ -904,7 +890,7 @@ export default function HomePage() {
                     {["", ...CITIES].map((c,i)=>(
                       <button key={i} type="button"
                         onClick={()=>{ setSearchCity(c); setCityOpen(false); }}
-                        style={{width:"100%", padding:"9px 14px", minHeight:44, boxSizing:"border-box", background: searchCity===c ? "rgba(16,196,195,0.12)" : "transparent", border:"none", borderRadius:9, textAlign:"left", fontFamily:"'Cal Sans',sans-serif", fontSize:13, color: c ? "#fff" : "rgba(255,255,255,0.35)", cursor:"pointer", transition:"background 0.15s", display:"flex", alignItems:"center"}}
+                        style={{width:"100%", padding:"9px 14px", minHeight:44, boxSizing:"border-box", background: searchCity===c ? "rgba(16,196,195,0.12)" : "transparent", border:"none", borderRadius:9, textAlign:"left", fontFamily:"var(--font-body-new)", fontSize:13, color: c ? "#fff" : "rgba(255,255,255,0.35)", cursor:"pointer", transition:"background 0.15s", display:"flex", alignItems:"center"}}
                         onMouseOver={e=>(e.currentTarget.style.background="rgba(16,196,195,0.10)")}
                         onMouseOut={e=>(e.currentTarget.style.background= searchCity===c ? "rgba(16,196,195,0.12)" : "transparent")}
                       >{c || "All Cities"}</button>
@@ -916,7 +902,7 @@ export default function HomePage() {
                 <SvgIcon d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" size={16} color="rgba(255,255,255,0.4)" />
                 <input value={searchQuery} onChange={e=>setSearchQuery(e.target.value)}
                   placeholder="Search by Locality, Project or Builder"
-                  style={{flex:1, height:"100%", minHeight:44, background:"transparent", border:"none", color:"#fff", fontSize:16, outline:"none", fontFamily:"'Cal Sans',sans-serif"}}
+                  style={{flex:1, height:"100%", minHeight:44, background:"transparent", border:"none", color:"#fff", fontSize:16, outline:"none", fontFamily:"var(--font-body-new)"}}
                   onKeyDown={e => {
                     if (e.key === 'Enter') {
                       router.push(`/search?q=${encodeURIComponent(searchQuery)}&city=${encodeURIComponent(searchCity)}&tab=${searchTab.toLowerCase().replace(/ /g, '-')}`);
@@ -951,7 +937,7 @@ export default function HomePage() {
           <div className="glow-dot" />
           <span style={{ fontSize:12, color:"rgba(255,255,255,0.5)", fontWeight:500, letterSpacing:"0.05em", whiteSpace:"nowrap" }}>INDIA'S PREMIUM REAL ESTATE PLATFORM</span>
           <div style={{ flex:1, height:1, background:"rgba(255,255,255,0.06)" }} />
-          {["RERA Verified Listings", `${liveStats.agents}+ Expert Agents`, `${liveStats.cities} Cities`].map((t,i) => (
+          {["Admin-Reviewed Listings", `${liveStats.agents}+ Expert Agents`, `${liveStats.cities} Cities`].map((t,i) => (
             <div key={i} style={{ display:"flex", alignItems:"center", gap:8, flexShrink:0 }}>
               <div style={{ width:4, height:4, borderRadius:"50%", background:"#10C4C3" }} />
               <span style={{ fontSize:12, color:"rgba(255,255,255,0.45)", whiteSpace:"nowrap" }}>{t}</span>
@@ -969,7 +955,7 @@ export default function HomePage() {
           <div style={{display:"flex", justifyContent:"space-between", alignItems:"flex-end", marginBottom:28, flexWrap:"wrap", gap:16}}>
             <div>
               <div style={{fontSize:11, color:G.gold, fontWeight:700, letterSpacing:2, textTransform:"uppercase", marginBottom:8}}>Our Services</div>
-              <h2 className="services-h2" style={{fontFamily:"'Cal Sans',Georgia,serif", fontSize:32, fontWeight:700, color:"#fff", wordBreak:"break-word", maxWidth:"100%"}}>Everything You Need at One Place</h2>
+              <h2 className="services-h2" style={{fontFamily:"var(--font-heading-new)", fontSize:32, fontWeight:700, color:"#fff", wordBreak:"break-word", maxWidth:"100%"}}>Everything You Need at One Place</h2>
             </div>
             <div className="services-tabs" style={{display:"flex", gap:6, background:"rgba(255,255,255,0.04)", borderRadius:12, padding:4, border:"1px solid rgba(255,255,255,0.06)"}}>
               {Object.keys(SERVICES).map(t=>(
@@ -1007,7 +993,7 @@ export default function HomePage() {
           <div style={{display:"flex", justifyContent:"space-between", alignItems:"flex-end", marginBottom:20, paddingRight:56, flexWrap:"wrap", gap:12}}>
             <div>
               <div style={{fontSize:11, color:G.gold, fontWeight:700, letterSpacing:2, textTransform:"uppercase", marginBottom:8}}>Featured Listings</div>
-              <h2 className="featured-heading" style={{fontFamily:"'Cal Sans',Georgia,serif", fontSize:32, fontWeight:700, color:"#fff", wordBreak:"break-word", maxWidth:"100%"}}>Premium Properties</h2>
+              <h2 className="featured-heading" style={{fontFamily:"var(--font-heading-new)", fontSize:32, fontWeight:700, color:"#fff", wordBreak:"break-word", maxWidth:"100%"}}>Premium Properties</h2>
             </div>
             <div style={{display:"flex", alignItems:"center", gap:16}}>
               <a href="/properties" style={{fontSize:14, color:G.gold, fontWeight:600, display:"flex", alignItems:"center", gap:4}}>
@@ -1060,13 +1046,13 @@ export default function HomePage() {
                     </svg>
                   </button>
                   <div style={{position:"absolute", bottom:12, right:12, zIndex:1, background:"rgba(0,0,0,0.5)", backdropFilter:"blur(6px)", borderRadius:6, padding:"4px 10px"}}>
-                    <span style={{fontFamily:"'Cal Sans',Georgia,serif", fontSize:18, fontWeight:700, color:"#fff"}}>{p.price}</span>
+                    <span style={{fontFamily:"var(--font-support-new)", fontSize:18, fontWeight:700, color:"#fff"}}>{p.price}</span>
                   </div>
                 </div>
                 {/* Info */}
                 <div style={{padding:"18px", background:"rgba(11,13,16,0.96)"}}>
                   <div style={{fontSize:11, color:"rgba(255,255,255,0.45)", fontWeight:500, letterSpacing:"0.05em", marginBottom:4}}>{p.city} · {p.type}</div>
-                  <h3 style={{fontFamily:"'Cal Sans',Georgia,serif", fontSize:18, fontWeight:700, color:"#fff", marginBottom:10}}>{p.title}</h3>
+                  <h3 style={{fontFamily:"var(--font-heading-new)", fontSize:18, fontWeight:700, color:"#fff", marginBottom:10}}>{p.title}</h3>
                   <div style={{display:"flex", gap:14, fontSize:12, color:"rgba(255,255,255,0.45)"}}>
                     <span style={{display:"flex", alignItems:"center", gap:4}}>
                       <SvgIcon d="M3 12l9-9 9 9M5 10v10h5v-6h4v6h5V10" size={12} color="rgba(255,255,255,0.35)" /> {p.beds ?? 0} Beds
@@ -1095,7 +1081,7 @@ export default function HomePage() {
           <div style={{display:"flex", justifyContent:"space-between", alignItems:"flex-end", marginBottom:24, flexWrap:"wrap", gap:12}}>
             <div>
               <div style={{fontSize:11, color:G.gold, fontWeight:700, letterSpacing:2, textTransform:"uppercase", marginBottom:8}}>Browse by Type</div>
-              <h2 className="discover-heading" style={{fontFamily:"'Cal Sans',Georgia,serif", fontSize:32, fontWeight:700, color:"#fff", wordBreak:"break-word", maxWidth:"100%"}}>Discover Properties Across India</h2>
+              <h2 className="discover-heading" style={{fontFamily:"var(--font-heading-new)", fontSize:32, fontWeight:700, color:"#fff", wordBreak:"break-word", maxWidth:"100%"}}>Discover Properties Across India</h2>
             </div>
             <div style={{display:"flex", gap:6, flexWrap:"wrap"}}>
               {CITIES.slice(0,6).map(c=>(
@@ -1120,7 +1106,7 @@ export default function HomePage() {
                 <div style={{position:"absolute", inset:0, background:cat.grad, opacity:0.3}} />
                 <div style={{position:"relative", zIndex:2, padding:"0 28px 28px"}}>
                   <span style={{display:"inline-block", background:"rgba(16,196,195,0.15)", border:"1px solid rgba(16,196,195,0.30)", color:G.goldLt, borderRadius:8, padding:"4px 12px", fontSize:11, fontWeight:600, marginBottom:8}}>{count > 0 ? `${count} properties` : "Explore listings"}</span>
-                  <h3 style={{fontFamily:"'Cal Sans',Georgia,serif", fontSize:32, fontWeight:700, color:"#fff", marginBottom:6}}>{cat.type}</h3>
+                  <h3 style={{fontFamily:"var(--font-heading-new)", fontSize:32, fontWeight:700, color:"#fff", marginBottom:6}}>{cat.type}</h3>
                   <p style={{fontSize:12, color:"rgba(255,255,255,0.6)", marginBottom:0}}>for Sale in {catCity}</p>
                   <div style={{color:G.gold, fontSize:13, marginTop:8, opacity:0.8}}>→</div>
                 </div>
@@ -1141,7 +1127,7 @@ export default function HomePage() {
           <div style={{display:"flex", justifyContent:"space-between", alignItems:"flex-end", marginBottom:24, flexWrap:"wrap", gap:12}}>
             <div>
               <div style={{fontSize:11, color:G.gold, fontWeight:700, letterSpacing:2, textTransform:"uppercase", marginBottom:8}}>Market Intelligence</div>
-              <h2 className="market-heading" style={{fontFamily:"'Cal Sans',Georgia,serif", fontSize:32, fontWeight:700, color:"#fff", wordBreak:"break-word", maxWidth:"100%"}}>Property Price Insights</h2>
+              <h2 className="market-heading" style={{fontFamily:"var(--font-heading-new)", fontSize:32, fontWeight:700, color:"#fff", wordBreak:"break-word", maxWidth:"100%"}}>Property Price Insights</h2>
             </div>
             <div style={{display:"flex", gap:6, flexWrap:"wrap"}}>
               {Object.keys(MARKET).map(c=>(
@@ -1173,7 +1159,7 @@ export default function HomePage() {
             <Reveal delay={0.08}>
             <div style={{background:"rgba(255,255,255,0.03)", backdropFilter:"blur(16px)", WebkitBackdropFilter:"blur(16px)", borderRadius:16, padding:24, border:"1px solid rgba(255,255,255,0.07)", boxShadow:"0 4px 24px rgba(0,0,0,0.2)", height:"100%"}}>
               <div style={{fontSize:11, color:"rgba(255,255,255,0.4)", fontWeight:600, letterSpacing:1, textTransform:"uppercase", marginBottom:16}}>Avg Price / Sqft</div>
-              <div style={{fontFamily:"'Cal Sans',Georgia,serif", fontSize:40, fontWeight:700, color:"#fff", lineHeight:1, marginBottom:8}}>{md.price}</div>
+              <div style={{fontFamily:"var(--font-support-new)", fontSize:40, fontWeight:700, color:"#fff", lineHeight:1, marginBottom:8}}>{md.price}</div>
               <span style={{display:"inline-block", background:"rgba(26,122,60,0.15)", color:"#4ade80", fontSize:12, fontWeight:700, padding:"4px 10px", borderRadius:6, border:"1px solid rgba(74,222,128,0.2)"}}>
                 {md.growth} YoY
               </span>
@@ -1201,7 +1187,7 @@ export default function HomePage() {
             <Reveal delay={0.24}>
             <div style={{background:"rgba(255,255,255,0.03)", backdropFilter:"blur(16px)", WebkitBackdropFilter:"blur(16px)", borderRadius:16, padding:24, border:"1px solid rgba(255,255,255,0.07)", boxShadow:"0 4px 24px rgba(0,0,0,0.2)", height:"100%"}}>
               <div style={{fontSize:11, color:"rgba(255,255,255,0.4)", fontWeight:600, letterSpacing:1, textTransform:"uppercase", marginBottom:16}}>New Listings This Month</div>
-              <div style={{fontFamily:"'Cal Sans',Georgia,serif", fontSize:40, fontWeight:700, color:"#fff", lineHeight:1, marginBottom:8}}>{md.newListings}</div>
+              <div style={{fontFamily:"var(--font-support-new)", fontSize:40, fontWeight:700, color:"#fff", lineHeight:1, marginBottom:8}}>{md.newListings}</div>
               <div style={{display:"flex", alignItems:"center", gap:6, marginBottom:16}}>
                 <span style={{fontSize:18, color:"#4ade80"}}>↑</span>
                 <span style={{fontSize:13, color:"#4ade80", fontWeight:600}}>+12% vs last month</span>
@@ -1224,14 +1210,14 @@ export default function HomePage() {
           <Reveal>
           <div style={{textAlign:"center", marginBottom:28}}>
             <div style={{fontSize:11, color:G.gold, fontWeight:700, letterSpacing:2, textTransform:"uppercase", marginBottom:8}}>Why Choose Us</div>
-            <h2 className="why-heading" style={{fontFamily:"'Cal Sans',Georgia,serif", fontSize:32, fontWeight:700, color:"#fff", wordBreak:"break-word", maxWidth:"100%"}}>The Nilay 360 Difference</h2>
+            <h2 className="why-heading" style={{fontFamily:"var(--font-heading-new)", fontSize:32, fontWeight:700, color:"#fff", wordBreak:"break-word", maxWidth:"100%"}}>The Nilay 360 Difference</h2>
           </div>
           </Reveal>
 
           <div className="why-grid" style={{display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:12}}>
             {[
-              {d:"M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z", title:"RERA Verified", desc:"Every listing verified"},
-              {d:"M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z", title:"Trusted Agents", desc:"500+ certified professionals"},
+              {d:"M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z", title:"Admin-Reviewed", desc:"Every listing manually approved"},
+              {d:"M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z", title:"Local Agents", desc:`${liveStats.agents} agents on the ground`},
               {d:"M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z", title:"Zero Hidden Costs", desc:"100% transparent pricing"},
               {d:"M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9", title:"NRI Friendly", desc:"Seamless cross-border service"},
               {d:"M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0h6", title:"Market Intelligence", desc:"Real-time data & insights"},
@@ -1261,14 +1247,14 @@ export default function HomePage() {
           <Reveal>
           <div style={{textAlign:"center", marginBottom:28}}>
             <div style={{fontSize:11, color:G.gold, fontWeight:700, letterSpacing:2, textTransform:"uppercase", marginBottom:8}}>Client Stories</div>
-            <h2 className="testimonials-heading" style={{fontFamily:"'Cal Sans',Georgia,serif", fontSize:32, fontWeight:700, color:"#fff", marginBottom:8, wordBreak:"break-word", maxWidth:"100%"}}>What Our Clients Say</h2>
+            <h2 className="testimonials-heading" style={{fontFamily:"var(--font-heading-new)", fontSize:32, fontWeight:700, color:"#fff", marginBottom:8, wordBreak:"break-word", maxWidth:"100%"}}>What Our Clients Say</h2>
           </div>
           </Reveal>
 
           {testimonials.length === 0 ? (
             <Reveal>
               <div className="premium-card" style={{borderRadius:20, padding:"48px 32px", textAlign:"center", borderTop:"2px solid rgba(16,196,195,0.25)", maxWidth:560, margin:"0 auto"}}>
-                <p style={{fontFamily:"'Cal Sans',Georgia,serif", fontSize:20, color:"rgba(255,255,255,0.8)", marginBottom:8}}>Be the First to Share Your Experience</p>
+                <p style={{fontFamily:"var(--font-heading-new)", fontSize:20, color:"rgba(255,255,255,0.8)", marginBottom:8}}>Be the First to Share Your Experience</p>
                 <p style={{fontSize:13, color:"rgba(255,255,255,0.45)"}}>We're just getting started — client reviews will appear here as they come in.</p>
               </div>
             </Reveal>
@@ -1280,7 +1266,7 @@ export default function HomePage() {
                   <Reveal key={r.id} delay={pos*0.08}>
                   <div className="premium-card" style={{borderRadius:20, padding:"32px", borderTop:"2px solid rgba(16,196,195,0.25)", transition:"opacity 0.3s", height:"100%"}}>
                     <StarRow n={r.rating} />
-                    <p style={{fontFamily:"'Cal Sans',Georgia,serif", fontSize:17, color:"rgba(255,255,255,0.85)", lineHeight:1.65, margin:"14px 0 20px", fontStyle:"italic"}}>{`"${r.text}"`}</p>
+                    <p style={{fontFamily:"var(--font-heading-new)", fontSize:17, color:"rgba(255,255,255,0.85)", lineHeight:1.65, margin:"14px 0 20px", fontStyle:"italic"}}>{`"${r.text}"`}</p>
                     <div style={{display:"flex", alignItems:"center", gap:12}}>
                       <div style={{width:38, height:38, borderRadius:"50%", background:"linear-gradient(135deg, #10C4C3 0%, #0B9C9B 100%)", display:"flex", alignItems:"center", justifyContent:"center"}}>
                         <span style={{fontSize:14, fontWeight:700, color:"#fff"}}>{r.name[0]}</span>
@@ -1318,7 +1304,7 @@ export default function HomePage() {
         <div style={{position:"absolute", inset:0, backgroundImage:"radial-gradient(ellipse 50% 80% at 80% 50%, rgba(16,196,195,0.1) 0%, transparent 60%)", pointerEvents:"none"}} />
         <Reveal style={{maxWidth:720, margin:"0 auto", position:"relative", zIndex:1}}>
         <div style={{textAlign:"center", background:"rgba(255,255,255,0.04)", backdropFilter:"blur(24px)", WebkitBackdropFilter:"blur(24px)", border:"1px solid rgba(255,255,255,0.10)", borderRadius:32, padding:"clamp(32px,5vw,56px) clamp(24px,4vw,48px)", boxShadow:"0 20px 60px rgba(0,0,0,0.45), 0 0 0 1px rgba(16,196,195,0.08)"}}>
-          <h2 className="cta-heading" style={{fontFamily:"'Cal Sans',Georgia,serif", fontSize:"clamp(26px,5vw,40px)", fontWeight:300, color:"#fff", marginBottom:14, wordBreak:"break-word", maxWidth:"100%"}}>
+          <h2 className="cta-heading" style={{fontFamily:"var(--font-heading-new)", fontSize:"clamp(26px,5vw,40px)", fontWeight:300, color:"#fff", marginBottom:14, wordBreak:"break-word", maxWidth:"100%"}}>
             Ready to Find Your<br /><em style={{fontStyle:"italic", color:G.goldLt}}>Perfect Property?</em>
           </h2>
           <p style={{fontSize:15, color:"rgba(255,255,255,0.65)", marginBottom:32, lineHeight:1.7}}>
@@ -1364,8 +1350,8 @@ export default function HomePage() {
             {[
               {heading:"Properties", links:[["Buy","/buy"],["Rent","/rent"],["New Projects","/new-projects"],["Commercial","/commercial"],["Builders","/builders"],["Blog","/blog"]]},
               {heading:"Company",    links:[["About Us","/about"],["Our Agents","/agents"],["NRI Services","/nri"],["Careers","/careers"],["Contact","/contact"]]},
-              {heading:"Tools",      links:[["EMI Calculator","/calculator"],["Compare","/compare"],["Search","/search"],["RERA Guide","/legal-guide"]]},
-              {heading:"Legal",      links:[["Privacy Policy","/privacy"],["Terms of Service","/terms"],["Cookie Policy","/cookies"],["RERA Guide","/legal-guide"]]},
+              {heading:"Tools",      links:[["EMI Calculator","/calculator"],["Compare","/compare"],["Search","/search"],["RERA Guide","/legal-guide"],["Safety Guide","/safety-guide"]]},
+              {heading:"Legal",      links:[["Privacy Policy","/privacy"],["Terms of Service","/terms"],["Cookie Policy","/cookies"],["RERA Guide","/legal-guide"],["Agent Terms","/agent-terms"],["Grievance Redressal","/grievance-redressal"]]},
             ].map(col=>(
               <div key={col.heading}>
                 <h4 style={{fontSize:10, fontWeight:700, color:"#fff", letterSpacing:"0.15em", textTransform:"uppercase", marginBottom:16}}>{col.heading}</h4>

@@ -11,11 +11,11 @@ export default function Mission() {
 
       <div style={{ position: "relative", maxWidth: "1000px" }}>
         <Reveal y={12}>
-          <span style={{ display: "block", marginBottom: "clamp(30px, 4vh, 52px)", fontFamily: "'Cal Sans', sans-serif", fontSize: "11px", fontWeight: 600, letterSpacing: "0.32em", textTransform: "uppercase", color: "rgba(255,255,255,0.34)" }}>Our Mission</span>
+          <span style={{ display: "block", marginBottom: "clamp(30px, 4vh, 52px)", fontFamily: "var(--font-support-new)", fontSize: "11px", fontWeight: 600, letterSpacing: "0.32em", textTransform: "uppercase", color: "rgba(255,255,255,0.34)" }}>Our Mission</span>
         </Reveal>
 
         <Reveal delay={0.12} y={32}>
-          <p style={{ margin: 0, fontFamily: "'Cal Sans', Georgia, serif", fontWeight: 300, fontSize: "clamp(26px, 4.2vw, 68px)", lineHeight: 1.16, letterSpacing: "-0.024em", color: "#FFFFFF", textWrap: "balance" }}>
+          <p style={{ margin: 0, fontFamily: "var(--font-heading-new)", fontWeight: 300, fontSize: "clamp(26px, 4.2vw, 68px)", lineHeight: 1.16, letterSpacing: "-0.024em", color: "#FFFFFF", textWrap: "balance" }}>
             To make finding a home feel effortless — transparent, intuitive, and worthy of the decision it carries.
           </p>
         </Reveal>

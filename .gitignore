@@ -14,8 +14,15 @@ build/
 .env.production
 .env*.local
 
+# Database backups — contain real customer PII (names, emails, phone numbers),
+# never commit these
+supabase/backups/
+
 # Vercel
 .vercel
+
+# Supabase CLI local state
+supabase/.temp/
 
 # TypeScript
 *.tsbuildinfo
@@ -31,6 +38,7 @@ Thumbs.db
 
 # Claude Code
 .claude/
+.agents/
 *.swp
 *.swo
 
@@ -39,3 +47,9 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 .env*
+
+# Capacitor — not a wired-up dependency on this branch (see
+# feature/mobile-capacitor-branding); android/ is orphaned generated
+# output currently untracked in the working tree.
+android/
+node_modules/@capacitor/

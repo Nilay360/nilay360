@@ -108,7 +108,7 @@ export default function Philosophy() {
 
   const wordStyle: React.CSSProperties = {
     gridArea: "1 / 1", margin: 0, textAlign: "center",
-    fontFamily: "'Cal Sans', Georgia, serif", fontWeight: 300,
+    fontFamily: "var(--font-heading-new)", fontWeight: 300,
     fontSize: "clamp(38px, 10vw, 176px)", lineHeight: 0.98,
     color: "#FFFFFF", whiteSpace: "nowrap",
     textShadow: "0 2px 0 rgba(0,0,0,0.35), 0 40px 90px rgba(0,0,0,0.6), 0 0 90px rgba(16,196,195,0.14)",
@@ -119,7 +119,7 @@ export default function Philosophy() {
       <div ref={stageRef} style={{ position: "sticky", top: 0, height: "100vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", overflow: "clip", padding: "0 clamp(16px, 4vw, 60px)", perspective: "1400px" }}>
         <div ref={glowRef} aria-hidden="true" style={{ position: "absolute", top: "50%", left: "50%", width: "120vw", height: "90vh", transform: "translate(-50%, -50%)", background: "radial-gradient(circle at 50% 50%, rgba(16,196,195,0.15), rgba(16,196,195,0.05) 38%, rgba(2,12,28,0) 62%)", filter: "blur(20px)", pointerEvents: "none" }} />
 
-        <span style={{ position: "relative", marginBottom: "clamp(28px, 4vh, 56px)", fontFamily: "'Cal Sans', sans-serif", fontSize: "11px", fontWeight: 600, letterSpacing: "0.32em", textTransform: "uppercase", color: "rgba(255,255,255,0.34)" }}>Our Philosophy</span>
+        <span style={{ position: "relative", marginBottom: "clamp(28px, 4vh, 56px)", fontFamily: "var(--font-support-new)", fontSize: "11px", fontWeight: 600, letterSpacing: "0.32em", textTransform: "uppercase", color: "rgba(255,255,255,0.34)" }}>Our Philosophy</span>
 
         <div ref={wordsRef} style={{ position: "relative", width: "100%", display: "grid", placeItems: "center", transformStyle: "preserve-3d" }}>
           <h2 ref={aRef} style={wordStyle}>VIEW FIRST.</h2>

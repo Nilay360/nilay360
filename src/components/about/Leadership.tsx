@@ -62,7 +62,7 @@ function SocialPlaceholders({ name }: { name: string }) {
         <span
           key={net}
           title={`${net} profile coming soon`}
-          style={{ display: "grid", placeItems: "center", width: "38px", height: "38px", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "8px", color: "rgba(255,255,255,0.32)", cursor: "default", fontFamily: "'Cal Sans', sans-serif", fontWeight: 500, fontSize: "13px" }}
+          style={{ display: "grid", placeItems: "center", width: "38px", height: "38px", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "8px", color: "rgba(255,255,255,0.32)", cursor: "default", fontFamily: "var(--font-body-new)", fontWeight: 500, fontSize: "13px" }}
         >
           {net === "Instagram" ? (
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5" /><circle cx="12" cy="12" r="4.2" /><circle cx="17.3" cy="6.7" r="1.15" fill="currentColor" stroke="none" /></svg>
@@ -129,7 +129,7 @@ export default function Leadership() {
       <div style={{ width: "100%", maxWidth: "1240px", margin: "0 auto" }}>
         <ChapterLabel>The People</ChapterLabel>
         <Reveal>
-          <h2 style={{ margin: "0 0 clamp(40px, 5vw, 80px)", maxWidth: "22ch", fontFamily: "'Cal Sans', Georgia, serif", fontWeight: 300, fontSize: "clamp(30px, 4.4vw, 70px)", lineHeight: 1.06, letterSpacing: "-0.026em", color: "#FFFFFF" }}>Four people. One shared purpose.</h2>
+          <h2 style={{ margin: "0 0 clamp(40px, 5vw, 80px)", maxWidth: "22ch", fontFamily: "var(--font-heading-new)", fontWeight: 300, fontSize: "clamp(30px, 4.4vw, 70px)", lineHeight: 1.06, letterSpacing: "-0.026em", color: "#FFFFFF" }}>Four people. One shared purpose.</h2>
         </Reveal>
 
         {SHOW_LEADERSHIP_DETAILS ? (
@@ -144,14 +144,14 @@ export default function Leadership() {
                   <Reveal delay={0.08} y={16}>
                     <div style={{ display: "flex", alignItems: "center", gap: "14px", marginBottom: "clamp(16px, 2vw, 26px)" }}>
                       <span style={{ width: "34px", height: "1px", background: "rgba(255,255,255,0.16)" }} />
-                      <span style={{ fontFamily: "'Cal Sans', sans-serif", fontSize: "11px", fontWeight: 600, letterSpacing: "0.2em", textTransform: "uppercase", color: TEAL }}>{leader.role}</span>
+                      <span style={{ fontFamily: "var(--font-support-new)", fontSize: "11px", fontWeight: 600, letterSpacing: "0.2em", textTransform: "uppercase", color: TEAL }}>{leader.role}</span>
                     </div>
                   </Reveal>
                   <Reveal delay={0.14} y={24}>
-                    <h3 style={{ margin: "0 0 clamp(14px, 1.8vw, 22px)", fontFamily: "'Cal Sans', Georgia, serif", fontWeight: 300, fontSize: "clamp(26px, 3.2vw, 50px)", lineHeight: 1.06, letterSpacing: "-0.024em", color: "#FFFFFF" }}>{leader.name}</h3>
+                    <h3 style={{ margin: "0 0 clamp(14px, 1.8vw, 22px)", fontFamily: "var(--font-heading-new)", fontWeight: 300, fontSize: "clamp(26px, 3.2vw, 50px)", lineHeight: 1.06, letterSpacing: "-0.024em", color: "#FFFFFF" }}>{leader.name}</h3>
                   </Reveal>
                   <Reveal delay={0.2} y={20}>
-                    <p style={{ margin: "0 0 clamp(18px, 2.2vw, 28px)", maxWidth: "44ch", fontFamily: "'Cal Sans', Georgia, serif", fontWeight: 300, fontSize: "clamp(17px, 1.5vw, 23px)", lineHeight: 1.5, letterSpacing: "-0.008em", color: "rgba(255,255,255,0.9)" }}>{leader.tagline}</p>
+                    <p style={{ margin: "0 0 clamp(18px, 2.2vw, 28px)", maxWidth: "44ch", fontFamily: "var(--font-heading-new)", fontWeight: 300, fontSize: "clamp(17px, 1.5vw, 23px)", lineHeight: 1.5, letterSpacing: "-0.008em", color: "rgba(255,255,255,0.9)" }}>{leader.tagline}</p>
                   </Reveal>
                   <Reveal delay={0.26} y={20}>
                     <p style={{ margin: "0 0 clamp(24px, 3vw, 38px)", maxWidth: "50ch", fontSize: "clamp(14.5px, 1.1vw, 17px)", lineHeight: 1.9, color: "rgba(255,255,255,0.52)" }}>{leader.bio}</p>
@@ -166,7 +166,7 @@ export default function Leadership() {
         ) : (
           <div style={{ padding: "clamp(64px, 10vw, 140px) 0", textAlign: "center", borderTop: "1px solid rgba(255,255,255,0.08)", borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
             <Reveal>
-              <p style={{ margin: 0, fontFamily: "'Cal Sans', Georgia, serif", fontWeight: 300, fontStyle: "italic", fontSize: "clamp(24px, 3.2vw, 40px)", color: TEAL }}>
+              <p style={{ margin: 0, fontFamily: "var(--font-heading-new)", fontWeight: 300, fontStyle: "italic", fontSize: "clamp(24px, 3.2vw, 40px)", color: TEAL }}>
                 Meet the team — coming soon
               </p>
             </Reveal>

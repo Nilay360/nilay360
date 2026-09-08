@@ -178,14 +178,14 @@ function PropertyCard({ property, savedIds, onToggleSave, reduceMotion }: { prop
             <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
           </svg>
         </button>
-        <button onClick={handleCompare} title={!comparing && isFull ? "Comparison is full (max 3)" : comparing ? "Remove from comparison" : "Add to comparison"} style={{ position: "absolute", top: "54px", right: "12px", height: "34px", padding: "0 11px", borderRadius: "100px", background: comparing ? "var(--brand-accent)" : "var(--bg-elevated)", border: comparing ? "none" : "1px solid var(--border)", display: "flex", alignItems: "center", gap: "5px", cursor: !comparing && isFull ? "not-allowed" : "pointer", opacity: !comparing && isFull ? 0.5 : 1, backdropFilter: "blur(8px)", fontFamily: "'Cal Sans', sans-serif", fontSize: "10px", fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", color: comparing ? "var(--brand-primary)" : "var(--text-secondary)" }}>
+        <button onClick={handleCompare} title={!comparing && isFull ? "Comparison is full (max 3)" : comparing ? "Remove from comparison" : "Add to comparison"} style={{ position: "absolute", top: "54px", right: "12px", height: "34px", padding: "0 11px", borderRadius: "100px", background: comparing ? "var(--brand-accent)" : "var(--bg-elevated)", border: comparing ? "none" : "1px solid var(--border)", display: "flex", alignItems: "center", gap: "5px", cursor: !comparing && isFull ? "not-allowed" : "pointer", opacity: !comparing && isFull ? 0.5 : 1, backdropFilter: "blur(8px)", fontFamily: "var(--font-body-new)", fontSize: "10px", fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", color: comparing ? "var(--brand-primary)" : "var(--text-secondary)" }}>
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             {comparing ? <polyline points="20 6 9 17 4 12" /> : <><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></>}
           </svg>
           {comparing ? "Added" : "Compare"}
         </button>
         <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, background: "linear-gradient(transparent, rgba(0,0,0,0.75))", padding: "32px 16px 14px" }}>
-          <span style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "22px", fontWeight: 700, color: "var(--brand-accent)", background: "rgba(2,12,28,0.55)", padding: "4px 10px", borderRadius: "6px", backdropFilter: "blur(4px)" }}>
+          <span style={{ fontFamily: "var(--font-support-new)", fontSize: "22px", fontWeight: 700, color: "var(--brand-accent)", background: "rgba(2,12,28,0.55)", padding: "4px 10px", borderRadius: "6px", backdropFilter: "blur(4px)" }}>
             {formatPrice(property.price, property.listing_type)}
           </span>
           {property.price_per_sqft && property.listing_type !== "rent" && (
@@ -195,7 +195,7 @@ function PropertyCard({ property, savedIds, onToggleSave, reduceMotion }: { prop
       </div>
 
       <div style={{ padding: "18px 20px 20px" }}>
-        <h3 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "17px", fontWeight: 700, color: "var(--text-primary)", lineHeight: 1.3, marginBottom: "8px", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{property.title}</h3>
+        <h3 style={{ fontFamily: "var(--font-heading-new)", fontSize: "17px", fontWeight: 700, color: "var(--text-primary)", lineHeight: 1.3, marginBottom: "8px", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{property.title}</h3>
         <div style={{ display: "flex", alignItems: "center", gap: "5px", marginBottom: "14px" }}>
           <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="var(--brand-accent)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" /><circle cx="12" cy="10" r="3" />
@@ -376,7 +376,7 @@ export default function PropertiesPage() {
     <>
       <style>{`
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'Cal Sans', system-ui, sans-serif; background: var(--brand-primary); overflow-x: hidden; }
+        body { font-family: var(--font-body-new); background: var(--brand-primary); overflow-x: hidden; }
         @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
         select { appearance: none; -webkit-appearance: none; }
         input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; }
@@ -428,7 +428,7 @@ export default function PropertiesPage() {
               <span style={{ color: "var(--text-muted)", fontSize: "10px" }}>›</span>
               <span style={{ fontSize: "12px", color: "var(--brand-accent)" }}>Properties</span>
             </div>
-            <h1 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "clamp(36px, 5vw, 56px)", fontWeight: 300, color: "var(--text-primary)", lineHeight: 1.1, marginBottom: "10px" }}>
+            <h1 style={{ fontFamily: "var(--font-heading-new)", fontSize: "clamp(36px, 5vw, 56px)", fontWeight: 300, color: "var(--text-primary)", lineHeight: 1.1, marginBottom: "10px" }}>
               Find Your <em style={{ fontStyle: "italic", color: "var(--brand-accent)" }}>Perfect Home</em>
             </h1>
             <p style={{ fontSize: "14px", color: "var(--text-secondary)", marginBottom: "24px" }}>
@@ -445,7 +445,7 @@ export default function PropertiesPage() {
                 value={keyword}
                 onChange={e => setKeyword(e.target.value)}
                 placeholder="Search by location, project or keyword…"
-                style={{ width: "100%", padding: "14px 16px 14px 44px", background: "rgba(255,255,255,0.06)", border: "1px solid var(--border-hover)", borderRadius: "10px", color: "var(--text-primary)", fontSize: "14px", fontFamily: "'Cal Sans', sans-serif", outline: "none" }}
+                style={{ width: "100%", padding: "14px 16px 14px 44px", background: "rgba(255,255,255,0.06)", border: "1px solid var(--border-hover)", borderRadius: "10px", color: "var(--text-primary)", fontSize: "14px", fontFamily: "var(--font-body-new)", outline: "none" }}
               />
             </div>
           </div>
@@ -463,7 +463,7 @@ export default function PropertiesPage() {
             <div style={{ padding: "16px 16px 14px", borderBottom: "1px solid var(--border)", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
               <span style={{ fontSize: "13px", fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--text-secondary)" }}>Filters</span>
               <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
-                {hasFilters && <button onClick={clearFilters} style={{ fontSize: "11px", fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--brand-accent)", background: "transparent", border: "none", cursor: "pointer", fontFamily: "'Cal Sans', sans-serif" }}>Clear All</button>}
+                {hasFilters && <button onClick={clearFilters} style={{ fontSize: "11px", fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--brand-accent)", background: "transparent", border: "none", cursor: "pointer", fontFamily: "var(--font-body-new)" }}>Clear All</button>}
                 <button className="pr-sidebar-close" onClick={() => setMobileFiltersOpen(false)} aria-label="Close filters" style={{ width: "28px", height: "28px", borderRadius: "8px", background: "rgba(255,255,255,0.06)", border: "1px solid var(--border)", color: "var(--text-primary)", alignItems: "center", justifyContent: "center", cursor: "pointer", fontSize: "14px" }}>✕</button>
               </div>
             </div>
@@ -474,7 +474,7 @@ export default function PropertiesPage() {
                 <div style={{ fontSize: "11px", fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--text-muted)", marginBottom: "12px" }}>Type</div>
                 <div style={{ display: "flex", gap: "6px" }}>
                   {(["all", "sale", "rent"] as const).map(t => (
-                    <button key={t} onClick={() => setListingType(t)} style={{ flex: 1, padding: "8px 4px", borderRadius: "8px", fontSize: "12px", fontWeight: 600, textTransform: "capitalize", background: listingType === t ? "var(--brand-accent)" : "rgba(255,255,255,0.05)", border: listingType === t ? "none" : "1px solid var(--border)", color: listingType === t ? "var(--brand-primary)" : "var(--text-secondary)", cursor: "pointer", fontFamily: "'Cal Sans', sans-serif", transition: "all 0.15s" }}>
+                    <button key={t} onClick={() => setListingType(t)} style={{ flex: 1, padding: "8px 4px", borderRadius: "8px", fontSize: "12px", fontWeight: 600, textTransform: "capitalize", background: listingType === t ? "var(--brand-accent)" : "rgba(255,255,255,0.05)", border: listingType === t ? "none" : "1px solid var(--border)", color: listingType === t ? "var(--brand-primary)" : "var(--text-secondary)", cursor: "pointer", fontFamily: "var(--font-body-new)", transition: "all 0.15s" }}>
                       {t === "all" ? "All" : t === "sale" ? "Buy" : "Rent"}
                     </button>
                   ))}
@@ -485,7 +485,7 @@ export default function PropertiesPage() {
               <div style={{ marginBottom: "24px" }}>
                 <div style={{ fontSize: "11px", fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--text-muted)", marginBottom: "12px" }}>City</div>
                 <div style={{ position: "relative" }}>
-                  <select value={city} onChange={e => setCity(e.target.value)} style={{ width: "100%", padding: "10px 36px 10px 14px", background: "rgba(255,255,255,0.05)", border: "1px solid var(--border-hover)", borderRadius: "8px", color: city === "all" ? "var(--text-muted)" : "var(--text-primary)", fontSize: "13px", fontFamily: "'Cal Sans', sans-serif", cursor: "pointer" }}>
+                  <select value={city} onChange={e => setCity(e.target.value)} style={{ width: "100%", padding: "10px 36px 10px 14px", background: "rgba(255,255,255,0.05)", border: "1px solid var(--border-hover)", borderRadius: "8px", color: city === "all" ? "var(--text-muted)" : "var(--text-primary)", fontSize: "13px", fontFamily: "var(--font-body-new)", cursor: "pointer" }}>
                     <option value="all" style={{ background: "var(--brand-primary)", color: "var(--text-primary)" }}>All Cities</option>
                     {["Hyderabad", "Mumbai", "Bengaluru"].map(c => <option key={c} value={c} style={{ background: "var(--brand-primary)", color: "var(--text-primary)" }}>{c}</option>)}
                   </select>
@@ -515,7 +515,7 @@ export default function PropertiesPage() {
                 />
                 <div style={{ display: "flex", gap: "6px", marginTop: "12px", flexWrap: "wrap" }}>
                   {[{ label: "< 50L", min: "", max: "5000000" }, { label: "1–3 Cr", min: "10000000", max: "30000000" }, { label: "3 Cr+", min: "30000000", max: "" }].map(p => (
-                    <button key={p.label} onClick={() => { setMinPrice(p.min); setMaxPrice(p.max); }} style={{ padding: "4px 10px", borderRadius: "100px", fontSize: "11px", fontWeight: 500, background: "rgba(16,196,195,0.08)", border: "1px solid var(--border-accent)", color: "var(--brand-accent)", cursor: "pointer", fontFamily: "'Cal Sans', sans-serif" }}>{p.label}</button>
+                    <button key={p.label} onClick={() => { setMinPrice(p.min); setMaxPrice(p.max); }} style={{ padding: "4px 10px", borderRadius: "100px", fontSize: "11px", fontWeight: 500, background: "rgba(16,196,195,0.08)", border: "1px solid var(--border-accent)", color: "var(--brand-accent)", cursor: "pointer", fontFamily: "var(--font-body-new)" }}>{p.label}</button>
                   ))}
                 </div>
               </div>
@@ -539,7 +539,7 @@ export default function PropertiesPage() {
                 <div style={{ fontSize: "11px", fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--text-muted)", marginBottom: "12px" }}>Bedrooms</div>
                 <div style={{ display: "flex", gap: "6px", flexWrap: "wrap" }}>
                   {[1, 2, 3, 4, 5].map(n => (
-                    <button key={n} onClick={() => setBhk(s => toggleSet(s, n))} style={{ width: "40px", height: "36px", borderRadius: "8px", fontSize: "13px", fontWeight: 600, background: bhk.has(n) ? "var(--brand-accent)" : "rgba(255,255,255,0.05)", border: bhk.has(n) ? "none" : "1px solid var(--border)", color: bhk.has(n) ? "var(--brand-primary)" : "var(--text-secondary)", cursor: "pointer", fontFamily: "'Cal Sans', sans-serif", transition: "all 0.15s" }}>{n === 5 ? "5+" : n}</button>
+                    <button key={n} onClick={() => setBhk(s => toggleSet(s, n))} style={{ width: "40px", height: "36px", borderRadius: "8px", fontSize: "13px", fontWeight: 600, background: bhk.has(n) ? "var(--brand-accent)" : "rgba(255,255,255,0.05)", border: bhk.has(n) ? "none" : "1px solid var(--border)", color: bhk.has(n) ? "var(--brand-primary)" : "var(--text-secondary)", cursor: "pointer", fontFamily: "var(--font-body-new)", transition: "all 0.15s" }}>{n === 5 ? "5+" : n}</button>
                   ))}
                 </div>
               </div>
@@ -553,7 +553,7 @@ export default function PropertiesPage() {
               </div>
 
               {hasFilters && (
-                <button onClick={clearFilters} style={{ width: "100%", padding: "11px", marginTop: "12px", background: "transparent", border: "1.5px solid var(--border-accent)", borderRadius: "8px", color: "var(--brand-accent)", fontSize: "12px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", cursor: "pointer", fontFamily: "'Cal Sans', sans-serif" }}>Clear All Filters</button>
+                <button onClick={clearFilters} style={{ width: "100%", padding: "11px", marginTop: "12px", background: "transparent", border: "1.5px solid var(--border-accent)", borderRadius: "8px", color: "var(--brand-accent)", fontSize: "12px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", cursor: "pointer", fontFamily: "var(--font-body-new)" }}>Clear All Filters</button>
               )}
             </div>
           </aside>
@@ -564,7 +564,7 @@ export default function PropertiesPage() {
             {/* Top bar */}
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "24px", gap: "16px", flexWrap: "wrap" }}>
               <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-                <button className="pr-mobile-filter-btn" onClick={() => setMobileFiltersOpen(true)} style={{ alignItems: "center", gap: "8px", padding: "9px 14px", background: "rgba(255,255,255,0.06)", border: "1px solid var(--border)", borderRadius: "8px", color: "var(--text-primary)", fontSize: "13px", fontWeight: 600, cursor: "pointer", fontFamily: "'Cal Sans', sans-serif", position: "relative" }}>
+                <button className="pr-mobile-filter-btn" onClick={() => setMobileFiltersOpen(true)} style={{ alignItems: "center", gap: "8px", padding: "9px 14px", background: "rgba(255,255,255,0.06)", border: "1px solid var(--border)", borderRadius: "8px", color: "var(--text-primary)", fontSize: "13px", fontWeight: 600, cursor: "pointer", fontFamily: "var(--font-body-new)", position: "relative" }}>
                   ☰ Filters
                   {activeFilterCount > 0 && (
                     <span style={{ position: "absolute", top: "-6px", right: "-6px", width: "18px", height: "18px", borderRadius: "50%", background: "var(--brand-accent)", color: "var(--brand-primary)", fontSize: "10px", fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center" }}>{activeFilterCount}</span>
@@ -574,14 +574,14 @@ export default function PropertiesPage() {
                   <div style={{ width: "160px", height: "18px", borderRadius: "6px", background: "rgba(255,255,255,0.08)", animation: "pulse 1.6s ease-in-out infinite" }} />
                 ) : (
                   <span style={{ fontSize: "14px", color: "var(--text-secondary)" }}>
-                    <span style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "22px", fontWeight: 700, color: "var(--text-primary)", marginRight: "6px" }}>{filtered.length}</span>
+                    <span style={{ fontFamily: "var(--font-support-new)", fontSize: "22px", fontWeight: 700, color: "var(--text-primary)", marginRight: "6px" }}>{filtered.length}</span>
                     {filtered.length === 1 ? "Property" : "Properties"} Found
                   </span>
                 )}
               </div>
               <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
                 <div style={{ position: "relative" }}>
-                  <select value={sortBy} onChange={e => setSortBy(e.target.value)} style={{ padding: "9px 36px 9px 14px", background: "rgba(255,255,255,0.05)", border: "1px solid var(--border-hover)", borderRadius: "8px", color: "var(--text-primary)", fontSize: "13px", fontFamily: "'Cal Sans', sans-serif", cursor: "pointer" }}>
+                  <select value={sortBy} onChange={e => setSortBy(e.target.value)} style={{ padding: "9px 36px 9px 14px", background: "rgba(255,255,255,0.05)", border: "1px solid var(--border-hover)", borderRadius: "8px", color: "var(--text-primary)", fontSize: "13px", fontFamily: "var(--font-body-new)", cursor: "pointer" }}>
                     <option value="featured" style={{ background: "var(--brand-primary)", color: "var(--text-primary)" }}>Featured First</option>
                     <option value="price_asc" style={{ background: "var(--brand-primary)", color: "var(--text-primary)" }}>Price: Low to High</option>
                     <option value="price_desc" style={{ background: "var(--brand-primary)", color: "var(--text-primary)" }}>Price: High to Low</option>
@@ -610,9 +610,9 @@ export default function PropertiesPage() {
             ) : filtered.length === 0 ? (
               <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "80px 24px", textAlign: "center", background: "var(--bg-surface)", border: "1px solid var(--border)", borderRadius: "16px" }}>
                 <div style={{ fontSize: "48px", marginBottom: "20px", opacity: 0.4 }}>⌂</div>
-                <h3 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "28px", fontWeight: 400, color: "var(--text-primary)", marginBottom: "12px" }}>No Properties Found</h3>
+                <h3 style={{ fontFamily: "var(--font-heading-new)", fontSize: "28px", fontWeight: 400, color: "var(--text-primary)", marginBottom: "12px" }}>No Properties Found</h3>
                 <p style={{ fontSize: "14px", color: "var(--text-secondary)", marginBottom: "24px", maxWidth: "360px" }}>No properties match these filters — try adjusting your price range, area, or search terms.</p>
-                <button onClick={clearFilters} style={{ padding: "11px 28px", background: "var(--brand-accent)", border: "none", borderRadius: "8px", color: "var(--brand-primary)", fontSize: "13px", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", cursor: "pointer", fontFamily: "'Cal Sans', sans-serif" }}>Clear Filters</button>
+                <button onClick={clearFilters} style={{ padding: "11px 28px", background: "var(--brand-accent)", border: "none", borderRadius: "8px", color: "var(--brand-primary)", fontSize: "13px", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", cursor: "pointer", fontFamily: "var(--font-body-new)" }}>Clear Filters</button>
               </div>
             ) : viewMode === "grid" ? (
               <div className="pr-cards-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", columnGap: "20px", rowGap: "32px" }}>
@@ -646,8 +646,8 @@ export default function PropertiesPage() {
                       <div style={{ flex: 1, padding: "24px 28px", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
                         <div>
                           <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "16px", marginBottom: "8px" }}>
-                            <h3 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "20px", fontWeight: 700, color: "var(--text-primary)", lineHeight: 1.3 }}>{p.title}</h3>
-                            <span style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "22px", fontWeight: 700, color: "var(--brand-accent)", whiteSpace: "nowrap" }}>{formatPrice(p.price, p.listing_type)}</span>
+                            <h3 style={{ fontFamily: "var(--font-heading-new)", fontSize: "20px", fontWeight: 700, color: "var(--text-primary)", lineHeight: 1.3 }}>{p.title}</h3>
+                            <span style={{ fontFamily: "var(--font-support-new)", fontSize: "22px", fontWeight: 700, color: "var(--brand-accent)", whiteSpace: "nowrap" }}>{formatPrice(p.price, p.listing_type)}</span>
                           </div>
                           <div style={{ display: "flex", alignItems: "center", gap: "5px", marginBottom: "12px" }}>
                             <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="var(--brand-accent)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" /><circle cx="12" cy="10" r="3" /></svg>
@@ -685,7 +685,7 @@ export default function PropertiesPage() {
                     border: `1px solid ${page === 1 ? "rgba(255,255,255,0.05)" : "rgba(16,196,195,0.25)"}`,
                     color: page === 1 ? "rgba(255,255,255,0.2)" : "#FFFFFF",
                     fontSize: 14, fontWeight: 600, cursor: page === 1 ? "not-allowed" : "pointer",
-                    transition: "all 0.2s ease", fontFamily: "'Cal Sans',sans-serif"
+                    transition: "all 0.2s ease", fontFamily: "var(--font-body-new)"
                   }}
                   onMouseOver={e => { if (page !== 1) e.currentTarget.style.background = "rgba(16,196,195,0.1)"; }}
                   onMouseOut={e => { if (page !== 1) e.currentTarget.style.background = "#182B3F"; }}
@@ -704,7 +704,7 @@ export default function PropertiesPage() {
                       color: p === page ? "#000" : "rgba(255,255,255,0.6)",
                       fontSize: 14, fontWeight: p === page ? 700 : 400,
                       cursor: "pointer", transition: "all 0.2s ease",
-                      fontFamily: "'Cal Sans',sans-serif"
+                      fontFamily: "var(--font-body-new)"
                     }}>
                       {p}
                     </button>
@@ -722,7 +722,7 @@ export default function PropertiesPage() {
                     color: page === totalPages ? "rgba(255,255,255,0.2)" : "#FFFFFF",
                     fontSize: 14, fontWeight: 600,
                     cursor: page === totalPages ? "not-allowed" : "pointer",
-                    transition: "all 0.2s ease", fontFamily: "'Cal Sans',sans-serif"
+                    transition: "all 0.2s ease", fontFamily: "var(--font-body-new)"
                   }}
                   onMouseOver={e => { if (page !== totalPages) e.currentTarget.style.background = "rgba(16,196,195,0.1)"; }}
                   onMouseOut={e => { if (page !== totalPages) e.currentTarget.style.background = "#182B3F"; }}

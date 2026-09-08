@@ -15,10 +15,10 @@ export default function SearchesPage() {
 
         <div className="sr-header" style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 36, flexWrap: "wrap", gap: 16 }}>
           <div>
-            <h1 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: 34, fontWeight: 600, color: "#FFFFFF", margin: 0, lineHeight: 1.15 }}>
+            <h1 style={{ fontFamily: "var(--font-heading-new)", fontSize: 34, fontWeight: 600, color: "#FFFFFF", margin: 0, lineHeight: 1.15 }}>
               Saved Searches
             </h1>
-            <p style={{ color: "#A9B4C2", fontFamily: "'Cal Sans', sans-serif", fontSize: 14, margin: "6px 0 0" }}>
+            <p style={{ color: "#A9B4C2", fontFamily: "var(--font-body-new)", fontSize: 14, margin: "6px 0 0" }}>
               Save searches to get email alerts on new matching properties.
             </p>
           </div>
@@ -28,7 +28,7 @@ export default function SearchesPage() {
                 padding: "9px 16px", fontSize: 13, fontWeight: 500,
                 color: "#FFFFFF", background: "rgba(255,255,255,0.05)",
                 border: "1px solid rgba(255,255,255,0.15)", borderRadius: 8,
-                cursor: "pointer", fontFamily: "'Cal Sans', sans-serif",
+                cursor: "pointer", fontFamily: "var(--font-body-new)",
               }}>← Dashboard</button>
             </Link>
             <Link href="/search" style={{ textDecoration: "none" }}>
@@ -37,7 +37,7 @@ export default function SearchesPage() {
                 color: "#020C1C", background: "#10C4C3",
                 border: "none", borderRadius: 999,
                 boxShadow: "0 10px 30px rgba(16,196,195,0.35)",
-                cursor: "pointer", fontFamily: "'Cal Sans', sans-serif",
+                cursor: "pointer", fontFamily: "var(--font-body-new)",
               }}>+ New Search</button>
             </Link>
           </div>

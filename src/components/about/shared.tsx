@@ -39,7 +39,7 @@ export function ChapterLabel({ children }: { children: ReactNode }) {
   return (
     <div style={{ display: "flex", alignItems: "center", gap: "14px", marginBottom: "clamp(30px, 3.6vw, 52px)" }}>
       <span style={{ width: "40px", height: "1px", background: "rgba(255,255,255,0.16)" }} />
-      <span style={{ fontFamily: "'Cal Sans', sans-serif", fontSize: "11px", fontWeight: 600, letterSpacing: "0.28em", textTransform: "uppercase", color: TEAL }}>{children}</span>
+      <span style={{ fontFamily: "var(--font-support-new)", fontSize: "11px", fontWeight: 600, letterSpacing: "0.28em", textTransform: "uppercase", color: TEAL }}>{children}</span>
     </div>
   );
 }

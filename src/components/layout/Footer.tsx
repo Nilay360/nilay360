@@ -25,6 +25,9 @@ const footerLinks = {
     { label: "Terms of Service",href: "/terms"   },
     { label: "Cookie Policy",   href: "/cookies" },
     { label: "RERA Information",href: "/legal-guide" },
+    { label: "Agent Terms",     href: "/agent-terms" },
+    { label: "Grievance Redressal", href: "/grievance-redressal" },
+    { label: "Safety Guide",    href: "/safety-guide" },
   ],
 }
 
@@ -146,9 +149,6 @@ export function Footer() {
             <span className="w-1.5 h-1.5 rounded-full bg-[#10C4C3] animate-pulse" />
             All systems operational
           </div>
-          <p className="text-[12px] text-white/35">
-            RERA Compliant Platform · India
-          </p>
         </div>
       </div>
     </footer>

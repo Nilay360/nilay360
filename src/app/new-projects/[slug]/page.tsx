@@ -25,7 +25,7 @@ export default function ProjectDetailPage() {
       ]}
     >
       <div style={{ textAlign:"center", maxWidth:600, margin:"0 auto 8px" }}>
-        <h2 style={{ fontFamily:"'Cal Sans',Georgia,serif", fontSize:32, fontWeight:700, color:"#020C1C", marginBottom:14 }}>Register your interest</h2>
+        <h2 style={{ fontFamily:"var(--font-heading-new)", fontSize:32, fontWeight:700, color:"#020C1C", marginBottom:14 }}>Register your interest</h2>
         <p style={{ fontSize:15, color:"#666", lineHeight:1.7, marginBottom:24 }}>
           Be the first to receive floor plans, pricing and launch offers for this project.
         </p>

@@ -79,15 +79,15 @@ function InterestModal({ project, onClose }: { project: Project | null; onClose:
         {sent ? (
           <div style={{ textAlign: "center", padding: "24px 0" }}>
             <div style={{ fontSize: "44px", marginBottom: "12px" }}>✅</div>
-            <h3 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "24px", color: "#020C1C", marginBottom: "8px" }}>Interest Registered!</h3>
+            <h3 style={{ fontFamily: "var(--font-heading-new)", fontSize: "24px", color: "#020C1C", marginBottom: "8px" }}>Interest Registered!</h3>
             <p style={{ fontSize: "13px", color: "#6B7C72", lineHeight: 1.7 }}>Our project advisor will contact you within 24 hours with detailed brochures, pricing, and floor plans for <strong>{project.name}</strong>.</p>
-            <button onClick={onClose} style={{ marginTop: "22px", padding: "10px 28px", background: "#020C1C", border: "none", borderRadius: "8px", color: "#10C4C3", fontSize: "12px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", cursor: "pointer", fontFamily: "'Cal Sans', sans-serif" }}>Close</button>
+            <button onClick={onClose} style={{ marginTop: "22px", padding: "10px 28px", background: "#020C1C", border: "none", borderRadius: "8px", color: "#10C4C3", fontSize: "12px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", cursor: "pointer", fontFamily: "var(--font-body-new)" }}>Close</button>
           </div>
         ) : (
           <>
             <div style={{ marginBottom: "22px" }}>
               <p style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.14em", color: "#10C4C3", textTransform: "uppercase", marginBottom: "4px" }}>{project.developer}</p>
-              <h3 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "22px", fontWeight: 600, color: "#020C1C" }}>Register Interest — {project.name}</h3>
+              <h3 style={{ fontFamily: "var(--font-heading-new)", fontSize: "22px", fontWeight: 600, color: "#020C1C" }}>Register Interest — {project.name}</h3>
             </div>
             <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
               {[
@@ -98,15 +98,15 @@ function InterestModal({ project, onClose }: { project: Project | null; onClose:
                 <div key={f.key}>
                   <label style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.1em", color: "#6B7C72", textTransform: "uppercase", display: "block", marginBottom: "5px" }}>{f.label}</label>
                   <input type={f.type} placeholder={f.placeholder} required value={(form as any)[f.key]} onChange={e => setForm(p => ({ ...p, [f.key]: e.target.value }))}
-                    style={{ width: "100%", padding: "10px 14px", background: "#F8F6F1", border: "1.5px solid rgba(13,43,31,0.1)", borderRadius: "8px", fontSize: "13px", color: "#020C1C", fontFamily: "'Cal Sans', sans-serif", outline: "none" }} />
+                    style={{ width: "100%", padding: "10px 14px", background: "#F8F6F1", border: "1.5px solid rgba(13,43,31,0.1)", borderRadius: "8px", fontSize: "13px", color: "#020C1C", fontFamily: "var(--font-body-new)", outline: "none" }} />
                 </div>
               ))}
               <div>
                 <label style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.1em", color: "#6B7C72", textTransform: "uppercase", display: "block", marginBottom: "5px" }}>Message (optional)</label>
                 <textarea placeholder="Any specific requirements…" rows={3} value={form.message} onChange={e => setForm(p => ({ ...p, message: e.target.value }))}
-                  style={{ width: "100%", padding: "10px 14px", background: "#F8F6F1", border: "1.5px solid rgba(13,43,31,0.1)", borderRadius: "8px", fontSize: "13px", color: "#020C1C", fontFamily: "'Cal Sans', sans-serif", outline: "none", resize: "vertical" }} />
+                  style={{ width: "100%", padding: "10px 14px", background: "#F8F6F1", border: "1.5px solid rgba(13,43,31,0.1)", borderRadius: "8px", fontSize: "13px", color: "#020C1C", fontFamily: "var(--font-body-new)", outline: "none", resize: "vertical" }} />
               </div>
-              <button type="submit" style={{ padding: "13px", background: "#10C4C3", border: "none", borderRadius: "9px", color: "#020C1C", fontSize: "12px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", cursor: "pointer", fontFamily: "'Cal Sans', sans-serif" }}>
+              <button type="submit" style={{ padding: "13px", background: "#10C4C3", border: "none", borderRadius: "9px", color: "#020C1C", fontSize: "12px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", cursor: "pointer", fontFamily: "var(--font-body-new)" }}>
                 Register My Interest →
               </button>
             </form>
@@ -143,14 +143,14 @@ function ProjectCard({ p, onInterest }: { p: Project; onInterest: (p: Project) =
 
       {/* Content */}
       <div style={{ padding: "20px 18px" }}>
-        <h3 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "20px", fontWeight: 600, color: "#020C1C", marginBottom: "4px", lineHeight: 1.3 }}>{p.name}</h3>
+        <h3 style={{ fontFamily: "var(--font-heading-new)", fontSize: "20px", fontWeight: 600, color: "#020C1C", marginBottom: "4px", lineHeight: 1.3 }}>{p.name}</h3>
         <p style={{ display: "flex", alignItems: "center", gap: "4px", fontSize: "11px", color: "#9CA3AF", marginBottom: "14px" }}>
           <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
           {p.location}
         </p>
 
         {/* Price */}
-        <p style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "22px", fontWeight: 600, color: "#10C4C3", marginBottom: "12px" }}>
+        <p style={{ fontFamily: "var(--font-support-new)", fontSize: "22px", fontWeight: 600, color: "#10C4C3", marginBottom: "12px" }}>
           Starting {fmtINR(p.price_from)}
         </p>
 
@@ -174,7 +174,7 @@ function ProjectCard({ p, onInterest }: { p: Project; onInterest: (p: Project) =
           <a href={`/new-projects/${p.id}`} style={{ flex: 1, padding: "10px", background: "#020C1C", borderRadius: "8px", color: "#10C4C3", fontSize: "11px", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", textDecoration: "none", textAlign: "center" }}>
             View Details
           </a>
-          <button onClick={() => onInterest(p)} style={{ flex: 1, padding: "10px", background: "transparent", border: "1.5px solid rgba(13,43,31,0.15)", borderRadius: "8px", color: "#020C1C", fontSize: "11px", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", cursor: "pointer", fontFamily: "'Cal Sans', sans-serif" }}>
+          <button onClick={() => onInterest(p)} style={{ flex: 1, padding: "10px", background: "transparent", border: "1.5px solid rgba(13,43,31,0.15)", borderRadius: "8px", color: "#020C1C", fontSize: "11px", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", cursor: "pointer", fontFamily: "var(--font-body-new)" }}>
             Register Interest
           </button>
         </div>
@@ -254,14 +254,14 @@ function NewProjectsPageInner() {
   }
 
   const PILL_BTN = (label: string, active: boolean, onClick: () => void) => (
-    <button key={label} onClick={onClick} style={{ padding: "8px 18px", borderRadius: "100px", fontSize: "12px", fontWeight: 600, background: active ? "#020C1C" : "rgba(245,242,236,0.06)", border: active ? "none" : "1px solid rgba(245,242,236,0.14)", color: active ? "#10C4C3" : "rgba(245,242,236,0.55)", cursor: "pointer", fontFamily: "'Cal Sans', sans-serif", transition: "all 0.18s" }}>
+    <button key={label} onClick={onClick} style={{ padding: "8px 18px", borderRadius: "100px", fontSize: "12px", fontWeight: 600, background: active ? "#020C1C" : "rgba(245,242,236,0.06)", border: active ? "none" : "1px solid rgba(245,242,236,0.14)", color: active ? "#10C4C3" : "rgba(245,242,236,0.55)", cursor: "pointer", fontFamily: "var(--font-body-new)", transition: "all 0.18s" }}>
       {label}
     </button>
   );
 
   const SEL = (value: string, onChange: (v: string) => void, opts: [string, string][], placeholder: string) => (
     <select value={value} onChange={e => onChange(e.target.value)}
-      style={{ padding: "9px 32px 9px 14px", background: "#fff", border: "1.5px solid rgba(13,43,31,0.1)", borderRadius: "9px", fontSize: "12px", fontWeight: 600, color: value === "all" ? "#9CA3AF" : "#020C1C", fontFamily: "'Cal Sans', sans-serif", cursor: "pointer", outline: "none", appearance: "none", backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%239CA3AF' stroke-width='2.5'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E")`, backgroundRepeat: "no-repeat", backgroundPosition: "right 12px center" }}>
+      style={{ padding: "9px 32px 9px 14px", background: "#fff", border: "1.5px solid rgba(13,43,31,0.1)", borderRadius: "9px", fontSize: "12px", fontWeight: 600, color: value === "all" ? "#9CA3AF" : "#020C1C", fontFamily: "var(--font-body-new)", cursor: "pointer", outline: "none", appearance: "none", backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%239CA3AF' stroke-width='2.5'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E")`, backgroundRepeat: "no-repeat", backgroundPosition: "right 12px center" }}>
       <option value="all">{placeholder}</option>
       {opts.map(([v, l]) => <option key={v} value={v}>{l}</option>)}
     </select>
@@ -272,7 +272,7 @@ function NewProjectsPageInner() {
       <style>{`
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
         html { scroll-behavior: smooth; }
-        body { font-family: 'Cal Sans', system-ui, sans-serif; background: #020C1C; overflow-x: hidden; }
+        body { font-family: var(--font-body-new); background: #020C1C; overflow-x: hidden; }
         ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-thumb { background: rgba(201,168,76,0.3); border-radius: 2px; }
         @keyframes fadeUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
@@ -314,7 +314,7 @@ function NewProjectsPageInner() {
             <div style={{ animation: "fadeUp 0.5s ease-out both" }}>
               <Eyebrow label="New Launches 2025" />
             </div>
-            <h1 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "clamp(44px, 6.5vw, 80px)", fontWeight: 300, color: "#020C1C", lineHeight: 1.08, marginBottom: "16px", animation: "fadeUp 0.5s 0.1s ease-out both" }}>
+            <h1 style={{ fontFamily: "var(--font-heading-new)", fontSize: "clamp(44px, 6.5vw, 80px)", fontWeight: 300, color: "#020C1C", lineHeight: 1.08, marginBottom: "16px", animation: "fadeUp 0.5s 0.1s ease-out both" }}>
               Discover New<br /><em style={{ fontStyle: "italic", color: "#10C4C3" }}>Projects</em>
             </h1>
             <p style={{ fontSize: "16px", color: "rgba(245,242,236,0.5)", marginBottom: "40px", animation: "fadeUp 0.5s 0.18s ease-out both" }}>
@@ -324,7 +324,7 @@ function NewProjectsPageInner() {
             {/* Search bar */}
             <div style={{ maxWidth: "580px", margin: "0 auto 28px", position: "relative", animation: "fadeUp 0.5s 0.24s ease-out both" }}>
               <input type="text" placeholder="Search by project, developer or location…" value={search} onChange={e => setSearch(e.target.value)}
-                style={{ width: "100%", padding: "16px 56px 16px 20px", background: "rgba(245,242,236,0.06)", border: "1.5px solid rgba(245,242,236,0.14)", borderRadius: "12px", fontSize: "14px", color: "#020C1C", fontFamily: "'Cal Sans', sans-serif", outline: "none", backdropFilter: "blur(8px)" }} />
+                style={{ width: "100%", padding: "16px 56px 16px 20px", background: "rgba(245,242,236,0.06)", border: "1.5px solid rgba(245,242,236,0.14)", borderRadius: "12px", fontSize: "14px", color: "#020C1C", fontFamily: "var(--font-body-new)", outline: "none", backdropFilter: "blur(8px)" }} />
               <svg style={{ position: "absolute", right: "18px", top: "50%", transform: "translateY(-50%)", opacity: 0.45 }} width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#020C1C" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
             </div>
 
@@ -333,15 +333,10 @@ function NewProjectsPageInner() {
               {["All", "Apartments", "Villas", "Commercial", "Plots"].map(t => PILL_BTN(t, typeFilter === t, () => setTypeFilter(t)))}
             </div>
 
-            {/* Stats strip */}
-            <div style={{ display: "flex", justifyContent: "center", gap: "40px", marginTop: "48px", paddingTop: "28px", borderTop: "1px solid rgba(245,242,236,0.06)", animation: "fadeUp 0.5s 0.36s ease-out both" }}>
-              {[["240+", "Active Projects"], ["48", "Top Developers"], ["12", "Cities Covered"], ["₹500Cr+", "Value Listed"]].map(([v, l]) => (
-                <div key={l} style={{ textAlign: "center" }}>
-                  <p style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "28px", fontWeight: 600, color: "#10C4C3" }}>{v}</p>
-                  <p style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.12em", color: "rgba(245,242,236,0.3)", textTransform: "uppercase" }}>{l}</p>
-                </div>
-              ))}
-            </div>
+            {/* Status note — honest placeholder while the new-launches directory is still empty */}
+            <p style={{ textAlign: "center", marginTop: "48px", paddingTop: "28px", borderTop: "1px solid rgba(245,242,236,0.06)", animation: "fadeUp 0.5s 0.36s ease-out both", fontSize: "14px", color: "rgba(245,242,236,0.4)" }}>
+              New project launches are being added — check back soon.
+            </p>
           </div>
         </section>
 
@@ -370,12 +365,12 @@ function NewProjectsPageInner() {
                 <div style={{ position: "absolute", inset: 0, backgroundImage: "linear-gradient(rgba(201,168,76,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(201,168,76,0.04) 1px, transparent 1px)", backgroundSize: "36px 36px" }} />
                 <div style={{ position: "relative", zIndex: 2 }}>
                   <p style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.18em", color: "#10C4C3", textTransform: "uppercase", marginBottom: "6px" }}>{featured.developer}</p>
-                  <h2 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "clamp(26px, 3vw, 40px)", fontWeight: 400, color: "#020C1C", lineHeight: 1.2, marginBottom: "8px" }}>{featured.name}</h2>
+                  <h2 style={{ fontFamily: "var(--font-heading-new)", fontSize: "clamp(26px, 3vw, 40px)", fontWeight: 400, color: "#020C1C", lineHeight: 1.2, marginBottom: "8px" }}>{featured.name}</h2>
                   <p style={{ display: "flex", alignItems: "center", gap: "5px", fontSize: "12px", color: "rgba(245,242,236,0.4)", marginBottom: "24px" }}>
                     <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
                     {featured.location}
                   </p>
-                  <p style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "32px", fontWeight: 600, color: "#10C4C3", marginBottom: "24px" }}>
+                  <p style={{ fontFamily: "var(--font-support-new)", fontSize: "32px", fontWeight: 600, color: "#10C4C3", marginBottom: "24px" }}>
                     Starting {fmtINR(featured.price_from)}
                   </p>
                   {/* Highlights */}
@@ -396,7 +391,7 @@ function NewProjectsPageInner() {
                     <a href={`/new-projects/${featured.id}`} style={{ flex: 1, padding: "13px", background: "#10C4C3", borderRadius: "9px", color: "#020C1C", fontSize: "12px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", textDecoration: "none", textAlign: "center" }}>
                       View Project →
                     </a>
-                    <button onClick={() => setInterestProject(featured)} style={{ flex: 1, padding: "13px", background: "transparent", border: "1.5px solid rgba(245,242,236,0.2)", borderRadius: "9px", color: "rgba(245,242,236,0.75)", fontSize: "12px", fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase", cursor: "pointer", fontFamily: "'Cal Sans', sans-serif" }}>
+                    <button onClick={() => setInterestProject(featured)} style={{ flex: 1, padding: "13px", background: "transparent", border: "1.5px solid rgba(245,242,236,0.2)", borderRadius: "9px", color: "rgba(245,242,236,0.75)", fontSize: "12px", fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase", cursor: "pointer", fontFamily: "var(--font-body-new)" }}>
                       Register Interest
                     </button>
                   </div>
@@ -426,19 +421,19 @@ function NewProjectsPageInner() {
         <section style={{ maxWidth: "1280px", margin: "0 auto", padding: "40px 48px 72px" }}>
           {cityNotAvailable ? (
             <div style={{ padding: "80px", textAlign: "center", background: "#fff", borderRadius: "18px", border: "1px solid rgba(13,43,31,0.07)" }}>
-              <p style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "28px", color: "#020C1C", marginBottom: "8px" }}>Currently only available in Hyderabad</p>
+              <p style={{ fontFamily: "var(--font-heading-new)", fontSize: "28px", color: "#020C1C", marginBottom: "8px" }}>Currently only available in Hyderabad</p>
               <p style={{ fontSize: "13px", color: "#6B7C72", marginBottom: "20px" }}>We're not listing new launches in other cities yet.</p>
               <a href="/new-projects" style={{ fontSize: "13px", fontWeight: 600, color: "#10C4C3", textDecoration: "none" }}>Browse Hyderabad launches →</a>
             </div>
           ) : filtered.length === 0 ? (
             <div style={{ padding: "80px", textAlign: "center", background: "#fff", borderRadius: "18px", border: "1px solid rgba(13,43,31,0.07)" }}>
               {projects.length === 0 ? (
-                <p style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "28px", color: "#020C1C", marginBottom: "8px" }}>No projects listed yet</p>
+                <p style={{ fontFamily: "var(--font-heading-new)", fontSize: "28px", color: "#020C1C", marginBottom: "8px" }}>No projects listed yet</p>
               ) : (
                 <>
-                  <p style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "28px", color: "#020C1C", marginBottom: "8px" }}>No projects match your filters</p>
+                  <p style={{ fontFamily: "var(--font-heading-new)", fontSize: "28px", color: "#020C1C", marginBottom: "8px" }}>No projects match your filters</p>
                   <button onClick={() => { setBudgetFilter("all"); setPossessionFilter("all"); setTypeFilter("All"); setSearch(""); }}
-                    style={{ fontSize: "13px", fontWeight: 600, color: "#10C4C3", background: "transparent", border: "none", cursor: "pointer", fontFamily: "'Cal Sans', sans-serif" }}>Clear all filters</button>
+                    style={{ fontSize: "13px", fontWeight: 600, color: "#10C4C3", background: "transparent", border: "none", cursor: "pointer", fontFamily: "var(--font-body-new)" }}>Clear all filters</button>
                 </>
               )}
             </div>
@@ -453,7 +448,7 @@ function NewProjectsPageInner() {
         <section className="np-why" style={{ maxWidth: "1280px", margin: "0 auto", padding: "72px 48px" }}>
           <div style={{ textAlign: "center", marginBottom: "44px" }}>
             <Eyebrow label="The Advantage" />
-            <h2 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "clamp(28px, 3.5vw, 44px)", fontWeight: 400, color: "#020C1C" }}>
+            <h2 style={{ fontFamily: "var(--font-heading-new)", fontSize: "clamp(28px, 3.5vw, 44px)", fontWeight: 400, color: "#020C1C" }}>
               Why Buy a<br /><em style={{ fontStyle: "italic", color: "#10C4C3" }}>New Project?</em>
             </h2>
           </div>
@@ -486,7 +481,7 @@ function NewProjectsPageInner() {
             ].map(b => (
               <div key={b.title} style={{ background: b.bg, border: `1.5px solid ${b.border}`, borderRadius: "18px", padding: "28px 24px" }}>
                 <div style={{ fontSize: "28px", marginBottom: "14px" }}>{b.icon}</div>
-                <h3 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "20px", fontWeight: 600, color: "#020C1C", marginBottom: "10px" }}>{b.title}</h3>
+                <h3 style={{ fontFamily: "var(--font-heading-new)", fontSize: "20px", fontWeight: 600, color: "#020C1C", marginBottom: "10px" }}>{b.title}</h3>
                 <p style={{ fontSize: "12.5px", color: "#6B7C72", lineHeight: 1.75, marginBottom: "16px" }}>{b.desc}</p>
                 <ul style={{ listStyle: "none", display: "flex", flexDirection: "column", gap: "6px" }}>
                   {b.points.map(pt => (
@@ -507,7 +502,7 @@ function NewProjectsPageInner() {
           <div style={{ position: "absolute", inset: 0, background: "radial-gradient(ellipse 60% 55% at 50% 110%, rgba(201,168,76,0.1) 0%, transparent 55%)", pointerEvents: "none" }} />
           <div style={{ position: "relative", zIndex: 2, maxWidth: "680px", margin: "0 auto", textAlign: "center" }}>
             <Eyebrow label="Stay Ahead" />
-            <h2 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "clamp(34px, 5vw, 56px)", fontWeight: 300, color: "#020C1C", lineHeight: 1.15, marginBottom: "12px" }}>
+            <h2 style={{ fontFamily: "var(--font-heading-new)", fontSize: "clamp(34px, 5vw, 56px)", fontWeight: 300, color: "#020C1C", lineHeight: 1.15, marginBottom: "12px" }}>
               Be First<br /><em style={{ fontStyle: "italic", color: "#10C4C3" }}>to Know</em>
             </h2>
             <p style={{ fontSize: "14px", color: "rgba(245,242,236,0.45)", lineHeight: 1.75, marginBottom: "40px" }}>
@@ -517,16 +512,16 @@ function NewProjectsPageInner() {
             {alertSent ? (
               <div style={{ padding: "32px", background: "rgba(16,185,129,0.06)", border: "1px solid rgba(16,185,129,0.2)", borderRadius: "16px" }}>
                 <div style={{ fontSize: "36px", marginBottom: "10px" }}>🎉</div>
-                <p style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "22px", color: "#020C1C", marginBottom: "6px" }}>You're on the list!</p>
+                <p style={{ fontFamily: "var(--font-heading-new)", fontSize: "22px", color: "#020C1C", marginBottom: "6px" }}>You're on the list!</p>
                 <p style={{ fontSize: "13px", color: "rgba(245,242,236,0.45)" }}>We'll alert you the moment a matching pre-launch goes live in your preferred city.</p>
               </div>
             ) : (
               <form onSubmit={handleAlertSubmit} style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
                   <input type="email" placeholder="Your email address" required value={alertForm.email} onChange={e => setAlertForm(p => ({ ...p, email: e.target.value }))}
-                    style={{ padding: "14px 16px", background: "rgba(245,242,236,0.06)", border: "1.5px solid rgba(245,242,236,0.1)", borderRadius: "10px", fontSize: "13px", color: "#020C1C", fontFamily: "'Cal Sans', sans-serif", outline: "none" }} />
+                    style={{ padding: "14px 16px", background: "rgba(245,242,236,0.06)", border: "1.5px solid rgba(245,242,236,0.1)", borderRadius: "10px", fontSize: "13px", color: "#020C1C", fontFamily: "var(--font-body-new)", outline: "none" }} />
                   <select value={alertForm.city} onChange={e => setAlertForm(p => ({ ...p, city: e.target.value }))} required
-                    style={{ padding: "14px 16px", background: "rgba(245,242,236,0.06)", border: "1.5px solid rgba(245,242,236,0.1)", borderRadius: "10px", fontSize: "13px", color: alertForm.city ? "#020C1C" : "rgba(245,242,236,0.35)", fontFamily: "'Cal Sans', sans-serif", outline: "none", appearance: "none", cursor: "pointer" }}>
+                    style={{ padding: "14px 16px", background: "rgba(245,242,236,0.06)", border: "1.5px solid rgba(245,242,236,0.1)", borderRadius: "10px", fontSize: "13px", color: alertForm.city ? "#020C1C" : "rgba(245,242,236,0.35)", fontFamily: "var(--font-body-new)", outline: "none", appearance: "none", cursor: "pointer" }}>
                     <option value="" disabled>Preferred City</option>
                     {["Hyderabad", "Mumbai", "Bengaluru", "Delhi NCR", "Chennai", "Pune", "Any City"].map(c => (
                       <option key={c} value={c} style={{ color: "#020C1C", background: "#fff" }}>{c}</option>
@@ -534,13 +529,13 @@ function NewProjectsPageInner() {
                   </select>
                 </div>
                 <select value={alertForm.type} onChange={e => setAlertForm(p => ({ ...p, type: e.target.value }))} required
-                  style={{ padding: "14px 16px", background: "rgba(245,242,236,0.06)", border: "1.5px solid rgba(245,242,236,0.1)", borderRadius: "10px", fontSize: "13px", color: alertForm.type ? "#020C1C" : "rgba(245,242,236,0.35)", fontFamily: "'Cal Sans', sans-serif", outline: "none", appearance: "none", cursor: "pointer" }}>
+                  style={{ padding: "14px 16px", background: "rgba(245,242,236,0.06)", border: "1.5px solid rgba(245,242,236,0.1)", borderRadius: "10px", fontSize: "13px", color: alertForm.type ? "#020C1C" : "rgba(245,242,236,0.35)", fontFamily: "var(--font-body-new)", outline: "none", appearance: "none", cursor: "pointer" }}>
                   <option value="" disabled>Property Type Preference</option>
                   {["Apartments", "Villas", "Plots", "Commercial", "Any Type"].map(t => (
                     <option key={t} value={t} style={{ color: "#020C1C", background: "#fff" }}>{t}</option>
                   ))}
                 </select>
-                <button type="submit" style={{ padding: "15px", background: "#10C4C3", border: "none", borderRadius: "10px", color: "#020C1C", fontSize: "13px", fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", cursor: "pointer", fontFamily: "'Cal Sans', sans-serif", display: "flex", alignItems: "center", justifyContent: "center", gap: "8px" }}>
+                <button type="submit" style={{ padding: "15px", background: "#10C4C3", border: "none", borderRadius: "10px", color: "#020C1C", fontSize: "13px", fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", cursor: "pointer", fontFamily: "var(--font-body-new)", display: "flex", alignItems: "center", justifyContent: "center", gap: "8px" }}>
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M22 17H2a3 3 0 0 0 3-3V9a7 7 0 0 1 14 0v5a3 3 0 0 0 3 3zm-8.27 4a2 2 0 0 1-3.46 0"/></svg>
                   Subscribe to Pre-Launch Alerts
                 </button>
@@ -556,7 +551,7 @@ function NewProjectsPageInner() {
             <div style={{ position: "absolute", inset: 0, backgroundImage: "radial-gradient(circle, rgba(201,168,76,0.06) 1px, transparent 1px)", backgroundSize: "30px 30px", pointerEvents: "none" }} />
             <div style={{ position: "relative", zIndex: 2 }}>
               <Eyebrow label="Get Started" />
-              <h2 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "clamp(30px, 4vw, 52px)", fontWeight: 400, color: "#020C1C", marginBottom: "14px" }}>
+              <h2 style={{ fontFamily: "var(--font-heading-new)", fontSize: "clamp(30px, 4vw, 52px)", fontWeight: 400, color: "#020C1C", marginBottom: "14px" }}>
                 Ready to Invest in<br /><em style={{ fontStyle: "italic", color: "#10C4C3" }}>India's Finest Projects?</em>
               </h2>
               <p style={{ fontSize: "14px", color: "#6B7C72", lineHeight: 1.75, marginBottom: "32px", maxWidth: "480px", margin: "0 auto 32px" }}>
@@ -580,8 +575,8 @@ function NewProjectsPageInner() {
           <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
             <div className="np-footer-grid" style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1fr", gap: "48px", paddingBottom: "56px", borderBottom: "1px solid rgba(245,242,236,0.06)" }}>
               <div>
-                <div style={{ fontFamily: "'Cal Sans', sans-serif", fontSize: "18px", fontWeight: 600, color: "#fff", letterSpacing: "0.16em", marginBottom: "14px" }}>Nilay 360 <span style={{ color: "#10C4C3" }}>·</span></div>
-                <p style={{ fontSize: "13px", color: "rgba(245,242,236,0.35)", lineHeight: 1.75, maxWidth: "280px", marginBottom: "22px" }}>India's most trusted premium real estate platform. Every listing verified, every project curated.</p>
+                <div style={{ fontFamily: "var(--font-support-new)", fontSize: "18px", fontWeight: 600, color: "#fff", letterSpacing: "0.16em", marginBottom: "14px" }}>Nilay 360 <span style={{ color: "#10C4C3" }}>·</span></div>
+                <p style={{ fontSize: "13px", color: "rgba(245,242,236,0.35)", lineHeight: 1.75, maxWidth: "280px", marginBottom: "22px" }}>India's premium real estate platform connecting discerning buyers with exceptional properties.</p>
                 <div style={{ display: "flex", gap: "10px" }}>
                   {[
                     { s: "IN", href: "https://www.instagram.com/nilay360_/" },
@@ -607,7 +602,6 @@ function NewProjectsPageInner() {
             </div>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "22px 0", flexWrap: "wrap", gap: "12px" }}>
               <p style={{ fontSize: "12px", color: "rgba(245,242,236,0.2)" }}>© 2025 Nilay 360. All rights reserved.</p>
-              <span style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.1em", padding: "4px 10px", background: "rgba(201,168,76,0.08)", border: "1px solid rgba(201,168,76,0.15)", borderRadius: "4px", color: "rgba(201,168,76,0.5)" }}>RERA COMPLIANT</span>
             </div>
           </div>
         </footer>

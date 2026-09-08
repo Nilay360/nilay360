@@ -65,16 +65,16 @@ function ListingsPanel({ listings, loading, onNavClose, onMouseEnter, onMouseLea
           border: "1px solid rgba(255,255,255,0.18)",
           borderRadius: 6, fontSize: 12,
           color: "#FFFFFF", outline: "none",
-          fontFamily: "'Cal Sans', sans-serif",
+          fontFamily: "var(--font-body-new)",
         }}
       />
 
       {loading ? (
-        <p style={{ fontSize: 12, color: "rgba(255,255,255,0.35)", padding: "4px 2px", margin: 0, fontFamily: "'Cal Sans', sans-serif" }}>
+        <p style={{ fontSize: 12, color: "rgba(255,255,255,0.35)", padding: "4px 2px", margin: 0, fontFamily: "var(--font-body-new)" }}>
           Loading…
         </p>
       ) : visible.length === 0 ? (
-        <p style={{ fontSize: 12, color: "rgba(255,255,255,0.35)", padding: "4px 2px", margin: 0, fontFamily: "'Cal Sans', sans-serif" }}>
+        <p style={{ fontSize: 12, color: "rgba(255,255,255,0.35)", padding: "4px 2px", margin: 0, fontFamily: "var(--font-body-new)" }}>
           {search ? "No match" : "No listings yet"}
         </p>
       ) : (
@@ -90,10 +90,10 @@ function ListingsPanel({ listings, loading, onNavClose, onMouseEnter, onMouseLea
                 onMouseEnter={e => (e.currentTarget.style.background = "rgba(255,255,255,0.05)")}
                 onMouseLeave={e => (e.currentTarget.style.background = "transparent")}
               >
-                <span style={{ fontSize: 12, fontWeight: 500, color: "#FFFFFF", fontFamily: "'Cal Sans', sans-serif", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", flex: 1, minWidth: 0 }}>
+                <span style={{ fontSize: 12, fontWeight: 500, color: "#FFFFFF", fontFamily: "var(--font-body-new)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", flex: 1, minWidth: 0 }}>
                   {l.title ?? "Untitled"}
                 </span>
-                <span style={{ fontSize: 10, fontWeight: 600, padding: "2px 6px", borderRadius: 4, flexShrink: 0, color: sc.text, background: sc.bg, fontFamily: "'Cal Sans', sans-serif" }}>
+                <span style={{ fontSize: 10, fontWeight: 600, padding: "2px 6px", borderRadius: 4, flexShrink: 0, color: sc.text, background: sc.bg, fontFamily: "var(--font-support-new)" }}>
                   {sc.label}
                 </span>
               </Link>
@@ -106,7 +106,7 @@ function ListingsPanel({ listings, loading, onNavClose, onMouseEnter, onMouseLea
         <Link
           href="/dashboard/my-listings"
           onClick={onNavClose}
-          style={{ display: "block", textAlign: "center", fontSize: 11, fontWeight: 600, color: "#10C4C3", fontFamily: "'Cal Sans', sans-serif", padding: "4px 0", textDecoration: "none" }}
+          style={{ display: "block", textAlign: "center", fontSize: 11, fontWeight: 600, color: "#10C4C3", fontFamily: "var(--font-body-new)", padding: "4px 0", textDecoration: "none" }}
           onMouseEnter={e => (e.currentTarget.style.opacity = "0.7")}
           onMouseLeave={e => (e.currentTarget.style.opacity = "1")}
         >
@@ -173,7 +173,7 @@ export function MyListingsDropdown({ onNavClose, mobile = false }: Props) {
               background: open ? "rgba(16,196,195,0.06)" : "rgba(255,255,255,0.04)",
               color: open ? "#10C4C3" : "rgba(255,255,255,0.75)",
               fontSize: 13, fontWeight: 500, textDecoration: "none",
-              fontFamily: "'Cal Sans', sans-serif",
+              fontFamily: "var(--font-body-new)",
             }}
           >
             <span style={{ fontSize: 15, color: "#10C4C3" }}>🏠</span>
@@ -222,7 +222,7 @@ export function MyListingsDropdown({ onNavClose, mobile = false }: Props) {
           style={{
             flex: 1, fontSize: 13, fontWeight: 450,
             color: open ? "#FFFFFF" : "rgba(255,255,255,0.65)",
-            fontFamily: "'Cal Sans', sans-serif",
+            fontFamily: "var(--font-body-new)",
             textDecoration: "none", transition: "color 0.12s",
           }}
         >

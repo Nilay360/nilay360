@@ -75,10 +75,10 @@ function buildFallback(slug: string): CityConfig {
     transport_list: [], schools_list: [], hospitals_list: [], shopping_list: [],
     faqs: [
       { q: `Is ${name} a good city to invest in real estate?`, a: `${name} offers strong fundamentals for real estate investment — growing infrastructure, rising employment, and consistent property appreciation.` },
-      { q: "How do I find verified properties?", a: "All properties on Nilay 360 are manually verified by our ground team before listing. Each property comes with RERA registration details and legal clearance status." },
+      { q: "How do I know a listing on Nilay 360 is legitimate?", a: "All properties on Nilay 360 go through admin review before they're published. Where available, a listing's RERA registration number is displayed on its page — Nilay 360 does not independently verify legal title or ownership, so always confirm those details directly with the seller or your own legal counsel before transacting." },
       { q: "Can NRIs buy property here?", a: "Yes. NRIs, PIOs, and OCI cardholders can purchase residential and commercial property across India under FEMA regulations. Visit our NRI Services page for detailed guidance." },
       { q: "What is the home loan interest rate?", a: "Home loan rates in India currently range from 8.5% to 10% per annum, depending on your credit profile and lender. Use our EMI Calculator to estimate your monthly payment." },
-      { q: "Does Nilay 360 provide legal assistance?", a: "Yes. Our in-house legal team reviews title documents, encumbrance certificates, and builder credentials for every listing. We also offer POA assistance for NRI buyers." },
+      { q: "Does Nilay 360 provide legal assistance?", a: "Nilay 360 does not provide in-house legal review of listings. We recommend engaging your own lawyer to review title documents and other legal paperwork before finalizing any purchase." },
     ],
   };
 }
@@ -117,7 +117,7 @@ function FaqItem({ q, a, idx }: { q: string; a: string; idx: number }) {
   const [open, setOpen] = useState(false);
   return (
     <div style={{ borderBottom: "1px solid rgba(13,43,31,0.08)" }}>
-      <button onClick={() => setOpen(o => !o)} style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between", gap: "16px", padding: "20px 0", background: "transparent", border: "none", cursor: "pointer", fontFamily: "'Cal Sans', sans-serif", textAlign: "left" }}>
+      <button onClick={() => setOpen(o => !o)} style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between", gap: "16px", padding: "20px 0", background: "transparent", border: "none", cursor: "pointer", fontFamily: "var(--font-body-new)", textAlign: "left" }}>
         <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
           <span style={{ width: "26px", height: "26px", borderRadius: "7px", background: open ? "#020C1C" : "rgba(201,168,76,0.1)", border: `1px solid ${open ? "transparent" : "rgba(201,168,76,0.25)"}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "10px", fontWeight: 700, color: "#10C4C3", flexShrink: 0 }}>{String(idx + 1).padStart(2, "0")}</span>
           <span style={{ fontSize: "14px", fontWeight: 600, color: "#020C1C", lineHeight: 1.4 }}>{q}</span>
@@ -148,8 +148,8 @@ function PropCard({ p }: { p: Property }) {
       </div>
       <div style={{ padding: "16px 18px" }}>
         <p style={{ fontSize: "9px", fontWeight: 700, letterSpacing: "0.1em", color: "#10C4C3", textTransform: "uppercase", marginBottom: "4px" }}>{p.property_type}{p.neighbourhood ? ` · ${p.neighbourhood}` : ""}</p>
-        <h4 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "17px", fontWeight: 600, color: "#020C1C", marginBottom: "8px", lineHeight: 1.3, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{p.title}</h4>
-        <p style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "19px", fontWeight: 600, color: "#10C4C3", marginBottom: "10px" }}>{fmtINR(p.price, true)}{p.listing_type === "rent" ? "/mo" : ""}</p>
+        <h4 style={{ fontFamily: "var(--font-heading-new)", fontSize: "17px", fontWeight: 600, color: "#020C1C", marginBottom: "8px", lineHeight: 1.3, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{p.title}</h4>
+        <p style={{ fontFamily: "var(--font-support-new)", fontSize: "19px", fontWeight: 600, color: "#10C4C3", marginBottom: "10px" }}>{fmtINR(p.price, true)}{p.listing_type === "rent" ? "/mo" : ""}</p>
         {(p.bedrooms || p.bathrooms || p.area_sqft) && (
           <div style={{ display: "flex", gap: "12px" }}>
             {p.bedrooms    && <span style={{ fontSize: "11px", color: "#6B7C72" }}>🛏 {p.bedrooms} {COMMERCIAL_CATEGORIES.includes(p.property_type?.toLowerCase()) ? "Rooms" : "BHK"}</span>}
@@ -229,7 +229,7 @@ export default function CityPage() {
       <style>{`
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
         html { scroll-behavior: smooth; }
-        body { font-family: 'Cal Sans', system-ui, sans-serif; background: #020C1C; overflow-x: hidden; }
+        body { font-family: var(--font-body-new); background: #020C1C; overflow-x: hidden; }
         ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-thumb { background: rgba(201,168,76,0.3); border-radius: 2px; }
         @keyframes fadeUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
@@ -273,7 +273,7 @@ export default function CityPage() {
                 </span>
               ))}
             </div>
-            <h1 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "clamp(48px, 7vw, 80px)", fontWeight: 300, color: "#020C1C", lineHeight: 1.05, marginBottom: "10px", animation: "fadeUp 0.5s ease-out both" }}>
+            <h1 style={{ fontFamily: "var(--font-heading-new)", fontSize: "clamp(48px, 7vw, 80px)", fontWeight: 300, color: "#020C1C", lineHeight: 1.05, marginBottom: "10px", animation: "fadeUp 0.5s ease-out both" }}>
               {cfg.name}
             </h1>
             <p style={{ fontSize: "14px", color: "rgba(245,242,236,0.5)", marginBottom: "24px" }}>{cfg.state}, {cfg.country}</p>
@@ -296,7 +296,7 @@ export default function CityPage() {
             {/* Text */}
             <div>
               <Eyebrow label="About the City" />
-              <h2 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "clamp(28px, 3.5vw, 44px)", fontWeight: 400, color: "#020C1C", lineHeight: 1.2, marginBottom: "22px" }}>
+              <h2 style={{ fontFamily: "var(--font-heading-new)", fontSize: "clamp(28px, 3.5vw, 44px)", fontWeight: 400, color: "#020C1C", lineHeight: 1.2, marginBottom: "22px" }}>
                 Living in <em style={{ fontStyle: "italic", color: "#10C4C3" }}>{cfg.name}</em>
               </h2>
               <p style={{ fontSize: "14px", color: "#4B5563", lineHeight: 1.85, marginBottom: "24px" }}>{cfg.lifestyle}</p>
@@ -327,7 +327,7 @@ export default function CityPage() {
                 ].map(row => (
                   <div key={row.label} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "13px 0", borderBottom: "1px solid rgba(245,242,236,0.07)" }}>
                     <span style={{ fontSize: "12px", color: "rgba(245,242,236,0.45)" }}>{row.label}</span>
-                    <span style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "20px", fontWeight: 600, color: "#10C4C3" }}>{row.value}</span>
+                    <span style={{ fontFamily: "var(--font-support-new)", fontSize: "20px", fontWeight: 600, color: "#10C4C3" }}>{row.value}</span>
                   </div>
                 ))}
                 <a href={`/search?city=${encodeURIComponent(cfg.name)}`} style={{ display: "block", marginTop: "20px", padding: "12px", background: "#10C4C3", borderRadius: "9px", color: "#020C1C", fontSize: "12px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", textDecoration: "none", textAlign: "center" }}>
@@ -344,18 +344,18 @@ export default function CityPage() {
             <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", flexWrap: "wrap", gap: "16px", marginBottom: "28px" }}>
               <div>
                 <Eyebrow label="Available Now" />
-                <h2 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "clamp(28px, 3.5vw, 44px)", fontWeight: 400, color: "#020C1C" }}>
+                <h2 style={{ fontFamily: "var(--font-heading-new)", fontSize: "clamp(28px, 3.5vw, 44px)", fontWeight: 400, color: "#020C1C" }}>
                   Properties in {cfg.name}
                 </h2>
               </div>
               {/* Filters */}
               <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
                 {[["all", "All"], ["sale", "For Sale"], ["rent", "For Rent"]].map(([v, l]) => (
-                  <button key={v} onClick={() => setTypeFilter(v)} style={{ padding: "7px 16px", borderRadius: "100px", fontSize: "12px", fontWeight: 600, background: typeFilter === v ? "#020C1C" : "#fff", border: typeFilter === v ? "none" : "1.5px solid rgba(13,43,31,0.12)", color: typeFilter === v ? "#10C4C3" : "#6B7C72", cursor: "pointer", fontFamily: "'Cal Sans', sans-serif" }}>{l}</button>
+                  <button key={v} onClick={() => setTypeFilter(v)} style={{ padding: "7px 16px", borderRadius: "100px", fontSize: "12px", fontWeight: 600, background: typeFilter === v ? "#020C1C" : "#fff", border: typeFilter === v ? "none" : "1.5px solid rgba(13,43,31,0.12)", color: typeFilter === v ? "#10C4C3" : "#6B7C72", cursor: "pointer", fontFamily: "var(--font-body-new)" }}>{l}</button>
                 ))}
                 <div style={{ width: "1px", background: "rgba(13,43,31,0.1)", margin: "0 4px" }} />
                 {[["all", "Any Price"], ["under1", "Under ₹1Cr"], ["1-3", "₹1–3Cr"], ["above3", "₹3Cr+"]].map(([v, l]) => (
-                  <button key={v} onClick={() => setPriceFilter(v)} style={{ padding: "7px 16px", borderRadius: "100px", fontSize: "12px", fontWeight: 600, background: priceFilter === v ? "#10C4C3" : "#fff", border: priceFilter === v ? "none" : "1.5px solid rgba(13,43,31,0.12)", color: priceFilter === v ? "#020C1C" : "#6B7C72", cursor: "pointer", fontFamily: "'Cal Sans', sans-serif" }}>{l}</button>
+                  <button key={v} onClick={() => setPriceFilter(v)} style={{ padding: "7px 16px", borderRadius: "100px", fontSize: "12px", fontWeight: 600, background: priceFilter === v ? "#10C4C3" : "#fff", border: priceFilter === v ? "none" : "1.5px solid rgba(13,43,31,0.12)", color: priceFilter === v ? "#020C1C" : "#6B7C72", cursor: "pointer", fontFamily: "var(--font-body-new)" }}>{l}</button>
                 ))}
               </div>
             </div>
@@ -374,11 +374,11 @@ export default function CityPage() {
             ) : filtered.length === 0 ? (
               <div style={{ padding: "60px", textAlign: "center", background: "#fff", borderRadius: "16px", border: "1px solid rgba(13,43,31,0.07)" }}>
                 {properties.length === 0 ? (
-                  <p style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "24px", color: "#020C1C", marginBottom: "8px" }}>No properties listed in {cfg.name} yet</p>
+                  <p style={{ fontFamily: "var(--font-heading-new)", fontSize: "24px", color: "#020C1C", marginBottom: "8px" }}>No properties listed in {cfg.name} yet</p>
                 ) : (
                   <>
-                    <p style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "24px", color: "#020C1C", marginBottom: "8px" }}>No properties match this filter</p>
-                    <button onClick={() => { setTypeFilter("all"); setPriceFilter("all"); }} style={{ fontSize: "13px", fontWeight: 600, color: "#10C4C3", background: "transparent", border: "none", cursor: "pointer", fontFamily: "'Cal Sans', sans-serif" }}>Clear filters</button>
+                    <p style={{ fontFamily: "var(--font-heading-new)", fontSize: "24px", color: "#020C1C", marginBottom: "8px" }}>No properties match this filter</p>
+                    <button onClick={() => { setTypeFilter("all"); setPriceFilter("all"); }} style={{ fontSize: "13px", fontWeight: 600, color: "#10C4C3", background: "transparent", border: "none", cursor: "pointer", fontFamily: "var(--font-body-new)" }}>Clear filters</button>
                   </>
                 )}
               </div>
@@ -403,7 +403,7 @@ export default function CityPage() {
         <section style={{ maxWidth: "1280px", margin: "0 auto", padding: "72px 48px" }}>
           <div style={{ textAlign: "center", marginBottom: "44px" }}>
             <Eyebrow label="Infrastructure" />
-            <h2 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "clamp(28px, 3.5vw, 44px)", fontWeight: 400, color: "#020C1C" }}>
+            <h2 style={{ fontFamily: "var(--font-heading-new)", fontSize: "clamp(28px, 3.5vw, 44px)", fontWeight: 400, color: "#020C1C" }}>
               Amenities & Infrastructure
             </h2>
           </div>
@@ -411,7 +411,7 @@ export default function CityPage() {
             {AMENITY_CATS.map(cat => (
               <div key={cat.label} style={{ background: "#fff", border: "1px solid rgba(13,43,31,0.07)", borderRadius: "16px", padding: "24px 20px" }}>
                 <div style={{ fontSize: "26px", marginBottom: "12px" }}>{cat.icon}</div>
-                <h4 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "19px", fontWeight: 600, color: "#020C1C", marginBottom: "14px" }}>{cat.label}</h4>
+                <h4 style={{ fontFamily: "var(--font-heading-new)", fontSize: "19px", fontWeight: 600, color: "#020C1C", marginBottom: "14px" }}>{cat.label}</h4>
                 {cat.items.length > 0 ? (
                   <ul style={{ listStyle: "none", display: "flex", flexDirection: "column", gap: "8px" }}>
                     {cat.items.map(item => (
@@ -432,7 +432,7 @@ export default function CityPage() {
           <div style={{ maxWidth: "820px", margin: "0 auto" }}>
             <div style={{ textAlign: "center", marginBottom: "44px" }}>
               <Eyebrow label="Common Questions" />
-              <h2 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "clamp(28px, 3.5vw, 44px)", fontWeight: 400, color: "#020C1C" }}>
+              <h2 style={{ fontFamily: "var(--font-heading-new)", fontSize: "clamp(28px, 3.5vw, 44px)", fontWeight: 400, color: "#020C1C" }}>
                 {cfg.name} Property<br /><em style={{ fontStyle: "italic", color: "#10C4C3" }}>FAQs</em>
               </h2>
             </div>
@@ -447,7 +447,7 @@ export default function CityPage() {
           <div style={{ position: "absolute", inset: 0, backgroundImage: "linear-gradient(rgba(201,168,76,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(201,168,76,0.04) 1px, transparent 1px)", backgroundSize: "52px 52px", pointerEvents: "none" }} />
           <div style={{ position: "absolute", inset: 0, background: "radial-gradient(ellipse 60% 55% at 50% 110%, rgba(201,168,76,0.1) 0%, transparent 55%)", pointerEvents: "none" }} />
           <div style={{ position: "relative", zIndex: 2, maxWidth: "660px", margin: "0 auto", textAlign: "center" }}>
-            <h2 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "clamp(34px, 5vw, 56px)", fontWeight: 300, color: "#020C1C", lineHeight: 1.15, marginBottom: "16px" }}>
+            <h2 style={{ fontFamily: "var(--font-heading-new)", fontSize: "clamp(34px, 5vw, 56px)", fontWeight: 300, color: "#020C1C", lineHeight: 1.15, marginBottom: "16px" }}>
               Find Your Home<br /><em style={{ fontStyle: "italic", color: "#10C4C3" }}>in {cfg.name}</em>
             </h2>
             <p style={{ fontSize: "15px", color: "rgba(245,242,236,0.5)", lineHeight: 1.75, marginBottom: "36px" }}>
@@ -470,8 +470,8 @@ export default function CityPage() {
           <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
             <div className="loc-footer-grid" style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1fr 1fr", gap: "48px", paddingBottom: "56px", borderBottom: "1px solid rgba(245,242,236,0.06)" }}>
               <div>
-                <div style={{ fontFamily: "'Cal Sans', sans-serif", fontSize: "18px", fontWeight: 600, color: "#fff", letterSpacing: "0.16em", marginBottom: "14px" }}>Nilay 360 <span style={{ color: "#10C4C3" }}>·</span></div>
-                <p style={{ fontSize: "13px", color: "rgba(245,242,236,0.35)", lineHeight: 1.75, maxWidth: "280px", marginBottom: "22px" }}>India's most trusted premium real estate platform.</p>
+                <div style={{ fontFamily: "var(--font-support-new)", fontSize: "18px", fontWeight: 600, color: "#fff", letterSpacing: "0.16em", marginBottom: "14px" }}>Nilay 360 <span style={{ color: "#10C4C3" }}>·</span></div>
+                <p style={{ fontSize: "13px", color: "rgba(245,242,236,0.35)", lineHeight: 1.75, maxWidth: "280px", marginBottom: "22px" }}>India's premium real estate platform connecting discerning buyers with exceptional properties.</p>
                 <div style={{ display: "flex", gap: "10px" }}>
                   {[
                     { s: "IN", href: "https://www.instagram.com/nilay360_/" },
@@ -485,8 +485,8 @@ export default function CityPage() {
               {[
                 { heading: "Properties", links: [["Buy","/buy"],["Rent","/rent"],["New Projects","/new-projects"],["Commercial","/commercial"],["Builders","/builders"],["Blog","/blog"]] },
                 { heading: "Company",    links: [["About Us","/about"],["Our Agents","/agents"],["NRI Services","/nri"],["Careers","/careers"],["Contact","/contact"]] },
-                { heading: "Tools",      links: [["EMI Calculator","/calculator"],["Compare","/compare"],["Search","/search"],["RERA Guide","/legal-guide"]] },
-                { heading: "Legal",      links: [["Privacy Policy","/privacy"],["Terms of Service","/terms"],["Cookie Policy","/cookies"],["RERA Guide","/legal-guide"]] },
+                { heading: "Tools",      links: [["EMI Calculator","/calculator"],["Compare","/compare"],["Search","/search"],["RERA Guide","/legal-guide"],["Safety Guide","/safety-guide"]] },
+                { heading: "Legal",      links: [["Privacy Policy","/privacy"],["Terms of Service","/terms"],["Cookie Policy","/cookies"],["RERA Guide","/legal-guide"],["Agent Terms","/agent-terms"],["Grievance Redressal","/grievance-redressal"]] },
               ].map(col => (
                 <div key={col.heading}>
                   <h4 style={{ fontSize: "11px", fontWeight: 700, letterSpacing: "0.16em", color: "rgba(245,242,236,0.3)", textTransform: "uppercase", marginBottom: "18px" }}>{col.heading}</h4>
@@ -498,7 +498,6 @@ export default function CityPage() {
             </div>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "22px 0", flexWrap: "wrap", gap: "12px" }}>
               <p style={{ fontSize: "12px", color: "rgba(245,242,236,0.2)" }}>© 2025 Nilay 360. All rights reserved.</p>
-              <span style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.1em", padding: "4px 10px", background: "rgba(201,168,76,0.08)", border: "1px solid rgba(201,168,76,0.15)", borderRadius: "4px", color: "rgba(201,168,76,0.5)" }}>RERA COMPLIANT</span>
             </div>
           </div>
         </footer>

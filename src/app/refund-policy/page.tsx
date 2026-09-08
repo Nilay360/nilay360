@@ -19,7 +19,7 @@ export default function RefundPolicyPage() {
           { h:"6. Contact", b:"For any billing question, write to billing@nilay360.com or reach us through the Contact page. We aim to respond within 2 business days." },
         ].map(s => (
           <div key={s.h} style={{ marginBottom:28 }}>
-            <h3 style={{ fontFamily:"'Cal Sans',Georgia,serif", fontSize:22, fontWeight:700, color:"#020C1C", marginBottom:8 }}>{s.h}</h3>
+            <h3 style={{ fontFamily:"var(--font-heading-new)", fontSize:22, fontWeight:700, color:"#020C1C", marginBottom:8 }}>{s.h}</h3>
             <p style={{ fontSize:15, color:"#555", lineHeight:1.75 }}>{s.b}</p>
           </div>
         ))}

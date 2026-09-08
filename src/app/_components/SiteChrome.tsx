@@ -9,8 +9,6 @@ const NAV = [
   ["Commercial","/commercial"],["Builders","/builders"],["Agents","/agents"],["Blog","/blog"],
 ];
 
-const FONTS = "https://cdn.jsdelivr.net/npm/cal-sans@1.0.1/index.css";
-
 export function Navbar() {
   return (
     <nav className="sc-nav" style={{ position:"fixed", top:0, left:0, right:0, zIndex:200, height:60, display:"flex", alignItems:"center", justifyContent:"space-between", padding:"0 40px", background:"rgba(0,0,0,0.96)", backdropFilter:"blur(20px)", borderBottom:"0.5px solid rgba(16,196,195,0.15)" }}>
@@ -37,8 +35,8 @@ export function Footer() {
   const cols = [
     { heading:"Properties", links:[["Buy","/buy"],["Rent","/rent"],["New Projects","/new-projects"],["Commercial","/commercial"],["Builders","/builders"],["Blog","/blog"]] },
     { heading:"Company",    links:[["About Us","/about"],["Our Agents","/agents"],["NRI Services","/nri"],["Careers","/careers"],["Press","/press"],["Contact","/contact"]] },
-    { heading:"Tools",      links:[["EMI Calculator","/calculator"],["Investment Calc","/investment-calculator"],["Compare","/compare"],["Search","/search"],["RERA Guide","/legal-guide"]] },
-    { heading:"Legal",      links:[["Privacy Policy","/privacy"],["Terms of Service","/terms"],["Cookie Policy","/cookies"],["Refund Policy","/refund-policy"]] },
+    { heading:"Tools",      links:[["EMI Calculator","/calculator"],["Investment Calc","/investment-calculator"],["Compare","/compare"],["Search","/search"],["RERA Guide","/legal-guide"],["Safety Guide","/safety-guide"]] },
+    { heading:"Legal",      links:[["Privacy Policy","/privacy"],["Terms of Service","/terms"],["Cookie Policy","/cookies"],["Refund Policy","/refund-policy"],["Agent Terms","/agent-terms"],["Grievance Redressal","/grievance-redressal"]] },
   ];
   return (
     <footer className="sc-footer" style={{ background:"#020C1C", padding:"56px 56px 28px", color:"rgba(255,255,255,0.55)" }}>
@@ -91,8 +89,7 @@ export function PageShell({
 }) {
   return (
     <>
-      <link rel="stylesheet" href={FONTS} />
-      <style>{`*{box-sizing:border-box;margin:0;padding:0}body{font-family:'Cal Sans',system-ui,sans-serif;background:#020C1C;color:#FFFFFF}a{text-decoration:none;color:inherit}@media(max-width:820px){.nv-center{display:none!important}}@media(max-width:768px){.sc-nav{padding:0 16px!important}.sc-nav-actions{gap:8px!important}.sc-hero{padding:90px 16px 48px!important}.sc-body{padding:32px 16px!important}.sc-bullets{grid-template-columns:1fr!important;gap:12px!important}.sc-cta-banner{padding:28px 20px!important;flex-direction:column!important;gap:16px!important}.sc-footer{padding:48px 16px 24px!important}.sc-footer-grid{grid-template-columns:1fr 1fr!important;gap:28px!important}.sc-footer-bottom{flex-direction:column!important;text-align:center!important;gap:8px!important}}@media(max-width:480px){.sc-footer-grid{grid-template-columns:1fr!important}.sc-bullets{grid-template-columns:1fr!important}}`}</style>
+      <style>{`*{box-sizing:border-box;margin:0;padding:0}body{font-family:var(--font-body-new);background:#020C1C;color:#FFFFFF}a{text-decoration:none;color:inherit}@media(max-width:820px){.nv-center{display:none!important}}@media(max-width:768px){.sc-nav{padding:0 16px!important}.sc-nav-actions{gap:8px!important}.sc-hero{padding:90px 16px 48px!important}.sc-body{padding:32px 16px!important}.sc-bullets{grid-template-columns:1fr!important;gap:12px!important}.sc-cta-banner{padding:28px 20px!important;flex-direction:column!important;gap:16px!important}.sc-footer{padding:48px 16px 24px!important}.sc-footer-grid{grid-template-columns:1fr 1fr!important;gap:28px!important}.sc-footer-bottom{flex-direction:column!important;text-align:center!important;gap:8px!important}}@media(max-width:480px){.sc-footer-grid{grid-template-columns:1fr!important}.sc-bullets{grid-template-columns:1fr!important}}`}</style>
       <Navbar />
 
       {/* Hero */}
@@ -106,7 +103,7 @@ export function PageShell({
             </div>
           )}
           {eyebrow && <div style={{ fontSize:11, color:"#10C4C3", fontWeight:700, letterSpacing:"0.2em", textTransform:"uppercase", marginBottom:14 }}>{eyebrow}</div>}
-          <h1 style={{ fontFamily:"'Cal Sans',Georgia,serif", fontSize:"clamp(40px,5vw,60px)", fontWeight:300, color:"#fff", lineHeight:1.05, letterSpacing:"-0.01em" }}>
+          <h1 style={{ fontFamily:"var(--font-heading-new)", fontSize:"clamp(40px,5vw,60px)", fontWeight:300, color:"#fff", lineHeight:1.05, letterSpacing:"-0.01em" }}>
             {title}
             {italic && <em style={{ display:"block", color:"#3DDAD9", fontStyle:"italic", fontWeight:400 }}>{italic}</em>}
           </h1>
@@ -125,7 +122,7 @@ export function PageShell({
                   <div style={{ width:40, height:40, borderRadius:10, background:"rgba(16,196,195,0.08)", display:"flex", alignItems:"center", justifyContent:"center", marginBottom:14 }}>
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#10C4C3" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                   </div>
-                  <h3 style={{ fontFamily:"'Cal Sans',Georgia,serif", fontSize:20, fontWeight:700, color:"#FFFFFF", marginBottom:8 }}>{b.t}</h3>
+                  <h3 style={{ fontFamily:"var(--font-heading-new)", fontSize:20, fontWeight:700, color:"#FFFFFF", marginBottom:8 }}>{b.t}</h3>
                   <p style={{ fontSize:14, color:"rgba(255,255,255,0.6)", lineHeight:1.7 }}>{b.d}</p>
                 </div>
               ))}
@@ -135,7 +132,7 @@ export function PageShell({
           {/* Never dead-end: always links back */}
           <div className="sc-cta-banner" style={{ marginTop:48, padding:"36px 40px", background:"linear-gradient(135deg, #0A1526 0%, #111F33 100%)", borderRadius:16, display:"flex", justifyContent:"space-between", alignItems:"center", flexWrap:"wrap", gap:20 }}>
             <div>
-              <h3 style={{ fontFamily:"'Cal Sans',Georgia,serif", fontSize:24, fontWeight:600, color:"#FFFFFF", marginBottom:6 }}>Looking for something now?</h3>
+              <h3 style={{ fontFamily:"var(--font-heading-new)", fontSize:24, fontWeight:600, color:"#FFFFFF", marginBottom:6 }}>Looking for something now?</h3>
               <p style={{ fontSize:14, color:"rgba(255,255,255,0.6)" }}>Browse live listings or talk to a Nilay 360 property expert.</p>
             </div>
             <div style={{ display:"flex", gap:12, flexWrap:"wrap" }}>

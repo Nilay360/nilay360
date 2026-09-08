@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { recordConsent } from '@/lib/consent'
 
 function adminClient() {
   return createClient(
@@ -110,6 +111,17 @@ export async function POST(req: NextRequest) {
         whatsapp:    whatsapp ? fullPhone : null,
       })
       if (upsertErr) console.error('Profile upsert error:', upsertErr)
+
+      // Consent capture — new registrations only, never on plain sign-in.
+      // The client already gated the checkboxes before this request was
+      // ever sent; this just records that agreement server-side. Non-fatal
+      // by design (see recordConsent) — never blocks account creation.
+      await recordConsent(supabase, {
+        userId,
+        context: 'registration',
+        ipAddress: req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || null,
+        userAgent: req.headers.get('user-agent'),
+      })
     }
 
     // ── Step 3: Mint a session token via generateLink ────────────────────────

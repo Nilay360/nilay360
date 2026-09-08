@@ -15,7 +15,7 @@ export default function SavedPage() {
       ]}
     >
       <div style={{ textAlign:"center", maxWidth:600, margin:"0 auto 8px" }}>
-        <h2 style={{ fontFamily:"'Cal Sans',Georgia,serif", fontSize:32, fontWeight:700, color:"#020C1C", marginBottom:14 }}>No saved properties yet</h2>
+        <h2 style={{ fontFamily:"var(--font-heading-new)", fontSize:32, fontWeight:700, color:"#020C1C", marginBottom:14 }}>No saved properties yet</h2>
         <p style={{ fontSize:15, color:"#666", lineHeight:1.7, marginBottom:24 }}>
           Sign in to see your wishlist, or start browsing and tap the heart on homes you love.
         </p>

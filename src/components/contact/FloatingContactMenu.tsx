@@ -206,7 +206,7 @@ export default function FloatingContactMenu() {
           border: 1px solid rgba(255,255,255,0.1);
           border-radius: 100px;
           cursor: pointer;
-          font-family: 'Cal Sans', sans-serif; font-size: 13px; font-weight: 600; color: #fff;
+          font-family: var(--font-body-new); font-size: 13px; font-weight: 600; color: #fff;
           text-decoration: none; white-space: nowrap;
           transition: border-color 0.15s, background 0.15s;
           box-shadow: 0 4px 16px rgba(0,0,0,0.4);
@@ -235,7 +235,7 @@ export default function FloatingContactMenu() {
           border: 1px solid rgba(255,255,255,0.12);
           border-radius: 10px;
           font-size: 13px; color: #fff;
-          font-family: 'Cal Sans', sans-serif;
+          font-family: var(--font-body-new);
           outline: none; width: 100%; box-sizing: border-box;
           transition: border-color 0.15s;
         }
@@ -361,7 +361,7 @@ export default function FloatingContactMenu() {
                 borderRadius: 18,
                 padding: "20px 20px 16px",
                 width: 272,
-                fontFamily: "'Cal Sans', sans-serif",
+                fontFamily: "var(--font-body-new)",
                 boxShadow: "0 8px 32px rgba(0,0,0,0.5)",
               }}
             >
@@ -413,7 +413,7 @@ export default function FloatingContactMenu() {
                   <button
                     type="submit"
                     disabled={submitting}
-                    style={{ padding: "11px 16px", background: submitting ? "rgba(16,196,195,0.45)" : "#10C4C3", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, color: "#000", letterSpacing: "0.05em", cursor: submitting ? "not-allowed" : "pointer", fontFamily: "'Cal Sans', sans-serif", marginTop: 2, transition: "background 0.15s" }}
+                    style={{ padding: "11px 16px", background: submitting ? "rgba(16,196,195,0.45)" : "#10C4C3", border: "none", borderRadius: 10, fontSize: 13, fontWeight: 700, color: "#000", letterSpacing: "0.05em", cursor: submitting ? "not-allowed" : "pointer", fontFamily: "var(--font-body-new)", marginTop: 2, transition: "background 0.15s" }}
                   >
                     {submitting ? "Sending…" : "Request Callback"}
                   </button>

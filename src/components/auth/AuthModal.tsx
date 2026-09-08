@@ -148,6 +148,8 @@ function AuthModalInner({
     full_name: "", phone: "", email: "", city: CITIES[0], rera: "", agency: "",
   });
   const [whatsappOptIn, setWhatsappOptIn] = useState(true);
+  const [agreeTerms, setAgreeTerms] = useState(false);
+  const [agreePrivacy, setAgreePrivacy] = useState(false);
   const [reOtp, setReOtp] = useState<string[]>(["", "", "", "", "", ""]);
   const [agentPending, setAgentPending] = useState(false);
   const [reSuccess, setReSuccess] = useState(false);
@@ -293,6 +295,8 @@ function AuthModalInner({
       setError("RERA Registration Number is required for agent accounts.");
       return;
     }
+    if (!agreeTerms) { setError("Please agree to the Terms of Service to continue."); return; }
+    if (!agreePrivacy) { setError("Please agree to the Privacy Policy to continue."); return; }
     setLoading(true);
     const ok = await sendOtp(reForm.phone);
     setLoading(false);
@@ -333,7 +337,7 @@ function AuthModalInner({
 
       // Exchange the server-issued token_hash for a real Supabase session
       const supabase = createClient();
-      const { error: sessionErr } = await supabase.auth.verifyOtp({
+      const { data: sessionData, error: sessionErr } = await supabase.auth.verifyOtp({
         token_hash: data.token_hash,
         type: data.type,
       });
@@ -341,6 +345,33 @@ function AuthModalInner({
         setError("Something went wrong completing sign-in. Please try again.");
         setLoading(false);
         return;
+      }
+
+      // Migrations 052/053 — create the agent_profiles row (rera_number +
+      // status:'pending') right here at signup time, before it existed at
+      // all until become-an-agent was separately submitted. Non-fatal, same
+      // discipline as recordConsent() (src/lib/consent.ts): never blocks the
+      // signup flow — a failure here is logged loudly and the existing
+      // notify-admin-agent email below still fires as a fallback
+      // notification path, same as today.
+      if (accountType === "agent") {
+        const newUserId = sessionData?.user?.id ?? sessionData?.session?.user?.id ?? null;
+        if (newUserId) {
+          try {
+            const { error: agentProfileErr } = await supabase.from("agent_profiles").insert({
+              user_id: newUserId,
+              rera_number: reForm.rera,
+              status: "pending",
+            });
+            if (agentProfileErr) {
+              console.error(`[agent_profiles] Failed to create agent_profiles row at signup for user ${newUserId}:`, agentProfileErr);
+            }
+          } catch (err) {
+            console.error(`[agent_profiles] Unexpected error creating agent_profiles row at signup for user ${newUserId}:`, err);
+          }
+        } else {
+          console.error("[agent_profiles] No user id available after OTP verification — could not create agent_profiles row for agent signup.");
+        }
       }
 
       // Notify admin for agent applications (non-blocking)
@@ -577,6 +608,22 @@ function AuthModalInner({
 
                 <label className="am-check">
                   <input
+                    type="checkbox" checked={agreeTerms}
+                    onChange={(e) => setAgreeTerms(e.target.checked)}
+                  />
+                  <span>I agree to the <a href="/terms" target="_blank" rel="noopener noreferrer" style={{ color: GOLD }}>Terms of Service</a></span>
+                </label>
+
+                <label className="am-check">
+                  <input
+                    type="checkbox" checked={agreePrivacy}
+                    onChange={(e) => setAgreePrivacy(e.target.checked)}
+                  />
+                  <span>I agree to the <a href="/privacy" target="_blank" rel="noopener noreferrer" style={{ color: GOLD }}>Privacy Policy</a></span>
+                </label>
+
+                <label className="am-check">
+                  <input
                     type="checkbox" checked={whatsappOptIn}
                     onChange={(e) => setWhatsappOptIn(e.target.checked)}
                   />
@@ -695,7 +742,7 @@ const styles = `
     display: flex; align-items: center; justify-content: center;
     padding: 24px;
     animation: amOverlayIn 0.2s ease;
-    font-family: 'Cal Sans', system-ui, sans-serif;
+    font-family: var(--font-body-new);
   }
   .am-card {
     position: relative;
@@ -730,7 +777,7 @@ const styles = `
   .am-tab {
     flex: 1; padding: 9px 0; border: none; cursor: pointer;
     background: transparent; border-radius: 7px;
-    font-family: 'Cal Sans', sans-serif; font-size: 13px; font-weight: 600;
+    font-family: var(--font-body-new); font-size: 13px; font-weight: 600;
     letter-spacing: 0.04em; color: rgba(245,242,236,0.5);
     transition: background 0.18s, color 0.18s;
   }
@@ -740,7 +787,7 @@ const styles = `
   .am-step { animation: amStepIn 0.22s ease; }
 
   .am-title {
-    font-family: 'Cal Sans', Georgia, serif;
+    font-family: var(--font-heading-new);
     font-size: 30px; font-weight: 500; line-height: 1.1;
     color: #FFFFFF; margin: 0 0 6px;
   }
@@ -759,7 +806,7 @@ const styles = `
     background: rgba(255,255,255,0.04);
     border: 1.5px solid rgba(255,255,255,0.12);
     border-radius: 9px;
-    font-family: 'Cal Sans', sans-serif; font-size: 14px; color: #F5F2EC;
+    font-family: var(--font-body-new); font-size: 14px; color: #F5F2EC;
     outline: none; transition: border-color 0.18s, box-shadow 0.18s;
     -webkit-appearance: none;
   }
@@ -781,7 +828,7 @@ const styles = `
     text-align: center; font-size: 22px; font-weight: 600;
     color: #F5F2EC; background: rgba(255,255,255,0.04);
     border: 1.5px solid rgba(255,255,255,0.14); border-radius: 10px;
-    outline: none; font-family: 'Cal Sans', sans-serif;
+    outline: none; font-family: var(--font-body-new);
     transition: border-color 0.15s, box-shadow 0.15s;
   }
   .am-otp-box:focus { border-color: ${GOLD}; box-shadow: 0 0 0 3px rgba(16,196,195,0.16); }
@@ -789,7 +836,7 @@ const styles = `
   .am-btn-gold {
     width: 100%; padding: 13px 24px; margin-top: 4px;
     background: ${GOLD}; border: none; border-radius: 9px;
-    font-family: 'Cal Sans', sans-serif; font-size: 14px; font-weight: 700;
+    font-family: var(--font-body-new); font-size: 14px; font-weight: 700;
     letter-spacing: 0.04em; color: #0A1526; cursor: pointer;
     transition: background 0.18s, transform 0.12s, box-shadow 0.18s;
   }
@@ -804,7 +851,7 @@ const styles = `
     width: 100%; padding: 12px 24px;
     background: #fff; border: 1px solid rgba(255,255,255,0.2); border-radius: 9px;
     display: flex; align-items: center; justify-content: center; gap: 10px;
-    font-family: 'Cal Sans', sans-serif; font-size: 14px; font-weight: 500;
+    font-family: var(--font-body-new); font-size: 14px; font-weight: 500;
     color: #1a1a1a; cursor: pointer; transition: box-shadow 0.18s, transform 0.12s;
   }
   .am-btn-google:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.3); transform: translateY(-1px); }
@@ -818,7 +865,7 @@ const styles = `
 
   .am-resend { text-align: center; font-size: 13px; color: rgba(245,242,236,0.5); margin: 16px 0 0; }
   .am-resend-wait { color: rgba(245,242,236,0.35); }
-  .am-resend-link { background: none; border: none; cursor: pointer; color: ${GOLD}; font-weight: 600; font-size: 13px; font-family: 'Cal Sans', sans-serif; }
+  .am-resend-link { background: none; border: none; cursor: pointer; color: ${GOLD}; font-weight: 600; font-size: 13px; font-family: var(--font-body-new); }
   .am-resend-link:hover { text-decoration: underline; }
 
   .am-role {

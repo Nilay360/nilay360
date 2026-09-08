@@ -21,6 +21,15 @@ interface FloorPlanRow {
 // must not label it "Bedrooms" / "X BHK".
 const COMMERCIAL_CATEGORIES = ["office", "retail", "warehouse"];
 
+// Optional preference fields on the contact form (Property Matching, Phase 10).
+// Reuses the exact same real category/city lists post-property/edit/[id]/page.tsx
+// already uses for property_category/city — not a separate invented list — so a
+// visitor's stated preference can only ever match a value that actually appears
+// on real listings.
+const PREFERENCE_CATEGORIES = ["apartment", "villa", "plot", "office", "retail", "penthouse", "townhouse", "warehouse"];
+const PREFERENCE_CITIES = ["Hyderabad", "Mumbai", "Bengaluru", "Delhi NCR", "Chennai", "Pune", "Kolkata", "Ahmedabad"];
+const PREFERENCE_BHK_OPTIONS = ["1", "2", "3", "4", "5", "5+"];
+
 // Quick-select presets for the contact form's message field — proposed wording,
 // pending confirmation. "other" leaves the field blank for free text.
 type ContactMsgType = "interested" | "visit" | "pricing" | "details" | "other";
@@ -370,7 +379,7 @@ const VISIT_SLOTS = [
 function SectionHeading({ children }: { children: React.ReactNode }) {
   return (
     <div style={{ marginBottom: "24px" }}>
-      <h2 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "26px", fontWeight: 500, color: "#FFFFFF", lineHeight: 1.2, marginBottom: "8px" }}>{children}</h2>
+      <h2 style={{ fontFamily: "var(--font-heading-new)", fontSize: "26px", fontWeight: 500, color: "#FFFFFF", lineHeight: 1.2, marginBottom: "8px" }}>{children}</h2>
       <div style={{ width: "36px", height: "2px", background: "#10C4C3", borderRadius: "1px" }} />
     </div>
   );
@@ -401,7 +410,7 @@ function SimilarCard({ p }: { p: Property }) {
           </span>
         </div>
         <div style={{ padding: "16px" }}>
-          <div style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "18px", fontWeight: 600, color: "#10C4C3", marginBottom: "6px" }}>{formatPrice(p.price, p.listing_type)}</div>
+          <div style={{ fontFamily: "var(--font-support-new)", fontSize: "18px", fontWeight: 600, color: "#10C4C3", marginBottom: "6px" }}>{formatPrice(p.price, p.listing_type)}</div>
           <div style={{ fontSize: "13px", fontWeight: 500, color: "#FFFFFF", marginBottom: "4px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{p.title}</div>
           <div style={{ fontSize: "11px", color: "#A9B4C2" }}>{p.neighbourhood ? `${p.neighbourhood}, ` : ""}{p.city}</div>
           <div style={{ display: "flex", gap: "12px", marginTop: "10px", paddingTop: "10px", borderTop: "1px solid rgba(255,255,255,0.08)" }}>
@@ -432,7 +441,7 @@ function LockedPropertyPreview({
     <>
       <style>{`
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'Cal Sans', system-ui, sans-serif; background: #020C1C; color: #FFFFFF; overflow-x: hidden; }
+        body { font-family: var(--font-body-new); background: #020C1C; color: #FFFFFF; overflow-x: hidden; }
         .pd-lock-btn { transition: background 0.2s, box-shadow 0.2s, transform 0.2s; }
         .pd-lock-btn:hover { background: #3DDAD9 !important; transform: translateY(-1px); }
         @media (max-width: 480px) {
@@ -456,7 +465,7 @@ function LockedPropertyPreview({
             <span style={{ padding: "6px 14px", borderRadius: "100px", fontSize: "11px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", background: property.listing_type === "rent" ? "rgba(11,13,16,0.85)" : "rgba(16,196,195,0.92)", color: property.listing_type === "rent" ? "#10C4C3" : "#020C1C", border: property.listing_type === "rent" ? "1px solid rgba(16,196,195,0.5)" : "none", marginBottom: "16px" }}>
               {property.listing_type === "rent" ? "For Rent" : "For Sale"}
             </span>
-            <div className="pd-lock-price" style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "36px", fontWeight: 700, color: "#10C4C3", marginBottom: "8px" }}>
+            <div className="pd-lock-price" style={{ fontFamily: "var(--font-support-new)", fontSize: "36px", fontWeight: 700, color: "#10C4C3", marginBottom: "8px" }}>
               {formatPrice(property.price, property.listing_type)}
             </div>
             <div style={{ fontSize: "14px", color: "#A9B4C2", marginBottom: "18px" }}>
@@ -481,7 +490,7 @@ function LockedPropertyPreview({
               <div style={{ width: "48px", height: "48px", borderRadius: "50%", background: "rgba(16,196,195,0.12)", border: "1px solid rgba(16,196,195,0.3)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 18px" }}>
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10C4C3" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>
               </div>
-              <div style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "22px", fontWeight: 600, color: "#FFFFFF", marginBottom: "8px" }}>
+              <div style={{ fontFamily: "var(--font-heading-new)", fontSize: "22px", fontWeight: 600, color: "#FFFFFF", marginBottom: "8px" }}>
                 Sign In to View Full Details
               </div>
               <p style={{ fontSize: "13px", color: "#A9B4C2", lineHeight: 1.6, marginBottom: "24px" }}>
@@ -490,7 +499,7 @@ function LockedPropertyPreview({
               <button
                 onClick={onSignIn}
                 className="pd-lock-btn"
-                style={{ width: "100%", padding: "13px", background: "#10C4C3", border: "none", borderRadius: "16px", boxShadow: "0 10px 30px rgba(30,167,255,.35)", color: "#020C1C", fontSize: "13px", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", cursor: "pointer", fontFamily: "'Cal Sans', sans-serif" }}
+                style={{ width: "100%", padding: "13px", background: "#10C4C3", border: "none", borderRadius: "16px", boxShadow: "0 10px 30px rgba(30,167,255,.35)", color: "#020C1C", fontSize: "13px", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", cursor: "pointer", fontFamily: "var(--font-body-new)" }}
               >
                 Sign In to View Full Details
               </button>
@@ -538,6 +547,17 @@ export default function PropertyDetailClient() {
   const [contactSubmitting, setContactSubmitting] = useState(false);
   const [contactError, setContactError] = useState<string | null>(null);
   const [contactFieldErrors, setContactFieldErrors] = useState<{ name?: string; email?: string; phone?: string }>({});
+  // Optional preference fields (Property Matching, Phase 10) — collapsed by
+  // default so a visitor who just wants a quick callback isn't forced through
+  // them. All blank/unset until the visitor opts in; never defaulted to a
+  // guessed value.
+  const [showPreferences, setShowPreferences] = useState(false);
+  const [prefBudgetMin, setPrefBudgetMin] = useState("");
+  const [prefBudgetMax, setPrefBudgetMax] = useState("");
+  const [prefBhk, setPrefBhk] = useState("");
+  const [prefLocality, setPrefLocality] = useState("");
+  const [prefCity, setPrefCity] = useState("");
+  const [prefPropertyType, setPrefPropertyType] = useState("");
 
   // EMI calculator state
   const [downPct, setDownPct] = useState(20);
@@ -566,8 +586,8 @@ export default function PropertyDetailClient() {
   const [visitDone, setVisitDone] = useState(false);
   const [visitError, setVisitError] = useState<string | null>(null);
 
-  const [prevProperty, setPrevProperty] = useState<{slug:string, title:string, price:number, images:string[]} | null>(null);
-  const [nextProperty, setNextProperty] = useState<{slug:string, title:string, price:number, images:string[]} | null>(null);
+  const [prevProperty, setPrevProperty] = useState<{slug:string, title:string, price:number, photo_urls:string[]} | null>(null);
+  const [nextProperty, setNextProperty] = useState<{slug:string, title:string, price:number, photo_urls:string[]} | null>(null);
 
   // Contact form: this page is sign-in gated, so the account's verified phone
   // is already known — pre-fill it and lock the field rather than trust a
@@ -604,7 +624,42 @@ export default function PropertyDetailClient() {
       if (row.status !== "active") {
         const { data: { session } } = await supabase.auth.getSession();
         const userEmail = session?.user?.email ?? null;
-        if (!userEmail || userEmail !== row.seller_email) {
+        const uid = session?.user?.id ?? null;
+        const isSeller = !!userEmail && userEmail === row.seller_email;
+
+        // Additive: also allow the approved agent assigned to a real lead
+        // referencing this exact property — mirrors migration 026's RLS
+        // logic (agent_profiles.status='approved' + inquiries.assigned_to),
+        // just re-expressed as a frontend query since this is this
+        // component's own display rule, not a database permission. 026
+        // already grants the underlying row visibility; without this, an
+        // assigned agent could load the row but still get bounced here.
+        // inquiries.property_id is untyped TEXT (no FK, no CREATE TABLE
+        // migration in-repo — see 026's own commentary), so no uuid cast
+        // is needed on this side: we're filtering that text column against
+        // a plain string literal (row.id), not joining it to a uuid column
+        // in SQL, so there's no operator-mismatch risk here.
+        let isAssignedAgent = false;
+        if (!isSeller && uid) {
+          const { data: myAgentProfile } = await supabase
+            .from("agent_profiles")
+            .select("id")
+            .eq("user_id", uid)
+            .eq("status", "approved")
+            .maybeSingle();
+          if (myAgentProfile) {
+            const { data: myAssignedInquiry } = await supabase
+              .from("inquiries")
+              .select("id")
+              .eq("property_id", String(row.id))
+              .eq("assigned_to", myAgentProfile.id)
+              .limit(1)
+              .maybeSingle();
+            isAssignedAgent = !!myAssignedInquiry;
+          }
+        }
+
+        if (!isSeller && !isAssignedAgent) {
           setNotFound(true);
           setLoading(false);
           return;
@@ -659,7 +714,7 @@ export default function PropertyDetailClient() {
       const supabase = createClient();
       const { data } = await supabase
         .from('property_listings')
-        .select('slug, title, price, images, created_at')
+        .select('slug, title, price, photo_urls, created_at')
         .eq('status', 'active')
         .order('created_at', { ascending: false });
 
@@ -773,6 +828,17 @@ export default function PropertyDetailClient() {
     setVisitError(null);
     const slotLabel = VISIT_SLOTS.find(s => s.id === visitSlot)?.label ?? visitSlot;
     const supabase = createClient();
+    // Re-check the session directly at submit time rather than trusting
+    // `user` from useAuth() — that hook's `loading` can flip to false
+    // via AuthContext's 5s safety timer before its own refreshAuth()
+    // call has actually set `user`, and this write shouldn't depend on
+    // winning or losing that race. auth.getUser() asks Supabase for the
+    // current session right now, independent of whatever React state
+    // happens to say.
+    const { data: { user: currentUser } } = await supabase.auth.getUser();
+    // TEMPORARY — diagnostic for the visitor_user_id-still-null report. Remove after confirming.
+    const authCheck = await supabase.auth.getUser();
+    console.log("VISIT SUBMIT — auth check:", authCheck.data?.user?.id, "| error:", authCheck.error?.message ?? "none");
     const { error } = await supabase.from("site_visits").insert({
       property_id:     property.id,
       property_slug:   property.slug,
@@ -783,6 +849,11 @@ export default function PropertyDetailClient() {
       visit_date:      visitDate,
       visit_time_slot: slotLabel,
       status:          "pending",
+      // 048 (live) — links this booking back to the logged-in user, if
+      // any, so it can show up in their own "My Appointments" view.
+      // null for a signed-out booking, same as every historical row —
+      // the INSERT policy (WITH CHECK (true)) already permits both.
+      visitor_user_id: currentUser?.id ?? null,
     });
     setVisitSubmitting(false);
     if (error) {
@@ -824,7 +895,7 @@ export default function PropertyDetailClient() {
       border: hasError ? "1px solid #F87171" : focused ? "1px solid #10C4C3" : "1px solid rgba(255,255,255,0.10)",
       borderRadius: "16px",
       fontSize: "13px", color: "#FFFFFF",
-      fontFamily: "'Cal Sans', sans-serif",
+      fontFamily: "var(--font-body-new)",
       outline: "none", transition: "border-color 0.15s, background 0.15s",
       marginBottom: "12px",
     };
@@ -857,6 +928,12 @@ export default function PropertyDetailClient() {
       message:        contactMsg || null,
       inquiry_type:   inquiryType,
       status:         "new",
+      budget_min:               prefBudgetMin.trim() ? Number(prefBudgetMin) : null,
+      budget_max:               prefBudgetMax.trim() ? Number(prefBudgetMax) : null,
+      bhk:                      prefBhk || null,
+      preferred_locality:       prefLocality.trim() || null,
+      preferred_city:           prefCity || null,
+      property_type_preference: prefPropertyType || null,
     });
     setContactSubmitting(false);
     if (error) {
@@ -894,7 +971,7 @@ export default function PropertyDetailClient() {
     <>
       <div style={{ minHeight: "100vh", background: "#020C1C", display: "flex", alignItems: "center", justifyContent: "center" }}>
         <div style={{ textAlign: "center" }}>
-          <div style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "28px", color: "#FFFFFF", opacity: 0.6, animation: "pulse 1.6s ease-in-out infinite" }}>Loading property…</div>
+          <div style={{ fontFamily: "var(--font-heading-new)", fontSize: "28px", color: "#FFFFFF", opacity: 0.6, animation: "pulse 1.6s ease-in-out infinite" }}>Loading property…</div>
         </div>
       </div>
     </>
@@ -904,7 +981,7 @@ export default function PropertyDetailClient() {
     <>
       <div style={{ minHeight: "100vh", background: "#020C1C", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "16px" }}>
         <div style={{ fontSize: "64px", opacity: 0.25, color: "#FFFFFF" }}>⌂</div>
-        <h1 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "40px", fontWeight: 300, color: "#FFFFFF" }}>Property Not Found</h1>
+        <h1 style={{ fontFamily: "var(--font-heading-new)", fontSize: "40px", fontWeight: 300, color: "#FFFFFF" }}>Property Not Found</h1>
         <p style={{ fontSize: "14px", color: "#A9B4C2" }}>This listing may have been removed or the URL is incorrect.</p>
         <a href="/properties" style={{ marginTop: "8px", padding: "12px 28px", background: "#10C4C3", borderRadius: "999px", color: "#020C1C", fontSize: "13px", fontWeight: 700, textDecoration: "none", letterSpacing: "0.08em", textTransform: "uppercase", boxShadow: "0 10px 30px rgba(30,167,255,.35)" }}>Browse Properties</a>
       </div>
@@ -942,14 +1019,14 @@ export default function PropertyDetailClient() {
         <button
           onClick={() => { if (navigator.share) { navigator.share({ title: property.title, url: window.location.href }); } else { navigator.clipboard.writeText(window.location.href); } }}
           className="pd-lb-btn"
-          style={{ display: "flex", alignItems: "center", gap: "7px", padding: "8px 16px", borderRadius: "999px", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.10)", color: "#fff", fontSize: "12px", fontWeight: 500, cursor: "pointer", fontFamily: "'Cal Sans', sans-serif", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)" }}
+          style={{ display: "flex", alignItems: "center", gap: "7px", padding: "8px 16px", borderRadius: "999px", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.10)", color: "#fff", fontSize: "12px", fontWeight: 500, cursor: "pointer", fontFamily: "var(--font-body-new)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)" }}
         >
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="18" cy="5" r="3" /><circle cx="6" cy="12" r="3" /><circle cx="18" cy="19" r="3" /><line x1="8.59" y1="13.51" x2="15.42" y2="17.49" /><line x1="15.41" y1="6.51" x2="8.59" y2="10.49" /></svg>
           Share
         </button>
         <button
           onClick={() => toggleSave(property.id)}
-          style={{ display: "flex", alignItems: "center", gap: "7px", padding: "8px 16px", borderRadius: "999px", background: savedIds.has(property.id) ? "rgba(16,196,195,0.15)" : "rgba(255,255,255,0.06)", border: savedIds.has(property.id) ? "1px solid rgba(16,196,195,0.5)" : "1px solid rgba(255,255,255,0.10)", color: savedIds.has(property.id) ? "#10C4C3" : "#fff", fontSize: "12px", fontWeight: 500, cursor: "pointer", fontFamily: "'Cal Sans', sans-serif", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", transition: "all 0.15s" }}
+          style={{ display: "flex", alignItems: "center", gap: "7px", padding: "8px 16px", borderRadius: "999px", background: savedIds.has(property.id) ? "rgba(16,196,195,0.15)" : "rgba(255,255,255,0.06)", border: savedIds.has(property.id) ? "1px solid rgba(16,196,195,0.5)" : "1px solid rgba(255,255,255,0.10)", color: savedIds.has(property.id) ? "#10C4C3" : "#fff", fontSize: "12px", fontWeight: 500, cursor: "pointer", fontFamily: "var(--font-body-new)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", transition: "all 0.15s" }}
         >
           <svg width="13" height="13" viewBox="0 0 24 24" fill={savedIds.has(property.id) ? "#10C4C3" : "none"} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" /></svg>
           {savedIds.has(property.id) ? "Saved" : "Save"}
@@ -989,14 +1066,14 @@ export default function PropertyDetailClient() {
         {user ? (
           <a
             href="/pricing"
-            style={{ display: "inline-flex", alignItems: "center", gap: "6px", padding: "9px 20px", borderRadius: "100px", fontSize: "12px", fontWeight: 700, letterSpacing: "0.03em", color: "#020C1C", background: "#10C4C3", textDecoration: "none", fontFamily: "'Cal Sans', sans-serif" }}
+            style={{ display: "inline-flex", alignItems: "center", gap: "6px", padding: "9px 20px", borderRadius: "100px", fontSize: "12px", fontWeight: 700, letterSpacing: "0.03em", color: "#020C1C", background: "#10C4C3", textDecoration: "none", fontFamily: "var(--font-body-new)" }}
           >
             Upgrade to Premium
           </a>
         ) : (
           <button
             onClick={() => openAuthModal("signin")}
-            style={{ display: "inline-flex", alignItems: "center", gap: "6px", padding: "9px 20px", borderRadius: "100px", fontSize: "12px", fontWeight: 700, letterSpacing: "0.03em", color: "#020C1C", background: "#10C4C3", border: "none", cursor: "pointer", fontFamily: "'Cal Sans', sans-serif" }}
+            style={{ display: "inline-flex", alignItems: "center", gap: "6px", padding: "9px 20px", borderRadius: "100px", fontSize: "12px", fontWeight: 700, letterSpacing: "0.03em", color: "#020C1C", background: "#10C4C3", border: "none", cursor: "pointer", fontFamily: "var(--font-body-new)" }}
           >
             Sign In to Unlock
           </button>
@@ -1009,7 +1086,7 @@ export default function PropertyDetailClient() {
     <>
       <style>{`
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'Cal Sans', system-ui, sans-serif; background: #020C1C; color: #FFFFFF; overflow-x: hidden; }
+        body { font-family: var(--font-body-new); background: #020C1C; color: #FFFFFF; overflow-x: hidden; }
         select { appearance: none; -webkit-appearance: none; }
         input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; }
         input[type=range] { -webkit-appearance: none; appearance: none; width: 100%; height: 4px; border-radius: 2px; background: rgba(255,255,255,0.12); outline: none; }
@@ -1071,7 +1148,7 @@ export default function PropertyDetailClient() {
                   <button
                     onClick={() => setLightboxOpen(true)}
                     className="pd-lb-btn"
-                    style={{ position: "absolute", bottom: "16px", left: "24px", display: "flex", alignItems: "center", gap: "7px", padding: "8px 16px", borderRadius: "999px", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.10)", color: "#fff", fontSize: "12px", fontWeight: 600, cursor: "pointer", fontFamily: "'Cal Sans', sans-serif", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)" }}
+                    style={{ position: "absolute", bottom: "16px", left: "24px", display: "flex", alignItems: "center", gap: "7px", padding: "8px 16px", borderRadius: "999px", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.10)", color: "#fff", fontSize: "12px", fontWeight: 600, cursor: "pointer", fontFamily: "var(--font-body-new)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)" }}
                   >
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2" /><circle cx="8.5" cy="8.5" r="1.5" /><polyline points="21 15 16 10 5 21" /></svg>
                     View All {images.length} Photos
@@ -1114,7 +1191,7 @@ export default function PropertyDetailClient() {
                 <button
                   onClick={() => setLightboxOpen(true)}
                   className="pd-lb-btn"
-                  style={{ position: "absolute", bottom: "100px", left: "24px", display: "flex", alignItems: "center", gap: "7px", padding: "8px 16px", borderRadius: "999px", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.10)", color: "#fff", fontSize: "12px", fontWeight: 600, cursor: "pointer", fontFamily: "'Cal Sans', sans-serif", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)" }}
+                  style={{ position: "absolute", bottom: "100px", left: "24px", display: "flex", alignItems: "center", gap: "7px", padding: "8px 16px", borderRadius: "999px", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.10)", color: "#fff", fontSize: "12px", fontWeight: 600, cursor: "pointer", fontFamily: "var(--font-body-new)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)" }}
                 >
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2" /><circle cx="8.5" cy="8.5" r="1.5" /><polyline points="21 15 16 10 5 21" /></svg>
                   View All {images.length} Photos
@@ -1165,7 +1242,7 @@ export default function PropertyDetailClient() {
                 <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "16px", marginBottom: "16px", flexWrap: "wrap" }}>
                   <div>
                     <div style={{ display: "flex", alignItems: "baseline", gap: "12px", marginBottom: "4px" }}>
-                      <span style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "42px", fontWeight: 600, color: "#10C4C3", lineHeight: 1 }}>
+                      <span style={{ fontFamily: "var(--font-support-new)", fontSize: "42px", fontWeight: 600, color: "#10C4C3", lineHeight: 1 }}>
                         {formatPrice(property.price, property.listing_type)}
                       </span>
                       {property.price_per_sqft && property.listing_type !== "rent" && (
@@ -1186,7 +1263,7 @@ export default function PropertyDetailClient() {
                   )}
                 </div>
 
-                <h1 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "32px", fontWeight: 500, color: "#FFFFFF", lineHeight: 1.2, marginBottom: "12px" }}>{property.title}</h1>
+                <h1 style={{ fontFamily: "var(--font-heading-new)", fontSize: "32px", fontWeight: 500, color: "#FFFFFF", lineHeight: 1.2, marginBottom: "12px" }}>{property.title}</h1>
 
                 <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "24px", flexWrap: "wrap" }}>
                   <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
@@ -1280,7 +1357,7 @@ export default function PropertyDetailClient() {
                             background: idx === activeFloorPlan ? "rgba(16,196,195,0.12)" : "transparent",
                             color: idx === activeFloorPlan ? "#10C4C3" : "#A9B4C2",
                             fontSize: "12.5px", fontWeight: idx === activeFloorPlan ? 700 : 500,
-                            cursor: "pointer", fontFamily: "'Cal Sans', sans-serif", whiteSpace: "nowrap",
+                            cursor: "pointer", fontFamily: "var(--font-body-new)", whiteSpace: "nowrap",
                             transition: "all 0.15s",
                           }}
                         >
@@ -1322,14 +1399,14 @@ export default function PropertyDetailClient() {
                         {user ? (
                           <a
                             href="/pricing"
-                            style={{ display: "inline-flex", alignItems: "center", gap: "6px", padding: "9px 20px", borderRadius: "100px", fontSize: "12px", fontWeight: 700, letterSpacing: "0.03em", color: "#020C1C", background: "#10C4C3", textDecoration: "none", fontFamily: "'Cal Sans', sans-serif" }}
+                            style={{ display: "inline-flex", alignItems: "center", gap: "6px", padding: "9px 20px", borderRadius: "100px", fontSize: "12px", fontWeight: 700, letterSpacing: "0.03em", color: "#020C1C", background: "#10C4C3", textDecoration: "none", fontFamily: "var(--font-body-new)" }}
                           >
                             Upgrade to Premium
                           </a>
                         ) : (
                           <button
                             onClick={() => openAuthModal("signin")}
-                            style={{ display: "inline-flex", alignItems: "center", gap: "6px", padding: "9px 20px", borderRadius: "100px", fontSize: "12px", fontWeight: 700, letterSpacing: "0.03em", color: "#020C1C", background: "#10C4C3", border: "none", cursor: "pointer", fontFamily: "'Cal Sans', sans-serif" }}
+                            style={{ display: "inline-flex", alignItems: "center", gap: "6px", padding: "9px 20px", borderRadius: "100px", fontSize: "12px", fontWeight: 700, letterSpacing: "0.03em", color: "#020C1C", background: "#10C4C3", border: "none", cursor: "pointer", fontFamily: "var(--font-body-new)" }}
                           >
                             Sign In to Unlock
                           </button>
@@ -1400,7 +1477,7 @@ export default function PropertyDetailClient() {
                       {/* Property price display */}
                       <div style={{ marginBottom: "20px" }}>
                         <div style={{ fontSize: "11px", fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase", color: "#A9B4C2", marginBottom: "8px" }}>Property Price</div>
-                        <div style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "24px", fontWeight: 600, color: "#FFFFFF" }}>{formatPrice(property.price, "sale")}</div>
+                        <div style={{ fontFamily: "var(--font-support-new)", fontSize: "24px", fontWeight: 600, color: "#FFFFFF" }}>{formatPrice(property.price, "sale")}</div>
                       </div>
 
                       {/* Down payment */}
@@ -1426,7 +1503,7 @@ export default function PropertyDetailClient() {
                         <div style={{ fontSize: "11px", fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase", color: "#A9B4C2", marginBottom: "8px" }}>Loan Tenure</div>
                         <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
                           {[10, 15, 20, 25, 30].map(y => (
-                            <button key={y} onClick={() => setTenure(y)} style={{ padding: "7px 14px", borderRadius: "8px", fontSize: "12px", fontWeight: 600, background: tenure === y ? "#10C4C3" : "rgba(255,255,255,0.06)", border: tenure === y ? "none" : "1px solid rgba(255,255,255,0.12)", color: tenure === y ? "#020C1C" : "#A9B4C2", cursor: "pointer", fontFamily: "'Cal Sans', sans-serif", transition: "all 0.15s" }}>{y}Y</button>
+                            <button key={y} onClick={() => setTenure(y)} style={{ padding: "7px 14px", borderRadius: "8px", fontSize: "12px", fontWeight: 600, background: tenure === y ? "#10C4C3" : "rgba(255,255,255,0.06)", border: tenure === y ? "none" : "1px solid rgba(255,255,255,0.12)", color: tenure === y ? "#020C1C" : "#A9B4C2", cursor: "pointer", fontFamily: "var(--font-body-new)", transition: "all 0.15s" }}>{y}Y</button>
                           ))}
                         </div>
                       </div>
@@ -1436,7 +1513,7 @@ export default function PropertyDetailClient() {
                     <div style={{ background: "#111F33", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "16px", padding: "28px", display: "flex", flexDirection: "column", justifyContent: "center", gap: "20px" }}>
                       <div style={{ textAlign: "center" }}>
                         <div style={{ fontSize: "11px", fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: "rgba(255,255,255,0.45)", marginBottom: "8px" }}>Monthly EMI</div>
-                        <div style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "38px", fontWeight: 600, color: "#10C4C3", lineHeight: 1 }}>
+                        <div style={{ fontFamily: "var(--font-support-new)", fontSize: "38px", fontWeight: 600, color: "#10C4C3", lineHeight: 1 }}>
                           {formatPrice(Math.round(emi), "rent").replace("/mo", "")}
                         </div>
                         <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.45)", marginTop: "4px" }}>per month</div>
@@ -1480,7 +1557,7 @@ export default function PropertyDetailClient() {
                 {/* Agent header */}
                 <div style={{ display: "flex", alignItems: "center", gap: "14px", marginBottom: "20px", paddingBottom: "20px", borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
                   <div style={{ width: "48px", height: "48px", borderRadius: "50%", background: "linear-gradient(135deg, #020C1C 0%, #111F33 100%)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                    <span style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "20px", color: "#10C4C3", fontWeight: 600 }}>N</span>
+                    <span style={{ fontFamily: "var(--font-body-new)", fontSize: "20px", color: "#10C4C3", fontWeight: 600 }}>N</span>
                   </div>
                   <div>
                     <div style={{ fontSize: "14px", fontWeight: 600, color: "#FFFFFF" }}>Nilay 360 Expert</div>
@@ -1545,7 +1622,7 @@ export default function PropertyDetailClient() {
                             key={opt.id}
                             type="button"
                             onClick={() => { setContactMsgType(opt.id); setContactMsg(opt.preset); }}
-                            style={{ padding: "5px 12px", borderRadius: "100px", fontSize: "11px", fontWeight: on ? 700 : 500, letterSpacing: "0.02em", background: on ? "#10C4C3" : "rgba(255,255,255,0.06)", color: on ? "#020C1C" : "#A9B4C2", border: on ? "1.5px solid #10C4C3" : "1.5px solid rgba(255,255,255,0.12)", cursor: "pointer", fontFamily: "'Cal Sans', sans-serif", transition: "all 0.14s" }}
+                            style={{ padding: "5px 12px", borderRadius: "100px", fontSize: "11px", fontWeight: on ? 700 : 500, letterSpacing: "0.02em", background: on ? "#10C4C3" : "rgba(255,255,255,0.06)", color: on ? "#020C1C" : "#A9B4C2", border: on ? "1.5px solid #10C4C3" : "1.5px solid rgba(255,255,255,0.12)", cursor: "pointer", fontFamily: "var(--font-body-new)", transition: "all 0.14s" }}
                           >
                             {opt.label}
                           </button>
@@ -1560,12 +1637,94 @@ export default function PropertyDetailClient() {
                       onFocus={() => setContactFocus("msg")}
                       onBlur={() => setContactFocus(null)}
                       rows={3}
-                      style={{ width: "100%", padding: "11px 14px", background: "rgba(255,255,255,0.06)", border: contactFocus === "msg" ? "1px solid #10C4C3" : "1px solid rgba(255,255,255,0.10)", borderRadius: "16px", fontSize: "13px", color: "#FFFFFF", fontFamily: "'Cal Sans', sans-serif", outline: "none", resize: "vertical", marginBottom: "14px" }}
+                      style={{ width: "100%", padding: "11px 14px", background: "rgba(255,255,255,0.06)", border: contactFocus === "msg" ? "1px solid #10C4C3" : "1px solid rgba(255,255,255,0.10)", borderRadius: "16px", fontSize: "13px", color: "#FFFFFF", fontFamily: "var(--font-body-new)", outline: "none", resize: "vertical", marginBottom: "14px" }}
                     />
+
+                    {/* Optional preferences — collapsed by default, never required */}
+                    {!showPreferences ? (
+                      <button
+                        type="button"
+                        onClick={() => setShowPreferences(true)}
+                        style={{ width: "100%", textAlign: "left", background: "none", border: "none", padding: "0 0 14px", color: "#10C4C3", fontSize: "12px", fontWeight: 600, cursor: "pointer", fontFamily: "var(--font-body-new)" }}
+                      >
+                        + Add your preferences (optional)
+                      </button>
+                    ) : (
+                      <div style={{ marginBottom: "14px" }}>
+                        <div style={{ fontSize: "11px", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "#A9B4C2", marginBottom: "8px" }}>
+                          Your Preferences <span style={{ opacity: 0.6, textTransform: "none", fontWeight: 500 }}>(optional)</span>
+                        </div>
+                        <div style={{ display: "flex", gap: "8px", marginBottom: "8px" }}>
+                          <input
+                            type="number"
+                            placeholder="Budget min (₹)"
+                            value={prefBudgetMin}
+                            onChange={e => setPrefBudgetMin(e.target.value)}
+                            style={{ ...inputStyle(contactFocus === "budgetMin"), marginBottom: 0 }}
+                            onFocus={() => setContactFocus("budgetMin")}
+                            onBlur={() => setContactFocus(null)}
+                          />
+                          <input
+                            type="number"
+                            placeholder="Budget max (₹)"
+                            value={prefBudgetMax}
+                            onChange={e => setPrefBudgetMax(e.target.value)}
+                            style={{ ...inputStyle(contactFocus === "budgetMax"), marginBottom: 0 }}
+                            onFocus={() => setContactFocus("budgetMax")}
+                            onBlur={() => setContactFocus(null)}
+                          />
+                        </div>
+                        <div style={{ display: "flex", gap: "6px", flexWrap: "wrap", marginBottom: "8px" }}>
+                          {PREFERENCE_BHK_OPTIONS.map(v => {
+                            const on = prefBhk === v;
+                            return (
+                              <button
+                                key={v}
+                                type="button"
+                                onClick={() => setPrefBhk(on ? "" : v)}
+                                style={{ padding: "5px 12px", borderRadius: "100px", fontSize: "11px", fontWeight: on ? 700 : 500, background: on ? "#10C4C3" : "rgba(255,255,255,0.06)", color: on ? "#020C1C" : "#A9B4C2", border: on ? "1.5px solid #10C4C3" : "1.5px solid rgba(255,255,255,0.12)", cursor: "pointer", fontFamily: "var(--font-body-new)" }}
+                              >
+                                {v} BHK
+                              </button>
+                            );
+                          })}
+                        </div>
+                        <div style={{ display: "flex", gap: "8px", marginBottom: "8px" }}>
+                          <input
+                            placeholder="Preferred locality"
+                            value={prefLocality}
+                            onChange={e => setPrefLocality(e.target.value)}
+                            style={{ ...inputStyle(contactFocus === "locality"), marginBottom: 0 }}
+                            onFocus={() => setContactFocus("locality")}
+                            onBlur={() => setContactFocus(null)}
+                          />
+                          <select
+                            value={prefCity}
+                            onChange={e => setPrefCity(e.target.value)}
+                            style={{ ...inputStyle(contactFocus === "city"), marginBottom: 0, cursor: "pointer" }}
+                            onFocus={() => setContactFocus("city")}
+                            onBlur={() => setContactFocus(null)}
+                          >
+                            <option value="">Preferred city</option>
+                            {PREFERENCE_CITIES.map(c => <option key={c} value={c}>{c}</option>)}
+                          </select>
+                        </div>
+                        <select
+                          value={prefPropertyType}
+                          onChange={e => setPrefPropertyType(e.target.value)}
+                          style={{ ...inputStyle(contactFocus === "propertyType"), cursor: "pointer" }}
+                          onFocus={() => setContactFocus("propertyType")}
+                          onBlur={() => setContactFocus(null)}
+                        >
+                          <option value="">Property type</option>
+                          {PREFERENCE_CATEGORIES.map(c => <option key={c} value={c}>{c[0].toUpperCase() + c.slice(1)}</option>)}
+                        </select>
+                      </div>
+                    )}
 
                     {/* Error */}
                     {contactError && (
-                      <div style={{ marginBottom: "12px", padding: "10px 14px", background: "rgba(185,28,28,0.15)", border: "1px solid rgba(248,113,113,0.35)", borderRadius: "16px", color: "#F87171", fontSize: "12px", fontFamily: "'Cal Sans', sans-serif", display: "flex", alignItems: "center", gap: "8px" }}>
+                      <div style={{ marginBottom: "12px", padding: "10px 14px", background: "rgba(185,28,28,0.15)", border: "1px solid rgba(248,113,113,0.35)", borderRadius: "16px", color: "#F87171", fontSize: "12px", fontFamily: "var(--font-body-new)", display: "flex", alignItems: "center", gap: "8px" }}>
                         <span>⚠</span>
                         {contactError}
                       </div>
@@ -1575,7 +1734,7 @@ export default function PropertyDetailClient() {
                     <button
                       onClick={handleInquiry}
                       disabled={contactSubmitting}
-                      style={{ width: "100%", padding: "13px", background: "#10C4C3", border: "none", borderRadius: "16px", color: "#020C1C", fontSize: "13px", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", cursor: contactSubmitting ? "not-allowed" : "pointer", opacity: contactSubmitting ? 0.65 : 1, fontFamily: "'Cal Sans', sans-serif", marginBottom: "10px", boxShadow: "0 10px 30px rgba(30,167,255,.35)", transition: "background 0.2s" }}
+                      style={{ width: "100%", padding: "13px", background: "#10C4C3", border: "none", borderRadius: "16px", color: "#020C1C", fontSize: "13px", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", cursor: contactSubmitting ? "not-allowed" : "pointer", opacity: contactSubmitting ? 0.65 : 1, fontFamily: "var(--font-body-new)", marginBottom: "10px", boxShadow: "0 10px 30px rgba(30,167,255,.35)", transition: "background 0.2s" }}
                       className="pd-btn-primary"
                     >{contactSubmitting ? "Sending…" : "Request Callback"}</button>
 
@@ -1602,9 +1761,22 @@ export default function PropertyDetailClient() {
                       </a>
                     )}
 
+                    {/* Payment-risk warning — sits right at the one point on this
+                        page where a buyer gets direct, unmediated contact with the
+                        seller. Amber palette matches the existing warning
+                        convention used in admin/page.tsx and DashboardClient.tsx
+                        (#F59E0B / rgba(245,158,11,...)), not invented here. */}
+                    <div style={{ display: "flex", alignItems: "flex-start", gap: "8px", padding: "10px 12px", background: "rgba(245,158,11,0.1)", border: "1px solid rgba(245,158,11,0.3)", borderRadius: "12px", marginBottom: "14px" }}>
+                      <span style={{ fontSize: "13px", color: "#F59E0B", flexShrink: 0, lineHeight: 1.4 }}>⚠</span>
+                      <p style={{ fontSize: "11.5px", color: "#F59E0B", lineHeight: 1.5, margin: 0 }}>
+                        Never pay before visiting in person and verifying documents.{" "}
+                        <a href="/safety-guide" style={{ color: "#F59E0B", textDecoration: "underline" }}>Read our safety guide</a>
+                      </p>
+                    </div>
+
                     <button
                       onClick={() => { setVisitError(null); setVisitOpen(true); }}
-                      style={{ width: "100%", padding: "13px", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.10)", borderRadius: "16px", color: "#FFFFFF", fontSize: "13px", fontWeight: 600, letterSpacing: "0.06em", textTransform: "uppercase", cursor: "pointer", fontFamily: "'Cal Sans', sans-serif", display: "flex", alignItems: "center", justifyContent: "center", gap: "8px" }}>
+                      style={{ width: "100%", padding: "13px", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.10)", borderRadius: "16px", color: "#FFFFFF", fontSize: "13px", fontWeight: 600, letterSpacing: "0.06em", textTransform: "uppercase", cursor: "pointer", fontFamily: "var(--font-body-new)", display: "flex", alignItems: "center", justifyContent: "center", gap: "8px" }}>
                       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2" /><line x1="16" y1="2" x2="16" y2="6" /><line x1="8" y1="2" x2="8" y2="6" /><line x1="3" y1="10" x2="21" y2="10" /></svg>
                       Schedule Visit
                     </button>
@@ -1615,7 +1787,7 @@ export default function PropertyDetailClient() {
               {/* ── DOWNLOAD BROCHURE ── */}
               <button
                 onClick={downloadBrochure}
-                style={{ width: "100%", padding: "13px", background: "#111F33", border: "1px solid rgba(16,196,195,0.3)", borderRadius: "16px", color: "#10C4C3", fontSize: "13px", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", cursor: "pointer", fontFamily: "'Cal Sans', sans-serif", display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", marginBottom: "20px" }}>
+                style={{ width: "100%", padding: "13px", background: "#111F33", border: "1px solid rgba(16,196,195,0.3)", borderRadius: "16px", color: "#10C4C3", fontSize: "13px", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", cursor: "pointer", fontFamily: "var(--font-body-new)", display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", marginBottom: "20px" }}>
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="7 10 12 15 17 10" /><line x1="12" y1="15" x2="12" y2="3" /></svg>
                 Download Brochure
               </button>
@@ -1662,11 +1834,11 @@ export default function PropertyDetailClient() {
                   <div style={{fontSize: 24, color: "rgba(255,255,255,0.3)"}}>←</div>
                   <div style={{overflow: "hidden", flex: 1}}>
                     <div style={{fontSize: 11, color: "rgba(255,255,255,0.4)", marginBottom: 4, textTransform: "uppercase", letterSpacing: "0.1em"}}>Previous Property</div>
-                    <div style={{fontSize: 15, fontWeight: 600, color: "#FFFFFF", fontFamily: "'Cal Sans',serif", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis"}}>{prevProperty.title}</div>
+                    <div style={{fontSize: 15, fontWeight: 600, color: "#FFFFFF", fontFamily: "var(--font-heading-new)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis"}}>{prevProperty.title}</div>
                     <div style={{fontSize: 13, color: "#10C4C3", marginTop: 4, fontWeight: 600}}>₹{(prevProperty.price / 10000000).toFixed(1)} Cr</div>
                   </div>
-                  {prevProperty.images?.[0] && (
-                    <div style={{width: 64, height: 64, borderRadius: 10, backgroundImage: `url(${optimizedImageUrl(prevProperty.images[0], 128)})`, backgroundSize: "cover", backgroundPosition: "center", flexShrink: 0}} />
+                  {prevProperty.photo_urls?.[0] && (
+                    <div style={{width: 64, height: 64, borderRadius: 10, backgroundImage: `url(${optimizedImageUrl(prevProperty.photo_urls[0], 128)})`, backgroundSize: "cover", backgroundPosition: "center", flexShrink: 0}} />
                   )}
                 </a>
               ) : <div />}
@@ -1681,12 +1853,12 @@ export default function PropertyDetailClient() {
                 }}
                 onMouseOver={e => (e.currentTarget.style.borderColor = "rgba(16,196,195,0.3)")}
                 onMouseOut={e => (e.currentTarget.style.borderColor = "rgba(255,255,255,0.07)")}>
-                  {nextProperty.images?.[0] && (
-                    <div style={{width: 64, height: 64, borderRadius: 10, backgroundImage: `url(${optimizedImageUrl(nextProperty.images[0], 128)})`, backgroundSize: "cover", backgroundPosition: "center", flexShrink: 0}} />
+                  {nextProperty.photo_urls?.[0] && (
+                    <div style={{width: 64, height: 64, borderRadius: 10, backgroundImage: `url(${optimizedImageUrl(nextProperty.photo_urls[0], 128)})`, backgroundSize: "cover", backgroundPosition: "center", flexShrink: 0}} />
                   )}
                   <div style={{overflow: "hidden", flex: 1, textAlign: "right"}}>
                     <div style={{fontSize: 11, color: "rgba(255,255,255,0.4)", marginBottom: 4, textTransform: "uppercase", letterSpacing: "0.1em"}}>Next Property</div>
-                    <div style={{fontSize: 15, fontWeight: 600, color: "#FFFFFF", fontFamily: "'Cal Sans',serif", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis"}}>{nextProperty.title}</div>
+                    <div style={{fontSize: 15, fontWeight: 600, color: "#FFFFFF", fontFamily: "var(--font-heading-new)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis"}}>{nextProperty.title}</div>
                     <div style={{fontSize: 13, color: "#10C4C3", marginTop: 4, fontWeight: 600}}>₹{(nextProperty.price / 10000000).toFixed(1)} Cr</div>
                   </div>
                   <div style={{fontSize: 24, color: "rgba(255,255,255,0.3)"}}>→</div>
@@ -1796,23 +1968,23 @@ export default function PropertyDetailClient() {
             {visitDone ? (
               <div style={{ textAlign: "center", padding: "16px 0 4px" }}>
                 <div style={{ fontSize: "40px", marginBottom: "12px" }}>📅</div>
-                <h3 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "26px", fontWeight: 600, color: "#FFFFFF", marginBottom: "8px" }}>Visit Scheduled!</h3>
+                <h3 style={{ fontFamily: "var(--font-heading-new)", fontSize: "26px", fontWeight: 600, color: "#FFFFFF", marginBottom: "8px" }}>Visit Scheduled!</h3>
                 <p style={{ fontSize: "14px", color: "#A9B4C2", lineHeight: 1.6 }}>The seller will confirm your appointment.</p>
                 <button
                   onClick={() => { setVisitOpen(false); setVisitDone(false); }}
-                  style={{ marginTop: "22px", padding: "11px 28px", background: "#10C4C3", border: "none", borderRadius: "16px", boxShadow: "0 10px 30px rgba(30,167,255,.35)", color: "#020C1C", fontSize: "13px", fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", cursor: "pointer", fontFamily: "'Cal Sans', sans-serif" }}
+                  style={{ marginTop: "22px", padding: "11px 28px", background: "#10C4C3", border: "none", borderRadius: "16px", boxShadow: "0 10px 30px rgba(30,167,255,.35)", color: "#020C1C", fontSize: "13px", fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", cursor: "pointer", fontFamily: "var(--font-body-new)" }}
                 >Done</button>
               </div>
             ) : (
               <>
-                <h3 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "26px", fontWeight: 600, color: "#FFFFFF", marginBottom: "4px" }}>Schedule a Site Visit</h3>
+                <h3 style={{ fontFamily: "var(--font-heading-new)", fontSize: "26px", fontWeight: 600, color: "#FFFFFF", marginBottom: "4px" }}>Schedule a Site Visit</h3>
                 <p style={{ fontSize: "13px", color: "#A9B4C2", marginBottom: "22px" }}>{property.title}</p>
 
                 <label style={{ display: "block", fontSize: "12px", fontWeight: 600, color: "#FFFFFF", marginBottom: "6px" }}>Preferred Date</label>
                 <input
                   type="date" value={visitDate} min={today}
                   onChange={(e) => setVisitDate(e.target.value)}
-                  style={{ width: "100%", padding: "11px 14px", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.10)", borderRadius: "16px", fontSize: "13px", color: "#FFFFFF", fontFamily: "'Cal Sans', sans-serif", outline: "none", marginBottom: "18px" }}
+                  style={{ width: "100%", padding: "11px 14px", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.10)", borderRadius: "16px", fontSize: "13px", color: "#FFFFFF", fontFamily: "var(--font-body-new)", outline: "none", marginBottom: "18px" }}
                 />
 
                 <label style={{ display: "block", fontSize: "12px", fontWeight: 600, color: "#FFFFFF", marginBottom: "8px" }}>Time Slot</label>
@@ -1821,7 +1993,7 @@ export default function PropertyDetailClient() {
                     <button
                       key={s.id}
                       onClick={() => setVisitSlot(s.id)}
-                      style={{ padding: "11px 14px", borderRadius: "8px", textAlign: "left", fontSize: "13px", fontWeight: 600, fontFamily: "'Cal Sans', sans-serif", cursor: "pointer", border: visitSlot === s.id ? "1px solid #10C4C3" : "1px solid rgba(255,255,255,0.10)", background: visitSlot === s.id ? "rgba(16,196,195,0.15)" : "rgba(255,255,255,0.06)", color: visitSlot === s.id ? "#10C4C3" : "#A9B4C2" }}
+                      style={{ padding: "11px 14px", borderRadius: "8px", textAlign: "left", fontSize: "13px", fontWeight: 600, fontFamily: "var(--font-body-new)", cursor: "pointer", border: visitSlot === s.id ? "1px solid #10C4C3" : "1px solid rgba(255,255,255,0.10)", background: visitSlot === s.id ? "rgba(16,196,195,0.15)" : "rgba(255,255,255,0.06)", color: visitSlot === s.id ? "#10C4C3" : "#A9B4C2" }}
                     >
                       {s.label}
                     </button>
@@ -1832,14 +2004,14 @@ export default function PropertyDetailClient() {
                 <input
                   type="text" value={visitName} placeholder="Full name"
                   onChange={(e) => setVisitName(e.target.value)}
-                  style={{ width: "100%", padding: "11px 14px", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.10)", borderRadius: "16px", fontSize: "13px", color: "#FFFFFF", fontFamily: "'Cal Sans', sans-serif", outline: "none", marginBottom: "14px" }}
+                  style={{ width: "100%", padding: "11px 14px", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.10)", borderRadius: "16px", fontSize: "13px", color: "#FFFFFF", fontFamily: "var(--font-body-new)", outline: "none", marginBottom: "14px" }}
                 />
 
                 <label style={{ display: "block", fontSize: "12px", fontWeight: 600, color: "#FFFFFF", marginBottom: "6px" }}>Phone Number</label>
                 <input
                   type="tel" value={visitPhone} placeholder="10-digit mobile"
                   onChange={(e) => setVisitPhone(e.target.value)}
-                  style={{ width: "100%", padding: "11px 14px", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.10)", borderRadius: "16px", fontSize: "13px", color: "#FFFFFF", fontFamily: "'Cal Sans', sans-serif", outline: "none", marginBottom: "18px" }}
+                  style={{ width: "100%", padding: "11px 14px", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.10)", borderRadius: "16px", fontSize: "13px", color: "#FFFFFF", fontFamily: "var(--font-body-new)", outline: "none", marginBottom: "18px" }}
                 />
 
                 {visitError && (
@@ -1851,7 +2023,7 @@ export default function PropertyDetailClient() {
                 <button
                   onClick={submitVisit}
                   disabled={visitSubmitting}
-                  style={{ width: "100%", padding: "13px", background: "#10C4C3", border: "none", borderRadius: "16px", boxShadow: "0 10px 30px rgba(30,167,255,.35)", color: "#020C1C", fontSize: "13px", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", cursor: visitSubmitting ? "not-allowed" : "pointer", opacity: visitSubmitting ? 0.65 : 1, fontFamily: "'Cal Sans', sans-serif", transition: "background 0.2s" }}
+                  style={{ width: "100%", padding: "13px", background: "#10C4C3", border: "none", borderRadius: "16px", boxShadow: "0 10px 30px rgba(30,167,255,.35)", color: "#020C1C", fontSize: "13px", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", cursor: visitSubmitting ? "not-allowed" : "pointer", opacity: visitSubmitting ? 0.65 : 1, fontFamily: "var(--font-body-new)", transition: "background 0.2s" }}
                   className="pd-btn-primary"
                 >{visitSubmitting ? "Scheduling…" : "Confirm Visit"}</button>
               </>

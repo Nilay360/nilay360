@@ -104,7 +104,7 @@ export function SavedSearchesList() {
   if (loading) {
     return (
       <div style={{ padding: "40px 0", textAlign: "center" }}>
-        <span style={{ color: "#A9B4C2", fontFamily: "'Cal Sans', sans-serif", fontSize: 14 }}>Loading…</span>
+        <span style={{ color: "#A9B4C2", fontFamily: "var(--font-body-new)", fontSize: 14 }}>Loading…</span>
       </div>
     );
   }
@@ -112,10 +112,10 @@ export function SavedSearchesList() {
   if (!isAuthed) {
     return (
       <div style={{ padding: "40px 0", textAlign: "center" }}>
-        <p style={{ color: "#FFFFFF", fontFamily: "'Cal Sans', sans-serif", fontSize: 15, margin: "0 0 12px" }}>
+        <p style={{ color: "#FFFFFF", fontFamily: "var(--font-body-new)", fontSize: 15, margin: "0 0 12px" }}>
           Please sign in to view your saved searches.
         </p>
-        <Link href="/login" style={{ color: "#10C4C3", fontWeight: 600, fontFamily: "'Cal Sans', sans-serif", textDecoration: "none" }}>
+        <Link href="/login" style={{ color: "#10C4C3", fontWeight: 600, fontFamily: "var(--font-body-new)", textDecoration: "none" }}>
           Sign In →
         </Link>
       </div>
@@ -140,10 +140,10 @@ export function SavedSearchesList() {
             <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
           </svg>
         </div>
-        <h2 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: 24, fontWeight: 500, color: "#FFFFFF", margin: "0 0 10px" }}>
+        <h2 style={{ fontFamily: "var(--font-heading-new)", fontSize: 24, fontWeight: 500, color: "#FFFFFF", margin: "0 0 10px" }}>
           No saved searches yet
         </h2>
-        <p style={{ fontSize: 13.5, color: "#A9B4C2", fontFamily: "'Cal Sans', sans-serif", margin: "0 auto 26px", maxWidth: 360, lineHeight: 1.65 }}>
+        <p style={{ fontSize: 13.5, color: "#A9B4C2", fontFamily: "var(--font-body-new)", margin: "0 auto 26px", maxWidth: 360, lineHeight: 1.65 }}>
           Search for properties, apply filters, then click "Save this search" to get email alerts when matching listings go live.
         </p>
         <Link href="/search" style={{ textDecoration: "none" }}>
@@ -151,7 +151,7 @@ export function SavedSearchesList() {
             padding: "11px 28px", borderRadius: 999, fontSize: 13, fontWeight: 600,
             color: "#020C1C", background: "#10C4C3",
             boxShadow: "0 10px 30px rgba(16,196,195,0.35)", border: "none", cursor: "pointer",
-            fontFamily: "'Cal Sans', sans-serif",
+            fontFamily: "var(--font-body-new)",
           }}>Browse & Save a Search</button>
         </Link>
       </div>
@@ -173,13 +173,13 @@ export function SavedSearchesList() {
             flexWrap: "wrap",
           }}>
             <div style={{ flex: 1, minWidth: 0 }}>
-              <p style={{ margin: "0 0 4px", fontSize: 15, fontWeight: 600, color: "#FFFFFF", fontFamily: "'Cal Sans', sans-serif", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+              <p style={{ margin: "0 0 4px", fontSize: 15, fontWeight: 600, color: "#FFFFFF", fontFamily: "var(--font-body-new)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
                 {s.name ?? "Saved Search"}
               </p>
-              <p style={{ margin: "0 0 10px", fontSize: 12.5, color: "#A9B4C2", fontFamily: "'Cal Sans', sans-serif", lineHeight: 1.5 }}>
+              <p style={{ margin: "0 0 10px", fontSize: 12.5, color: "#A9B4C2", fontFamily: "var(--font-body-new)", lineHeight: 1.5 }}>
                 {summary}
               </p>
-              <p style={{ margin: 0, fontSize: 11, color: "rgba(255,255,255,0.3)", fontFamily: "'Cal Sans', sans-serif" }}>
+              <p style={{ margin: 0, fontSize: 11, color: "rgba(255,255,255,0.3)", fontFamily: "var(--font-body-new)" }}>
                 Saved {new Date(s.created_at).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}
               </p>
             </div>
@@ -193,7 +193,7 @@ export function SavedSearchesList() {
                   background: s.alert_email ? "rgba(16,196,195,0.15)" : "rgba(255,255,255,0.06)",
                   color: s.alert_email ? "#10C4C3" : "#A9B4C2",
                   border: s.alert_email ? "1px solid rgba(16,196,195,0.35)" : "1px solid rgba(255,255,255,0.12)",
-                  cursor: "pointer", fontFamily: "'Cal Sans', sans-serif", transition: "all 0.14s",
+                  cursor: "pointer", fontFamily: "var(--font-support-new)", transition: "all 0.14s",
                 }}
               >
                 {s.alert_email ? "🔔 Alerts On" : "🔕 Muted"}
@@ -204,7 +204,7 @@ export function SavedSearchesList() {
                   padding: "6px 12px", borderRadius: 100, fontSize: 11, fontWeight: 500,
                   background: "rgba(255,255,255,0.06)", color: "#A9B4C2",
                   border: "1px solid rgba(255,255,255,0.12)",
-                  cursor: "pointer", fontFamily: "'Cal Sans', sans-serif",
+                  cursor: "pointer", fontFamily: "var(--font-body-new)",
                 }}>Search →</button>
               </Link>
 
@@ -217,7 +217,7 @@ export function SavedSearchesList() {
                   color: deleting === s.id ? "rgba(248,113,113,0.4)" : "#F87171",
                   border: "1px solid rgba(248,113,113,0.2)",
                   cursor: deleting === s.id ? "not-allowed" : "pointer",
-                  fontFamily: "'Cal Sans', sans-serif",
+                  fontFamily: "var(--font-body-new)",
                 }}
               >
                 {deleting === s.id ? "…" : "Delete"}

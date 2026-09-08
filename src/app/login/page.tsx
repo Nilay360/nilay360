@@ -72,7 +72,7 @@ export default function LoginPage() {
       <style>{`
 
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'Cal Sans', system-ui, sans-serif; background: #020C1C; overflow-x: hidden; }
+        body { font-family: var(--font-body-new); background: #020C1C; overflow-x: hidden; }
 
         .auth-root {
           display: flex; min-height: 100vh;
@@ -108,7 +108,7 @@ export default function LoginPage() {
           text-decoration: none; position: relative; z-index: 2;
         }
         .auth-logo-text {
-          font-family: 'Cal Sans', sans-serif;
+          font-family: var(--font-support-new);
           font-size: 18px; font-weight: 600;
           color: #fff; letter-spacing: 0.2em;
         }
@@ -131,7 +131,7 @@ export default function LoginPage() {
           color: #10C4C3; text-transform: uppercase;
         }
         .auth-left-heading {
-          font-family: 'Cal Sans', Georgia, serif;
+          font-family: var(--font-heading-new);
           font-size: clamp(36px, 4vw, 52px);
           font-weight: 300; line-height: 1.12;
           color: #020C1C; margin-bottom: 20px;
@@ -154,7 +154,7 @@ export default function LoginPage() {
           padding-left: 20px;
         }
         .auth-quote-text {
-          font-family: 'Cal Sans', Georgia, serif;
+          font-family: var(--font-heading-new);
           font-size: 17px; font-style: italic; font-weight: 300;
           line-height: 1.65; color: rgba(245,242,236,0.65);
         }
@@ -210,7 +210,7 @@ export default function LoginPage() {
           margin-bottom: 36px;
         }
         .auth-form-title {
-          font-family: 'Cal Sans', Georgia, serif;
+          font-family: var(--font-heading-new);
           font-size: 36px; font-weight: 500; line-height: 1.1;
           color: #020C1C; margin-bottom: 8px;
         }
@@ -240,7 +240,7 @@ export default function LoginPage() {
           background: #fff;
           border: 1.5px solid rgba(13,43,31,0.15);
           border-radius: 8px;
-          font-family: 'Cal Sans', sans-serif;
+          font-family: var(--font-body-new);
           font-size: 14px; font-weight: 400; color: #020C1C;
           outline: none; transition: border-color 0.2s, box-shadow 0.2s;
           -webkit-appearance: none;
@@ -277,7 +277,7 @@ export default function LoginPage() {
         .btn-gold {
           width: 100%; padding: 14px 24px;
           background: #10C4C3; border: none; border-radius: 8px;
-          font-family: 'Cal Sans', sans-serif;
+          font-family: var(--font-body-new);
           font-size: 14px; font-weight: 600; letter-spacing: 0.06em;
           color: #020C1C; cursor: pointer;
           transition: background 0.18s, transform 0.12s, box-shadow 0.18s;
@@ -302,7 +302,7 @@ export default function LoginPage() {
           background: #fff; border: 1.5px solid rgba(13,43,31,0.15);
           border-radius: 8px; cursor: pointer;
           display: flex; align-items: center; justify-content: center; gap: 10px;
-          font-family: 'Cal Sans', sans-serif;
+          font-family: var(--font-body-new);
           font-size: 14px; font-weight: 500; color: #020C1C;
           transition: border-color 0.18s, box-shadow 0.18s;
           margin-bottom: 12px;
@@ -319,7 +319,7 @@ export default function LoginPage() {
           border: 1.5px solid rgba(13,43,31,0.15);
           border-radius: 8px; cursor: pointer;
           display: flex; align-items: center; justify-content: center; gap: 10px;
-          font-family: 'Cal Sans', sans-serif;
+          font-family: var(--font-body-new);
           font-size: 14px; font-weight: 500; color: #6B7C72;
           transition: border-color 0.18s, color 0.18s;
         }

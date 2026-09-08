@@ -7,7 +7,7 @@ import { CITIES } from "@/constants";
 const inputStyle: React.CSSProperties = {
   width: "100%", padding: "12px 16px", background: "rgba(255,255,255,0.06)",
   border: "1.5px solid rgba(255,255,255,0.12)", borderRadius: "9px", fontSize: "14px",
-  color: "#FFFFFF", fontFamily: "'Cal Sans', sans-serif", outlineColor: "#10C4C3",
+  color: "#FFFFFF", fontFamily: "var(--font-body-new)", outlineColor: "#10C4C3",
 };
 
 const labelStyle: React.CSSProperties = {
@@ -28,7 +28,7 @@ function CityMultiSelect({ selected, onChange }: { selected: string[]; onChange:
             type="button"
             key={city}
             onClick={() => toggle(city)}
-            style={{ padding: "8px 16px", borderRadius: "100px", fontSize: "13px", fontWeight: on ? 700 : 500, background: on ? "#10C4C3" : "rgba(255,255,255,0.06)", color: on ? "#020C1C" : "#A9B4C2", border: on ? "1.5px solid #10C4C3" : "1.5px solid rgba(255,255,255,0.12)", cursor: "pointer", fontFamily: "'Cal Sans', sans-serif" }}
+            style={{ padding: "8px 16px", borderRadius: "100px", fontSize: "13px", fontWeight: on ? 700 : 500, background: on ? "#10C4C3" : "rgba(255,255,255,0.06)", color: on ? "#020C1C" : "#A9B4C2", border: on ? "1.5px solid #10C4C3" : "1.5px solid rgba(255,255,255,0.12)", cursor: "pointer", fontFamily: "var(--font-body-new)" }}
           >
             {city}
           </button>
@@ -56,33 +56,76 @@ export default function BecomeAnAgentPage() {
     setError(null);
 
     const supabase = createClient();
-    const { data: inserted, error: insertErr } = await supabase
-      .from("agent_profiles")
-      .insert({
-        user_id: user.id,
-        license_number: licenseNumber || null,
-        agency_name: agencyName || null,
-        bio: bio || null,
-        years_experience: yearsExperience ? parseInt(yearsExperience, 10) : null,
-        status: "pending",
-      })
-      .select("id")
-      .single();
 
-    if (insertErr || !inserted) {
+    // Migration 052 — AuthModal's agent-signup flow may already have
+    // created this user's agent_profiles row (rera_number + status:
+    // 'pending'), in which case a plain INSERT here would fail on the
+    // unique user_id constraint with the dead-end "already have an
+    // application" error below. Check first, and UPDATE that row with this
+    // page's fields instead of failing. Falls through to the original
+    // unconditional INSERT for anyone who reaches this page without having
+    // gone through AuthModal's agent-signup flow first.
+    const { data: existingProfile, error: selectErr } = await supabase
+      .from("agent_profiles")
+      .select("id")
+      .eq("user_id", user.id)
+      .maybeSingle();
+
+    if (selectErr) {
       setSubmitting(false);
-      setError(
-        insertErr?.code === "23505"
-          ? "You already have an agent application on file."
-          : "Something went wrong — please try again."
-      );
+      setError("Something went wrong — please try again.");
       return;
+    }
+
+    let agentId: string;
+
+    if (existingProfile) {
+      const { error: updateErr } = await supabase
+        .from("agent_profiles")
+        .update({
+          license_number: licenseNumber || null,
+          agency_name: agencyName || null,
+          bio: bio || null,
+          years_experience: yearsExperience ? parseInt(yearsExperience, 10) : null,
+        })
+        .eq("id", existingProfile.id);
+
+      if (updateErr) {
+        setSubmitting(false);
+        setError("Something went wrong — please try again.");
+        return;
+      }
+      agentId = existingProfile.id;
+    } else {
+      const { data: inserted, error: insertErr } = await supabase
+        .from("agent_profiles")
+        .insert({
+          user_id: user.id,
+          license_number: licenseNumber || null,
+          agency_name: agencyName || null,
+          bio: bio || null,
+          years_experience: yearsExperience ? parseInt(yearsExperience, 10) : null,
+          status: "pending",
+        })
+        .select("id")
+        .single();
+
+      if (insertErr || !inserted) {
+        setSubmitting(false);
+        setError(
+          insertErr?.code === "23505"
+            ? "You already have an agent application on file."
+            : "Something went wrong — please try again."
+        );
+        return;
+      }
+      agentId = inserted.id;
     }
 
     if (cities.length > 0) {
       await supabase
         .from("agent_service_cities")
-        .insert(cities.map(city => ({ agent_id: inserted.id, city })));
+        .insert(cities.map(city => ({ agent_id: agentId, city })));
     }
 
     setSubmitting(false);
@@ -92,7 +135,7 @@ export default function BecomeAnAgentPage() {
   const wrap: React.CSSProperties = {
     minHeight: "100dvh", background: "#020C1C", paddingTop: "64px",
     display: "flex", flexDirection: "column", alignItems: "center",
-    fontFamily: "'Cal Sans', system-ui, sans-serif",
+    fontFamily: "var(--font-body-new)",
   };
 
   if (authLoading) {
@@ -107,7 +150,7 @@ export default function BecomeAnAgentPage() {
     return (
       <div style={{ ...wrap, justifyContent: "center", padding: "24px" }}>
         <div style={{ textAlign: "center", maxWidth: "440px" }}>
-          <h1 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "32px", fontWeight: 600, color: "#FFFFFF", marginBottom: "12px" }}>
+          <h1 style={{ fontFamily: "var(--font-heading-new)", fontSize: "32px", fontWeight: 600, color: "#FFFFFF", marginBottom: "12px" }}>
             Become an Agent
           </h1>
           <p style={{ fontSize: "14px", color: "#A9B4C2", marginBottom: "24px", lineHeight: 1.6 }}>
@@ -115,7 +158,7 @@ export default function BecomeAnAgentPage() {
           </p>
           <button
             onClick={() => openAuthModal("signin")}
-            style={{ padding: "12px 28px", borderRadius: "9px", background: "#10C4C3", color: "#020C1C", border: "none", fontWeight: 700, fontSize: "13px", letterSpacing: "0.04em", cursor: "pointer", fontFamily: "'Cal Sans', sans-serif" }}
+            style={{ padding: "12px 28px", borderRadius: "9px", background: "#10C4C3", color: "#020C1C", border: "none", fontWeight: 700, fontSize: "13px", letterSpacing: "0.04em", cursor: "pointer", fontFamily: "var(--font-body-new)" }}
           >
             Sign In
           </button>
@@ -131,7 +174,7 @@ export default function BecomeAnAgentPage() {
           <div style={{ width: "52px", height: "52px", borderRadius: "50%", background: "rgba(52,211,153,0.08)", border: "1.5px solid rgba(52,211,153,0.2)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 20px", color: "#34D399" }}>
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75"><polyline points="20 6 9 17 4 12"/></svg>
           </div>
-          <h1 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "28px", fontWeight: 600, color: "#FFFFFF", marginBottom: "10px" }}>
+          <h1 style={{ fontFamily: "var(--font-heading-new)", fontSize: "28px", fontWeight: 600, color: "#FFFFFF", marginBottom: "10px" }}>
             Application Received
           </h1>
           <p style={{ fontSize: "14px", color: "#A9B4C2", lineHeight: 1.6 }}>
@@ -145,7 +188,7 @@ export default function BecomeAnAgentPage() {
   return (
     <div style={{ ...wrap, alignItems: "center", padding: "48px 24px 80px" }}>
       <div style={{ width: "100%", maxWidth: "560px" }}>
-        <h1 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: "34px", fontWeight: 600, color: "#FFFFFF", marginBottom: "8px" }}>
+        <h1 style={{ fontFamily: "var(--font-heading-new)", fontSize: "34px", fontWeight: 600, color: "#FFFFFF", marginBottom: "8px" }}>
           Become an Agent
         </h1>
         <p style={{ fontSize: "14px", color: "#A9B4C2", marginBottom: "32px", lineHeight: 1.6 }}>
@@ -179,7 +222,7 @@ export default function BecomeAnAgentPage() {
           <button
             onClick={() => void handleSubmit()}
             disabled={submitting}
-            style={{ padding: "14px", borderRadius: "9px", background: "#10C4C3", color: "#020C1C", border: "none", fontWeight: 700, fontSize: "14px", letterSpacing: "0.04em", cursor: submitting ? "not-allowed" : "pointer", opacity: submitting ? 0.6 : 1, fontFamily: "'Cal Sans', sans-serif" }}
+            style={{ padding: "14px", borderRadius: "9px", background: "#10C4C3", color: "#020C1C", border: "none", fontWeight: 700, fontSize: "14px", letterSpacing: "0.04em", cursor: submitting ? "not-allowed" : "pointer", opacity: submitting ? 0.6 : 1, fontFamily: "var(--font-body-new)" }}
           >
             {submitting ? "Submitting…" : "Submit Application"}
           </button>

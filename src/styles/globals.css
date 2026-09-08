@@ -1,5 +1,31 @@
-@import url('https://cdn.jsdelivr.net/npm/cal-sans@1.0.1/index.css');
 @import "tailwindcss";
+
+/* ── shadcn/ui semantic tokens ──────────────────────────────────────
+   Required by shadcn/originui components (Select, Label, etc.) — without
+   these, utilities like bg-background/bg-popover/border-input/ring-ring
+   generate no CSS at all, since this project has no @config directive
+   pointing Tailwind v4 at tailwind.config.ts (confirmed 2026-08-29: that
+   file's theme.extend.colors has never actually been read by the v4
+   build). Every value below maps to the real, already-live navy/teal
+   palette defined in the :root block further down — no new colors
+   introduced, "accent" here is shadcn's neutral hover-surface meaning,
+   distinct from the site's own --accent (brand teal), which is why it
+   maps to a card surface, not teal. */
+@theme {
+  --color-background:           #020C1C;
+  --color-foreground:           #FFFFFF;
+  --color-popover:              #111F33;
+  --color-popover-foreground:   #FFFFFF;
+  --color-accent:               #182B3F;
+  --color-accent-foreground:    #FFFFFF;
+  --color-muted:                #111F33;
+  --color-muted-foreground:     #A9B4C2;
+  --color-border:               rgba(255, 255, 255, 0.16);
+  --color-input:                rgba(255, 255, 255, 0.16);
+  --color-ring:                 #10C4C3;
+  --color-destructive:          #F87171;
+  --color-destructive-foreground: #FFFFFF;
+}
 
 /* ── Nilay 360 Design System (navy/teal, v2) ─────────────────────── */
 :root {
@@ -35,10 +61,6 @@
   --border-subtle: rgba(255, 255, 255, 0.08);
   --border-accent: rgba(16, 196, 195, 0.30);
 
-  /* Typography */
-  --font-display: 'Cal Sans', system-ui, sans-serif;
-  --font-body:    'Cal Sans', system-ui, sans-serif;
-
   /* Spacing (4px base) */
   --space-xs:  4px;
   --space-sm:  8px;
@@ -60,10 +82,22 @@
 }
 
 /* ── Reset ───────────────────────────────────────────────────────── */
-*, *::before, *::after {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
+/* Wrapped in Tailwind's `base` layer (not left un-layered) so that any
+   Tailwind utility class — which Tailwind v4 always emits into the
+   higher-priority `utilities` layer — correctly overrides this reset,
+   per CSS cascade-layer rules (an un-layered rule beats every layer
+   regardless of specificity; a rule properly inside `base` does not).
+   This was silently zeroing padding/spacing on any component built with
+   Tailwind utilities (e.g. the shadcn Select's `py-1.5`/`ps-8`). Existing
+   pages are unaffected: they're built entirely with inline `style={{}}`
+   objects, and inline styles always win over any stylesheet layer either
+   way — this change is a no-op for all of them. */
+@layer base {
+  *, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
 }
 
 html {
@@ -73,7 +107,7 @@ html {
 
 /* ── Body — liquid-silk black ────────────────────────────────────── */
 body {
-  font-family: var(--font-body);
+  font-family: var(--font-body-new);
   background-color: var(--bg-base);
   color: var(--text-primary);
   line-height: 1.6;
@@ -107,10 +141,10 @@ body::before {
 }
 
 /* ── Typography ──────────────────────────────────────────────────── */
-.font-display { font-family: var(--font-display); }
+.font-display { font-family: var(--font-heading-new); }
 
 h1, h2, h3, h4, h5, h6 {
-  font-family: var(--font-display);
+  font-family: var(--font-heading-new);
   font-weight: 600;
   line-height: 1.2;
   color: var(--text-primary);

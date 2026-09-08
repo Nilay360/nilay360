@@ -21,8 +21,17 @@ interface Props {
   listings: Listing[];
   onDelete?: (id: string) => Promise<void>;
   compact?: boolean;
-  /** Hides Edit/Delete — for viewers who don't own the listing (e.g. an assigned agent). */
+  /** Hides Delete — for viewers who don't own the listing (e.g. an assigned
+   *  agent). Also hides Edit unless `canEdit` is explicitly set, preserving
+   *  every existing caller's current behavior (readOnly = neither shown). */
   readOnly?: boolean;
+  /** Independently controls Edit visibility. Defaults to `!readOnly`.
+   *  Pass explicitly when Edit and Delete need to differ — e.g. an assigned
+   *  agent can Edit their assigned listing but not Delete it directly. */
+  canEdit?: boolean;
+  /** Renders a "Request Deletion" action per listing when provided — the
+   *  assigned-agent path to removal, since agents don't get direct Delete. */
+  onRequestDeletion?: (listing: Listing) => void;
 }
 
 const COMMERCIAL = ["office", "retail", "warehouse"];
@@ -55,14 +64,15 @@ function Pill({ active, label, onClick }: { active: boolean; label: string; onCl
       background: active ? "#10C4C3" : "rgba(255,255,255,0.06)",
       color: active ? "#020C1C" : "#A9B4C2",
       border: active ? "1.5px solid #10C4C3" : "1.5px solid rgba(255,255,255,0.12)",
-      cursor: "pointer", fontFamily: "'Cal Sans', sans-serif", transition: "all 0.14s",
+      cursor: "pointer", fontFamily: "var(--font-body-new)", transition: "all 0.14s",
     }}>
       {label}
     </button>
   );
 }
 
-export function MyListingsList({ listings, onDelete, compact = false, readOnly = false }: Props) {
+export function MyListingsList({ listings, onDelete, compact = false, readOnly = false, canEdit, onRequestDeletion }: Props) {
+  const showEdit = canEdit ?? !readOnly;
   const [search,       setSearch]       = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [typeFilter,   setTypeFilter]   = useState("all");
@@ -99,7 +109,7 @@ export function MyListingsList({ listings, onDelete, compact = false, readOnly =
 
   if (listings.length === 0) {
     return (
-      <div style={{ textAlign: "center", padding: compact ? "32px 0" : "80px 0", color: "rgba(255,255,255,0.45)", fontFamily: "'Cal Sans', sans-serif" }}>
+      <div style={{ textAlign: "center", padding: compact ? "32px 0" : "80px 0", color: "rgba(255,255,255,0.45)", fontFamily: "var(--font-body-new)" }}>
         <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.25" style={{ opacity: 0.35, marginBottom: 16 }}>
           <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
           <polyline points="9 22 9 12 15 12 15 22"/>
@@ -108,7 +118,7 @@ export function MyListingsList({ listings, onDelete, compact = false, readOnly =
           {readOnly ? "No listings assigned yet." : "No listings yet."}
         </p>
         {!readOnly && (
-          <Link href="/post-property" style={{ color: "#10C4C3", fontWeight: 600, fontFamily: "'Cal Sans', sans-serif", textDecoration: "none" }}>
+          <Link href="/post-property" style={{ color: "#10C4C3", fontWeight: 600, fontFamily: "var(--font-body-new)", textDecoration: "none" }}>
             List your first property →
           </Link>
         )}
@@ -141,12 +151,12 @@ export function MyListingsList({ listings, onDelete, compact = false, readOnly =
             background: "rgba(255,255,255,0.08)",
             border: "1.5px solid rgba(255,255,255,0.22)",
             borderRadius: 10, fontSize: 13, color: "#FFFFFF",
-            fontFamily: "'Cal Sans', sans-serif", outline: "none",
+            fontFamily: "var(--font-body-new)", outline: "none",
           }}
         />
 
         <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 12, flexWrap: "wrap" }}>
-          <span style={{ fontSize: 11, color: "rgba(255,255,255,0.35)", fontFamily: "'Cal Sans', sans-serif", marginRight: 2, flexShrink: 0 }}>Status</span>
+          <span style={{ fontSize: 11, color: "rgba(255,255,255,0.35)", fontFamily: "var(--font-support-new)", marginRight: 2, flexShrink: 0 }}>Status</span>
           {(["all", "active", "pending_review", "rejected"] as const).map(v => (
             <Pill key={v} active={statusFilter === v} onClick={() => setStatusFilter(v)}
               label={v === "all" ? "All" : v === "pending_review" ? "Pending Review" : v.charAt(0).toUpperCase() + v.slice(1)} />
@@ -154,7 +164,7 @@ export function MyListingsList({ listings, onDelete, compact = false, readOnly =
         </div>
 
         <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 8, flexWrap: "wrap" }}>
-          <span style={{ fontSize: 11, color: "rgba(255,255,255,0.35)", fontFamily: "'Cal Sans', sans-serif", marginRight: 2, flexShrink: 0 }}>Type</span>
+          <span style={{ fontSize: 11, color: "rgba(255,255,255,0.35)", fontFamily: "var(--font-support-new)", marginRight: 2, flexShrink: 0 }}>Type</span>
           {(["all", "apartment", "villa", "plot", "penthouse", "townhouse", "commercial"] as const).map(v => (
             <Pill key={v} active={typeFilter === v} onClick={() => setTypeFilter(v)}
               label={v === "all" ? "All" : v.charAt(0).toUpperCase() + v.slice(1)} />
@@ -162,7 +172,7 @@ export function MyListingsList({ listings, onDelete, compact = false, readOnly =
         </div>
 
         {(search.trim() !== "" || statusFilter !== "all" || typeFilter !== "all") && (
-          <p style={{ fontSize: 12, color: "rgba(255,255,255,0.45)", fontFamily: "'Cal Sans', sans-serif", margin: "10px 0 0" }}>
+          <p style={{ fontSize: 12, color: "rgba(255,255,255,0.45)", fontFamily: "var(--font-body-new)", margin: "10px 0 0" }}>
             Showing {filtered.length} of {listings.length} {listings.length === 1 ? "listing" : "listings"}
           </p>
         )}
@@ -176,10 +186,10 @@ export function MyListingsList({ listings, onDelete, compact = false, readOnly =
           backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)",
           borderRadius: 14, border: "1px solid rgba(255,255,255,0.08)",
         }}>
-          <p style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: compact ? 18 : 22, color: "#FFFFFF", margin: "0 0 6px" }}>
+          <p style={{ fontFamily: "var(--font-heading-new)", fontSize: compact ? 18 : 22, color: "#FFFFFF", margin: "0 0 6px" }}>
             No listings match
           </p>
-          <p style={{ fontSize: 13, color: "rgba(255,255,255,0.45)", fontFamily: "'Cal Sans', sans-serif", margin: 0 }}>
+          <p style={{ fontSize: 13, color: "rgba(255,255,255,0.45)", fontFamily: "var(--font-body-new)", margin: 0 }}>
             Try adjusting your search or filters.
           </p>
         </div>
@@ -230,14 +240,14 @@ export function MyListingsList({ listings, onDelete, compact = false, readOnly =
                       {compact ? (
                         <>
                           <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 5, flexWrap: "wrap" }}>
-                            <span style={{ fontSize: 10, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.07em", color: sc.text, background: sc.bg, borderRadius: 4, padding: "2px 6px", fontFamily: "'Cal Sans', sans-serif" }}>
+                            <span style={{ fontSize: 10, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.07em", color: sc.text, background: sc.bg, borderRadius: 4, padding: "2px 6px", fontFamily: "var(--font-support-new)" }}>
                               {sc.label}
                             </span>
-                            <span style={{ fontSize: 11, color: "rgba(255,255,255,0.35)", fontFamily: "'Cal Sans', sans-serif" }}>
+                            <span style={{ fontSize: 11, color: "rgba(255,255,255,0.35)", fontFamily: "var(--font-body-new)" }}>
                               {fmtDate(l.submitted_at)}
                             </span>
                           </div>
-                          <p style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: 16, fontWeight: 600, color: "#FFFFFF", margin: "0 0 4px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                          <p style={{ fontFamily: "var(--font-heading-new)", fontSize: 16, fontWeight: 600, color: "#FFFFFF", margin: "0 0 4px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                             {l.title ?? `${l.property_category ?? "Property"} in ${l.city ?? "—"}`}
                           </p>
                           <div style={{ display: "flex", gap: 10, flexWrap: "wrap", fontSize: 12, color: "#A9B4C2" }}>
@@ -248,23 +258,23 @@ export function MyListingsList({ listings, onDelete, compact = false, readOnly =
                       ) : (
                         <>
                           <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 5 }}>
-                            <span style={{ fontSize: 11, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.07em", color: sc.text, background: sc.bg, borderRadius: 4, padding: "2px 8px", fontFamily: "'Cal Sans', sans-serif" }}>
+                            <span style={{ fontSize: 11, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.07em", color: sc.text, background: sc.bg, borderRadius: 4, padding: "2px 8px", fontFamily: "var(--font-support-new)" }}>
                               {sc.label}
                             </span>
-                            <span style={{ fontSize: 12, color: "rgba(255,255,255,0.45)", fontFamily: "'Cal Sans', sans-serif" }}>
+                            <span style={{ fontSize: 12, color: "rgba(255,255,255,0.45)", fontFamily: "var(--font-support-new)" }}>
                               {[l.property_category, l.listing_type].filter(Boolean).join(" · ")}
                             </span>
                           </div>
-                          <h3 style={{ fontFamily: "'Cal Sans', Georgia, serif", fontSize: 19, fontWeight: 600, color: "#FFFFFF", margin: "0 0 4px", lineHeight: 1.2 }}>
+                          <h3 style={{ fontFamily: "var(--font-heading-new)", fontSize: 19, fontWeight: 600, color: "#FFFFFF", margin: "0 0 4px", lineHeight: 1.2 }}>
                             {l.title ?? "Untitled"}
                           </h3>
                           <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
-                            <span style={{ fontSize: 13, color: "#A9B4C2", fontFamily: "'Cal Sans', sans-serif" }}>{l.city ?? "—"}</span>
-                            <span style={{ fontSize: 13, fontWeight: 600, color: "#FFFFFF", fontFamily: "'Cal Sans', sans-serif" }}>
+                            <span style={{ fontSize: 13, color: "#A9B4C2", fontFamily: "var(--font-support-new)" }}>{l.city ?? "—"}</span>
+                            <span style={{ fontSize: 13, fontWeight: 600, color: "#FFFFFF", fontFamily: "var(--font-support-new)" }}>
                               {l.price != null ? fmtPrice(l.price) : "Price on request"}
                             </span>
                           </div>
-                          <div style={{ fontSize: 11.5, color: "rgba(255,255,255,0.45)", fontFamily: "'Cal Sans', sans-serif", marginTop: 4 }}>
+                          <div style={{ fontSize: 11.5, color: "rgba(255,255,255,0.45)", fontFamily: "var(--font-body-new)", marginTop: 4 }}>
                             Listed {fmtDate(l.submitted_at)}
                           </div>
                         </>
@@ -274,7 +284,7 @@ export function MyListingsList({ listings, onDelete, compact = false, readOnly =
                     {/* Actions */}
                     <div className="mll-actions" style={{ display: "flex", gap: 8, flexShrink: 0, alignItems: "center" }}>
                       {compact && l.price != null && (
-                        <span style={{ fontSize: 14, fontWeight: 600, color: "#FFFFFF", fontFamily: "'Cal Sans', Georgia, serif", marginRight: 4 }}>
+                        <span style={{ fontSize: 14, fontWeight: 600, color: "#FFFFFF", fontFamily: "var(--font-support-new)", marginRight: 4 }}>
                           {fmtPrice(l.price)}
                         </span>
                       )}
@@ -285,38 +295,54 @@ export function MyListingsList({ listings, onDelete, compact = false, readOnly =
                             fontSize: compact ? 12 : 13, fontWeight: 500,
                             color: "#FFFFFF", background: "rgba(255,255,255,0.05)",
                             border: "1px solid rgba(255,255,255,0.15)", borderRadius: 7,
-                            cursor: "pointer", fontFamily: "'Cal Sans', sans-serif",
+                            cursor: "pointer", fontFamily: "var(--font-body-new)",
                           }}>View</button>
                         </Link>
                       )}
+                      {showEdit && (
+                        <Link href={`/post-property/edit/${l.id}`} style={{ textDecoration: "none" }}>
+                          <button style={{
+                            padding: compact ? "5px 10px" : "7px 14px",
+                            fontSize: compact ? 12 : 13, fontWeight: 600,
+                            color: "#020C1C", background: "#10C4C3",
+                            boxShadow: "0 8px 24px rgba(16,196,195,0.3)",
+                            border: "none", borderRadius: 7, cursor: "pointer",
+                            fontFamily: "var(--font-body-new)",
+                          }}>Edit</button>
+                        </Link>
+                      )}
                       {!readOnly && (
-                        <>
-                          <Link href={`/post-property/edit/${l.id}`} style={{ textDecoration: "none" }}>
-                            <button style={{
-                              padding: compact ? "5px 10px" : "7px 14px",
-                              fontSize: compact ? 12 : 13, fontWeight: 600,
-                              color: "#020C1C", background: "#10C4C3",
-                              boxShadow: "0 8px 24px rgba(16,196,195,0.3)",
-                              border: "none", borderRadius: 7, cursor: "pointer",
-                              fontFamily: "'Cal Sans', sans-serif",
-                            }}>Edit</button>
-                          </Link>
-                          <button
-                            onClick={() => handleDeleteClick(l.id, l.title)}
-                            disabled={isDeleting}
-                            style={{
-                              padding: compact ? "5px 10px" : "7px 14px",
-                              fontSize: compact ? 12 : 13, fontWeight: 500,
-                              color: isDeleting ? "rgba(255,255,255,0.35)" : "#F87171",
-                              background: "rgba(248,113,113,0.10)",
-                              border: `1px solid ${isDeleting ? "rgba(255,255,255,0.15)" : "rgba(248,113,113,0.30)"}`,
-                              borderRadius: 7, cursor: isDeleting ? "not-allowed" : "pointer",
-                              fontFamily: "'Cal Sans', sans-serif", transition: "border-color 0.15s, color 0.15s",
-                            }}
-                          >
-                            {isDeleting ? "…" : "Delete"}
-                          </button>
-                        </>
+                        <button
+                          onClick={() => handleDeleteClick(l.id, l.title)}
+                          disabled={isDeleting}
+                          style={{
+                            padding: compact ? "5px 10px" : "7px 14px",
+                            fontSize: compact ? 12 : 13, fontWeight: 500,
+                            color: isDeleting ? "rgba(255,255,255,0.35)" : "#F87171",
+                            background: "rgba(248,113,113,0.10)",
+                            border: `1px solid ${isDeleting ? "rgba(255,255,255,0.15)" : "rgba(248,113,113,0.30)"}`,
+                            borderRadius: 7, cursor: isDeleting ? "not-allowed" : "pointer",
+                            fontFamily: "var(--font-body-new)", transition: "border-color 0.15s, color 0.15s",
+                          }}
+                        >
+                          {isDeleting ? "…" : "Delete"}
+                        </button>
+                      )}
+                      {onRequestDeletion && (
+                        <button
+                          onClick={() => onRequestDeletion(l)}
+                          style={{
+                            padding: compact ? "5px 10px" : "7px 14px",
+                            fontSize: compact ? 12 : 13, fontWeight: 500,
+                            color: "#FBBF24",
+                            background: "rgba(251,191,36,0.10)",
+                            border: "1px solid rgba(251,191,36,0.30)",
+                            borderRadius: 7, cursor: "pointer",
+                            fontFamily: "var(--font-body-new)",
+                          }}
+                        >
+                          Request Deletion
+                        </button>
                       )}
                     </div>
 

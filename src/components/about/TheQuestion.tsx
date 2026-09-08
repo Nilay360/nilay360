@@ -23,7 +23,7 @@ export default function TheQuestion() {
         <div>
           <ChapterLabel>The Question</ChapterLabel>
           <Reveal>
-            <p style={{ margin: 0, fontFamily: "'Cal Sans', Georgia, serif", fontWeight: 300, fontSize: "clamp(24px, 2.9vw, 46px)", lineHeight: 1.22, letterSpacing: "-0.018em", color: "#FFFFFF" }}>It should have been the start of something exciting.</p>
+            <p style={{ margin: 0, fontFamily: "var(--font-heading-new)", fontWeight: 300, fontSize: "clamp(24px, 2.9vw, 46px)", lineHeight: 1.22, letterSpacing: "-0.018em", color: "#FFFFFF" }}>It should have been the start of something exciting.</p>
           </Reveal>
           <Reveal delay={0.12} style={{ marginTop: "20px" }}>
             <p style={{ margin: 0, fontSize: "clamp(15px, 1.15vw, 18px)", lineHeight: 1.9, color: "rgba(255,255,255,0.5)", maxWidth: "42ch" }}>Instead, hours turned into days. Days turned into weeks. Listings were outdated. Information was incomplete. Every visit demanded more time, travel and uncertainty than it should have.</p>
@@ -32,8 +32,8 @@ export default function TheQuestion() {
             {PAIN_POINTS.map((p, i) => (
               <Reveal key={p.n} delay={0.2 + i * 0.08}>
                 <div style={{ display: "flex", alignItems: "baseline", gap: "18px", padding: "15px 0", borderTop: "1px solid rgba(255,255,255,0.08)", borderBottom: i === PAIN_POINTS.length - 1 ? "1px solid rgba(255,255,255,0.08)" : "none" }}>
-                  <span style={{ fontFamily: "'Cal Sans', sans-serif", fontSize: "11px", letterSpacing: "0.2em", color: "rgba(16,196,195,0.75)", minWidth: "42px" }}>{p.n}</span>
-                  <span style={{ fontFamily: "'Cal Sans', sans-serif", fontWeight: 300, fontSize: "clamp(16px, 1.4vw, 21px)", color: "rgba(255,255,255,0.82)" }}>{p.label}</span>
+                  <span style={{ fontFamily: "var(--font-support-new)", fontSize: "11px", letterSpacing: "0.2em", color: "rgba(16,196,195,0.75)", minWidth: "42px" }}>{p.n}</span>
+                  <span style={{ fontFamily: "var(--font-body-new)", fontWeight: 300, fontSize: "clamp(16px, 1.4vw, 21px)", color: "rgba(255,255,255,0.82)" }}>{p.label}</span>
                 </div>
               </Reveal>
             ))}
@@ -44,11 +44,11 @@ export default function TheQuestion() {
           <div style={{ position: "relative" }}>
             <div style={{ position: "absolute", inset: "-14% -10%", background: "radial-gradient(circle at 50% 50%, rgba(16,196,195,0.16), rgba(16,196,195,0) 68%)", filter: "blur(24px)", pointerEvents: "none" }} />
             <GlassCard style={{ position: "relative", padding: "clamp(32px, 4vw, 58px) clamp(26px, 3.4vw, 50px)", boxShadow: "0 40px 90px rgba(0,0,0,0.45)" }}>
-              <span aria-hidden="true" style={{ display: "block", fontFamily: "'Cal Sans', Georgia, serif", fontSize: "54px", lineHeight: 0.6, color: "rgba(16,196,195,0.4)" }}>&ldquo;</span>
-              <p style={{ margin: "20px 0 0", fontFamily: "'Cal Sans', Georgia, serif", fontWeight: 300, fontSize: "clamp(21px, 2.1vw, 34px)", lineHeight: 1.38, letterSpacing: "-0.012em", color: "#FFFFFF" }}>Why should finding a home require so much effort, when technology can help people experience it first?</p>
+              <span aria-hidden="true" style={{ display: "block", fontFamily: "var(--font-heading-new)", fontSize: "54px", lineHeight: 0.6, color: "rgba(16,196,195,0.4)" }}>&ldquo;</span>
+              <p style={{ margin: "20px 0 0", fontFamily: "var(--font-heading-new)", fontWeight: 300, fontSize: "clamp(21px, 2.1vw, 34px)", lineHeight: 1.38, letterSpacing: "-0.012em", color: "#FFFFFF" }}>Why should finding a home require so much effort, when technology can help people experience it first?</p>
               <div style={{ marginTop: "clamp(24px, 3vw, 38px)", display: "flex", alignItems: "center", gap: "14px" }}>
                 <span style={{ width: "30px", height: "1px", background: TEAL }} />
-                <span style={{ fontFamily: "'Cal Sans', sans-serif", fontSize: "10px", letterSpacing: "0.22em", textTransform: "uppercase", color: "rgba(255,255,255,0.42)" }}>Early 2026 · Hyderabad</span>
+                <span style={{ fontFamily: "var(--font-support-new)", fontSize: "10px", letterSpacing: "0.22em", textTransform: "uppercase", color: "rgba(255,255,255,0.42)" }}>Early 2026 · Hyderabad</span>
               </div>
             </GlassCard>
           </div>

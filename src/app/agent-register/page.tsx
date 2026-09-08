@@ -9,13 +9,13 @@ export default function AgentRegisterPage() {
       subtitle="Become part of India's premium real estate network. Get qualified leads, a powerful dashboard and the Nilay 360 brand behind every deal."
       badge="Applications Open"
       bullets={[
-        { t:"Qualified Leads", d:"Receive verified, high-intent buyer and tenant enquiries in your city every week." },
+        { t:"Qualified Leads", d:"Receive high-intent buyer and tenant enquiries in your city every week." },
         { t:"Agent Dashboard", d:"Manage listings, leads and client conversations from one elegant workspace." },
         { t:"Training & Support", d:"Onboarding, certification and a dedicated partner success team to help you close." },
       ]}
     >
       <div style={{ textAlign:"center", maxWidth:600, margin:"0 auto 8px" }}>
-        <h2 style={{ fontFamily:"'Cal Sans',Georgia,serif", fontSize:32, fontWeight:700, color:"#020C1C", marginBottom:14 }}>Start your application</h2>
+        <h2 style={{ fontFamily:"var(--font-heading-new)", fontSize:32, fontWeight:700, color:"#020C1C", marginBottom:14 }}>Start your application</h2>
         <p style={{ fontSize:15, color:"#666", lineHeight:1.7, marginBottom:24 }}>
           Create an account to begin onboarding, or explore the agent network to see who's already on board.
         </p>
