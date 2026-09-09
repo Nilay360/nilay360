@@ -241,11 +241,24 @@ export async function POST(req: NextRequest) {
         )
       }
 
+      // Minimal, honest self-heal (confirmed via investigation, 2026-09-09):
+      // full_name/email are NOT reliably recoverable from auth.users — for
+      // this app's test account, auth.users never had them at all
+      // (raw_user_meta_data.full_name was empty, email was the synthetic
+      // placeholder). profiles is this app's real source of truth for that
+      // data; once its row is deleted, that data is honestly gone, not
+      // reconstructable from auth.users no matter how this is implemented.
+      // Restore only what's genuinely known to be safe and correct — the
+      // existing "Complete your profile" flow already prompts for full_name
+      // on next load when it's missing, same as it does for any account
+      // still filling in its profile.
       const { error: selfHealErr } = await supabase.from('profiles').upsert({
         id:          linkData.user.id,
-        full_name:   full_name || '',
+        // full_name is NOT NULL with no default — '' is the genuinely
+        // honest value here (unknown, not fabricated), and the existing
+        // "Complete your profile" flow already prompts for it when blank.
+        full_name:   '',
         phone:       fullPhone,
-        city:        city     || null,
         role:        isAgent ? 'agent' : 'buyer',
         is_verified: !isAgent,
         whatsapp:    whatsapp ? fullPhone : null,
