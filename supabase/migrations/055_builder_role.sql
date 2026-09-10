@@ -1,0 +1,47 @@
+-- ═══════════════════════════════════════════════════════════════
+-- 055 — Add 'builder' to the user_role enum
+-- DRAFTED FOR REVIEW, NOT APPLIED. Same review discipline as every
+-- prior migration tonight: this file has not been run against the
+-- database. Do not apply until reviewed line by line.
+--
+-- Supports the new Builder account type on the registration flow —
+-- functionally identical to Agent accounts today (same agent_profiles-
+-- gated portal access via agent_profiles.status = 'approved', same
+-- operational capabilities: leads, deals, site visits, messaging,
+-- calendar, listings management, etc.), distinguished only by
+-- profiles.role for now. Every code call site that currently checks
+-- `role === 'agent'` needs a corresponding `|| role === 'builder'`
+-- (or equivalent) addition alongside this migration — that is
+-- separate application-layer work, not part of this schema-only
+-- change. Confirmed read-only beforehand: exactly 7 call sites do
+-- this today (admin/page.tsx x2, DashboardClient.tsx, login/page.tsx,
+-- Navbar.tsx, verify-otp/route.ts x2) — none of them are RLS
+-- policies; agent-portal access is gated entirely through
+-- agent_profiles.status, not profiles.role, so no RLS policy needs
+-- to change for this migration to be safe on its own.
+--
+-- Future work (not this migration): differentiate the Builder
+-- dashboard/profile from the Agent one — e.g. a distinct portal
+-- section, different default permissions, or its own approval
+-- workflow — once product direction on that is settled.
+--
+-- IMPORTANT — how to actually run this, read before applying:
+-- `ALTER TYPE ... ADD VALUE` has a real Postgres restriction that
+-- matters here. Since Postgres 12, this statement CAN run inside a
+-- transaction block — but the newly added enum value cannot be used
+-- (in an INSERT, UPDATE, comparison, etc.) within that SAME
+-- transaction; doing so raises "unsafe use of new value of enum type"
+-- at execution time. This migration only adds the value and does
+-- nothing else, so the file itself is safe as written — but Vanith
+-- should run this as its own standalone statement/commit, not bundled
+-- in the same multi-statement "Run" together with any query that
+-- writes or filters on role = 'builder'. If testing 'builder'
+-- immediately after, do it as a separate, subsequent query — after
+-- this one has fully committed — not pasted into the same SQL Editor
+-- execution.
+--
+-- IF NOT EXISTS makes this idempotent/safe to re-run, consistent with
+-- every other migration tonight.
+-- ═══════════════════════════════════════════════════════════════
+
+ALTER TYPE user_role ADD VALUE IF NOT EXISTS 'builder';

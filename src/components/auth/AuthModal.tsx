@@ -18,7 +18,7 @@ const GOOGLE_OAUTH_ENABLED = process.env.NEXT_PUBLIC_GOOGLE_OAUTH_ENABLED === "t
 
 const CITIES = ["Hyderabad", "Bengaluru", "Mumbai", "Delhi", "Pune", "Chennai", "Others"];
 
-type AccountType = "individual" | "agent";
+type AccountType = "individual" | "agent" | "builder";
 
 const GOLD = "#10C4C3";
 const GREEN = "#0A1526";
@@ -291,8 +291,8 @@ function AuthModalInner({
     if (!reForm.full_name.trim()) { setError("Please enter your full name."); return; }
     if (reForm.phone.length !== 10) { setError("Please enter a valid 10-digit mobile number."); return; }
     if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(reForm.email)) { setError("Please enter a valid email address."); return; }
-    if (accountType === "agent" && !reForm.rera.trim()) {
-      setError("RERA Registration Number is required for agent accounts.");
+    if ((accountType === "agent" || accountType === "builder") && !reForm.rera.trim()) {
+      setError("RERA Registration Number is required for agent and builder accounts.");
       return;
     }
     if (!agreeTerms) { setError("Please agree to the Terms of Service to continue."); return; }
@@ -354,7 +354,7 @@ function AuthModalInner({
       // signup flow — a failure here is logged loudly and the existing
       // notify-admin-agent email below still fires as a fallback
       // notification path, same as today.
-      if (accountType === "agent") {
+      if (accountType === "agent" || accountType === "builder") {
         const newUserId = sessionData?.user?.id ?? sessionData?.session?.user?.id ?? null;
         if (newUserId) {
           try {
@@ -374,8 +374,8 @@ function AuthModalInner({
         }
       }
 
-      // Notify admin for agent applications (non-blocking)
-      if (accountType === "agent") {
+      // Notify admin for agent/builder applications (non-blocking)
+      if (accountType === "agent" || accountType === "builder") {
         try {
           await fetch("/api/notify-admin-agent", {
             method: "POST",
@@ -395,11 +395,11 @@ function AuthModalInner({
       }
 
       await refreshAuth();
-      setAgentPending(accountType === "agent");
+      setAgentPending(accountType === "agent" || accountType === "builder");
       setLoading(false);
       setReStep(3);
       setReSuccess(true);
-      window.setTimeout(() => { onClose(); }, accountType === "agent" ? 2600 : 1600);
+      window.setTimeout(() => { onClose(); }, (accountType === "agent" || accountType === "builder") ? 2600 : 1600);
     } catch {
       setError("Something went wrong. Please try again.");
       setLoading(false);
@@ -527,10 +527,16 @@ function AuthModalInner({
                 <RoleCard
                   selected={accountType === "agent"}
                   onSelect={() => setAccountType("agent")}
-                  title="Agent / Broker"
-                  perk="Unlimited Listings"
+                  title="Agent"
+                  perk="Free listings until Oct 31st"
                   desc="Manage listings & clients"
-                  badge="Free Forever"
+                />
+                <RoleCard
+                  selected={accountType === "builder"}
+                  onSelect={() => setAccountType("builder")}
+                  title="Builder"
+                  perk="Free listings until Oct 31st"
+                  desc="List and manage development projects"
                 />
 
                 <button type="button" className="am-btn-gold" style={{ marginTop: 8 }} onClick={() => { setError(null); setReStep(2); }}>
@@ -550,7 +556,7 @@ function AuthModalInner({
                 <h2 className="am-title">Your details</h2>
                 <p className="am-sub">
                   Registering as{" "}
-                  <strong style={{ color: GOLD }}>{accountType === "agent" ? "Agent / Broker" : "Individual"}</strong>.
+                  <strong style={{ color: GOLD }}>{accountType === "agent" ? "Agent" : accountType === "builder" ? "Builder" : "Individual"}</strong>.
                 </p>
 
                 <label className="am-label" htmlFor="re-name">Full Name</label>
@@ -585,7 +591,7 @@ function AuthModalInner({
                   {CITIES.map((c) => <option key={c} value={c}>{c}</option>)}
                 </select>
 
-                {accountType === "agent" && (
+                {(accountType === "agent" || accountType === "builder") && (
                   <>
                     <label className="am-label" htmlFor="re-rera">
                       RERA Registration No. <span style={{ color: "#E57373" }}>*</span>
@@ -656,7 +662,7 @@ function AuthModalInner({
               <SuccessState
                 title={agentPending ? "Application received" : "Welcome to Nilay 360!"}
                 message={agentPending
-                  ? "Your agent application is under review. We'll notify you once approved."
+                  ? "Your application is under review. We'll notify you once approved."
                   : "Your account is ready. Redirecting…"}
               />
             )}

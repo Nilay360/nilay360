@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { useAuth } from "@/context/AuthContext";
 
-type AccountType = "individual" | "agent";
+type AccountType = "individual" | "agent" | "builder";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -55,7 +55,7 @@ export default function RegisterPage() {
             full_name: fields.name,
             phone: fields.phone,
             account_type: accountType,
-            ...(accountType === "agent" && {
+            ...((accountType === "agent" || accountType === "builder") && {
               rera_number: fields.rera,
               agency_name: fields.agency,
               cities: fields.cities,
@@ -279,7 +279,7 @@ export default function RegisterPage() {
           display: block;
         }
         .rp-type-grid {
-          display: grid; grid-template-columns: 1fr 1fr;
+          display: grid; grid-template-columns: 1fr 1fr 1fr;
           gap: 12px; margin-bottom: 26px;
         }
         .rp-type-card {
@@ -612,10 +612,38 @@ export default function RegisterPage() {
                   </div>
                 </div>
                 <div>
-                  <div className="rp-type-name">Agent / Broker</div>
+                  <div className="rp-type-name">Agent</div>
                   <div className="rp-type-subtitle">Manage Listings &amp; Clients</div>
                 </div>
                 <div className="rp-type-desc">For licensed real estate agents and brokers</div>
+                <span className="rp-type-badge">RERA Required</span>
+              </button>
+
+              {/* Builder */}
+              <button
+                type="button"
+                className={`rp-type-card${accountType === "builder" ? " sel" : ""}`}
+                onClick={() => setAccountType("builder")}
+              >
+                <div className="rp-type-card-top">
+                  <div className="rp-type-icon">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+                      stroke={accountType === "builder" ? "#10C4C3" : "#020C1C"}
+                      strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M6 22V4a1 1 0 0 1 1-1h5v19" />
+                      <path d="M12 22V11l5-2v13" />
+                      <path d="M2 22h20" />
+                    </svg>
+                  </div>
+                  <div className="rp-type-radio">
+                    <div className="rp-type-radio-dot" />
+                  </div>
+                </div>
+                <div>
+                  <div className="rp-type-name">Builder</div>
+                  <div className="rp-type-subtitle">Manage Development Projects</div>
+                </div>
+                <div className="rp-type-desc">For developers listing new projects</div>
                 <span className="rp-type-badge">RERA Required</span>
               </button>
 
@@ -713,8 +741,8 @@ export default function RegisterPage() {
                 </div>
               </div>
 
-              {/* Agent-only fields */}
-              {accountType === "agent" && (
+              {/* Agent/Builder-only fields */}
+              {(accountType === "agent" || accountType === "builder") && (
                 <>
                   <div className="rp-section-divider">
                     <div className="rp-section-divider-line" />
@@ -765,7 +793,7 @@ export default function RegisterPage() {
               )}
 
               {/* Terms */}
-              <label className="rp-checkbox-label" style={{ marginTop: accountType === "agent" ? "18px" : "6px" }}>
+              <label className="rp-checkbox-label" style={{ marginTop: (accountType === "agent" || accountType === "builder") ? "18px" : "6px" }}>
                 <input type="checkbox" checked={agreed} onChange={(e) => setAgreed(e.target.checked)} />
                 <span className="rp-checkbox-text">
                   I agree to Nilay 360&apos;s{" "}
@@ -777,7 +805,7 @@ export default function RegisterPage() {
               {/* Submit */}
               <button type="submit" className="rp-submit" disabled={loading}
                 style={loading ? { opacity: 0.7, cursor: "not-allowed" } : undefined}>
-                {loading ? "Creating Account…" : accountType === "agent" ? "Create Agent Account" : "Create Account"}
+                {loading ? "Creating Account…" : accountType === "agent" ? "Create Agent Account" : accountType === "builder" ? "Create Builder Account" : "Create Account"}
               </button>
 
               <p className="rp-signin-link">

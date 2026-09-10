@@ -52,7 +52,7 @@ export default function LoginPage() {
               .select("role")
               .eq("id", userId)
               .single();
-            if (profile?.role === "agent") destination = "/dashboard/agent";
+            if (profile?.role === "agent" || profile?.role === "builder") destination = "/dashboard/agent";
             else if (profile?.role === "admin" || profile?.role === "super_admin") destination = "/dashboard/admin";
           }
         } catch {

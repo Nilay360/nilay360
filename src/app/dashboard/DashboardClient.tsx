@@ -1701,7 +1701,7 @@ function SettingsTab({ email, fullName }: { email: string; fullName?: string }) 
 export default function DashboardClient({ email, userId, fullName, accountType }: Props) {
   const router = useRouter();
   const { profile: authProfile, loading: authLoading } = useAuth();
-  const isAgent = authProfile?.role === "agent";
+  const isAgent = authProfile?.role === "agent" || authProfile?.role === "builder";
 
   const [active,      setActive]      = useState<Tab>("overview");
   const [sidebarOpen, setSidebarOpen] = useState(false);

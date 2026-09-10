@@ -3192,7 +3192,24 @@ export default function AdminPage() {
     const oldStatus = agentApps.find(a => a.id === id)?.status ?? null;
     const supabase = createClient();
     const { error: statusErr } = await supabase.from("agent_profiles").update({ status: "approved" }).eq("id", id);
-    const { error: roleErr } = statusErr ? { error: null } : await supabase.from("profiles").update({ role: "agent" }).eq("id", userId);
+
+    // agent_profiles has no column recording whether this application was
+    // originally an Agent or Builder registration — but a user who
+    // self-registered via AuthModal already has the correct profiles.role
+    // ('agent' or 'builder') set at signup time (verify-otp/route.ts).
+    // Blindly overwriting to 'agent' here would silently convert an
+    // approved Builder back into an Agent. Only default to 'agent' when
+    // the current role is neither — the become-an-agent.tsx path, where an
+    // existing buyer applies later and has no Builder equivalent, so their
+    // role is still 'buyer' at this point.
+    let roleErr: { message: string } | null = null;
+    if (!statusErr) {
+      const { data: currentProfile } = await supabase.from("profiles").select("role").eq("id", userId).maybeSingle();
+      const alreadyCorrect = currentProfile?.role === "agent" || currentProfile?.role === "builder";
+      if (!alreadyCorrect) {
+        ({ error: roleErr } = await supabase.from("profiles").update({ role: "agent" }).eq("id", userId));
+      }
+    }
 
     if (statusErr || roleErr) {
       console.error("Admin — agent approve error:", statusErr ?? roleErr);

@@ -797,10 +797,12 @@ export function Navbar() {
               List Property
             </button>
 
-            {/* Notification bell — agent-only, sits beside the profile
-                dropdown. Rendered as its own sibling so its portal/z-index
-                is independent of the user dropdown's. */}
-            {mounted && user && profile?.role === "agent" && (
+            {/* Notification bell — universal for any signed-in user (backend
+                already fully generic: notif_own RLS is user_id = auth.uid(),
+                no role check anywhere). Sits beside the profile dropdown,
+                rendered as its own sibling so its portal/z-index is
+                independent of the user dropdown's. */}
+            {mounted && user && (
               <NotificationBell userId={user.id} />
             )}
 

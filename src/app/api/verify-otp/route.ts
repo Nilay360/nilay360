@@ -81,19 +81,34 @@ export async function POST(req: NextRequest) {
     const syntheticEmail = `phone_${phone}@auth.nilay360.com`
 
     let userEmail: string
-    const isAgent = account_type === 'agent'
+    // Builder is functionally identical to Agent for now (same
+    // agent_profiles-gated portal access, same verification requirement) —
+    // but profiles.role must genuinely be 'builder', not collapsed to the
+    // literal 'agent' string, so isAgentOrBuilder only drives the shared
+    // is_verified behavior, never the role value itself.
+    const isAgentOrBuilder = account_type === 'agent' || account_type === 'builder'
+    const roleForNewAccount = account_type === 'builder' ? 'builder' : isAgentOrBuilder ? 'agent' : 'buyer'
     // Set when admin.createUser() fails because the account already exists
     // (see below) — signals that Step 3 needs to run the created_at safety
     // check and self-heal the missing profiles row once it has recovered
     // the real user id.
     let selfHealNeeded = false
 
-    // Look up via profiles table (reliable source of truth for phone → user ID)
-    const { data: existingProfile } = await supabase
+    // Look up via profiles table (reliable source of truth for phone → user ID).
+    // Dual-format tolerant, mirroring findUserByPhone()'s proven pattern —
+    // belt-and-suspenders even with DB-level normalization (056) in place:
+    // guards against rows written before that trigger existed in a given
+    // environment, and against more than one legacy-format duplicate already
+    // existing for the same number. Ordered by created_at so the oldest
+    // (real) account wins over a later duplicate rather than erroring.
+    const { data: existingProfileMatches } = await supabase
       .from('profiles')
       .select('id')
-      .eq('phone', fullPhone)
-      .maybeSingle()
+      .or(`phone.eq.${fullPhone},phone.eq.${phone}`)
+      .order('created_at', { ascending: true })
+      .limit(1)
+
+    const existingProfile = existingProfileMatches?.[0] ?? null
 
     if (existingProfile) {
       // ── Existing user ──
@@ -175,8 +190,8 @@ export async function POST(req: NextRequest) {
           full_name:   full_name || '',
           phone:       fullPhone,
           city:        city     || null,
-          role:        isAgent ? 'agent' : 'buyer',
-          is_verified: !isAgent,
+          role:        roleForNewAccount,
+          is_verified: !isAgentOrBuilder,
           whatsapp:    whatsapp ? fullPhone : null,
         })
         if (upsertErr) console.error('Profile upsert error:', upsertErr)
@@ -259,8 +274,8 @@ export async function POST(req: NextRequest) {
         // "Complete your profile" flow already prompts for it when blank.
         full_name:   '',
         phone:       fullPhone,
-        role:        isAgent ? 'agent' : 'buyer',
-        is_verified: !isAgent,
+        role:        roleForNewAccount,
+        is_verified: !isAgentOrBuilder,
         whatsapp:    whatsapp ? fullPhone : null,
       })
       if (selfHealErr) console.error('[verify-otp] Self-heal profile upsert error:', selfHealErr)
@@ -282,7 +297,7 @@ export async function POST(req: NextRequest) {
       token_hash: linkData.properties.hashed_token,
       type:       'magiclink',
       isNewUser:  !existingProfile,
-      isAgent:    account_type === 'agent',
+      isAgent:    isAgentOrBuilder,
     })
   } catch (error) {
     console.error('verify-otp route error:', error)
