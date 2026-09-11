@@ -1,0 +1,57 @@
+-- ═══════════════════════════════════════════════════════════════
+-- 057 — Owner SELECT policy on property_listings, by user_id
+-- DRAFTED FOR REVIEW, NOT APPLIED. Same review discipline as every
+-- prior migration tonight: this file has not been run against the
+-- database. Do not apply until reviewed line by line.
+--
+-- ROOT CAUSE THIS FIXES (confirmed tonight, not a guess):
+-- post-property.tsx's listing submission does
+--   supabase.from('property_listings').insert([{...}]).select('id').single()
+-- — the .select() after .insert() means Postgres must also satisfy a
+-- SELECT-policy check on the newly inserted row via the implicit
+-- RETURNING clause, in addition to the INSERT policy's WITH CHECK.
+--
+-- Every SELECT policy that existed on property_listings before this
+-- migration was confirmed (by reading 003_rls_fixes.sql,
+-- 004_data_access_fix.sql, 011_agent_portal_schema.sql — the complete
+-- set, no others exist):
+--   "Public can view active listings"      — status = 'active' OR
+--                                             seller_email = auth.jwt()->>'email'
+--   "Users can view own listings"          — seller_email = auth.jwt()->>'email'
+--   "agent_can_view_assigned_listings"     — assigned_agent_id -> an
+--                                             agent_profiles row for auth.uid()
+--
+-- None of these match a freshly-inserted row: status is 'pending_review'
+-- (not 'active'), assigned_agent_id is NULL (never set until a later
+-- admin/agent-assignment step), and seller_email is a free-text form
+-- field (post-property.tsx, `state.sellerEmail`) that the submitting
+-- user types by hand — never validated or locked against their actual
+-- session login email. Confirmed in post-property.tsx: the field
+-- starts as '' and is only ever set by the input's onChange; nothing
+-- pre-fills or checks it against auth.getUser()/getSession() before
+-- this migration. If the typed value doesn't exactly match the JWT
+-- email, EVERY SELECT policy fails on that row, and the INSERT's
+-- implicit RETURNING gets blocked by RLS — even though the INSERT's own
+-- WITH CHECK (true) (003_rls_fixes.sql, "Anyone can insert listings")
+-- passed fine. This is the confirmed root cause of tonight's persisting
+-- property_listings 403, reached only after ruling out (with evidence,
+-- not assumption) mismatched policies, forced RLS, wrong grants,
+-- trigger-ownership mismatches, hidden triggers, and an upsert/onConflict
+-- path that doesn't exist in this code.
+--
+-- FIX: add a SELECT policy keyed on user_id, which is reliably set on
+-- every insert (post-property.tsx sets `user_id: authUserId` from the
+-- submitter's own session — never user-editable, unlike seller_email).
+-- This makes the RETURNING check succeed regardless of what the seller
+-- typed into the contact-email field, closing the gap structurally
+-- rather than depending on that field matching the login email.
+--
+-- SCOPE: purely additive. RLS policies OR-combine, so this cannot
+-- narrow any existing policy — it only adds one new case where a
+-- submitter can see their own row. No existing access (public,
+-- seller-by-email, assigned-agent) is changed or reduced.
+-- ═══════════════════════════════════════════════════════════════
+
+CREATE POLICY "Owner can view own listings by user_id"
+  ON property_listings FOR SELECT
+  USING (user_id = auth.uid());

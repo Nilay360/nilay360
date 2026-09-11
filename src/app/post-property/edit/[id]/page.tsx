@@ -275,7 +275,10 @@ export default function EditListingPage() {
     setFpError(null)
     setFpUploading(true)
     const supabase = createClient()
-    const MAX_BYTES = 10 * 1024 * 1024
+    // Matches Cloudinary's max_bytes in api/upload-image/route.ts exactly —
+    // previously 10*1024*1024 (10,485,760), which let a ~486 KB band of
+    // files pass this check and still get rejected server-side.
+    const MAX_BYTES = 10_000_000
     let nextOrder = floorPlans.length
     for (const file of Array.from(files)) {
       if (!file.type.startsWith('image/')) { setFpError(`${file.name} is not an image`); continue }

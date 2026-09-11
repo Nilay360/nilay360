@@ -81,6 +81,7 @@ type Action =
   | { type: 'REMOVE_FLOOR_PLAN'; id: string }
   | { type: 'SET_FLOOR_PLAN_LABEL'; id: string; label: string }
   | { type: 'LOAD_DRAFT'; partial: Partial<Omit<FormState, 'photos' | 'floorPlans'>> }
+  | { type: 'PREFILL_SELLER_EMAIL'; email: string }
 
 const INITIAL: FormState = {
   listingType: '', propertyCategory: '',
@@ -123,6 +124,10 @@ function reducer(s: FormState, a: Action): FormState {
     case 'SET_FLOOR_PLAN_LABEL':
       return { ...s, floorPlans: s.floorPlans.map(p => p.id === a.id ? { ...p, label: a.label } : p) }
     case 'LOAD_DRAFT': return { ...s, ...a.partial, photos: [], floorPlans: [] }
+    // Only fills in a still-blank field — never overwrites a value the
+    // user already typed or restored from a saved draft, regardless of
+    // whether this resolves before or after LOAD_DRAFT.
+    case 'PREFILL_SELLER_EMAIL': return s.sellerEmail ? s : { ...s, sellerEmail: a.email }
     default: return s
   }
 }
@@ -935,7 +940,10 @@ function Step6({ state, dispatch }: { state: FormState; dispatch: React.Dispatch
   const dragItem = useRef<number | null>(null)
   const dragTarget = useRef<number | null>(null)
 
-  const MAX_BYTES = 10 * 1024 * 1024 // 10 MB
+  // Matches Cloudinary's max_bytes in api/upload-image/route.ts exactly —
+  // previously 10*1024*1024 (10,485,760), which let a ~486 KB band of files
+  // pass this check and still get rejected server-side.
+  const MAX_BYTES = 10_000_000 // 10 MB
 
   const addFiles = useCallback((files: FileList | File[]) => {
     const incoming = Array.from(files)
@@ -1113,7 +1121,10 @@ function Step7({ state, dispatch }: { state: FormState; dispatch: React.Dispatch
   const [dragOver, setDragOver] = React.useState(false)
   const [fpError, setFpError] = React.useState('')
 
-  const MAX_BYTES = 10 * 1024 * 1024 // 10 MB
+  // Matches Cloudinary's max_bytes in api/upload-image/route.ts exactly —
+  // previously 10*1024*1024 (10,485,760), which let a ~486 KB band of files
+  // pass this check and still get rejected server-side.
+  const MAX_BYTES = 10_000_000 // 10 MB
 
   const addFiles = useCallback((files: FileList | File[]) => {
     const incoming = Array.from(files)
@@ -1519,6 +1530,21 @@ export default function PostPropertyPage() {
     } catch {}
   }, [])
 
+  // Pre-fill (not lock) the seller-email field from the authenticated
+  // session, so it defaults to the real login email instead of a blank
+  // free-text field the user has to remember to fill in accurately.
+  // Stays editable — a seller may legitimately want inquiries routed to
+  // a different contact email. PREFILL_SELLER_EMAIL only ever fills a
+  // still-blank field, so this can't clobber a manually-typed value or
+  // one just restored from a saved draft.
+  useEffect(() => {
+    const supabase = createClient()
+    supabase.auth.getSession().then((result: Awaited<ReturnType<typeof supabase.auth.getSession>>) => {
+      const email = result.data.session?.user?.email
+      if (email) dispatch({ type: 'PREFILL_SELLER_EMAIL', email })
+    })
+  }, [])
+
   const goNext = () => {
     const err = validate(step, state)
     if (err) { setStepError(err); return }
@@ -1560,7 +1586,8 @@ export default function PostPropertyPage() {
           imageUrls.push(json.secure_url as string)
         } catch (err) {
           console.error('Photo upload failed:', photo.file.name, err)
-          failed.push(photo.file.name)
+          const reason = err instanceof Error ? err.message : 'Upload failed'
+          failed.push(`${photo.file.name} (${reason})`)
         }
       }
 
