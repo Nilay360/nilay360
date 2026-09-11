@@ -43,6 +43,53 @@ async function findUserByPhone(
   }
 }
 
+// Resolves the correct role for a profiles write, given the account's real
+// resolved user id — never just trusts a possibly-absent account_type.
+// account_type is only ever sent by the registration flow (AuthModal.tsx);
+// a plain Sign In retry sends none, which previously made every downstream
+// write default to 'buyer' unconditionally, silently demoting real
+// agents/builders whenever their profiles row needed to be recreated by
+// self-heal. Confirmed root cause, 2026-09-11 — fixed by resolving role
+// from the account's actual current state instead of the request body
+// whenever account_type isn't present.
+async function resolveRole(
+  supabase: ReturnType<typeof adminClient>,
+  userId: string,
+  account_type: string | undefined
+): Promise<{ role: 'buyer' | 'agent' | 'builder'; isAgentOrBuilder: boolean }> {
+  // account_type present — trust it, same as this file's original behavior.
+  if (account_type === 'builder') return { role: 'builder', isAgentOrBuilder: true }
+  if (account_type === 'agent')   return { role: 'agent',   isAgentOrBuilder: true }
+
+  // account_type absent — prefer profiles.role if a (possibly incomplete)
+  // profiles row still exists: it's the most authoritative signal, since
+  // it may hold 'builder' specifically, which agent_profiles alone can't
+  // distinguish (011_agent_portal_schema.sql has no agent/builder column).
+  const { data: existingProfileRow } = await supabase
+    .from('profiles')
+    .select('role')
+    .eq('id', userId)
+    .maybeSingle()
+
+  if (existingProfileRow?.role === 'agent' || existingProfileRow?.role === 'builder') {
+    return { role: existingProfileRow.role, isAgentOrBuilder: true }
+  }
+
+  // No profiles row, or its role isn't agent/builder — fall back to
+  // agent_profiles existence. 'agent' is the correct generic fallback here
+  // (matches this file's original convention: isAgentOrBuilder ? 'agent' :
+  // 'buyer' — 'builder' is only ever assigned when explicitly known).
+  const { data: agentProfileRow } = await supabase
+    .from('agent_profiles')
+    .select('id')
+    .eq('user_id', userId)
+    .maybeSingle()
+
+  if (agentProfileRow) return { role: 'agent', isAgentOrBuilder: true }
+
+  return { role: 'buyer', isAgentOrBuilder: false }
+}
+
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json()
@@ -81,18 +128,16 @@ export async function POST(req: NextRequest) {
     const syntheticEmail = `phone_${phone}@auth.nilay360.com`
 
     let userEmail: string
-    // Builder is functionally identical to Agent for now (same
-    // agent_profiles-gated portal access, same verification requirement) —
-    // but profiles.role must genuinely be 'builder', not collapsed to the
-    // literal 'agent' string, so isAgentOrBuilder only drives the shared
-    // is_verified behavior, never the role value itself.
-    const isAgentOrBuilder = account_type === 'agent' || account_type === 'builder'
-    const roleForNewAccount = account_type === 'builder' ? 'builder' : isAgentOrBuilder ? 'agent' : 'buyer'
     // Set when admin.createUser() fails because the account already exists
     // (see below) — signals that Step 3 needs to run the created_at safety
     // check and self-heal the missing profiles row once it has recovered
     // the real user id.
     let selfHealNeeded = false
+    // Informational only (confirmed unused by any client this session) —
+    // reflects whichever branch below actually resolved a role; left false
+    // for the plain existing-user sign-in branch, unchanged from prior
+    // behavior there.
+    let responseIsAgentOrBuilder = false
 
     // Look up via profiles table (reliable source of truth for phone → user ID).
     // Dual-format tolerant, mirroring findUserByPhone()'s proven pattern —
@@ -183,6 +228,11 @@ export async function POST(req: NextRequest) {
         const userId = newUserData.user.id
         userEmail = email || syntheticEmail
 
+        // Brand-new auth user — no profiles/agent_profiles row can exist for
+        // it yet, so this always resolves from account_type, same as before.
+        const { role: roleForNewAccount, isAgentOrBuilder } = await resolveRole(supabase, userId, account_type)
+        responseIsAgentOrBuilder = isAgentOrBuilder
+
         // Profile upsert — non-fatal: user is created, profile can self-heal on
         // next sign-in if this write fails.
         const { error: upsertErr } = await supabase.from('profiles').upsert({
@@ -267,6 +317,12 @@ export async function POST(req: NextRequest) {
       // existing "Complete your profile" flow already prompts for full_name
       // on next load when it's missing, same as it does for any account
       // still filling in its profile.
+      // The account most likely to have account_type absent (a plain Sign
+      // In retry) — resolveRole checks profiles.role and agent_profiles
+      // for this exact user id rather than defaulting to 'buyer' blindly.
+      const { role: roleForNewAccount, isAgentOrBuilder } = await resolveRole(supabase, linkData.user.id, account_type)
+      responseIsAgentOrBuilder = isAgentOrBuilder
+
       const { error: selfHealErr } = await supabase.from('profiles').upsert({
         id:          linkData.user.id,
         // full_name is NOT NULL with no default — '' is the genuinely
@@ -297,7 +353,7 @@ export async function POST(req: NextRequest) {
       token_hash: linkData.properties.hashed_token,
       type:       'magiclink',
       isNewUser:  !existingProfile,
-      isAgent:    isAgentOrBuilder,
+      isAgent:    responseIsAgentOrBuilder,
     })
   } catch (error) {
     console.error('verify-otp route error:', error)

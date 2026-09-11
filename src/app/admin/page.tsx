@@ -94,9 +94,26 @@ type AgentApplication = {
   years_experience: number | null;
   status: string;
   created_at: string;
-  profiles: { full_name: string | null; phone: string | null; email: string | null } | null;
+  rera_number: string | null;
+  oc_number: string | null;
+  profiles: { full_name: string | null; phone: string | null; email: string | null; role: string | null } | null;
   agent_service_cities: { city: string }[] | null;
 };
+
+// Which required-but-unenforced fields this application is missing — RERA is
+// expected for agent and builder alike, OC only for builder (agent_profiles
+// has no agent/builder column of its own, so this reads profiles.role to
+// know which), and "email" flags the synthetic phone-only placeholder
+// (see verify-otp/route.ts's syntheticEmail) rather than a real address.
+// Individual accounts are never checked — a missing email there is normal.
+function incompleteAgentAppReasons(app: AgentApplication): string[] {
+  const isBuilder = app.profiles?.role === "builder";
+  const reasons: string[] = [];
+  if (!app.rera_number?.trim()) reasons.push("RERA");
+  if (isBuilder && !app.oc_number?.trim()) reasons.push("OC");
+  if (!app.profiles?.email?.trim() || app.profiles.email.endsWith("@auth.nilay360.com")) reasons.push("email");
+  return reasons;
+}
 
 // KYC Documents — same fixed 4-slot checklist as the agent's own profile
 // page (src/app/dashboard/DashboardClient.tsx's KYC_DOCUMENT_SLOTS),
@@ -1632,7 +1649,7 @@ function InquiriesSection({
 
 // ── Section: Agent Applications ─────────────────────────────────────────────────
 
-const AGENT_STATUS_FILTERS = ["pending", "approved", "rejected"] as const;
+const AGENT_STATUS_FILTERS = ["pending", "approved", "rejected", "incomplete"] as const;
 type AgentStatusFilter = typeof AGENT_STATUS_FILTERS[number];
 
 function AgentCard({
@@ -1644,6 +1661,7 @@ function AgentCard({
   documents: AgentDocumentRow[];
 }) {
   const cities = (app.agent_service_cities ?? []).map(c => c.city);
+  const missing = incompleteAgentAppReasons(app);
   return (
     <div style={{ background: "rgba(255,255,255,0.05)", backdropFilter: "blur(24px)", WebkitBackdropFilter: "blur(24px)", borderRadius: "16px", border: "1px solid rgba(255,255,255,0.08)", boxShadow: "0 4px 24px rgba(0,0,0,0.18)", padding: "18px 22px", opacity: inFlight ? 0.55 : 1, transition: "opacity 0.2s" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: "12px", flexWrap: "wrap", marginBottom: "10px" }}>
@@ -1651,6 +1669,11 @@ function AgentCard({
           <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px", flexWrap: "wrap" }}>
             <StatusBadge status={app.status === "approved" ? "active" : app.status === "pending" ? "pending_review" : "rejected"} />
             <span style={{ fontSize: "11px", color: "rgba(255,255,255,0.45)" }}>{fmtDate(app.created_at)}</span>
+            {missing.length > 0 && (
+              <span style={{ padding: "3px 10px", borderRadius: "100px", fontSize: "10px", fontWeight: 700, background: "rgba(245,158,11,0.12)", color: "#F59E0B", border: "1px solid rgba(245,158,11,0.3)" }}>
+                ⚠ Missing {missing.join("/")}
+              </span>
+            )}
           </div>
           <h3 style={{ fontFamily: "var(--font-heading-new)", fontSize: "19px", fontWeight: 600, color: "#FFFFFF", lineHeight: 1.25, marginBottom: "4px" }}>
             {app.profiles?.full_name ?? "Unnamed applicant"}
@@ -1912,7 +1935,17 @@ function AgentsSection({
   const [filter, setFilter] = useState<AgentStatusFilter>("pending");
   const [showAddModal, setShowAddModal] = useState(false);
 
-  const filtered = applications.filter(a => a.status === filter);
+  // "incomplete" is a derived flag, not a status value — an application can
+  // be pending/approved/rejected AND incomplete at the same time, so this
+  // filters across all statuses rather than narrowing to one.
+  const countFor = (f: AgentStatusFilter) =>
+    f === "incomplete"
+      ? applications.filter(a => incompleteAgentAppReasons(a).length > 0).length
+      : applications.filter(a => a.status === f).length;
+
+  const filtered = filter === "incomplete"
+    ? applications.filter(a => incompleteAgentAppReasons(a).length > 0)
+    : applications.filter(a => a.status === filter);
 
   if (loading) return <Spinner />;
 
@@ -1930,7 +1963,7 @@ function AgentsSection({
                 onClick={() => setFilter(f)}
                 style={{ padding: "6px 14px", borderRadius: "100px", fontSize: "11px", fontWeight: on ? 700 : 500, background: on ? "#10C4C3" : "rgba(255,255,255,0.06)", color: on ? "#020C1C" : "#A9B4C2", border: on ? "1.5px solid #10C4C3" : "1.5px solid rgba(255,255,255,0.12)", cursor: "pointer", fontFamily: "var(--font-support-new)", textTransform: "capitalize" as const }}
               >
-                {f} ({applications.filter(a => a.status === f).length})
+                {f} ({countFor(f)})
               </button>
             );
           })}
@@ -2624,7 +2657,7 @@ export default function AdminPage() {
       setAgentAppsLoading(true);
       supabase
         .from("agent_profiles")
-        .select("id, user_id, license_number, agency_name, bio, years_experience, status, created_at, profiles(full_name, phone, email), agent_service_cities(city)")
+        .select("id, user_id, license_number, agency_name, bio, years_experience, status, created_at, rera_number, oc_number, profiles(full_name, phone, email, role), agent_service_cities(city)")
         .order("created_at", { ascending: false })
         .then(async (res: { data: unknown }) => {
           const apps = (res.data as AgentApplication[] | null) ?? [];

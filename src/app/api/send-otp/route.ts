@@ -1,4 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { createClient } from '@supabase/supabase-js'
+
+function adminClient() {
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,
+    { auth: { autoRefreshToken: false, persistSession: false } }
+  )
+}
+
+const MAX_OTP_REQUESTS_PER_HOUR = 5
 
 export async function POST(req: NextRequest) {
   try {
@@ -7,9 +18,38 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Invalid phone number' }, { status: 400 })
     }
 
-    // Test mode: only active when explicitly set AND not in production
+    // Test mode: only active when explicitly set AND not in production.
+    // Placed before the rate-limit check so test mode is fully exempt — it
+    // never touches MSG91 or its quota, so there's nothing to rate-limit.
     if (process.env.MSG91_TEST_MODE === 'true' && process.env.NODE_ENV !== 'production') {
       return NextResponse.json({ success: true, requestId: 'test-mode', testMode: true })
+    }
+
+    // Same +91XXXXXXXXXX convention as verify-otp/route.ts's fullPhone — the
+    // one canonical format this codebase uses, per 056_phone_normalization.sql.
+    const fullPhone = `+91${phone}`
+
+    // Rate limit: 5 sends per phone per hour (059_otp_rate_limiting.sql).
+    // Checked before calling MSG91 at all — a caller over the limit never
+    // reaches MSG91, so this also protects against burning MSG91 send quota.
+    const supabase = adminClient()
+    const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString()
+    const { count, error: countErr } = await supabase
+      .from('otp_requests')
+      .select('id', { count: 'exact', head: true })
+      .eq('phone', fullPhone)
+      .gte('requested_at', oneHourAgo)
+
+    if (countErr) {
+      // Fail open on a counting error rather than blocking every OTP send —
+      // an unreachable rate-limit table shouldn't take down sign-in/register
+      // entirely. Logged loudly so it's visible, not silently ignored.
+      console.error('[send-otp] otp_requests count query failed — failing open:', countErr)
+    } else if ((count ?? 0) >= MAX_OTP_REQUESTS_PER_HOUR) {
+      return NextResponse.json(
+        { error: 'Too many OTP requests. Please try again later.' },
+        { status: 429 }
+      )
     }
 
     const payload = {
@@ -40,6 +80,14 @@ export async function POST(req: NextRequest) {
         { status: 500 }
       )
     }
+
+    // Record this send for future rate-limit counts. Non-fatal — an insert
+    // failure here shouldn't fail an OTP send that already succeeded with
+    // MSG91; it only means this one send under-counts toward the limit.
+    const { error: insertErr } = await supabase
+      .from('otp_requests')
+      .insert({ phone: fullPhone })
+    if (insertErr) console.error('[send-otp] Failed to record otp_requests row:', insertErr)
 
     return NextResponse.json({ success: true, requestId: data.request_id })
   } catch (error) {

@@ -1,10 +1,21 @@
 ﻿import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
+import { createClient } from "@supabase/supabase-js";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
-// Notifies the Nilay 360 admin team when a new agent registers so the application
-// can be reviewed and verified. Mirrors the pattern in send-inquiry-email.
+function adminClient() {
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,
+    { auth: { autoRefreshToken: false, persistSession: false } }
+  );
+}
+
+// Notifies the Nilay 360 admin team when a new agent/builder registers so the
+// application can be reviewed and verified. Mirrors the pattern in
+// send-inquiry-email for the outbound email; the in-app notification insert
+// below is new (2026-09-11, Part B) and additive to that existing email path.
 export async function POST(req: NextRequest) {
   let body: Record<string, unknown>;
   try {
@@ -13,13 +24,15 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
   }
 
-  const { name, phone, email, rera, agency, city } = body as {
+  const { name, phone, email, rera, oc, agency, city, account_type } = body as {
     name?: string;
     phone?: string;
     email?: string;
     rera?: string;
+    oc?: string;
     agency?: string;
     city?: string;
+    account_type?: string;
   };
 
   const adminEmail = process.env.ADMIN_EMAIL || "admin@nilay360.com";
@@ -104,6 +117,12 @@ export async function POST(req: NextRequest) {
 </html>
 `;
 
+  // Two independent notification channels, each in its own try/catch — same
+  // discipline as recordConsent()/change_log tonight: a secondary/non-critical
+  // action must never depend on or be blocked by another one. A Resend outage
+  // must not suppress the in-app admin notification, and (symmetrically) a
+  // notifications-table problem must never suppress the email.
+  let emailSent = false;
   try {
     await resend.emails.send({
       from: "Nilay 360 <onboarding@resend.dev>",
@@ -111,11 +130,68 @@ export async function POST(req: NextRequest) {
       subject,
       html,
     });
-    return NextResponse.json({ success: true });
+    emailSent = true;
   } catch (err) {
     console.error("Resend error (notify-admin-agent):", err);
-    return NextResponse.json({ error: "Email send failed" }, { status: 500 });
   }
+
+  // In-app admin notification — completeness check, agent/builder only (an
+  // Individual account never providing an email is normal and expected, not
+  // worth notifying admins about; agent/builder accounts missing real contact
+  // info are the ones that need follow-up). Fire-and-forget, non-fatal — same
+  // discipline as recordConsent(): never fails this route or blocks the
+  // registration flow above, which has already completed by the time this
+  // fires. Runs regardless of whether the email above succeeded.
+  let notified = false;
+  if (account_type === "agent" || account_type === "builder") {
+    try {
+      const missingRera = !rera?.trim();
+      const missingOc = account_type === "builder" && !oc?.trim();
+      const missingEmail = !email?.trim() || email.endsWith("@auth.nilay360.com");
+
+      if (missingRera || missingOc || missingEmail) {
+        const reasons = [
+          missingRera && "RERA",
+          missingOc && "OC",
+          missingEmail && "email",
+        ].filter(Boolean).join("/");
+
+        const supabase = adminClient();
+        const { data: admins, error: adminsErr } = await supabase
+          .from("profiles")
+          .select("id")
+          .in("role", ["admin", "super_admin"]);
+
+        if (adminsErr) {
+          console.error("[notify-admin-agent] Failed to look up admin recipients:", adminsErr);
+        } else if (admins?.length) {
+          const rows = admins.map((a) => ({
+            user_id: a.id,
+            title: `Incomplete ${account_type} registration`,
+            body: `${name ?? "Unknown"} (${phone ?? "no phone"}) — missing: ${reasons}`,
+            type: "incomplete_registration",
+            action_url: "/admin?section=agents",
+          }));
+          const { error: notifErr } = await supabase.from("notifications").insert(rows);
+          if (notifErr) console.error("[notify-admin-agent] Failed to insert admin notifications:", notifErr);
+          else notified = true;
+        } else {
+          // Nothing missing — no admin follow-up needed, not a failure.
+          notified = true;
+        }
+      } else {
+        notified = true;
+      }
+    } catch (err) {
+      console.error("[notify-admin-agent] Unexpected error during completeness check:", err);
+    }
+  }
+
+  // Best-effort route by design (see AuthModal.tsx's fire-and-forget caller) —
+  // always 200; emailSent/notified report what actually happened for anyone
+  // who does inspect the response, without turning either failure into a
+  // hard error for the other channel.
+  return NextResponse.json({ success: true, emailSent, notified });
 }
 
 function escHtml(str: string): string {

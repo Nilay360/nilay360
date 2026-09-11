@@ -145,7 +145,7 @@ function AuthModalInner({
   const [reStep, setReStep]   = useState<1 | 2 | 3>(1);
   const [accountType, setAccountType] = useState<AccountType>("individual");
   const [reForm, setReForm] = useState({
-    full_name: "", phone: "", email: "", city: CITIES[0], rera: "", agency: "",
+    full_name: "", phone: "", email: "", city: CITIES[0], rera: "", agency: "", oc: "",
   });
   const [whatsappOptIn, setWhatsappOptIn] = useState(true);
   const [agreeTerms, setAgreeTerms] = useState(false);
@@ -290,11 +290,14 @@ function AuthModalInner({
     setError(null);
     if (!reForm.full_name.trim()) { setError("Please enter your full name."); return; }
     if (reForm.phone.length !== 10) { setError("Please enter a valid 10-digit mobile number."); return; }
-    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(reForm.email)) { setError("Please enter a valid email address."); return; }
-    if ((accountType === "agent" || accountType === "builder") && !reForm.rera.trim()) {
-      setError("RERA Registration Number is required for agent and builder accounts.");
+    // Email is optional for every account type — only validate shape if something
+    // was actually typed, never require it to be non-empty.
+    if (reForm.email.trim() && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(reForm.email)) {
+      setError("Please enter a valid email address.");
       return;
     }
+    // RERA/OC are collected but no longer block submission — an admin follows up
+    // on incomplete agent/builder applications instead (see notify-admin-agent).
     if (!agreeTerms) { setError("Please agree to the Terms of Service to continue."); return; }
     if (!agreePrivacy) { setError("Please agree to the Privacy Policy to continue."); return; }
     setLoading(true);
@@ -360,7 +363,8 @@ function AuthModalInner({
           try {
             const { error: agentProfileErr } = await supabase.from("agent_profiles").insert({
               user_id: newUserId,
-              rera_number: reForm.rera,
+              rera_number: reForm.rera.trim() || null,
+              oc_number: accountType === "builder" ? (reForm.oc.trim() || null) : null,
               status: "pending",
             });
             if (agentProfileErr) {
@@ -381,12 +385,14 @@ function AuthModalInner({
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-              name:   reForm.full_name,
-              phone:  "+91" + reForm.phone,
-              email:  reForm.email,
-              rera:   reForm.rera,
-              agency: reForm.agency,
-              city:   reForm.city,
+              name:         reForm.full_name,
+              phone:        "+91" + reForm.phone,
+              email:        reForm.email,
+              rera:         reForm.rera,
+              oc:           reForm.oc,
+              agency:       reForm.agency,
+              city:         reForm.city,
+              account_type: accountType,
             }),
           });
         } catch (err) {
@@ -594,13 +600,25 @@ function AuthModalInner({
                 {(accountType === "agent" || accountType === "builder") && (
                   <>
                     <label className="am-label" htmlFor="re-rera">
-                      RERA Registration No. <span style={{ color: "#E57373" }}>*</span>
+                      RERA Registration No. <span className="am-optional">(optional)</span>
                     </label>
                     <input
                       id="re-rera" type="text" className="am-input"
                       placeholder="e.g. A51800012345"
                       value={reForm.rera} onChange={(e) => setReForm((f) => ({ ...f, rera: e.target.value }))}
                     />
+                    {accountType === "builder" && (
+                      <>
+                        <label className="am-label" htmlFor="re-oc">
+                          OC Number <span className="am-optional">(optional)</span>
+                        </label>
+                        <input
+                          id="re-oc" type="text" className="am-input"
+                          placeholder="Occupancy Certificate number"
+                          value={reForm.oc} onChange={(e) => setReForm((f) => ({ ...f, oc: e.target.value }))}
+                        />
+                      </>
+                    )}
                     <label className="am-label" htmlFor="re-agency">
                       Agency Name <span className="am-optional">(optional)</span>
                     </label>
