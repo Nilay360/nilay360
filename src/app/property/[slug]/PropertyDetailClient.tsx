@@ -1,5 +1,5 @@
 ﻿"use client";
-import { useState, useEffect, useMemo, useCallback } from "react";
+import { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import { useParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import Reveal from "@/components/ui/Reveal";
@@ -8,6 +8,7 @@ import { useAuth } from "@/context/AuthContext";
 import { useSavedProperties } from "@/hooks/useSavedProperties";
 import ReportButton from "@/components/shared/ReportButton";
 import { optimizedImageUrl } from "@/lib/image-url";
+import { loadGoogleMapsScript } from "@/lib/loadGoogleMapsScript";
 
 interface FloorPlanRow {
   id: string
@@ -122,6 +123,63 @@ type Property = {
   seller_name?: string;
   seller_phone?: string;
   seller_whatsapp?: string;
+  assigned_agent_id?: string | null;
+  latitude?: number | null;
+  longitude?: number | null;
+};
+
+// One category's cached row from nearby_places_cache (063_nearby_places_cache.sql,
+// 064_nearby_places_coordinates.sql). latitude/longitude are null for any row cached
+// before 064 — repopulated on that row's next weekly refresh, never faked here.
+type NearbyPlace = {
+  id: string;
+  category: string;
+  name: string;
+  address: string | null;
+  distance_meters: number | null;
+  rating: number | null;
+  latitude: number | null;
+  longitude: number | null;
+};
+
+// Colors deliberately distinct from the site's teal accent (#10C4C3) — these are
+// data/category pins, not brand CTAs, and each color is reused identically for both
+// the list's icon-circle badge and that category's map markers so the two read as
+// one connected system.
+const NEARBY_CATEGORY_META: Record<string, { color: string; label: string; glyph: string }> = {
+  hospital:      { color: "#EF4444", label: "Hospitals",       glyph: "M11 4h2v6h6v2h-6v6h-2v-6H5v-2h6V4z" },
+  school:        { color: "#3B82F6", label: "Schools",         glyph: "M12 3 1 9l11 6 9-4.91V17h2V9L12 3zM5 13.18v4.18L12 21l7-3.64v-4.18L12 17l-7-3.82z" },
+  supermarket:   { color: "#22C55E", label: "Supermarkets",    glyph: "M7 4h-2v2h2l3.6 7.59-1.35 2.44A2 2 0 0 0 11 19h9v-2h-9l1.1-2h7.45a2 2 0 0 0 1.75-1.03L23.24 8H6.21l-.94-2H2v0zM7 20a2 2 0 1 0 .001-4.001A2 2 0 0 0 7 20zm10 0a2 2 0 1 0 .001-4.001A2 2 0 0 0 17 20z" },
+  gas_station:   { color: "#F59E0B", label: "Gas Stations",    glyph: "M17.8 5.8 16.4 4.4l-1.4 1.4 1.4 1.4c-.5.4-.9.9-1.1 1.5H8V4H3v18h2v-9h8v6.5c0 1.4 1.1 2.5 2.5 2.5S18 20.9 18 19.5V9.8c0-.6-.2-1.2-.6-1.6l.4-.4zM5 9V6h2v3H5zm11 10.5a.5.5 0 0 1-1 0V11h1v8.5z" },
+  shopping_mall: { color: "#A855F7", label: "Shopping Malls",  glyph: "M18 6h-2a4 4 0 0 0-8 0H6a2 2 0 0 0-2 2l-1 12a2 2 0 0 0 2 2.2h14a2 2 0 0 0 2-2.2l-1-12a2 2 0 0 0-2-2zm-6-2a2 2 0 0 1 2 2H10a2 2 0 0 1 2-2zM8 10a2 2 0 0 0 4 0V8h0v2a2 2 0 0 0 4 0V8h1.1l1 12H4.9l1-12H8v2z" },
+};
+const NEARBY_CATEGORY_ORDER = ["hospital", "school", "supermarket", "gas_station", "shopping_mall"];
+const NEARBY_VISIBLE_COUNT = 3;
+
+function formatDistance(meters: number | null): string {
+  if (meters == null) return "";
+  if (meters >= 1000) return `${(meters / 1000).toFixed(1)} km`;
+  return `${meters} m`;
+}
+
+function CategoryGlyphIcon({ category, size = 18 }: { category: string; size?: number }) {
+  const meta = NEARBY_CATEGORY_META[category];
+  return (
+    <div style={{ width: size + 20, height: size + 20, borderRadius: "50%", background: `${meta.color}22`, border: `1px solid ${meta.color}55`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+      <svg width={size} height={size} viewBox="0 0 24 24" fill={meta.color}><path d={meta.glyph} /></svg>
+    </div>
+  );
+}
+
+// Public-safe agent card info only — same discipline as agents/[slug]/page.tsx:
+// no raw phone/email/whatsapp fetched here at all, so there's nothing sensitive
+// to accidentally render. slug is what "View Profile"/"Message Agent" link to.
+type AssignedAgent = {
+  slug: string;
+  full_name: string;
+  agency_name: string | null;
+  years_experience: number | null;
+  is_verified_badge: boolean;
 };
 
 // ── Map user-submitted property_listings row → detail Property ──
@@ -177,6 +235,9 @@ function mapListingToProperty(row: Record<string, unknown>): Property {
     seller_name:     typeof row.seller_name === "string" ? row.seller_name : undefined,
     seller_phone:    typeof row.seller_phone === "string" ? row.seller_phone : undefined,
     seller_whatsapp: typeof row.seller_whatsapp === "string" ? row.seller_whatsapp : undefined,
+    assigned_agent_id: typeof row.assigned_agent_id === "string" ? row.assigned_agent_id : null,
+    latitude:  num(row.latitude),
+    longitude: num(row.longitude),
   };
 }
 
@@ -188,6 +249,9 @@ async function fetchSimilar(
   excludeId: string,
 ): Promise<Property[]> {
   const SELECT = "*";
+  // Carousel target: 10 cards (middle of the 8-12 range) — enough to give the
+  // horizontal-scroll carousel real content to scroll through.
+  const TARGET = 10;
   // Primary: same city
   const { data: byCity } = await supabase
     .from("property_listings")
@@ -195,12 +259,12 @@ async function fetchSimilar(
     .eq("status", "active")
     .eq("city", city)
     .neq("id", excludeId)
-    .limit(4);
+    .limit(TARGET);
 
   let rows = (byCity ?? []) as Record<string, unknown>[];
 
   // Fallback: top up with same listing_type when the city has too few
-  if (rows.length < 4) {
+  if (rows.length < TARGET) {
     const haveIds = new Set(rows.map(r => String(r.id ?? "")));
     const { data: byType } = await supabase
       .from("property_listings")
@@ -208,14 +272,14 @@ async function fetchSimilar(
       .eq("status", "active")
       .eq("listing_type", listingType)
       .neq("id", excludeId)
-      .limit(8);
+      .limit(TARGET * 2);
     for (const r of (byType ?? []) as Record<string, unknown>[]) {
-      if (rows.length >= 4) break;
+      if (rows.length >= TARGET) break;
       if (!haveIds.has(String(r.id ?? ""))) { rows.push(r); haveIds.add(String(r.id ?? "")); }
     }
   }
 
-  return rows.slice(0, 4).map(mapListingToProperty);
+  return rows.slice(0, TARGET).map(mapListingToProperty);
 }
 
 // ── Helpers ──────────────────────────────────────────────────
@@ -398,7 +462,7 @@ function Card({ children, style }: { children: React.ReactNode; style?: React.CS
 function SimilarCard({ p }: { p: Property }) {
   const img = p.images?.[0] || `https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800&q=80`;
   return (
-    <a href={`/property/${p.slug}`} style={{ textDecoration: "none", display: "block" }}>
+    <a href={`/property/${p.slug}`} style={{ textDecoration: "none", display: "block", flex: "0 0 240px", width: "240px", scrollSnapAlign: "start" }}>
       <div className="premium-card" style={{ background: "rgba(255,255,255,0.04)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", borderRadius: "16px", overflow: "hidden", border: "1px solid rgba(255,255,255,0.08)", boxShadow: "0 4px 24px rgba(0,0,0,0.18)", transition: "transform 0.4s cubic-bezier(0.16,1,0.3,1), box-shadow 0.4s cubic-bezier(0.16,1,0.3,1)" }}
         onMouseEnter={e => { const d = e.currentTarget as HTMLDivElement; d.style.transform = "translateY(-8px)"; d.style.boxShadow = "0 20px 60px rgba(0,0,0,.45), 0 0 0 1px rgba(16,196,195,0.22)"; }}
         onMouseLeave={e => { const d = e.currentTarget as HTMLDivElement; d.style.transform = "translateY(0)"; d.style.boxShadow = "0 4px 24px rgba(0,0,0,0.18)"; }}
@@ -424,6 +488,183 @@ function SimilarCard({ p }: { p: Property }) {
         </div>
       </div>
     </a>
+  );
+}
+
+// ── Assigned agent card (item #9) ─────────────────────────────
+// No raw phone/email/whatsapp here — same admin-only-contact discipline as
+// agents/[slug]/page.tsx. "View Profile" and "Message Agent" both link to
+// the agent's real public profile (Message Agent anchors to #send-message,
+// the existing wrapper id around the profile page's already-wired
+// ContactForm) rather than duplicating that form's state/validation/insert
+// logic a second time on this already-large page.
+function AgentInfoCard({ agent }: { agent: AssignedAgent }) {
+  return (
+    <Reveal>
+      <Card>
+        <div style={{ display: "flex", alignItems: "center", gap: "16px", flexWrap: "wrap" }}>
+          <div style={{ width: "56px", height: "56px", borderRadius: "50%", background: "linear-gradient(135deg, #020C1C 0%, #111F33 100%)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, fontFamily: "var(--font-heading-new)", fontSize: "20px", fontWeight: 600, color: "#10C4C3", border: "1px solid rgba(255,255,255,0.1)" }}>
+            {agent.full_name.split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase()}
+          </div>
+          <div style={{ flex: 1, minWidth: "160px" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+              <span style={{ fontFamily: "var(--font-heading-new)", fontSize: "18px", fontWeight: 600, color: "#FFFFFF" }}>{agent.full_name}</span>
+              {agent.is_verified_badge && (
+                <img src="/brand/nilay360_verified_agent_badge.png" alt="Verified Agent" style={{ width: "18px", height: "18px" }} />
+              )}
+            </div>
+            <div style={{ fontSize: "12.5px", color: "#A9B4C2", marginTop: "3px" }}>
+              {agent.agency_name ? `${agent.agency_name} · ` : ""}
+              {agent.years_experience != null ? `${agent.years_experience}+ yrs experience` : "Listing agent"}
+            </div>
+          </div>
+          <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
+            <a href={`/agents/${agent.slug}`} style={{ textDecoration: "none" }}>
+              <button style={{ padding: "9px 16px", fontSize: "13px", fontWeight: 500, color: "#FFFFFF", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.15)", borderRadius: "8px", cursor: "pointer", fontFamily: "var(--font-body-new)" }}>
+                View Profile
+              </button>
+            </a>
+            <a href={`/agents/${agent.slug}#send-message`} style={{ textDecoration: "none" }}>
+              <button style={{ padding: "9px 18px", fontSize: "13px", fontWeight: 600, color: "#020C1C", background: "#10C4C3", border: "none", borderRadius: "8px", cursor: "pointer", fontFamily: "var(--font-body-new)" }}>
+                Message Agent
+              </button>
+            </a>
+          </div>
+        </div>
+      </Card>
+    </Reveal>
+  );
+}
+
+// ── Nearby & Around: map (item #10 redesign) ──────────────────
+// Property marker (larger, teal) + one marker per cached place, colored by
+// category. Rows with null latitude/longitude (cached before
+// 064_nearby_places_coordinates.sql, not yet refreshed) are skipped — never
+// plotted at a guessed position. Fails soft: no key / script-load failure
+// just means no map renders, not a crashed page.
+function NearbyPlacesMap({
+  propertyLat, propertyLng, places,
+}: { propertyLat: number; propertyLng: number; places: Record<string, NearbyPlace[]> }) {
+  const mapDivRef = useRef<HTMLDivElement>(null);
+  const [mapFailed, setMapFailed] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    loadGoogleMapsScript()
+      .then(maps => {
+        if (cancelled || !mapDivRef.current) return;
+
+        const map = new maps.Map(mapDivRef.current, {
+          center: { lat: propertyLat, lng: propertyLng },
+          zoom: 14,
+          disableDefaultUI: true,
+          zoomControl: true,
+          styles: [
+            { elementType: "geometry", stylers: [{ color: "#111F33" }] },
+            { elementType: "labels.text.stroke", stylers: [{ color: "#020C1C" }] },
+            { elementType: "labels.text.fill", stylers: [{ color: "#A9B4C2" }] },
+            { featureType: "road", elementType: "geometry", stylers: [{ color: "#1B2C45" }] },
+            { featureType: "water", elementType: "geometry", stylers: [{ color: "#0A1526" }] },
+            { featureType: "poi", stylers: [{ visibility: "off" }] },
+          ],
+        });
+
+        const svgMarker = (color: string, size: number) =>
+          `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(
+            `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="${color}" stroke="#020C1C" stroke-width="2"/></svg>`
+          )}`;
+
+        new maps.Marker({
+          position: { lat: propertyLat, lng: propertyLng },
+          map,
+          title: "This property",
+          icon: { url: svgMarker("#10C4C3", 34), scaledSize: new maps.Size(34, 34), anchor: new maps.Point(17, 17) },
+          zIndex: 999,
+        });
+
+        for (const category of NEARBY_CATEGORY_ORDER) {
+          const color = NEARBY_CATEGORY_META[category].color;
+          for (const place of places[category] ?? []) {
+            if (place.latitude == null || place.longitude == null) continue; // no real position — skip, don't guess
+            new maps.Marker({
+              position: { lat: place.latitude, lng: place.longitude },
+              map,
+              title: place.name,
+              icon: { url: svgMarker(color, 22), scaledSize: new maps.Size(22, 22), anchor: new maps.Point(11, 11) },
+            });
+          }
+        }
+      })
+      .catch(err => {
+        console.error("[NearbyPlacesMap] Failed to load Google Maps:", err);
+        if (!cancelled) setMapFailed(true);
+      });
+    return () => { cancelled = true; };
+  }, [propertyLat, propertyLng, places]);
+
+  if (mapFailed) return null;
+  return <div ref={mapDivRef} style={{ width: "100%", height: "340px", borderRadius: "16px", overflow: "hidden", border: "1px solid rgba(255,255,255,0.08)", marginBottom: "16px", background: "#111F33" }} />;
+}
+
+// ── Nearby & Around: category card (item #10 redesign) ────────
+// Colored icon-circle badge, first 3 items shown, "View All (N)" reveals
+// the rest — purely local display state, no new data (the route already
+// caps at 5/category).
+function NearbyCategoryCard({ category, items }: { category: string; items: NearbyPlace[] }) {
+  const [expanded, setExpanded] = useState(false);
+  const meta = NEARBY_CATEGORY_META[category];
+  const visible = expanded ? items : items.slice(0, NEARBY_VISIBLE_COUNT);
+  const hiddenCount = items.length - NEARBY_VISIBLE_COUNT;
+
+  return (
+    <div style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "14px", padding: "18px" }}>
+      <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "14px" }}>
+        <CategoryGlyphIcon category={category} />
+        <span style={{ fontSize: "13px", fontWeight: 600, color: "#FFFFFF" }}>{meta.label}</span>
+      </div>
+      <div style={{ display: "flex", flexDirection: "column", gap: "9px" }}>
+        {visible.map(place => (
+          <div key={place.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: "10px" }}>
+            <span style={{ fontSize: "12.5px", color: "#A9B4C2", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{place.name}</span>
+            <span style={{ fontSize: "11.5px", color: meta.color, fontWeight: 600, flexShrink: 0 }}>{formatDistance(place.distance_meters)}</span>
+          </div>
+        ))}
+      </div>
+      {hiddenCount > 0 && (
+        <button
+          onClick={() => setExpanded(e => !e)}
+          style={{ marginTop: "12px", padding: 0, background: "none", border: "none", color: "#10C4C3", fontSize: "12px", fontWeight: 600, cursor: "pointer", fontFamily: "var(--font-body-new)" }}
+        >
+          {expanded ? "Show Less" : `View All (${items.length})`}
+        </button>
+      )}
+    </div>
+  );
+}
+
+// ── Nearby & Around: section (item #10 redesign) ──────────────
+// Map first, category cards below — confirmed layout. Grouped by category,
+// cache-fresh rows from nearby_places_cache via /api/nearby-places.
+// Categories with zero results simply don't render; a total failure (no
+// coordinates, or every category empty/failed) hides the whole section.
+function NearbyPlacesSection({
+  places, propertyLat, propertyLng,
+}: { places: Record<string, NearbyPlace[]>; propertyLat: number; propertyLng: number }) {
+  const categoriesWithResults = NEARBY_CATEGORY_ORDER.filter(c => (places[c]?.length ?? 0) > 0);
+  if (categoriesWithResults.length === 0) return null;
+
+  return (
+    <Reveal>
+      <div style={{ marginBottom: "24px" }}>
+        <SectionHeading>Nearby &amp; Around</SectionHeading>
+        <NearbyPlacesMap propertyLat={propertyLat} propertyLng={propertyLng} places={places} />
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: "16px" }}>
+          {categoriesWithResults.map(category => (
+            <NearbyCategoryCard key={category} category={category} items={places[category]} />
+          ))}
+        </div>
+      </div>
+    </Reveal>
   );
 }
 
@@ -523,6 +764,9 @@ export default function PropertyDetailClient() {
   const [similar, setSimilar] = useState<Property[]>([]);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
+  const [assignedAgent, setAssignedAgent] = useState<AssignedAgent | null>(null);
+  const similarScrollRef = useRef<HTMLDivElement>(null);
+  const [nearbyPlaces, setNearbyPlaces] = useState<Record<string, NearbyPlace[]> | null>(null);
 
   // Gallery state
   const [activeImg, setActiveImg] = useState(0);
@@ -597,6 +841,16 @@ export default function PropertyDetailClient() {
     if (profile?.phone) setContactPhone(stripIndianCountryCode(profile.phone));
   }, [profile?.phone]);
   const phoneLocked = !!profile?.phone;
+
+  // Prefill name/email from the signed-in user's session/profile — same
+  // "only if still blank" rule as post-property.tsx's PREFILL_SELLER_EMAIL:
+  // never overwrites something the visitor already typed into the form.
+  useEffect(() => {
+    if (profile?.full_name) setContactName(prev => prev || profile.full_name || "");
+  }, [profile?.full_name]);
+  useEffect(() => {
+    if (user?.email) setContactEmail(prev => prev || user.email || "");
+  }, [user?.email]);
 
   useEffect(() => {
     if (!slug) return;
@@ -692,6 +946,75 @@ export default function PropertyDetailClient() {
       });
     return () => { cancelled = true; };
   }, [property?.id]);
+
+  // Assigned agent (item #9) — gracefully absent when assigned_agent_id is
+  // null, which is the common case (assignment is manual, not automatic).
+  // Only public/non-sensitive fields are fetched: agent_profiles for
+  // agency_name/years_experience/is_verified_badge/slug, and the same
+  // public_agent_contact view agents/[slug]/page.tsx uses for full_name —
+  // no phone/email/whatsapp queried here at all, so there's nothing raw to
+  // accidentally render on this card.
+  useEffect(() => {
+    if (!property?.assigned_agent_id) { setAssignedAgent(null); return; }
+    let cancelled = false;
+    const supabase = createClient();
+    (async () => {
+      const { data: agentProfile } = await supabase
+        .from("agent_profiles")
+        .select("user_id, slug, agency_name, years_experience, is_verified_badge")
+        .eq("id", property.assigned_agent_id)
+        .maybeSingle();
+      if (cancelled || !agentProfile) { if (!cancelled) setAssignedAgent(null); return; }
+
+      const { data: contact } = await supabase
+        .from("public_agent_contact")
+        .select("full_name")
+        .eq("id", agentProfile.user_id)
+        .maybeSingle();
+      if (cancelled) return;
+
+      setAssignedAgent({
+        slug: agentProfile.slug,
+        full_name: contact?.full_name || "Unnamed Agent",
+        agency_name: agentProfile.agency_name,
+        years_experience: agentProfile.years_experience,
+        is_verified_badge: agentProfile.is_verified_badge,
+      });
+    })();
+    return () => { cancelled = true; };
+  }, [property?.assigned_agent_id]);
+
+  // Nearby & Around (item #10) — only fires when the listing has real
+  // coordinates (060_property_geocoordinates.sql is additive/nullable, so
+  // plenty of listings won't). The route itself decides per-category
+  // whether to hit Google or serve cache; this effect just calls it once
+  // per property and renders whatever comes back.
+  useEffect(() => {
+    if (property?.latitude == null || property?.longitude == null) { setNearbyPlaces(null); return; }
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch("/api/nearby-places", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ propertyId: property.id, latitude: property.latitude, longitude: property.longitude }),
+        });
+        if (!res.ok) { if (!cancelled) setNearbyPlaces(null); return; }
+        const json = await res.json();
+        if (!cancelled) setNearbyPlaces(json.places ?? null);
+      } catch (err) {
+        console.error("[NearbyPlaces] fetch failed:", err);
+        if (!cancelled) setNearbyPlaces(null);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [property?.id, property?.latitude, property?.longitude]);
+
+  const scrollSimilar = useCallback((direction: "left" | "right") => {
+    const el = similarScrollRef.current;
+    if (!el) return;
+    el.scrollBy({ left: direction === "left" ? -520 : 520, behavior: "smooth" });
+  }, []);
 
   // Record this property in per-device "recently viewed" history
   const { addRecentlyViewed } = useRecentlyViewed();
@@ -836,9 +1159,6 @@ export default function PropertyDetailClient() {
     // current session right now, independent of whatever React state
     // happens to say.
     const { data: { user: currentUser } } = await supabase.auth.getUser();
-    // TEMPORARY — diagnostic for the visitor_user_id-still-null report. Remove after confirming.
-    const authCheck = await supabase.auth.getUser();
-    console.log("VISIT SUBMIT — auth check:", authCheck.data?.user?.id, "| error:", authCheck.error?.message ?? "none");
     const { error } = await supabase.from("site_visits").insert({
       property_id:     property.id,
       property_slug:   property.slug,
@@ -1105,12 +1425,11 @@ export default function PropertyDetailClient() {
           .pd-left { flex: none !important; width: 100% !important; }
           .pd-right { flex: none !important; width: 100% !important; position: static !important; top: auto !important; }
           .pd-emi-grid { grid-template-columns: 1fr !important; }
-          .pd-similar-grid { grid-template-columns: repeat(2, 1fr) !important; }
           .pd-prev-next { padding: 32px 16px !important; grid-template-columns: 1fr !important; }
         }
-        @media (max-width: 480px) {
-          .pd-similar-grid { grid-template-columns: 1fr !important; }
-        }
+        .pd-similar-scroll::-webkit-scrollbar { height: 6px; }
+        .pd-similar-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 3px; }
+        .pd-similar-scroll::-webkit-scrollbar-track { background: transparent; }
       `}</style>
 
       <div style={{ background: "#020C1C", minHeight: "100vh" }}>
@@ -1535,12 +1854,45 @@ export default function PropertyDetailClient() {
                 </Card>
               )}
 
-              {/* ── SIMILAR PROPERTIES ── */}
+              {/* ── ASSIGNED AGENT ── */}
+              {assignedAgent && <AgentInfoCard agent={assignedAgent} />}
+
+              {/* ── NEARBY & AROUND ── */}
+              {nearbyPlaces && property?.latitude != null && property?.longitude != null && (
+                <NearbyPlacesSection places={nearbyPlaces} propertyLat={property.latitude} propertyLng={property.longitude} />
+              )}
+
+              {/* ── SIMILAR PROPERTIES (horizontal-scroll carousel) ── */}
               {similar.length > 0 && (
                 <Reveal>
                   <div style={{ marginBottom: "24px" }}>
-                    <SectionHeading>Similar Properties</SectionHeading>
-                    <div className="pd-similar-grid" style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "16px" }}>
+                    <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between" }}>
+                      <SectionHeading>Similar Properties</SectionHeading>
+                      {/* Arrow buttons: touch devices already scroll this row with a
+                          swipe, but a desktop mouse user has no drag-to-scroll
+                          affordance on a plain overflow-x row, so these give them an
+                          obvious way to advance the carousel without hunting for a
+                          trackpad gesture. Hidden on touch via CSS would be nicer but
+                          adds complexity for little benefit — clicking a visible arrow
+                          on a touch device is harmless, so it stays simple. */}
+                      <div style={{ display: "flex", gap: "8px", marginBottom: "8px" }}>
+                        {(["left", "right"] as const).map(dir => (
+                          <button
+                            key={dir}
+                            onClick={() => scrollSimilar(dir)}
+                            aria-label={dir === "left" ? "Scroll left" : "Scroll right"}
+                            style={{ width: "36px", height: "36px", borderRadius: "50%", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.15)", color: "#FFFFFF", cursor: "pointer", fontSize: "15px", display: "flex", alignItems: "center", justifyContent: "center" }}
+                          >
+                            {dir === "left" ? "←" : "→"}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                    <div
+                      ref={similarScrollRef}
+                      className="pd-similar-scroll"
+                      style={{ display: "flex", flexWrap: "nowrap", gap: "16px", overflowX: "auto", scrollSnapType: "x proximity", paddingBottom: "8px" }}
+                    >
                       {similar.map(p => <SimilarCard key={p.id} p={p} />)}
                     </div>
                   </div>

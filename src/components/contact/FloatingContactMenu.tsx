@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import Link from "next/link";
 import { useCompare } from "@/context/CompareContext";
+import { createClient } from "@/lib/supabase/client";
 
 const GENERIC_WHATSAPP_TEXT = "Hi, I'm interested in a property on Nilay 360";
 const GENERIC_WHATSAPP_HREF = `https://wa.me/917075792497?text=${encodeURIComponent(GENERIC_WHATSAPP_TEXT)}`;
@@ -138,6 +139,26 @@ export default function FloatingContactMenu() {
     const message = `Hi, I'm interested in this property on Nilay360: ${propertyTitle} - ${window.location.href}`;
     setWhatsappHref(`https://wa.me/917075792497?text=${encodeURIComponent(message)}`);
   }, [isPropertyPage, pathname]);
+
+  // Prefill name/phone for a signed-in visitor — same "only if still blank"
+  // rule as post-property.tsx's PREFILL_SELLER_EMAIL: never overwrites
+  // something already typed into the form. This widget has no
+  // useAuth()/profile fetch of its own, so session + profile are read
+  // directly, once, on mount.
+  useEffect(() => {
+    const supabase = createClient();
+    supabase.auth.getSession().then(async ({ data }: Awaited<ReturnType<typeof supabase.auth.getSession>>) => {
+      const sessionUser = data.session?.user;
+      if (!sessionUser) return;
+      const { data: profileRow } = await supabase
+        .from("profiles")
+        .select("full_name, phone")
+        .eq("id", sessionUser.id)
+        .maybeSingle();
+      if (profileRow?.full_name) setForm(f => ({ ...f, name: f.name || profileRow.full_name! }));
+      if (profileRow?.phone) setForm(f => ({ ...f, phone: f.phone || profileRow.phone! }));
+    });
+  }, []);
 
   useEffect(() => {
     if (!open) return;

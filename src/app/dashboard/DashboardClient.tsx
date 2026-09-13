@@ -1,6 +1,6 @@
 ﻿"use client";
 import React, { useState, useEffect, useCallback } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { useAuth } from "@/context/AuthContext";
 import { SavedSearchesList } from "@/components/dashboard/SavedSearchesList";
@@ -35,6 +35,8 @@ type Tab =
   | "appointments"
   | "settings";
 
+const VALID_TABS: Tab[] = ["overview", "listings", "assigned", "saved", "searches", "profile", "inquiries", "appointments", "settings"];
+
 type Props = {
   email: string;
   userId: string;
@@ -64,6 +66,7 @@ type AgentProfileData = {
   years_experience: number | null;
   cities:           string[];
   leaderboard_opt_out: boolean;
+  rera_number:      string | null;
 };
 
 type SaveRow = {
@@ -665,14 +668,15 @@ function AgentOverviewTab({ fullName, email, assignedListings, agentProfileId, u
 
 // ── Tab 2: My Listings ────────────────────────────────────────────────────────
 
-function ListingsTab({ listings, loading, onDelete }: {
+function ListingsTab({ listings, loading, onDelete, onViewInquiries }: {
   listings: Listing[];
   loading: boolean;
   onDelete: (id: string) => Promise<void>;
+  onViewInquiries: (listing: MLLListing) => void;
 }) {
   if (loading) return <Spinner />;
 
-  return <MyListingsList listings={listings} onDelete={onDelete} compact />;
+  return <MyListingsList listings={listings} onDelete={onDelete} onViewInquiries={onViewInquiries} compact />;
 }
 
 // ── Tab: Assigned Listings (agent — can Edit, cannot Delete directly) ──────────
@@ -844,6 +848,7 @@ function AgentProfileTab({ email, userId, agentProfile, loading, onSave }: {
   onSave: (updates: Omit<AgentProfileData, "id">) => Promise<boolean>;
 }) {
   const [licenseNumber,   setLicenseNumber]   = useState("");
+  const [reraNumber,      setReraNumber]      = useState("");
   const [agencyName,      setAgencyName]      = useState("");
   const [bio,              setBio]            = useState("");
   const [yearsExperience, setYearsExperience] = useState("");
@@ -933,6 +938,7 @@ function AgentProfileTab({ email, userId, agentProfile, loading, onSave }: {
   useEffect(() => {
     if (!agentProfile) return;
     setLicenseNumber(agentProfile.license_number ?? "");
+    setReraNumber(agentProfile.rera_number ?? "");
     setAgencyName(agentProfile.agency_name ?? "");
     setBio(agentProfile.bio ?? "");
     setYearsExperience(agentProfile.years_experience != null ? String(agentProfile.years_experience) : "");
@@ -950,6 +956,7 @@ function AgentProfileTab({ email, userId, agentProfile, loading, onSave }: {
       years_experience: yearsExperience ? parseInt(yearsExperience, 10) : null,
       cities,
       leaderboard_opt_out: !participating,
+      rera_number:      reraNumber.trim()    || null,
     });
     setSaving(false);
     setToast(ok ? { ok: true, msg: "Profile saved successfully" } : { ok: false, msg: "Save failed. Please try again." });
@@ -980,7 +987,8 @@ function AgentProfileTab({ email, userId, agentProfile, loading, onSave }: {
       <Card style={{ padding: "28px 32px", marginBottom: 20 }}>
         <h3 style={{ fontFamily: "var(--font-heading-new)", fontSize: 20, fontWeight: 600, color: "#FFFFFF", marginBottom: 22, paddingBottom: 16, borderBottom: "1px solid rgba(255,255,255,0.07)" }}>Agent Details</h3>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "0 28px" }}>
-          <FormField label="License Number"  value={licenseNumber}   onChange={setLicenseNumber} placeholder="RERA / license number" />
+          <FormField label="License Number"  value={licenseNumber}   onChange={setLicenseNumber} placeholder="Broker/agent license number" />
+          <FormField label="RERA Number"     value={reraNumber}      onChange={setReraNumber}    placeholder="e.g. TS/RERA/AGT/2024/001234" />
           <FormField label="Agency Name"     value={agencyName}      onChange={setAgencyName}    placeholder="Your agency (if any)" />
           <FormField label="Years of Experience" type="number" value={yearsExperience} onChange={setYearsExperience} />
           <div style={{ marginBottom: "18px" }}>
@@ -1439,13 +1447,27 @@ function InquiriesTab({
   inquiries,
   loading,
   onStatusChange,
+  properties,
+  filterPropertyId,
+  onFilterChange,
 }: {
   inquiries: Inquiry[];
   loading: boolean;
   onStatusChange: (inquiryId: string, newStatus: string) => Promise<void>;
+  properties: Listing[];
+  filterPropertyId: string | null;
+  onFilterChange: (propertyId: string | null) => void;
 }) {
   if (loading) return <Spinner />;
-  const count = inquiries.length;
+
+  // Filtered client-side against the already-fetched full inquiries list —
+  // this seller's own inquiry volume never justifies a second round-trip
+  // to Supabase just to narrow by property_id.
+  const visibleInquiries = filterPropertyId
+    ? inquiries.filter(i => i.property_id === filterPropertyId)
+    : inquiries;
+  const count = visibleInquiries.length;
+  const filteredProperty = filterPropertyId ? properties.find(p => p.id === filterPropertyId) : null;
 
   return (
     <div>
@@ -1453,6 +1475,40 @@ function InquiriesTab({
         title="Inquiries"
         subtitle={count ? `${count} inquir${count !== 1 ? "ies" : "y"} received on your listings` : "Inquiries from interested buyers."}
       />
+
+      {/* Property filter — deep-linkable via ?property=, and manually
+          selectable here too, per explicit spec. */}
+      {properties.length > 0 && (
+        <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap", marginBottom: "18px" }}>
+          <select
+            value={filterPropertyId ?? "all"}
+            onChange={e => onFilterChange(e.target.value === "all" ? null : e.target.value)}
+            style={{
+              padding: "9px 14px", borderRadius: "8px", fontSize: "13px",
+              background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.15)",
+              color: "#FFFFFF", fontFamily: "var(--font-body-new)", cursor: "pointer",
+            }}
+          >
+            <option value="all">All Properties</option>
+            {properties.map(p => (
+              <option key={p.id} value={p.id}>{p.title ?? "Untitled listing"}</option>
+            ))}
+          </select>
+
+          {filteredProperty && (
+            <span style={{ display: "flex", alignItems: "center", gap: "8px", padding: "7px 12px", background: "rgba(16,196,195,0.1)", border: "1px solid rgba(16,196,195,0.25)", borderRadius: "100px", fontSize: "12px", color: "#10C4C3" }}>
+              Showing inquiries for: <strong>{filteredProperty.title ?? "this listing"}</strong>
+              <button
+                onClick={() => onFilterChange(null)}
+                aria-label="Clear property filter"
+                style={{ background: "none", border: "none", color: "#10C4C3", cursor: "pointer", fontSize: "14px", lineHeight: 1, padding: 0, fontWeight: 700 }}
+              >
+                ×
+              </button>
+            </span>
+          )}
+        </div>
+      )}
 
       {count === 0 ? (
         <Card>
@@ -1466,7 +1522,7 @@ function InquiriesTab({
         </Card>
       ) : (
         <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
-          {inquiries.map(inq => (
+          {visibleInquiries.map(inq => (
             <Card key={inq.id} style={{ padding: "20px 24px" }}>
               {/* Header row */}
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: "12px", flexWrap: "wrap", marginBottom: "12px" }}>
@@ -1700,11 +1756,27 @@ function SettingsTab({ email, fullName }: { email: string; fullName?: string }) 
 
 export default function DashboardClient({ email, userId, fullName, accountType }: Props) {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { profile: authProfile, loading: authLoading } = useAuth();
   const isAgent = authProfile?.role === "agent" || authProfile?.role === "builder";
 
   const [active,      setActive]      = useState<Tab>("overview");
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [inquiryPropertyFilter, setInquiryPropertyFilter] = useState<string | null>(null);
+
+  // Deep-link support for "View Inquiries" (MyListingsList) — reads
+  // ?tab=&property= on mount and whenever the query changes (e.g.
+  // clicking a second "View Inquiries" button while already on this
+  // page navigates client-side without remounting).
+  useEffect(() => {
+    const tabParam = searchParams?.get("tab");
+    if (tabParam && VALID_TABS.includes(tabParam as Tab)) {
+      setActive(tabParam as Tab);
+    }
+    const propertyParam = searchParams?.get("property");
+    if (propertyParam) setInquiryPropertyFilter(propertyParam);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams]);
 
   // Escape closes the sidebar drawer whenever it's open — additive,
   // non-visual, and only acts when sidebarOpen is already true, so it
@@ -1742,7 +1814,7 @@ export default function DashboardClient({ email, userId, fullName, accountType }
     const loadAgent = async () => {
       const { data: apRow, error: apErr } = await supabase
         .from("agent_profiles")
-        .select("id, license_number, agency_name, bio, years_experience, leaderboard_opt_out, agent_service_cities(city)")
+        .select("id, license_number, agency_name, bio, years_experience, leaderboard_opt_out, rera_number, agent_service_cities(city)")
         .eq("user_id", userId)
         .maybeSingle();
       if (apErr) console.error("Dashboard — agent_profiles query error:", apErr);
@@ -1758,6 +1830,7 @@ export default function DashboardClient({ email, userId, fullName, accountType }
           years_experience: apRow.years_experience,
           cities,
           leaderboard_opt_out: apRow.leaderboard_opt_out,
+          rera_number: apRow.rera_number,
         });
 
         const { data: listData, error: listErr } = await supabase
@@ -1890,6 +1963,7 @@ export default function DashboardClient({ email, userId, fullName, accountType }
         bio:               updates.bio,
         years_experience: updates.years_experience,
         leaderboard_opt_out: updates.leaderboard_opt_out,
+        rera_number:      updates.rera_number,
         updated_at:        new Date().toISOString(),
       })
       .eq("id", agentProfile.id);
@@ -1936,14 +2010,14 @@ export default function DashboardClient({ email, userId, fullName, accountType }
     overview:     isAgent
       ? <AgentOverviewTab fullName={fullName} email={email} assignedListings={assignedListings} agentProfileId={agentProfile?.id ?? null} userId={userId} />
       : <OverviewTab      email={email} fullName={fullName} listings={listings} savedItems={savedItems} profile={profile} userId={userId} />,
-    listings:     <ListingsTab     listings={listings} loading={dataLoading} onDelete={deleteListing} />,
+    listings:     <ListingsTab     listings={listings} loading={dataLoading} onDelete={deleteListing} onViewInquiries={listing => router.push(`/dashboard?tab=inquiries&property=${listing.id}`)} />,
     assigned:     <AssignedListingsTab listings={assignedListings} loading={dataLoading} userId={userId} />,
     saved:        <SavedTab        savedItems={savedItems} loading={dataLoading} onRemove={removeSave} />,
     searches:     <SearchesTab />,
     profile:      isAgent
       ? <AgentProfileTab email={email} userId={userId} agentProfile={agentProfile} loading={dataLoading} onSave={updateAgentProfile} />
       : <ProfileTab      email={email} userId={userId} profile={profile} loading={dataLoading} onSave={updateProfile} />,
-    inquiries:    <InquiriesTab    inquiries={inquiries} loading={dataLoading} onStatusChange={updateInquiryStatus} />,
+    inquiries:    <InquiriesTab    inquiries={inquiries} loading={dataLoading} onStatusChange={updateInquiryStatus} properties={listings} filterPropertyId={inquiryPropertyFilter} onFilterChange={setInquiryPropertyFilter} />,
     appointments: <AppointmentsTab userId={userId} />,
     settings:     <SettingsTab     email={email} fullName={fullName} />,
   };

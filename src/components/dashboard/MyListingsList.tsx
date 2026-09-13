@@ -15,6 +15,13 @@ export interface Listing {
   submitted_at: string;
   slug: string | null;
   photo_urls?: string[] | null;
+  /** Populated by the caller with a single batched query against
+   *  capture_360_requests (one query for all listings, not per-row) —
+   *  the status of this listing's most recent pending/scheduled request,
+   *  if any. Absent/undefined means "not checked" (button still shows);
+   *  explicitly 'pending' or 'scheduled' hides the Request 360° Capture
+   *  button to avoid duplicate requests. */
+  capture_request_status?: string | null;
 }
 
 interface Props {
@@ -32,6 +39,18 @@ interface Props {
   /** Renders a "Request Deletion" action per listing when provided — the
    *  assigned-agent path to removal, since agents don't get direct Delete. */
   onRequestDeletion?: (listing: Listing) => void;
+  /** Renders a "Request 360° Capture" action per listing when provided.
+   *  Hidden per-listing when capture_request_status is already 'pending'
+   *  or 'scheduled' — avoids duplicate requests without this component
+   *  needing to query capture_360_requests itself. */
+  onRequestCapture?: (listing: Listing) => void;
+  /** Renders a "View Inquiries" action per listing when provided. What
+   *  clicking it actually does (navigate where, filtered how) is entirely
+   *  the caller's decision — this component stays presentational and
+   *  doesn't import routing itself, since it's also used from contexts
+   *  (the agent portal's Assigned Listings tab) with no inquiries view
+   *  to send an agent to. */
+  onViewInquiries?: (listing: Listing) => void;
 }
 
 const COMMERCIAL = ["office", "retail", "warehouse"];
@@ -71,7 +90,7 @@ function Pill({ active, label, onClick }: { active: boolean; label: string; onCl
   );
 }
 
-export function MyListingsList({ listings, onDelete, compact = false, readOnly = false, canEdit, onRequestDeletion }: Props) {
+export function MyListingsList({ listings, onDelete, compact = false, readOnly = false, canEdit, onRequestDeletion, onRequestCapture, onViewInquiries }: Props) {
   const showEdit = canEdit ?? !readOnly;
   const [search,       setSearch]       = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
@@ -343,6 +362,64 @@ export function MyListingsList({ listings, onDelete, compact = false, readOnly =
                         >
                           Request Deletion
                         </button>
+                      )}
+                      {onViewInquiries && (
+                        <button
+                          onClick={() => onViewInquiries(l)}
+                          style={{
+                            padding: compact ? "5px 10px" : "7px 14px",
+                            fontSize: compact ? 12 : 13, fontWeight: 500,
+                            color: "#FFFFFF",
+                            background: "rgba(255,255,255,0.05)",
+                            border: "1px solid rgba(255,255,255,0.15)",
+                            borderRadius: 7, cursor: "pointer",
+                            fontFamily: "var(--font-body-new)",
+                          }}
+                        >
+                          View Inquiries
+                        </button>
+                      )}
+                      {onRequestCapture && (
+                        l.capture_request_status === "pending" ? (
+                          <span style={{
+                            padding: compact ? "5px 10px" : "7px 14px",
+                            fontSize: compact ? 11 : 12, fontWeight: 600,
+                            color: "#F59E0B",
+                            background: "rgba(245,158,11,0.10)",
+                            border: "1px solid rgba(245,158,11,0.30)",
+                            borderRadius: 7,
+                            fontFamily: "var(--font-body-new)",
+                          }}>
+                            360° Request Pending
+                          </span>
+                        ) : l.capture_request_status === "scheduled" ? (
+                          <span style={{
+                            padding: compact ? "5px 10px" : "7px 14px",
+                            fontSize: compact ? 11 : 12, fontWeight: 600,
+                            color: "#10C4C3",
+                            background: "rgba(16,196,195,0.10)",
+                            border: "1px solid rgba(16,196,195,0.30)",
+                            borderRadius: 7,
+                            fontFamily: "var(--font-body-new)",
+                          }}>
+                            360° Capture Scheduled
+                          </span>
+                        ) : (
+                          <button
+                            onClick={() => onRequestCapture(l)}
+                            style={{
+                              padding: compact ? "5px 10px" : "7px 14px",
+                              fontSize: compact ? 12 : 13, fontWeight: 500,
+                              color: "#10C4C3",
+                              background: "rgba(16,196,195,0.10)",
+                              border: "1px solid rgba(16,196,195,0.30)",
+                              borderRadius: 7, cursor: "pointer",
+                              fontFamily: "var(--font-body-new)",
+                            }}
+                          >
+                            Request 360° Capture
+                          </button>
+                        )
                       )}
                     </div>
 

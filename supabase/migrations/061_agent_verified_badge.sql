@@ -1,0 +1,63 @@
+-- ═══════════════════════════════════════════════════════════════
+-- 061 — Verified Agent badge on agent_profiles
+-- DRAFTED FOR REVIEW, NOT APPLIED. Same review discipline as every
+-- prior migration tonight: this file has not been run against the
+-- database. Do not apply until reviewed line by line.
+--
+-- CONFIRMED NO COLLISION, via fresh investigation (2026-09-12) before
+-- drafting this — this is a genuinely new, distinct concept from BOTH
+-- existing fields that could plausibly be confused with it:
+--
+--   * profiles.is_verified — a generic, per-account admin toggle
+--     (001_nivila_schema.sql), used exclusively in admin/page.tsx's "All
+--     Users" panel as a plain Verified/Unverified flag any user account
+--     (buyer, seller, agent, whoever) can be flipped to. Set at signup
+--     by verify-otp/route.ts (!isAgentOrBuilder — true for individuals,
+--     false for agent/builder pending review). Two separate files
+--     already carry comments confirming this is NOT the same thing as
+--     agent approval/recognition: agents/[slug]/page.tsx ("...no
+--     rating/review_count/specialisations/is_verified — those don't
+--     exist on agent_profiles") and agents/page.tsx ("...is_verified/
+--     is_featured — those fields simply don't exist on the real
+--     [table]"). Unrelated table, unrelated meaning — not reused here.
+--
+--   * agent_profiles.status = 'approved' — operational PERMISSION to
+--     list properties and appear on /agents at all (011_agent_portal_
+--     schema.sql). Every agent ever shown on a public agent profile page
+--     already satisfies this (the page's own query filters
+--     .eq("status", "approved")) — it currently renders as the
+--     unconditional "✓ Approved Agent" badge in the hero. That badge
+--     means "this agent is allowed to operate on the platform," not
+--     "this agent has been specially recognized." Collapsing the two
+--     would make every approved agent automatically "verified," which
+--     is not the intent — that badge should be reversible, discretionary
+--     admin recognition, on top of (not a restatement of) approval.
+--
+-- This new column is a THIRD, independent concept: a special,
+-- admin-granted public recognition badge — separate from both "does this
+-- account count as generically verified" (profiles.is_verified) and
+-- "is this agent allowed to operate" (agent_profiles.status). An agent
+-- can be approved without being badged (the common case at launch), and
+-- in principle the badge could later be revoked without touching
+-- approval status either — the two are independent toggles.
+--
+-- NOT NULL DEFAULT false: every existing approved agent starts unbadged.
+-- This is a deliberate contrast with the other additive columns tonight
+-- (052 rera_number, 058 oc_number, 060 latitude/longitude), which are
+-- all nullable "unknown/not yet provided" fields — this one is a real
+-- boolean fact ("has this agent been granted the badge or not"), so
+-- NULL would be a meaningless third state here, not a legitimate
+-- "unknown." false is the only correct default for every current row.
+--
+-- No RLS change needed — the existing agent_profiles policies
+-- (011_agent_portal_schema.sql) already grant admins full select/update
+-- on the whole row via agent_profiles_admin_update_all (public.is_admin()),
+-- and agents/the public already read their own/public rows via the
+-- existing select policies — a new column needs no separate grant.
+-- Application-layer enforcement (only an admin can ever WRITE true here)
+-- is the same convention already relied on for agent_profiles.status
+-- itself, not newly introduced by this migration.
+-- ═══════════════════════════════════════════════════════════════
+
+ALTER TABLE public.agent_profiles
+  ADD COLUMN IF NOT EXISTS is_verified_badge boolean NOT NULL DEFAULT false;

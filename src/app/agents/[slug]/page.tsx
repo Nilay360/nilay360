@@ -18,6 +18,7 @@ import { useParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import ReportButton from "@/components/shared/ReportButton";
 import { optimizedImageUrl } from "@/lib/image-url";
+import { useAuth } from "@/context/AuthContext";
 
 type Agent = {
   id: string;
@@ -28,11 +29,15 @@ type Agent = {
   license_number: string | null;
   years_experience: number | null;
   bio: string | null; phone: string | null; email: string | null; avatar_url: string | null; whatsapp: string | null;
+  is_verified_badge: boolean;
+  rera_number: string | null;
 };
 
 type AgentProfileRow = {
   id: string; user_id: string;
   agency_name: string | null; license_number: string | null; years_experience: number | null; bio: string | null;
+  is_verified_badge: boolean;
+  rera_number: string | null;
   agent_service_cities: { city: string }[] | null;
 };
 
@@ -61,6 +66,8 @@ function mapAgent(row: AgentProfileRow, contact: ContactRow | undefined): Agent 
     email: contact?.email ?? null,
     avatar_url: contact?.avatar_url ?? null,
     whatsapp: contact?.whatsapp ?? null,
+    is_verified_badge: row.is_verified_badge,
+    rera_number: row.rera_number,
   };
 }
 
@@ -116,20 +123,63 @@ function PropCard({ p }: { p: Property }) {
   );
 }
 
-function ContactForm({ agent }: { agent: Agent }) {
+function ContactForm({ agent, prefillName, prefillEmail, prefillPhone }: { agent: Agent; prefillName?: string | null; prefillEmail?: string | null; prefillPhone?: string | null }) {
   const [form, setForm] = useState({ name: "", email: "", phone: "", message: "" });
   const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
+
+  // Prefill from the signed-in visitor's own session/profile — "only if
+  // still blank" rule, same as post-property.tsx's PREFILL_SELLER_EMAIL:
+  // never overwrites something already typed into the form.
+  useEffect(() => {
+    if (prefillName) setForm(f => ({ ...f, name: f.name || prefillName }));
+  }, [prefillName]);
+  useEffect(() => {
+    if (prefillEmail) setForm(f => ({ ...f, email: f.email || prefillEmail }));
+  }, [prefillEmail]);
+  useEffect(() => {
+    if (prefillPhone) setForm(f => ({ ...f, phone: f.phone || prefillPhone }));
+  }, [prefillPhone]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setStatus("sending");
     try {
       const supabase = createClient();
-      const { error } = await supabase.from("agent_enquiries").insert({
-        agent_id: agent.id, agent_name: agent.full_name,
-        name: form.name, email: form.email, phone: form.phone, message: form.message,
+      // Real, live table (agent_enquiries never existed in production — every
+      // prior submission through this form was silently discarded while
+      // showing "Message Sent!" regardless). assigned_to pre-assigns this
+      // inquiry directly to the agent, same column /agent/leads already
+      // reads from — no new schema, no admin routing step needed.
+      const { error } = await supabase.from("inquiries").insert({
+        property_id: null,
+        property_slug: null,
+        property_title: null,
+        seller_email: null,
+        inquirer_name: form.name,
+        inquirer_email: form.email,
+        inquirer_phone: form.phone || null,
+        message: form.message || null,
+        inquiry_type: "agent_contact",
+        status: "new",
+        assigned_to: agent.id,
       });
       setStatus(error ? "error" : "sent");
+
+      // Notify the agent — fire-and-forget, non-fatal. The inquiry row above
+      // is the durable record; a failure here only means the agent finds out
+      // via /agent/leads instead of the notification bell, not a lost lead.
+      if (!error) {
+        fetch("/api/notify-agent-contact", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            agentUserId: agent.userId,
+            name: form.name,
+            email: form.email,
+            phone: form.phone,
+          }),
+        }).catch((err) => console.error("[ContactForm] Agent notification failed:", err));
+      }
     } catch (_) {
       setStatus("error");
     }
@@ -206,7 +256,13 @@ export default function AgentProfilePage() {
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
   const [properties, setProperties] = useState<Property[]>([]);
+  const [dealsClosed, setDealsClosed] = useState(0);
   const [activeTab, setActiveTab] = useState<"listings">("listings");
+  const { user, profile, openAuthModal } = useAuth();
+  // Raw contact details (phone/WhatsApp/email) are admin-only — every other
+  // viewer, signed out or signed in as any other role, uses the Send Message
+  // form instead. Same check already established in admin/page.tsx:2480.
+  const isAdmin = profile?.role === "admin" || profile?.role === "super_admin";
 
   useEffect(() => {
     async function load() {
@@ -215,7 +271,7 @@ export default function AgentProfilePage() {
         const supabase = createClient();
         const { data, error } = await supabase
           .from("agent_profiles")
-          .select("id, user_id, agency_name, license_number, years_experience, bio, agent_service_cities(city)")
+          .select("id, user_id, agency_name, license_number, years_experience, bio, is_verified_badge, rera_number, agent_service_cities(city)")
           .eq("slug", agentSlug)
           .eq("status", "approved")
           .maybeSingle();
@@ -247,6 +303,16 @@ export default function AgentProfilePage() {
             listing_type: r.listing_type ?? "sale",
           })));
         }
+
+        // Deals table confirmed live (2026-09-11): stage enum includes
+        // 'closed', assigned_to -> agent_profiles.id — a real, direct count,
+        // not fabricated or derived from anything else.
+        const { count: closedCount } = await supabase
+          .from("deals")
+          .select("id", { count: "exact", head: true })
+          .eq("assigned_to", loadedAgent.id)
+          .eq("stage", "closed");
+        setDealsClosed(closedCount ?? 0);
       } catch (_) {
         setNotFound(true);
       } finally {
@@ -346,7 +412,15 @@ export default function AgentProfilePage() {
               <div>
                 <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "6px" }}>
                   <h1 style={{ fontFamily: "var(--font-heading-new)", fontSize: "clamp(32px, 4vw, 52px)", fontWeight: 400, color: "#020C1C", lineHeight: 1.1 }}>{agent.full_name}</h1>
-                  <span style={{ padding: "4px 12px", background: "rgba(16,185,129,0.1)", border: "1px solid rgba(16,185,129,0.25)", borderRadius: "100px", fontSize: "9px", fontWeight: 800, letterSpacing: "0.12em", color: "#10B981", textTransform: "uppercase", whiteSpace: "nowrap", flexShrink: 0 }}>✓ Approved Agent</span>
+                  <span style={{ padding: "4px 12px", background: "rgba(16,185,129,0.1)", border: "1px solid rgba(16,185,129,0.25)", borderRadius: "100px", fontSize: "9px", fontWeight: 800, letterSpacing: "0.12em", color: "#10B981", textTransform: "uppercase", whiteSpace: "nowrap", flexShrink: 0 }}>✓ Verified Agent</span>
+                  {agent.is_verified_badge && (
+                    <img
+                      src="/brand/nilay360_verified_agent_badge.png"
+                      alt="Verified Agent"
+                      title="Verified Agent"
+                      style={{ height: "44px", width: "auto", flexShrink: 0 }}
+                    />
+                  )}
                 </div>
                 <p style={{ fontSize: "14px", fontWeight: 600, color: "#10C4C3", marginBottom: "8px" }}>
                   {agent.agency_name || "Nilay 360 Agent"}{agent.city ? ` · ${agent.city}` : ""}
@@ -357,6 +431,7 @@ export default function AgentProfilePage() {
                     agent.city && { icon: "📍", text: agent.city },
                     agent.years_experience != null && { icon: "💼", text: `${agent.years_experience} years experience` },
                     agent.license_number && { icon: "📋", text: `License: ${agent.license_number}` },
+                    agent.rera_number && { icon: "🏛️", text: `RERA: ${agent.rera_number}` },
                   ].filter(Boolean).map((item: any) => (
                     <span key={item.text} style={{ display: "flex", alignItems: "center", gap: "5px", fontSize: "12px", color: "rgba(245,242,236,0.5)" }}>
                       {item.icon} {item.text}
@@ -366,13 +441,13 @@ export default function AgentProfilePage() {
               </div>
 
               <div className="as-hero-actions" style={{ display: "flex", flexDirection: "column", gap: "10px", minWidth: "200px" }}>
-                {agent.phone && (
+                {isAdmin && agent.phone && (
                   <a href={`tel:${agent.phone}`} style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", padding: "13px 22px", background: "#10C4C3", borderRadius: "10px", color: "#020C1C", fontSize: "13px", fontWeight: 700, textDecoration: "none" }}>
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.71 3.53 2 2 0 0 1 3.71 1.35h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9.91a16 16 0 0 0 6.13 6.13l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
                     Call Agent
                   </a>
                 )}
-                {agent.whatsapp && (
+                {isAdmin && agent.whatsapp && (
                   <a href={`https://wa.me/${agent.whatsapp.replace(/\+/g,"")}`} target="_blank" rel="noopener noreferrer"
                     style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", padding: "12px 22px", background: "rgba(37,211,102,0.1)", border: "1.5px solid rgba(37,211,102,0.3)", borderRadius: "10px", color: "#25D366", fontSize: "13px", fontWeight: 700, textDecoration: "none" }}>
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"/></svg>
@@ -391,13 +466,14 @@ export default function AgentProfilePage() {
         {/* ── STATS ROW (real fields only) ────────────────────── */}
         <section style={{ background: "#020C1C" }}>
           <div style={{ maxWidth: "1280px", margin: "0 auto", padding: "0 48px" }}>
-            <div className="as-stats" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", borderTop: "1px solid rgba(245,242,236,0.06)" }}>
+            <div className="as-stats" style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", borderTop: "1px solid rgba(245,242,236,0.06)" }}>
               {[
                 { label: "Active Listings", value: properties.length, suffix: "" },
+                { label: "Deals Closed",    value: dealsClosed, suffix: "" },
                 { label: "Years Experience", value: agent.years_experience ?? "—", suffix: agent.years_experience != null ? "yrs" : "" },
                 { label: "Cities Served",   value: agent.cities_served.length || (agent.city ? 1 : 0), suffix: "" },
-              ].map((s, i) => (
-                <div key={s.label} style={{ padding: "28px 20px", borderRight: i < 2 ? "1px solid rgba(245,242,236,0.06)" : "none", textAlign: "center" }}>
+              ].map((s, i, arr) => (
+                <div key={s.label} style={{ padding: "28px 20px", borderRight: i < arr.length - 1 ? "1px solid rgba(245,242,236,0.06)" : "none", textAlign: "center" }}>
                   <p style={{ fontFamily: "var(--font-support-new)", fontSize: "38px", fontWeight: 600, color: "#10C4C3", lineHeight: 1 }}>{s.value}<span style={{ fontSize: "20px" }}>{s.suffix}</span></p>
                   <p style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.14em", color: "rgba(245,242,236,0.3)", textTransform: "uppercase", marginTop: "6px" }}>{s.label}</p>
                 </div>
@@ -458,10 +534,24 @@ export default function AgentProfilePage() {
             <div id="send-message" style={{ background: "#fff", border: "1px solid rgba(13,43,31,0.07)", borderRadius: "18px", padding: "26px 22px", boxShadow: "0 4px 20px rgba(13,43,31,0.06)" }}>
               <div style={{ marginBottom: "16px" }}><Eyebrow label="Get in Touch" /></div>
               <h3 style={{ fontFamily: "var(--font-heading-new)", fontSize: "22px", fontWeight: 600, color: "#020C1C", marginBottom: "18px" }}>Message {agent.full_name.split(" ")[0]}</h3>
-              <ContactForm agent={agent} />
+              {user ? (
+                <ContactForm agent={agent} prefillName={profile?.full_name} prefillEmail={user.email} prefillPhone={profile?.phone} />
+              ) : (
+                <div style={{ textAlign: "center", padding: "24px 12px" }}>
+                  <p style={{ fontSize: "13px", color: "#6B7C72", lineHeight: 1.6, marginBottom: "16px" }}>
+                    Sign in to contact {agent.full_name.split(" ")[0]} directly.
+                  </p>
+                  <button
+                    onClick={() => openAuthModal("signin")}
+                    style={{ width: "100%", padding: "13px", background: "#10C4C3", border: "none", borderRadius: "9px", color: "#020C1C", fontSize: "12px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", cursor: "pointer", fontFamily: "var(--font-body-new)" }}
+                  >
+                    Sign In
+                  </button>
+                </div>
+              )}
             </div>
 
-            {(agent.phone || agent.email || agent.whatsapp) && (
+            {isAdmin && (agent.phone || agent.email || agent.whatsapp) && (
               <div style={{ background: "#020C1C", borderRadius: "14px", padding: "20px 18px" }}>
                 <p style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.14em", color: "rgba(201,168,76,0.55)", textTransform: "uppercase", marginBottom: "14px" }}>Quick Contact</p>
                 {[

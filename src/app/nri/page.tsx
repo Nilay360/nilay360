@@ -1,5 +1,6 @@
 ﻿"use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { createClient } from "@/lib/supabase/client";
 
 // ── FAQ accordion ─────────────────────────────────────────────
 function FaqItem({ q, a, index }: { q: string; a: string; index: number }) {
@@ -109,6 +110,27 @@ export default function NriPage() {
 
   const set = (k: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) =>
     setForm(f => ({ ...f, [k]: e.target.value }));
+
+  // Prefill name/email/phone for a signed-in visitor — same "only if still
+  // blank" rule as post-property.tsx's PREFILL_SELLER_EMAIL: never
+  // overwrites something the visitor already typed into the form. This
+  // page has no useAuth()/profile fetch of its own, so session + profile
+  // are read directly, once, on mount.
+  useEffect(() => {
+    const supabase = createClient();
+    supabase.auth.getSession().then(async ({ data }: Awaited<ReturnType<typeof supabase.auth.getSession>>) => {
+      const sessionUser = data.session?.user;
+      if (!sessionUser) return;
+      if (sessionUser.email) setForm(f => ({ ...f, email: f.email || sessionUser.email! }));
+      const { data: profileRow } = await supabase
+        .from("profiles")
+        .select("full_name, phone")
+        .eq("id", sessionUser.id)
+        .maybeSingle();
+      if (profileRow?.full_name) setForm(f => ({ ...f, name: f.name || profileRow.full_name! }));
+      if (profileRow?.phone) setForm(f => ({ ...f, phone: f.phone || profileRow.phone! }));
+    });
+  }, []);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();

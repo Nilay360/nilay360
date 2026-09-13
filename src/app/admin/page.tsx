@@ -1,6 +1,6 @@
 ﻿"use client";
-import React, { useState, useEffect, useCallback, useRef } from "react";
-import { useRouter } from "next/navigation";
+import React, { Suspense, useState, useEffect, useCallback, useRef } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { useAuth } from "@/context/AuthContext";
 import { CITIES } from "@/constants";
@@ -13,7 +13,7 @@ import InquiriesOverTimeChart from "./InquiriesOverTimeChart";
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
-type AdminSection = "overview" | "pending" | "approved" | "rejected" | "users" | "inquiries" | "agents" | "performance" | "leaderboard" | "reports" | "content" | "audit";
+type AdminSection = "overview" | "pending" | "approved" | "rejected" | "users" | "inquiries" | "agents" | "capture360" | "performance" | "leaderboard" | "reports" | "content" | "audit";
 
 type Stats = {
   pending: number;
@@ -75,6 +75,8 @@ type InquiryRow = {
   inquiry_type: string | null;
   status: string | null;
   created_at: string;
+  assigned_to: string | null;
+  agent_profiles: { profiles: { full_name: string | null } | null } | null;
 };
 
 type RecentActivity = {
@@ -96,6 +98,7 @@ type AgentApplication = {
   created_at: string;
   rera_number: string | null;
   oc_number: string | null;
+  is_verified_badge: boolean;
   profiles: { full_name: string | null; phone: string | null; email: string | null; role: string | null } | null;
   agent_service_cities: { city: string }[] | null;
 };
@@ -106,6 +109,20 @@ type AgentApplication = {
 // know which), and "email" flags the synthetic phone-only placeholder
 // (see verify-otp/route.ts's syntheticEmail) rather than a real address.
 // Individual accounts are never checked — a missing email there is normal.
+type Capture360Request = {
+  id: string;
+  property_id: string;
+  requester_id: string;
+  status: string;
+  scheduled_date: string | null;
+  scheduled_time_slot: string | null;
+  admin_notes: string | null;
+  created_at: string;
+  updated_at: string;
+  property_listings: { title: string | null; address: string | null; city: string | null } | null;
+  profiles: { full_name: string | null; phone: string | null } | null;
+};
+
 function incompleteAgentAppReasons(app: AgentApplication): string[] {
   const isBuilder = app.profiles?.role === "builder";
   const reasons: string[] = [];
@@ -257,6 +274,7 @@ function IconAudit()  { return <svg width="15" height="15" viewBox="0 0 24 24" f
 function IconEdit()   { return <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4z"/></svg>; }
 function IconChart()  { return <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 3v18h18"/><path d="M18 17V9M13 17V5M8 17v-4"/></svg>; }
 function IconAward()  { return <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="8" r="6"/><path d="M8.21 13.89 7 23l5-3 5 3-1.21-9.12"/></svg>; }
+function IconCamera() { return <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>; }
 function IconFlag()   { return <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>; }
 function IconChevron(){ return <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"/></svg>; }
 
@@ -1583,7 +1601,7 @@ function InquiriesSection({
                       {inq.inquirer_name ?? "Anonymous"}
                     </span>
                     {inq.inquiry_type && (
-                      <span style={{ display: "inline-block", padding: "2px 8px", borderRadius: "100px", fontSize: "9px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" as const, background: inq.inquiry_type === "viewing" ? "rgba(52,211,153,0.1)" : "rgba(16,196,195,0.12)", color: inq.inquiry_type === "viewing" ? "#34D399" : "#10C4C3", border: `1px solid ${inq.inquiry_type === "viewing" ? "rgba(52,211,153,0.25)" : "rgba(16,196,195,0.3)"}` }}>
+                      <span style={{ display: "inline-block", padding: "2px 8px", borderRadius: "100px", fontSize: "9px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" as const, background: inq.inquiry_type === "viewing" ? "rgba(52,211,153,0.1)" : inq.inquiry_type === "agent_contact" ? "rgba(245,158,11,0.12)" : "rgba(16,196,195,0.12)", color: inq.inquiry_type === "viewing" ? "#34D399" : inq.inquiry_type === "agent_contact" ? "#F59E0B" : "#10C4C3", border: `1px solid ${inq.inquiry_type === "viewing" ? "rgba(52,211,153,0.25)" : inq.inquiry_type === "agent_contact" ? "rgba(245,158,11,0.3)" : "rgba(16,196,195,0.3)"}` }}>
                         {inq.inquiry_type}
                       </span>
                     )}
@@ -1604,6 +1622,17 @@ function InquiriesSection({
                       : <span style={{ color: "#FFFFFF", fontWeight: 500 }}>{inq.property_title}</span>
                     }
                     {inq.seller_email && <span style={{ color: "rgba(255,255,255,0.45)" }}>→ {inq.seller_email}</span>}
+                  </div>
+                )}
+                {/* Assigned agent — only meaningful for agent_contact rows
+                    today (property inquiries get assigned later, by an
+                    admin), but shown for any row that has it set. */}
+                {inq.assigned_to && (
+                  <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "8px", fontSize: "12px", color: "#A9B4C2" }}>
+                    <span style={{ color: "rgba(255,255,255,0.45)" }}>Contacted:</span>
+                    <span style={{ color: "#FFFFFF", fontWeight: 500 }}>
+                      {inq.agent_profiles?.profiles?.full_name ?? "Unnamed agent"}
+                    </span>
                   </div>
                 )}
                 {/* Contact */}
@@ -1690,6 +1719,12 @@ function AgentCard({
       {app.license_number && (
         <div style={{ fontSize: "12px", color: "#A9B4C2", marginBottom: "8px" }}>
           License: <span style={{ color: "#FFFFFF" }}>{app.license_number}</span>
+        </div>
+      )}
+
+      {app.rera_number && (
+        <div style={{ fontSize: "12px", color: "#A9B4C2", marginBottom: "8px" }}>
+          RERA: <span style={{ color: "#FFFFFF" }}>{app.rera_number}</span>
         </div>
       )}
 
@@ -1919,13 +1954,14 @@ function AddAgentModal({ onClose, onSubmit }: {
 }
 
 function AgentsSection({
-  applications, loading, inFlight, onApprove, onReject, onAddAgent, documentsByProfile,
+  applications, loading, inFlight, onApprove, onReject, onToggleBadge, onAddAgent, documentsByProfile,
 }: {
   applications: AgentApplication[];
   loading: boolean;
   inFlight: string | null;
   onApprove: (id: string, userId: string) => void;
   onReject: (id: string) => void;
+  onToggleBadge: (id: string, currentValue: boolean) => void;
   onAddAgent: (data: {
     userId: string; licenseNumber: string; agencyName: string; bio: string;
     yearsExperience: string; cities: string[];
@@ -1989,24 +2025,43 @@ function AgentsSection({
               inFlight={inFlight === app.id}
               documents={documentsByProfile[app.id] ?? []}
               actions={
-                filter === "pending" ? (
-                  <>
+                <>
+                  {filter === "pending" && (
+                    <>
+                      <button
+                        onClick={() => onApprove(app.id, app.user_id)}
+                        disabled={inFlight === app.id}
+                        style={{ display: "flex", alignItems: "center", gap: "6px", padding: "7px 16px", borderRadius: "7px", fontSize: "11px", fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase" as const, background: "#10C4C3", color: "#020C1C", border: "none", cursor: inFlight === app.id ? "not-allowed" : "pointer", fontFamily: "var(--font-body-new)", opacity: inFlight === app.id ? 0.6 : 1 }}
+                      >
+                        <IconApprove /> Approve
+                      </button>
+                      <button
+                        onClick={() => onReject(app.id)}
+                        disabled={inFlight === app.id}
+                        style={{ display: "flex", alignItems: "center", gap: "6px", padding: "7px 16px", borderRadius: "7px", fontSize: "11px", fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase" as const, background: "rgba(248,113,113,0.1)", color: "#F87171", border: "1.5px solid rgba(248,113,113,0.3)", cursor: inFlight === app.id ? "not-allowed" : "pointer", fontFamily: "var(--font-body-new)", opacity: inFlight === app.id ? 0.6 : 1 }}
+                      >
+                        <IconReject /> Reject
+                      </button>
+                    </>
+                  )}
+                  {/* Badge toggle — independent of Approve/Reject's pending-tab
+                      gate; visible on any tab as long as the agent is
+                      currently approved (badging an unapproved application
+                      makes no sense — they aren't public yet). */}
+                  {app.status === "approved" && (
                     <button
-                      onClick={() => onApprove(app.id, app.user_id)}
+                      onClick={() => onToggleBadge(app.id, app.is_verified_badge)}
                       disabled={inFlight === app.id}
-                      style={{ display: "flex", alignItems: "center", gap: "6px", padding: "7px 16px", borderRadius: "7px", fontSize: "11px", fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase" as const, background: "#10C4C3", color: "#020C1C", border: "none", cursor: inFlight === app.id ? "not-allowed" : "pointer", fontFamily: "var(--font-body-new)", opacity: inFlight === app.id ? 0.6 : 1 }}
+                      style={app.is_verified_badge ? {
+                        display: "flex", alignItems: "center", gap: "6px", padding: "7px 16px", borderRadius: "7px", fontSize: "11px", fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase" as const, background: "rgba(248,113,113,0.1)", color: "#F87171", border: "1.5px solid rgba(248,113,113,0.3)", cursor: inFlight === app.id ? "not-allowed" : "pointer", fontFamily: "var(--font-body-new)", opacity: inFlight === app.id ? 0.6 : 1,
+                      } : {
+                        display: "flex", alignItems: "center", gap: "6px", padding: "7px 16px", borderRadius: "7px", fontSize: "11px", fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase" as const, background: "rgba(16,196,195,0.1)", color: "#10C4C3", border: "1.5px solid rgba(16,196,195,0.3)", cursor: inFlight === app.id ? "not-allowed" : "pointer", fontFamily: "var(--font-body-new)", opacity: inFlight === app.id ? 0.6 : 1,
+                      }}
                     >
-                      <IconApprove /> Approve
+                      {app.is_verified_badge ? <><IconReject /> Revoke Badge</> : <><IconApprove /> Grant Badge</>}
                     </button>
-                    <button
-                      onClick={() => onReject(app.id)}
-                      disabled={inFlight === app.id}
-                      style={{ display: "flex", alignItems: "center", gap: "6px", padding: "7px 16px", borderRadius: "7px", fontSize: "11px", fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase" as const, background: "rgba(248,113,113,0.1)", color: "#F87171", border: "1.5px solid rgba(248,113,113,0.3)", cursor: inFlight === app.id ? "not-allowed" : "pointer", fontFamily: "var(--font-body-new)", opacity: inFlight === app.id ? 0.6 : 1 }}
-                    >
-                      <IconReject /> Reject
-                    </button>
-                  </>
-                ) : null
+                  )}
+                </>
               }
             />
           ))}
@@ -2017,6 +2072,320 @@ function AgentsSection({
         <AddAgentModal
           onClose={() => setShowAddModal(false)}
           onSubmit={onAddAgent}
+        />
+      )}
+    </div>
+  );
+}
+
+// ── Section: 360° Capture Requests ──────────────────────────────────────────────
+// Structurally modeled on AgentsSection: status filter tabs + per-card action
+// buttons, same visual language (Pill-less tab buttons, same badge/button
+// styling conventions used throughout this file).
+
+const CAPTURE_360_STATUS_FILTERS = ["pending", "scheduled", "completed", "declined"] as const;
+type Capture360StatusFilter = typeof CAPTURE_360_STATUS_FILTERS[number];
+
+const CAPTURE_360_TIME_SLOTS = ["Morning (9 AM – 12 PM)", "Afternoon (12 – 4 PM)", "Evening (4 – 7 PM)"] as const;
+
+function daysFromNow(iso: string | null): number | null {
+  if (!iso) return null;
+  const ms = new Date(iso + "T00:00:00").getTime() - new Date(new Date().toDateString()).getTime();
+  return Math.round(ms / 86_400_000);
+}
+
+// ── Schedule modal — repeats context, pill-picker time slots with a free-text
+// fallback, and a confirmation summary line so the admin sees exactly what
+// they're about to commit to before submitting. Same dark modal-overlay
+// pattern already used by AddAgentModal in this file (fixed inset:0 scrim,
+// centered card, Escape-to-close, backdrop-click-to-close).
+function Capture360ScheduleModal({
+  req, submitting, onConfirm, onCancel,
+}: {
+  req: Capture360Request;
+  submitting: boolean;
+  onConfirm: (date: string, slot: string, notes: string) => void;
+  onCancel: () => void;
+}) {
+  const todayStr = new Date().toISOString().slice(0, 10);
+  const [date, setDate] = useState("");
+  const [slotChoice, setSlotChoice] = useState<string>(CAPTURE_360_TIME_SLOTS[0]);
+  const [customSlot, setCustomSlot] = useState("");
+  const [notes, setNotes] = useState("");
+  const usingCustom = slotChoice === "other";
+  const finalSlot = usingCustom ? customSlot.trim() : slotChoice;
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onCancel(); };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [onCancel]);
+
+  return (
+    <div
+      onClick={onCancel}
+      role="dialog"
+      aria-modal="true"
+      aria-label="Schedule 360° capture"
+      style={{ position: "fixed", inset: 0, zIndex: 500, background: "rgba(0,0,0,0.6)", backdropFilter: "blur(4px)", display: "flex", alignItems: "center", justifyContent: "center", padding: "20px" }}
+    >
+      <div
+        onClick={e => e.stopPropagation()}
+        style={{ background: "#0A1526", borderRadius: "18px", border: "1px solid rgba(255,255,255,0.1)", boxShadow: "0 12px 48px rgba(0,0,0,0.5)", width: "100%", maxWidth: "480px", maxHeight: "88vh", overflowY: "auto", padding: "26px 28px", animation: "fadeSlide 0.18s ease-out", fontFamily: "var(--font-body-new)" }}
+      >
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "6px" }}>
+          <h3 style={{ fontFamily: "var(--font-heading-new)", fontSize: "22px", fontWeight: 600, color: "#FFFFFF" }}>Schedule Capture</h3>
+          <button onClick={onCancel} aria-label="Close" style={{ width: "30px", height: "30px", borderRadius: "8px", background: "rgba(255,255,255,0.06)", border: "none", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: "#FFFFFF" }}>
+            <IconX />
+          </button>
+        </div>
+
+        {/* Context repeated so the admin isn't scheduling blind */}
+        <div style={{ marginBottom: "18px" }}>
+          <p style={{ fontSize: "14px", fontWeight: 600, color: "#FFFFFF", marginBottom: "2px" }}>{req.property_listings?.title ?? "Untitled listing"}</p>
+          {(req.property_listings?.address || req.property_listings?.city) && (
+            <p style={{ fontSize: "12px", color: "#A9B4C2", marginBottom: "4px" }}>
+              {[req.property_listings?.address, req.property_listings?.city].filter(Boolean).join(", ")}
+            </p>
+          )}
+          <p style={{ fontSize: "12px", color: "#6B7686" }}>
+            {[req.profiles?.full_name, req.profiles?.phone].filter(Boolean).join(" · ")}
+          </p>
+        </div>
+
+        <label style={{ display: "block", fontSize: "10px", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: "#6B7686", marginBottom: "6px" }}>Date</label>
+        <input
+          type="date" value={date} min={todayStr} onChange={e => setDate(e.target.value)}
+          style={{ width: "100%", boxSizing: "border-box", padding: "10px 12px", borderRadius: "8px", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.15)", color: "#FFFFFF", fontSize: "13px", fontFamily: "var(--font-body-new)", marginBottom: "16px" }}
+        />
+
+        <label style={{ display: "block", fontSize: "10px", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: "#6B7686", marginBottom: "6px" }}>Time slot</label>
+        <div style={{ display: "flex", gap: "6px", flexWrap: "wrap", marginBottom: "10px" }}>
+          {CAPTURE_360_TIME_SLOTS.map(s => (
+            <button key={s} onClick={() => setSlotChoice(s)}
+              style={{ padding: "6px 12px", borderRadius: "100px", fontSize: "11px", fontWeight: slotChoice === s ? 700 : 500, background: slotChoice === s ? "#10C4C3" : "rgba(255,255,255,0.06)", color: slotChoice === s ? "#020C1C" : "#A9B4C2", border: slotChoice === s ? "1.5px solid #10C4C3" : "1.5px solid rgba(255,255,255,0.12)", cursor: "pointer", fontFamily: "var(--font-body-new)" }}
+            >
+              {s}
+            </button>
+          ))}
+          <button onClick={() => setSlotChoice("other")}
+            style={{ padding: "6px 12px", borderRadius: "100px", fontSize: "11px", fontWeight: usingCustom ? 700 : 500, background: usingCustom ? "#10C4C3" : "rgba(255,255,255,0.06)", color: usingCustom ? "#020C1C" : "#A9B4C2", border: usingCustom ? "1.5px solid #10C4C3" : "1.5px solid rgba(255,255,255,0.12)", cursor: "pointer", fontFamily: "var(--font-body-new)" }}
+          >
+            Other
+          </button>
+        </div>
+        {usingCustom && (
+          <input
+            type="text" value={customSlot} onChange={e => setCustomSlot(e.target.value)} placeholder="e.g. 10:00 AM – 12:00 PM"
+            style={{ width: "100%", boxSizing: "border-box", padding: "9px 12px", borderRadius: "8px", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.15)", color: "#FFFFFF", fontSize: "12px", fontFamily: "var(--font-body-new)", marginBottom: "16px" }}
+          />
+        )}
+
+        <label style={{ display: "block", fontSize: "10px", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: "#6B7686", marginBottom: "6px", marginTop: usingCustom ? 0 : "10px" }}>Notes for the requester (optional)</label>
+        <textarea
+          value={notes} onChange={e => setNotes(e.target.value)} rows={2}
+          style={{ width: "100%", boxSizing: "border-box", padding: "9px 12px", borderRadius: "8px", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.15)", color: "#FFFFFF", fontSize: "12px", fontFamily: "var(--font-body-new)", resize: "vertical", marginBottom: "16px" }}
+        />
+
+        {date && (
+          <div style={{ padding: "11px 14px", background: "rgba(16,196,195,0.08)", border: "1px solid rgba(16,196,195,0.25)", borderRadius: "8px", fontSize: "12px", color: "#A9B4C2", marginBottom: "18px" }}>
+            Scheduling for <strong style={{ color: "#FFFFFF" }}>{req.property_listings?.title ?? "this listing"}</strong> on <strong style={{ color: "#10C4C3" }}>{date}</strong>{finalSlot ? <>, <strong style={{ color: "#10C4C3" }}>{finalSlot}</strong></> : ""}.
+          </div>
+        )}
+
+        <div style={{ display: "flex", gap: "10px" }}>
+          <button
+            onClick={() => { if (date) onConfirm(date, finalSlot, notes); }}
+            disabled={!date || submitting}
+            style={{ flex: 1, padding: "11px", borderRadius: "8px", fontSize: "12px", fontWeight: 700, letterSpacing: "0.04em", textTransform: "uppercase" as const, background: "#10C4C3", color: "#020C1C", border: "none", cursor: !date || submitting ? "not-allowed" : "pointer", fontFamily: "var(--font-body-new)", opacity: !date || submitting ? 0.6 : 1 }}
+          >
+            {submitting ? "Scheduling…" : "Confirm Schedule"}
+          </button>
+          <button
+            onClick={onCancel}
+            style={{ padding: "11px 18px", borderRadius: "8px", fontSize: "12px", fontWeight: 700, letterSpacing: "0.04em", textTransform: "uppercase" as const, background: "rgba(255,255,255,0.06)", color: "#A9B4C2", border: "1.5px solid rgba(255,255,255,0.12)", cursor: "pointer", fontFamily: "var(--font-body-new)" }}
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function Capture360Card({
+  req, inFlight, onScheduleClick, onDecline, onComplete,
+}: {
+  req: Capture360Request;
+  inFlight: boolean;
+  onScheduleClick: () => void;
+  onDecline: (notes: string) => void;
+  onComplete: () => void;
+}) {
+  const statusColors: Record<string, { text: string; bg: string; border: string }> = {
+    pending:   { text: "#F59E0B", bg: "rgba(245,158,11,0.12)",  border: "rgba(245,158,11,0.3)"  },
+    scheduled: { text: "#10C4C3", bg: "rgba(16,196,195,0.12)",  border: "rgba(16,196,195,0.3)"   },
+    completed: { text: "#34D399", bg: "rgba(52,211,153,0.1)",   border: "rgba(52,211,153,0.25)"  },
+    declined:  { text: "#F87171", bg: "rgba(248,113,113,0.1)",  border: "rgba(248,113,113,0.3)"  },
+  };
+  const sc = statusColors[req.status] ?? statusColors.pending;
+
+  return (
+    <div style={{ background: "rgba(255,255,255,0.05)", backdropFilter: "blur(24px)", WebkitBackdropFilter: "blur(24px)", borderRadius: "16px", border: "1px solid rgba(255,255,255,0.08)", boxShadow: "0 4px 24px rgba(0,0,0,0.18)", padding: "20px 24px", opacity: inFlight ? 0.55 : 1, transition: "opacity 0.2s" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: "12px", marginBottom: "10px" }}>
+        <h3 style={{ fontFamily: "var(--font-heading-new)", fontSize: "19px", fontWeight: 600, color: "#FFFFFF", lineHeight: 1.25 }}>
+          {req.property_listings?.title ?? "Untitled listing"}
+        </h3>
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: "4px", flexShrink: 0 }}>
+          <span style={{ padding: "2px 8px", borderRadius: "100px", fontSize: "9px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" as const, background: sc.bg, color: sc.text, border: `1px solid ${sc.border}` }}>
+            {req.status}
+          </span>
+          <span style={{ fontSize: "11px", color: "rgba(255,255,255,0.4)" }}>{fmtDate(req.created_at)}</span>
+        </div>
+      </div>
+
+      {(req.property_listings?.address || req.property_listings?.city) && (
+        <p style={{ fontSize: "12px", color: "#A9B4C2", marginBottom: "8px" }}>
+          {[req.property_listings?.address, req.property_listings?.city].filter(Boolean).join(", ")}
+        </p>
+      )}
+      <div style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "12px", color: "#A9B4C2", flexWrap: "wrap", marginBottom: "12px" }}>
+        <IconUsers />
+        {req.profiles?.full_name && <span>{req.profiles.full_name}</span>}
+        {req.profiles?.phone && <a href={`tel:${req.profiles.phone}`} style={{ color: "#A9B4C2", textDecoration: "none" }}>· {req.profiles.phone}</a>}
+      </div>
+
+      {req.status === "scheduled" && (
+        <div style={{ display: "inline-flex", alignItems: "center", gap: "6px", padding: "6px 12px", background: "rgba(16,196,195,0.1)", border: "1px solid rgba(16,196,195,0.25)", borderRadius: "100px", fontSize: "12px", fontWeight: 600, color: "#10C4C3", marginBottom: "10px" }}>
+          <IconClock /> {req.scheduled_date ?? "—"}{req.scheduled_time_slot ? ` · ${req.scheduled_time_slot}` : ""}
+        </div>
+      )}
+      {req.admin_notes && (
+        <p style={{ fontSize: "12px", color: "#A9B4C2", marginBottom: "10px", fontStyle: "italic" }}>
+          Note: {req.admin_notes}
+        </p>
+      )}
+
+      <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
+        {req.status === "pending" && (
+          <>
+            <button
+              onClick={onScheduleClick}
+              disabled={inFlight}
+              style={{ display: "flex", alignItems: "center", gap: "6px", padding: "7px 16px", borderRadius: "7px", fontSize: "11px", fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase" as const, background: "#10C4C3", color: "#020C1C", border: "none", cursor: inFlight ? "not-allowed" : "pointer", fontFamily: "var(--font-body-new)", opacity: inFlight ? 0.6 : 1 }}
+            >
+              <IconApprove /> Schedule
+            </button>
+            <button
+              onClick={() => {
+                const reason = window.prompt("Reason for declining (optional, shown to the requester):", "") ?? "";
+                onDecline(reason);
+              }}
+              disabled={inFlight}
+              style={{ display: "flex", alignItems: "center", gap: "6px", padding: "7px 16px", borderRadius: "7px", fontSize: "11px", fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase" as const, background: "rgba(248,113,113,0.1)", color: "#F87171", border: "1.5px solid rgba(248,113,113,0.3)", cursor: inFlight ? "not-allowed" : "pointer", fontFamily: "var(--font-body-new)", opacity: inFlight ? 0.6 : 1 }}
+            >
+              <IconReject /> Decline
+            </button>
+          </>
+        )}
+        {req.status === "scheduled" && (
+          <button
+            onClick={onComplete}
+            disabled={inFlight}
+            style={{ display: "flex", alignItems: "center", gap: "6px", padding: "7px 16px", borderRadius: "7px", fontSize: "11px", fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase" as const, background: "#10C4C3", color: "#020C1C", border: "none", cursor: inFlight ? "not-allowed" : "pointer", fontFamily: "var(--font-body-new)", opacity: inFlight ? 0.6 : 1 }}
+          >
+            <IconApprove /> Mark Completed
+          </button>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function Capture360Section({
+  requests, loading, inFlight, onSchedule, onDecline, onComplete,
+}: {
+  requests: Capture360Request[];
+  loading: boolean;
+  inFlight: string | null;
+  onSchedule: (req: Capture360Request, date: string, slot: string, notes: string) => void;
+  onDecline: (req: Capture360Request, notes: string) => void;
+  onComplete: (id: string) => void;
+}) {
+  const [filter, setFilter] = useState<Capture360StatusFilter>("pending");
+  const [schedulingReq, setSchedulingReq] = useState<Capture360Request | null>(null);
+  const filtered = requests.filter(r => r.status === filter);
+
+  const pendingCount = requests.filter(r => r.status === "pending").length;
+  const scheduledThisWeek = requests.filter(r => {
+    if (r.status !== "scheduled") return false;
+    const d = daysFromNow(r.scheduled_date);
+    return d !== null && d >= 0 && d <= 7;
+  }).length;
+  const now = new Date();
+  const completedThisMonth = requests.filter(r => {
+    if (r.status !== "completed") return false;
+    const d = new Date(r.updated_at);
+    return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth();
+  }).length;
+  const declinedCount = requests.filter(r => r.status === "declined").length;
+
+  if (loading) return <Spinner />;
+
+  return (
+    <div>
+      <SectionHeading title="360° Capture Requests" subtitle="Review and schedule professional 360° captures requested by sellers and agents." count={filtered.length} />
+
+      <div style={{ display: "flex", flexWrap: "wrap", gap: "16px", marginBottom: "24px" }}>
+        <StatCard label="Pending"               value={pendingCount}       icon={<IconClock />}  accent="gold" />
+        <StatCard label="Scheduled This Week"    value={scheduledThisWeek} icon={<IconCamera />} accent="blue" note="Next 7 days" />
+        <StatCard label="Completed This Month"   value={completedThisMonth} icon={<IconCheck />}  accent="green" />
+        <StatCard label="Declined"               value={declinedCount}      icon={<IconX />}      accent="red" />
+      </div>
+
+      <div style={{ display: "flex", gap: "6px", flexWrap: "wrap", marginBottom: "18px" }}>
+        {CAPTURE_360_STATUS_FILTERS.map(f => {
+          const on = filter === f;
+          return (
+            <button
+              key={f}
+              onClick={() => setFilter(f)}
+              style={{ padding: "6px 14px", borderRadius: "100px", fontSize: "11px", fontWeight: on ? 700 : 500, background: on ? "#10C4C3" : "rgba(255,255,255,0.06)", color: on ? "#020C1C" : "#A9B4C2", border: on ? "1.5px solid #10C4C3" : "1.5px solid rgba(255,255,255,0.12)", cursor: "pointer", fontFamily: "var(--font-support-new)", textTransform: "capitalize" as const }}
+            >
+              {f} ({requests.filter(r => r.status === f).length})
+            </button>
+          );
+        })}
+      </div>
+
+      {filtered.length === 0 ? (
+        <div style={{ padding: "60px 24px", textAlign: "center", background: "rgba(255,255,255,0.05)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", borderRadius: "18px", border: "1px solid rgba(255,255,255,0.08)" }}>
+          <p style={{ fontFamily: "var(--font-heading-new)", fontSize: "20px", color: "#FFFFFF" }}>No {filter} requests</p>
+        </div>
+      ) : (
+        <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
+          {filtered.map(req => (
+            <Capture360Card
+              key={req.id}
+              req={req}
+              inFlight={inFlight === req.id}
+              onScheduleClick={() => setSchedulingReq(req)}
+              onDecline={notes => onDecline(req, notes)}
+              onComplete={() => onComplete(req.id)}
+            />
+          ))}
+        </div>
+      )}
+
+      {schedulingReq && (
+        <Capture360ScheduleModal
+          req={schedulingReq}
+          submitting={inFlight === schedulingReq.id}
+          onConfirm={(date, slot, notes) => {
+            onSchedule(schedulingReq, date, slot, notes);
+            setSchedulingReq(null);
+          }}
+          onCancel={() => setSchedulingReq(null)}
         />
       )}
     </div>
@@ -2449,6 +2818,7 @@ const NAV: { id: AdminSection; label: string; icon: React.ReactNode }[] = [
   { id: "approved",   label: "Approved Listings",  icon: <IconCheck /> },
   { id: "rejected",   label: "Rejected Listings",  icon: <IconX /> },
   { id: "agents",     label: "Agent Applications", icon: <IconBriefcase /> },
+  { id: "capture360", label: "360° Requests",      icon: <IconCamera /> },
   { id: "users",      label: "All Users",          icon: <IconUsers /> },
   { id: "inquiries",  label: "All Inquiries",      icon: <IconMsg /> },
   { id: "performance", label: "Agent Performance", icon: <IconChart /> },
@@ -2461,6 +2831,17 @@ const NAV: { id: AdminSection; label: string; icon: React.ReactNode }[] = [
 // ── Main page ──────────────────────────────────────────────────────────────────
 
 export default function AdminPage() {
+  return (
+    <Suspense fallback={<Spinner />}>
+      <AdminPageInner />
+    </Suspense>
+  );
+}
+
+// useSearchParams() (needed to read ?section= for notification deep-links)
+// requires a Suspense boundary around any usage during static export — the
+// wrapper above exists solely for that; all actual page logic stays here.
+function AdminPageInner() {
   const router = useRouter();
   const { user, profile, loading: authLoading } = useAuth();
 
@@ -2470,7 +2851,25 @@ export default function AdminPage() {
   // Also covers the profilePending window (user set, profile still in flight).
   const authChecking = authLoading || (!!user && profile === null) || !isAdmin;
 
-  const [active,       setActive]       = useState<AdminSection>("overview");
+  const searchParams = useSearchParams();
+  const VALID_SECTIONS = NAV.map(n => n.id);
+  const sectionFromQuery = (): AdminSection => {
+    const section = searchParams?.get("section");
+    return section && (VALID_SECTIONS as string[]).includes(section) ? (section as AdminSection) : "overview";
+  };
+  const [active,       setActive]       = useState<AdminSection>(sectionFromQuery);
+
+  // Keeps `active` in sync with ?section= after the initial mount too —
+  // e.g. clicking a second notification's action_url (/admin?section=...)
+  // while already on this page navigates client-side without remounting,
+  // so the state initializer above alone wouldn't catch the change.
+  useEffect(() => {
+    const section = searchParams?.get("section");
+    if (section && (VALID_SECTIONS as string[]).includes(section)) {
+      setActive(section as AdminSection);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams]);
   const [sidebarOpen,  setSidebarOpen]  = useState(true);
   const [toast,        setToast]        = useState<{ ok: boolean; msg: string } | null>(null);
 
@@ -2483,6 +2882,7 @@ export default function AdminPage() {
   const [users,            setUsers]            = useState<UserRow[]>([]);
   const [inquiries,        setInquiries]        = useState<InquiryRow[]>([]);
   const [agentApps,        setAgentApps]        = useState<AgentApplication[]>([]);
+  const [capture360Requests, setCapture360Requests] = useState<Capture360Request[]>([]);
   const [agentDocsByProfile, setAgentDocsByProfile] = useState<Record<string, AgentDocumentRow[]>>({});
   const [approvedAgents,   setApprovedAgents]   = useState<ApprovedAgentOption[]>([]);
   const [auditLog,         setAuditLog]         = useState<AuditLogRow[]>([]);
@@ -2500,6 +2900,7 @@ export default function AdminPage() {
   const [lastSignIns,        setLastSignIns]        = useState<Record<string, string | null>>({});
   const [inquiriesLoading, setInquiriesLoading] = useState(false);
   const [agentAppsLoading, setAgentAppsLoading] = useState(false);
+  const [capture360Loading, setCapture360Loading] = useState(false);
   const [auditLoading,     setAuditLoading]     = useState(false);
   const [reportsLoading,   setReportsLoading]   = useState(false);
   const [contentLoading,   setContentLoading]   = useState(false);
@@ -2647,7 +3048,7 @@ export default function AdminPage() {
       setInquiriesLoading(true);
       supabase
         .from("inquiries")
-        .select("id, property_title, property_slug, seller_email, inquirer_name, inquirer_email, inquirer_phone, message, inquiry_type, status, created_at")
+        .select("id, property_title, property_slug, seller_email, inquirer_name, inquirer_email, inquirer_phone, message, inquiry_type, status, created_at, assigned_to, agent_profiles(profiles(full_name))")
         .order("created_at", { ascending: false })
         .then((res: { data: unknown }) => {
           setInquiries((res.data as InquiryRow[] | null) ?? []);
@@ -2657,7 +3058,7 @@ export default function AdminPage() {
       setAgentAppsLoading(true);
       supabase
         .from("agent_profiles")
-        .select("id, user_id, license_number, agency_name, bio, years_experience, status, created_at, rera_number, oc_number, profiles(full_name, phone, email, role), agent_service_cities(city)")
+        .select("id, user_id, license_number, agency_name, bio, years_experience, status, created_at, rera_number, oc_number, is_verified_badge, profiles(full_name, phone, email, role), agent_service_cities(city)")
         .order("created_at", { ascending: false })
         .then(async (res: { data: unknown }) => {
           const apps = (res.data as AgentApplication[] | null) ?? [];
@@ -2682,6 +3083,16 @@ export default function AdminPage() {
             (grouped[d.agent_profile_id] ??= []).push(d);
           });
           setAgentDocsByProfile(grouped);
+        });
+    } else if (active === "capture360") {
+      setCapture360Loading(true);
+      supabase
+        .from("capture_360_requests")
+        .select("id, property_id, requester_id, status, scheduled_date, scheduled_time_slot, admin_notes, created_at, updated_at, property_listings(title, address, city), profiles(full_name, phone)")
+        .order("created_at", { ascending: false })
+        .then((res: { data: unknown }) => {
+          setCapture360Requests((res.data as Capture360Request[] | null) ?? []);
+          setCapture360Loading(false);
         });
     } else if (active === "audit") {
       setAuditLoading(true);
@@ -3256,6 +3667,116 @@ export default function AdminPage() {
     setTimeout(() => setToast(null), 3000);
   }, [agentApps, logAdminAction]);
 
+  const handleAgentToggleBadge = useCallback(async (id: string, currentValue: boolean) => {
+    setInFlight(id);
+    const nextValue = !currentValue;
+    const supabase = createClient();
+    const { error } = await supabase.from("agent_profiles").update({ is_verified_badge: nextValue }).eq("id", id);
+
+    if (error) {
+      console.error("Admin — agent badge toggle error:", error);
+      setToast({ ok: false, msg: "Could not update badge — please try again." });
+    } else {
+      void logAdminAction(
+        nextValue ? "grant_verified_badge" : "revoke_verified_badge",
+        "agent_profile", id,
+        { is_verified_badge: currentValue }, { is_verified_badge: nextValue }
+      );
+      setAgentApps(prev => prev.map(a => a.id === id ? { ...a, is_verified_badge: nextValue } : a));
+      setToast({ ok: true, msg: nextValue ? "Verified badge granted." : "Verified badge revoked." });
+    }
+    setInFlight(null);
+    setTimeout(() => setToast(null), 3000);
+  }, [logAdminAction]);
+
+  const handleScheduleCapture = useCallback(async (
+    req: Capture360Request, scheduledDate: string, scheduledTimeSlot: string, adminNotes: string
+  ) => {
+    setInFlight(req.id);
+    const supabase = createClient();
+    const { error } = await supabase
+      .from("capture_360_requests")
+      .update({
+        status: "scheduled",
+        scheduled_date: scheduledDate,
+        scheduled_time_slot: scheduledTimeSlot || null,
+        admin_notes: adminNotes || null,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", req.id);
+
+    if (error) {
+      console.error("Admin — capture 360 schedule error:", error);
+      setToast({ ok: false, msg: "Could not schedule — please try again." });
+    } else {
+      void logAdminAction("schedule_capture_360", "capture_360_request", req.id, { status: req.status }, { status: "scheduled", scheduled_date: scheduledDate, scheduled_time_slot: scheduledTimeSlot });
+      setCapture360Requests(prev => prev.map(r => r.id === req.id ? { ...r, status: "scheduled", scheduled_date: scheduledDate, scheduled_time_slot: scheduledTimeSlot || null, admin_notes: adminNotes || null } : r));
+      setToast({ ok: true, msg: "Capture scheduled." });
+      fetch("/api/notify-capture-requester", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          requesterId: req.requester_id,
+          status: "scheduled",
+          propertyTitle: req.property_listings?.title,
+          scheduledDate, scheduledTimeSlot, adminNotes,
+        }),
+      }).catch(err => console.error("[Capture360] Requester notification failed:", err));
+    }
+    setInFlight(null);
+    setTimeout(() => setToast(null), 3000);
+  }, [logAdminAction]);
+
+  const handleDeclineCapture = useCallback(async (req: Capture360Request, adminNotes: string) => {
+    setInFlight(req.id);
+    const supabase = createClient();
+    const { error } = await supabase
+      .from("capture_360_requests")
+      .update({ status: "declined", admin_notes: adminNotes || null, updated_at: new Date().toISOString() })
+      .eq("id", req.id);
+
+    if (error) {
+      console.error("Admin — capture 360 decline error:", error);
+      setToast({ ok: false, msg: "Could not decline — please try again." });
+    } else {
+      void logAdminAction("decline_capture_360", "capture_360_request", req.id, { status: req.status }, { status: "declined" });
+      setCapture360Requests(prev => prev.map(r => r.id === req.id ? { ...r, status: "declined", admin_notes: adminNotes || null } : r));
+      setToast({ ok: true, msg: "Request declined." });
+      fetch("/api/notify-capture-requester", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          requesterId: req.requester_id,
+          status: "declined",
+          propertyTitle: req.property_listings?.title,
+          adminNotes,
+        }),
+      }).catch(err => console.error("[Capture360] Requester notification failed:", err));
+    }
+    setInFlight(null);
+    setTimeout(() => setToast(null), 3000);
+  }, [logAdminAction]);
+
+  const handleCompleteCapture = useCallback(async (id: string) => {
+    setInFlight(id);
+    const supabase = createClient();
+    const { error } = await supabase
+      .from("capture_360_requests")
+      .update({ status: "completed", updated_at: new Date().toISOString() })
+      .eq("id", id);
+
+    if (error) {
+      console.error("Admin — capture 360 complete error:", error);
+      setToast({ ok: false, msg: "Could not mark completed — please try again." });
+    } else {
+      void logAdminAction("complete_capture_360", "capture_360_request", id, { status: "scheduled" }, { status: "completed" });
+      setCapture360Requests(prev => prev.map(r => r.id === id ? { ...r, status: "completed", updated_at: new Date().toISOString() } : r));
+      setToast({ ok: true, msg: "Marked completed." });
+    }
+    setInFlight(null);
+    setTimeout(() => setToast(null), 3000);
+  }, [logAdminAction]);
+
   const handleAgentReject = useCallback(async (id: string) => {
     setInFlight(id);
     const oldStatus = agentApps.find(a => a.id === id)?.status ?? null;
@@ -3389,8 +3910,20 @@ export default function AdminPage() {
         inFlight={inFlight}
         onApprove={(id, userId) => void handleAgentApprove(id, userId)}
         onReject={id => void handleAgentReject(id)}
+        onToggleBadge={(id, current) => void handleAgentToggleBadge(id, current)}
         onAddAgent={handleAddAgent}
         documentsByProfile={agentDocsByProfile}
+      />
+    );
+  } else if (active === "capture360") {
+    content = (
+      <Capture360Section
+        requests={capture360Requests}
+        loading={capture360Loading}
+        inFlight={inFlight}
+        onSchedule={(req, date, slot, notes) => void handleScheduleCapture(req, date, slot, notes)}
+        onDecline={(req, notes) => void handleDeclineCapture(req, notes)}
+        onComplete={id => void handleCompleteCapture(id)}
       />
     );
   } else if (active === "users") {

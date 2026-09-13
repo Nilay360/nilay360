@@ -68,6 +68,7 @@ interface FormState {
   sellerWhatsapp: string
   agreeToTerms: boolean
   ownershipWarranty: boolean
+  capture360Requested: boolean
 }
 
 type Action =
@@ -96,6 +97,7 @@ const INITIAL: FormState = {
   sellerName: '', sellerEmail: '', sellerPhone: '', sellerWhatsapp: '',
   agreeToTerms: false,
   ownershipWarranty: false,
+  capture360Requested: false,
 }
 
 function reducer(s: FormState, a: Action): FormState {
@@ -1249,6 +1251,44 @@ function Step7({ state, dispatch }: { state: FormState; dispatch: React.Dispatch
           ))}
         </div>
       )}
+
+      {/* 360° capture request toggle — moved here from Step8's checkbox.
+          Same underlying state field (capture360Requested) and the same
+          post-insert logic in handleSubmit; only the control type and
+          location changed. Real on/off toggle, not a checkbox, since this
+          reads as "turn on a service" rather than "confirm a statement" —
+          same switch pattern already used for Price Negotiable (Step4). */}
+      <div style={{
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        padding: '16px 18px', background: C.surface2,
+        borderRadius: 10, border: `1px solid ${C.border}`,
+        marginTop: state.floorPlans.length > 0 ? 20 : 0,
+      }}>
+        <div>
+          <div style={{ fontFamily: FB, fontWeight: 500, color: C.text, fontSize: '0.9375rem' }}>
+            Request a professional 360° capture for this listing?
+          </div>
+          <div style={{ fontSize: '0.8rem', color: C.textMuted, marginTop: 2 }}>
+            Our team will reach out to schedule a visit — completely optional.
+          </div>
+        </div>
+        <button
+          type="button"
+          onClick={() => dispatch({ type: 'SET', field: 'capture360Requested', value: !state.capture360Requested })}
+          style={{
+            width: 46, height: 26, borderRadius: 999, border: 'none', flexShrink: 0,
+            background: state.capture360Requested ? C.gold : C.border,
+            cursor: 'pointer', position: 'relative', transition: 'background 0.2s',
+          }}
+        >
+          <span style={{
+            position: 'absolute', top: 3,
+            left: state.capture360Requested ? 23 : 3,
+            width: 20, height: 20, borderRadius: '50%', background: '#fff',
+            transition: 'left 0.2s',
+          }} />
+        </button>
+      </div>
     </div>
   )
 }
@@ -1631,6 +1671,26 @@ export default function PostPropertyPage() {
       if (state.openParking)    parkingParts.push(`${state.openParking} Open`)
 
       const isCommTitle = COMMERCIAL_CATEGORIES.includes(state.propertyCategory)
+
+      // Best-effort geocoding — never blocks submission. A network failure,
+      // a missing/misconfigured API key, or Google returning no match all
+      // resolve to `geo = null`, and the listing still submits exactly as
+      // it does today, just without coordinates.
+      const addressString = [state.address, state.locality, state.city, state.stateField, state.pincode]
+        .filter(Boolean).join(', ')
+      let geo: { latitude: number; longitude: number } | null = null
+      try {
+        const geoRes = await fetch('/api/geocode-address', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ address: addressString }),
+        })
+        const geoJson = await geoRes.json()
+        geo = geoJson.result ?? null
+      } catch (err) {
+        console.error('Geocoding request failed:', err)
+      }
+
       const { data: insertedListing, error: insertErr } = await supabase.from('property_listings').insert([{
         slug:               `${slugBase}-${Date.now()}`,
         title:              `${!isCommTitle && state.bedrooms ? state.bedrooms + ' BHK ' : ''}${state.propertyCategory} in ${state.locality}, ${state.city}`.trim(),
@@ -1658,6 +1718,8 @@ export default function PostPropertyPage() {
         state:              state.stateField,
         pincode:            state.pincode,
         landmark:           state.landmark || null,
+        latitude:           geo?.latitude ?? null,
+        longitude:          geo?.longitude ?? null,
         highlights:         state.highlights || null,
         photo_urls:         imageUrls,
         amenities:          state.amenities,
@@ -1687,6 +1749,35 @@ export default function PostPropertyPage() {
         // The listing itself was already created successfully — don't fail
         // the whole submission over the floor plans row insert.
         if (fpErr) console.error('Floor plan row insert failed:', fpErr)
+      }
+
+      // 360° capture request — non-fatal, own try/catch, never blocks a
+      // listing submission that already succeeded. authUserId is always
+      // present here: the checkbox is only reachable after a real signed-in
+      // submission (property_listings.user_id already required it above).
+      if (state.capture360Requested && insertedListing?.id && authUserId) {
+        try {
+          const { error: captureErr } = await supabase.from('capture_360_requests').insert({
+            property_id: insertedListing.id,
+            requester_id: authUserId,
+            status: 'pending',
+          })
+          if (captureErr) {
+            console.error('Capture 360 request insert failed:', captureErr)
+          } else {
+            fetch('/api/notify-capture-request', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                propertyTitle: `${!isCommTitle && state.bedrooms ? state.bedrooms + ' BHK ' : ''}${state.propertyCategory} in ${state.locality}, ${state.city}`.trim(),
+                propertyAddress: addressString,
+                requesterName: state.sellerName,
+              }),
+            }).catch((err) => console.error('[Capture360] Admin notification failed:', err))
+          }
+        } catch (err) {
+          console.error('Unexpected error requesting 360 capture:', err)
+        }
       }
 
       localStorage.removeItem('nilay360_post_draft')

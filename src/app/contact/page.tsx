@@ -1,6 +1,15 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
+
+// profiles.phone is stored as "+91" + 10 digits (see api/verify-otp/route.ts) — this
+// form's own phone field is bare 10-digit (see handleSubmit's `+91${form.phone}`
+// below), so the stored value must be stripped before prefilling or it would
+// double up the country code on submit.
+function stripIndianCountryCode(phone: string): string {
+  const digitsOnly = phone.replace(/\D/g, "");
+  return digitsOnly.length === 12 && digitsOnly.startsWith("91") ? digitsOnly.slice(2) : digitsOnly;
+}
 
 // ── Types ─────────────────────────────────────────────────────
 type FormState = {
@@ -108,6 +117,27 @@ export default function ContactPage() {
 
   const set = (k: keyof FormState) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
     setForm(f => ({ ...f, [k]: e.target.value }));
+
+  // Prefill full_name/email/phone for a signed-in visitor — same "only if
+  // still blank" rule as post-property.tsx's PREFILL_SELLER_EMAIL: never
+  // overwrites something the visitor already typed into the form. This
+  // page has no useAuth()/profile fetch of its own, so session + profile
+  // are read directly, once, on mount.
+  useEffect(() => {
+    const supabase = createClient();
+    supabase.auth.getSession().then(async ({ data }: Awaited<ReturnType<typeof supabase.auth.getSession>>) => {
+      const sessionUser = data.session?.user;
+      if (!sessionUser) return;
+      if (sessionUser.email) setForm(f => ({ ...f, email: f.email || sessionUser.email! }));
+      const { data: profileRow } = await supabase
+        .from("profiles")
+        .select("full_name, phone")
+        .eq("id", sessionUser.id)
+        .maybeSingle();
+      if (profileRow?.full_name) setForm(f => ({ ...f, full_name: f.full_name || profileRow.full_name! }));
+      if (profileRow?.phone) setForm(f => ({ ...f, phone: f.phone || stripIndianCountryCode(profileRow.phone!) }));
+    });
+  }, []);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();

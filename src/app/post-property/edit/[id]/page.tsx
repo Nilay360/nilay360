@@ -445,6 +445,26 @@ export default function EditListingPage() {
       return
     }
 
+    // Best-effort re-geocode — same as post-property/page.tsx's create flow,
+    // and never blocks saving. Address fields are always re-sent on every
+    // edit save below (not diffed against the prior value), so re-geocoding
+    // unconditionally here keeps latitude/longitude honest without needing
+    // to track whether the address specifically changed.
+    const addressString = [form.address, form.locality, form.city, form.state, form.pincode]
+      .filter(Boolean).join(', ')
+    let geo: { latitude: number; longitude: number } | null = null
+    try {
+      const geoRes = await fetch('/api/geocode-address', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ address: addressString }),
+      })
+      const geoJson = await geoRes.json()
+      geo = geoJson.result ?? null
+    } catch (err) {
+      console.error('Geocoding request failed:', err)
+    }
+
     try {
       const supabase = createClient()
       const { error: upErr } = await supabase
@@ -459,6 +479,12 @@ export default function EditListingPage() {
           state:              form.state              || null,
           pincode:            form.pincode            || null,
           landmark:           form.landmark           || null,
+          // Only overwrite stored coordinates when this save actually
+          // produced a new one — a transient geocoding failure must never
+          // clobber a previously-successful lat/lng with null. Unlike the
+          // create flow (nothing to lose yet), an edit save has real
+          // existing data at risk here.
+          ...(geo ? { latitude: geo.latitude, longitude: geo.longitude } : {}),
           built_up_area:      form.built_up_area      ? Number(form.built_up_area)      : null,
           bedrooms:           form.bedrooms           ? Number(form.bedrooms)           : null,
           bathrooms:          form.bathrooms          ? Number(form.bathrooms)          : null,

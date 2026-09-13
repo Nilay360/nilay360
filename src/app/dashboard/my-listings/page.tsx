@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import type { Session } from "@supabase/supabase-js";
 import { MyListingsList } from "@/components/dashboard/MyListingsList";
@@ -10,31 +11,75 @@ import type { Listing } from "@/components/dashboard/MyListingsList";
 const G = { ivory: "#020C1C", gold: "#10C4C3" };
 
 export default function MyListingsPage() {
+  const router = useRouter();
   const [listings, setListings] = useState<Listing[]>([]);
   const [loading,  setLoading]  = useState(true);
   const [email,    setEmail]    = useState<string | null>(null);
+  const [userId,   setUserId]   = useState<string | null>(null);
 
   useEffect(() => {
     const supabase = createClient();
-    supabase.auth.getSession().then(({ data }: { data: { session: Session | null } }) => {
+    supabase.auth.getSession().then(async ({ data }: { data: { session: Session | null } }) => {
       const userEmail = data.session?.user?.email ?? null;
-      const userId    = data.session?.user?.id    ?? null;
+      const sessionUserId = data.session?.user?.id ?? null;
       setEmail(userEmail);
-      if (!userEmail && !userId) { setLoading(false); return; }
-      const filter = userId && userEmail
-        ? `seller_email.eq.${userEmail},user_id.eq.${userId}`
-        : userEmail ? `seller_email.eq.${userEmail}` : `user_id.eq.${userId}`;
-      supabase
+      setUserId(sessionUserId);
+      if (!userEmail && !sessionUserId) { setLoading(false); return; }
+      const filter = sessionUserId && userEmail
+        ? `seller_email.eq.${userEmail},user_id.eq.${sessionUserId}`
+        : userEmail ? `seller_email.eq.${userEmail}` : `user_id.eq.${sessionUserId}`;
+      const { data: rows } = await supabase
         .from("property_listings")
         .select("id, title, city, property_category, listing_type, price, status, submitted_at, slug, photo_urls")
         .or(filter)
-        .order("submitted_at", { ascending: false })
-        .then(({ data: rows }: { data: Listing[] | null }) => {
-          setListings(rows ?? []);
-          setLoading(false);
-        });
+        .order("submitted_at", { ascending: false });
+
+      const baseListings = (rows ?? []) as Listing[];
+
+      // One batched query for all listings' existing capture requests,
+      // not a per-row fetch — merged in below so MyListingsList can hide
+      // the Request 360° Capture button per-listing without querying
+      // capture_360_requests itself.
+      if (baseListings.length > 0) {
+        const { data: requests } = await supabase
+          .from("capture_360_requests")
+          .select("property_id, status")
+          .in("property_id", baseListings.map(l => l.id))
+          .in("status", ["pending", "scheduled"]) as { data: { property_id: string; status: string }[] | null };
+        const statusByProperty = new Map((requests ?? []).map(r => [r.property_id, r.status]));
+        setListings(baseListings.map(l => ({ ...l, capture_request_status: statusByProperty.get(l.id) ?? null })));
+      } else {
+        setListings(baseListings);
+      }
+      setLoading(false);
     });
   }, []);
+
+  const handleRequestCapture = async (listing: Listing) => {
+    if (!userId) return;
+    const supabase = createClient();
+    const { error } = await supabase.from("capture_360_requests").insert({
+      property_id: listing.id,
+      requester_id: userId,
+      status: "pending",
+    });
+    if (error) {
+      console.error("Capture 360 request insert failed:", error);
+      alert("Could not submit the request. Please try again.");
+      return;
+    }
+    setListings(prev => prev.map(l => l.id === listing.id ? { ...l, capture_request_status: "pending" } : l));
+    alert("360° capture request submitted — our team will be in touch to schedule it.");
+    fetch("/api/notify-capture-request", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        propertyTitle: listing.title,
+        propertyAddress: listing.city,
+        requesterName: email,
+      }),
+    }).catch((err) => console.error("[Capture360] Admin notification failed:", err));
+  };
 
   const handleDelete = async (id: string) => {
     const supabase = createClient();
@@ -99,7 +144,12 @@ export default function MyListingsPage() {
           </div>
         </div>
 
-        <MyListingsList listings={listings} onDelete={handleDelete} />
+        <MyListingsList
+          listings={listings}
+          onDelete={handleDelete}
+          onRequestCapture={handleRequestCapture}
+          onViewInquiries={listing => router.push(`/dashboard?tab=inquiries&property=${listing.id}`)}
+        />
 
       </div>
     </div>
