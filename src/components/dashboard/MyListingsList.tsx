@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { createClient } from "@/lib/supabase/client";
 
 export interface Listing {
   id: string;
@@ -22,6 +23,13 @@ export interface Listing {
    *  explicitly 'pending' or 'scheduled' hides the Request 360° Capture
    *  button to avoid duplicate requests. */
   capture_request_status?: string | null;
+  /** Populated by the caller with a single batched query against
+   *  property_view_events (one query for all listings, not per-row), which
+   *  its own RLS (066) already restricts to rows this owner/agent is
+   *  allowed to see — so a real count here is safe by construction, not
+   *  something this component needs to re-check. Absent/undefined means
+   *  "not loaded yet" and simply shows nothing, same as capture_request_status. */
+  view_count?: number | null;
 }
 
 interface Props {
@@ -73,6 +81,103 @@ function fmtPrice(n: number): string {
 function fmtDate(iso: string | null | undefined): string {
   if (!iso) return "—";
   return new Date(iso).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
+}
+
+// Same reason vocabulary as UNPUBLISH_REASONS in admin/page.tsx (both keyed
+// off property_listings.unpublish_reason / listing_status_history.reason's
+// shared CHECK constraint, 067_unpublish_reason_and_history.sql) — kept as
+// a separate local const rather than a cross-file import since admin/
+// page.tsx's version is a page-local, unexported const.
+const REASON_LABELS: Record<string, string> = {
+  deal_closed: "Deal Closed",
+  expired: "Expired",
+  owner_requested: "Owner Requested",
+  admin_review: "Admin Review",
+  other: "Other",
+};
+
+function statusLabel(status: string | null): string {
+  if (!status) return "—";
+  return STATUS_COLORS[status]?.label ?? (status.charAt(0).toUpperCase() + status.slice(1).replace(/_/g, " "));
+}
+
+type StatusHistoryRow = {
+  old_status: string | null;
+  new_status: string;
+  reason: string | null;
+  note: string | null;
+  changed_at: string;
+};
+
+// Expandable per-card history — collapsed by default, fetched lazily on
+// first expand (not batched with the rest of the list, unlike view_count/
+// capture_request_status above): a seller/agent only occasionally wants to
+// see this, so there's no reason to query it for every card up front. The
+// query goes directly through the authenticated client, not a service-role
+// route — listing_status_history's own SELECT policy (067) already permits
+// the owner/assigned agent to read their own listing's rows, so RLS itself
+// is the only access check needed here.
+function StatusHistorySection({ propertyId, compact }: { propertyId: string; compact: boolean }) {
+  const [expanded, setExpanded] = useState(false);
+  const [loading,  setLoading]  = useState(false);
+  const [history,  setHistory]  = useState<StatusHistoryRow[] | null>(null);
+
+  const toggle = async () => {
+    const next = !expanded;
+    setExpanded(next);
+    if (next && history === null) {
+      setLoading(true);
+      const supabase = createClient();
+      const { data, error } = await supabase
+        .from("listing_status_history")
+        .select("old_status, new_status, reason, note, changed_at")
+        .eq("property_id", propertyId)
+        .order("changed_at", { ascending: false });
+      if (error) console.error("Status history load error:", error);
+      setHistory((data as StatusHistoryRow[] | null) ?? []);
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div style={{ borderTop: "1px solid rgba(255,255,255,0.08)", padding: compact ? "8px 16px" : "10px 20px" }}>
+      <button
+        onClick={toggle}
+        style={{ display: "flex", alignItems: "center", gap: 6, padding: 0, background: "none", border: "none", color: "#A9B4C2", fontSize: compact ? 11.5 : 12.5, fontWeight: 600, cursor: "pointer", fontFamily: "var(--font-body-new)" }}
+      >
+        <span style={{ display: "inline-block", transition: "transform 0.15s", transform: expanded ? "rotate(90deg)" : "none" }}>▶</span>
+        Status History
+      </button>
+      {expanded && (
+        <div style={{ marginTop: 10, display: "flex", flexDirection: "column", gap: 8 }}>
+          {loading ? (
+            <span style={{ fontSize: 12, color: "rgba(255,255,255,0.4)" }}>Loading…</span>
+          ) : !history || history.length === 0 ? (
+            <span style={{ fontSize: 12, color: "rgba(255,255,255,0.4)" }}>No status changes yet</span>
+          ) : (
+            history.map((h, i) => (
+              <div key={i} style={{ padding: "8px 10px", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 8 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap", fontSize: 12, color: "#FFFFFF", fontWeight: 600 }}>
+                  <span>{statusLabel(h.old_status)}</span>
+                  <span style={{ color: "#10C4C3" }}>→</span>
+                  <span>{statusLabel(h.new_status)}</span>
+                  {h.reason && (
+                    <span style={{ marginLeft: 4, fontSize: 10.5, fontWeight: 700, color: "#F59E0B", background: "rgba(245,158,11,0.1)", border: "1px solid rgba(245,158,11,0.25)", borderRadius: 100, padding: "1px 8px" }}>
+                      {REASON_LABELS[h.reason] ?? h.reason}
+                    </span>
+                  )}
+                </div>
+                {h.note && (
+                  <p style={{ fontSize: 11.5, color: "#A9B4C2", margin: "4px 0 0", fontStyle: "italic" }}>{h.note}</p>
+                )}
+                <p style={{ fontSize: 10.5, color: "rgba(255,255,255,0.35)", margin: "4px 0 0" }}>{fmtDate(h.changed_at)}</p>
+              </div>
+            ))
+          )}
+        </div>
+      )}
+    </div>
+  );
 }
 
 function Pill({ active, label, onClick }: { active: boolean; label: string; onClick: () => void }) {
@@ -265,6 +370,11 @@ export function MyListingsList({ listings, onDelete, compact = false, readOnly =
                             <span style={{ fontSize: 11, color: "rgba(255,255,255,0.35)", fontFamily: "var(--font-body-new)" }}>
                               {fmtDate(l.submitted_at)}
                             </span>
+                            {l.view_count != null && (
+                              <span style={{ fontSize: 11, color: "rgba(255,255,255,0.35)", fontFamily: "var(--font-body-new)" }}>
+                                · 👁 {l.view_count.toLocaleString("en-IN")}
+                              </span>
+                            )}
                           </div>
                           <p style={{ fontFamily: "var(--font-heading-new)", fontSize: 16, fontWeight: 600, color: "#FFFFFF", margin: "0 0 4px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                             {l.title ?? `${l.property_category ?? "Property"} in ${l.city ?? "—"}`}
@@ -295,6 +405,7 @@ export function MyListingsList({ listings, onDelete, compact = false, readOnly =
                           </div>
                           <div style={{ fontSize: 11.5, color: "rgba(255,255,255,0.45)", fontFamily: "var(--font-body-new)", marginTop: 4 }}>
                             Listed {fmtDate(l.submitted_at)}
+                            {l.view_count != null && ` · 👁 ${l.view_count.toLocaleString("en-IN")} views`}
                           </div>
                         </>
                       )}
@@ -308,7 +419,7 @@ export function MyListingsList({ listings, onDelete, compact = false, readOnly =
                         </span>
                       )}
                       {l.status === "active" && l.slug && (
-                        <Link href={`/properties/${l.slug}`} style={{ textDecoration: "none" }}>
+                        <Link href={`/property/${l.slug}`} style={{ textDecoration: "none" }}>
                           <button style={{
                             padding: compact ? "5px 10px" : "7px 14px",
                             fontSize: compact ? 12 : 13, fontWeight: 500,
@@ -425,6 +536,8 @@ export function MyListingsList({ listings, onDelete, compact = false, readOnly =
 
                   </div>
                 </div>
+
+                <StatusHistorySection propertyId={l.id} compact={compact} />
               </div>
             );
           })}

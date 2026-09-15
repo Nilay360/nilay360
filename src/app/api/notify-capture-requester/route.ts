@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { sendWhatsAppMessage } from '@/lib/whatsapp'
 
 function adminClient() {
   return createClient(
@@ -44,6 +45,21 @@ export async function POST(req: NextRequest) {
     if (error) {
       console.error('[notify-capture-requester] Failed to insert notification:', error)
       return NextResponse.json({ notified: false })
+    }
+
+    // WhatsApp, alongside the in-app notification above — fire-and-forget,
+    // never blocks this route's response. Requires its own lookup since this
+    // route is only ever called with requesterId, never their phone.
+    const { data: requesterProfile } = await supabase
+      .from('profiles')
+      .select('phone, full_name')
+      .eq('id', requesterId)
+      .maybeSingle()
+    if (requesterProfile?.phone) {
+      console.log(`[notify-capture-requester] Calling sendWhatsAppMessage for requester ${requesterId}...`)
+      void sendWhatsAppMessage(requesterProfile.phone, requesterProfile.full_name?.trim() || 'there', body)
+    } else {
+      console.log(`[notify-capture-requester] Skipping — no phone on file for requester ${requesterId}`)
     }
 
     return NextResponse.json({ notified: true })

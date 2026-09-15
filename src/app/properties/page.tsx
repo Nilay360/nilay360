@@ -121,8 +121,9 @@ function SkeletonCard() {
   );
 }
 
-function PropertyCard({ property, savedIds, onToggleSave, reduceMotion }: { property: Property; savedIds: Set<string>; onToggleSave: (id: string, data?: Record<string, unknown>) => void; reduceMotion: boolean }) {
+function PropertyCard({ property, savedIds, saveCounts, onToggleSave, reduceMotion }: { property: Property; savedIds: Set<string>; saveCounts: Map<string, number>; onToggleSave: (id: string, data?: Record<string, unknown>) => void; reduceMotion: boolean }) {
   const saved = savedIds.has(property.id);
+  const saveCount = saveCounts.get(property.id) ?? 0;
   const [imgError, setImgError] = useState(false);
   const [hovering, setHovering] = useState(false);
   const { has: isComparing, toggle: toggleCompare, isFull } = useCompare();
@@ -173,11 +174,22 @@ function PropertyCard({ property, savedIds, onToggleSave, reduceMotion }: { prop
             <span style={{ padding: "4px 10px", borderRadius: "100px", fontSize: "10px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", background: "var(--bg-elevated)", color: "var(--brand-accent)", border: "1px solid var(--border-accent)", backdropFilter: "blur(8px)" }}>Premium</span>
           )}
         </div>
-        <button onClick={e => { e.preventDefault(); e.stopPropagation(); onToggleSave(property.id, { title: property.title, city: property.city, price: property.price, property_type: property.type, image: property.images?.[0] }); }} style={{ position: "absolute", top: "12px", right: "12px", width: "34px", height: "34px", borderRadius: "50%", background: "var(--bg-elevated)", border: "1px solid var(--border)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", backdropFilter: "blur(8px)" }}>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill={saved ? "var(--brand-accent)" : "none"} stroke={saved ? "var(--brand-accent)" : "var(--text-secondary)"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
-          </svg>
-        </button>
+        <div style={{ position: "absolute", top: "12px", right: "12px", display: "flex", flexDirection: "column", alignItems: "center", gap: "4px" }}>
+          <button onClick={e => { e.preventDefault(); e.stopPropagation(); onToggleSave(property.id, { title: property.title, city: property.city, price: property.price, property_type: property.type, image: property.images?.[0] }); }} style={{ width: "34px", height: "34px", borderRadius: "50%", background: "var(--bg-elevated)", border: "1px solid var(--border)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", backdropFilter: "blur(8px)" }}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill={saved ? "var(--brand-accent)" : "none"} stroke={saved ? "var(--brand-accent)" : "var(--text-secondary)"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+            </svg>
+          </button>
+          {/* Only shown once there's an actual positive signal to display — a
+              "♥ 0" reads as "nobody wants this", so zero/unknown counts show
+              nothing rather than a discouraging number. Same convention as
+              Similar Properties/Nearby & Around hiding empty states tonight. */}
+          {saveCount > 0 && (
+            <span style={{ fontSize: "10px", fontWeight: 700, color: "var(--brand-accent)", background: "rgba(2,12,28,0.55)", padding: "2px 7px", borderRadius: "100px", backdropFilter: "blur(4px)" }}>
+              {saveCount}
+            </span>
+          )}
+        </div>
         <button onClick={handleCompare} title={!comparing && isFull ? "Comparison is full (max 3)" : comparing ? "Remove from comparison" : "Add to comparison"} style={{ position: "absolute", top: "54px", right: "12px", height: "34px", padding: "0 11px", borderRadius: "100px", background: comparing ? "var(--brand-accent)" : "var(--bg-elevated)", border: comparing ? "none" : "1px solid var(--border)", display: "flex", alignItems: "center", gap: "5px", cursor: !comparing && isFull ? "not-allowed" : "pointer", opacity: !comparing && isFull ? 0.5 : 1, backdropFilter: "blur(8px)", fontFamily: "var(--font-body-new)", fontSize: "10px", fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", color: comparing ? "var(--brand-primary)" : "var(--text-secondary)" }}>
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             {comparing ? <polyline points="20 6 9 17 4 12" /> : <><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></>}
@@ -264,18 +276,36 @@ export default function PropertiesPage() {
   const [loading, setLoading] = useState(true);
   const [userId, setUserId] = useState<string | null>(null);
   const { savedIds, toggleSave } = useSavedProperties(userId);
+  const [saveCounts, setSaveCounts] = useState<Map<string, number>>(new Map());
   const reduceMotion = usePrefersReducedMotion();
 
   useEffect(() => {
     async function loadUser() {
       const supabase = createClient()
       const { data } = await supabase.auth.getUser()
-      const uid = data.user?.id ?? null
-      setUserId(uid)
-      console.log('properties page userId:', uid)
+      setUserId(data.user?.id ?? null)
     }
     void loadUser()
   }, []);
+
+  // Batched save-count lookup — one query for every visible property, not
+  // one per card. public_property_save_counts (065) is a public view, safe
+  // to read regardless of sign-in state.
+  useEffect(() => {
+    if (allProperties.length === 0) return;
+    let cancelled = false;
+    (async () => {
+      const supabase = createClient();
+      const { data, error } = await supabase
+        .from("public_property_save_counts")
+        .select("property_id, save_count")
+        .in("property_id", allProperties.map(p => p.id));
+      if (cancelled) return;
+      if (error) { console.error("Save counts load error:", error); return; }
+      setSaveCounts(new Map((data ?? []).map((r: { property_id: string; save_count: number }) => [r.property_id, r.save_count])));
+    })();
+    return () => { cancelled = true; };
+  }, [allProperties]);
 
   const [keyword, setKeyword] = useState("");
   const [listingType, setListingType] = useState<"all" | "sale" | "rent">("all");
@@ -618,7 +648,7 @@ export default function PropertiesPage() {
               <div className="pr-cards-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", columnGap: "20px", rowGap: "32px" }}>
                 {paginatedItems.map((p, i) => (
                   <Reveal key={p.id} delay={reduceMotion ? 0 : Math.min(i * 0.05, 0.3)}>
-                    <PropertyCard property={p} savedIds={savedIds} onToggleSave={toggleSave} reduceMotion={reduceMotion} />
+                    <PropertyCard property={p} savedIds={savedIds} saveCounts={saveCounts} onToggleSave={toggleSave} reduceMotion={reduceMotion} />
                   </Reveal>
                 ))}
               </div>

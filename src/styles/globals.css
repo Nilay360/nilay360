@@ -267,3 +267,68 @@ a:hover { color: var(--blue-bright); }
   .ty-hero-check-path { animation: none !important; stroke-dashoffset: 0 !important; }
 }
 
+/* ── Google Places Autocomplete dropdown (LocationPicker) ─────────────────
+   Google's Maps JS SDK renders the suggestion dropdown (.pac-container) by
+   appending it directly to document.body, outside React's tree — so it
+   can't be reached with component-scoped styling (CSS modules, styled-jsx,
+   inline style props) and a global rule is the only way to restyle it.
+   Safe to keep global here: src/components/LocationPicker.tsx is the only
+   place in this codebase that ever constructs a
+   google.maps.places.Autocomplete, so there is exactly one usage this can
+   apply to. If a second Autocomplete instance is ever added elsewhere,
+   these rules will apply there too (Google gives no built-in way to scope
+   .pac-container per-input via CSS) — revisit at that point. */
+.pac-container {
+  background: #111F33;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  margin-top: 4px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  font-family: var(--font-body-new);
+}
+
+.pac-item {
+  background: transparent;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  color: #A9B4C2;
+  /* Vertical padding raised (not font-size) so each row is ~44px tall —
+     the usual minimum touch-target size — without making the suggestion
+     text itself larger than intended. */
+  padding: 15px 14px;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.pac-item:first-child {
+  border-top: none;
+}
+
+.pac-item:hover,
+.pac-item-selected {
+  background: rgba(16, 196, 195, 0.12);
+}
+
+.pac-icon {
+  filter: invert(1) brightness(1.4);
+}
+
+.pac-item-query {
+  color: #FFFFFF;
+  font-size: 13px;
+}
+
+.pac-matched {
+  color: #10C4C3;
+}
+
+.pac-container:after {
+  /* Google's required "powered by Google" logo footer — its artwork is
+     dark-on-transparent, so it disappears against this dark container
+     without a light backdrop of its own. Kept visible, per Google's ToS,
+     just given somewhere to sit that isn't the dark dropdown background. */
+  background-color: rgba(255, 255, 255, 0.92);
+  border-radius: 4px;
+  margin: 4px 8px 6px auto;
+  padding: 2px 6px;
+}
+

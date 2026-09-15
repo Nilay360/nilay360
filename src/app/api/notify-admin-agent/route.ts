@@ -1,6 +1,7 @@
 ﻿import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
 import { createClient } from "@supabase/supabase-js";
+import { sendWhatsAppMessage } from "@/lib/whatsapp";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -159,22 +160,34 @@ export async function POST(req: NextRequest) {
         const supabase = adminClient();
         const { data: admins, error: adminsErr } = await supabase
           .from("profiles")
-          .select("id")
+          .select("id, phone, full_name")
           .in("role", ["admin", "super_admin"]);
 
         if (adminsErr) {
           console.error("[notify-admin-agent] Failed to look up admin recipients:", adminsErr);
         } else if (admins?.length) {
+          const notificationBody = `${name ?? "Unknown"} (${phone ?? "no phone"}) — missing: ${reasons}`;
           const rows = admins.map((a) => ({
             user_id: a.id,
             title: `Incomplete ${account_type} registration`,
-            body: `${name ?? "Unknown"} (${phone ?? "no phone"}) — missing: ${reasons}`,
+            body: notificationBody,
             type: "incomplete_registration",
             action_url: "/admin?section=agents",
           }));
           const { error: notifErr } = await supabase.from("notifications").insert(rows);
           if (notifErr) console.error("[notify-admin-agent] Failed to insert admin notifications:", notifErr);
           else notified = true;
+
+          // WhatsApp, alongside (not instead of) the in-app notifications above —
+          // fire-and-forget per admin, never blocks or fails this route.
+          for (const admin of admins) {
+            if (admin.phone) {
+              console.log(`[notify-admin-agent] Calling sendWhatsAppMessage for admin ${admin.id}...`);
+              void sendWhatsAppMessage(admin.phone, admin.full_name?.trim() || "there", notificationBody);
+            } else {
+              console.log(`[notify-admin-agent] Skipping — no phone on file for admin ${admin.id}`);
+            }
+          }
         } else {
           // Nothing missing — no admin follow-up needed, not a failure.
           notified = true;

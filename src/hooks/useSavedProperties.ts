@@ -39,22 +39,29 @@ export function useSavedProperties(userId: string | null) {
         .eq('user_id', userId)
         .eq('property_id', id)
       if (error) {
-        console.error('UNSAVE FAILED — full error:', JSON.stringify(error, null, 2))
+        console.error('useSavedProperties unsave error:', error)
         setSavedIds(prev => new Set(prev).add(id))
       }
     } else {
       setSavedIds(prev => new Set(prev).add(id))
       const payload = { user_id: userId, property_id: id, property_data: propertyData ?? {} }
-      console.log('ATTEMPTING SAVE with payload:', JSON.stringify(payload, null, 2))
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from('saved_properties')
         .insert(payload)
-        .select()
       if (error) {
-        console.error('SAVE FAILED — full error:', JSON.stringify(error, null, 2))
+        console.error('useSavedProperties save error:', error)
         setSavedIds(prev => { const n = new Set(prev); n.delete(id); return n })
       } else {
-        console.log('SAVE SUCCESS:', JSON.stringify(data, null, 2))
+        // Notify whoever manages this listing (agent, or the owner if no
+        // agent assigned) — fire-and-forget, never blocks or fails a save
+        // that has already succeeded above. Never fires on unsave (see the
+        // branch above), and the route itself skips notifying someone about
+        // their own listing.
+        fetch('/api/notify-listing-saved', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ propertyId: id, saverId: userId }),
+        }).catch(err => console.error('[useSavedProperties] notify-listing-saved failed:', err))
       }
     }
   }, [userId, savedIds, router])

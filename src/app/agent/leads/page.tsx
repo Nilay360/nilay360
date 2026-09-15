@@ -15,8 +15,9 @@
 // yet applied to production — this page shows a schema-not-ready message
 // rather than crash if the columns don't exist yet.
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
+import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import type { Session } from "@supabase/supabase-js";
 import { FilterChips } from "@/components/leads/FilterChips";
 import { createClient } from "@/lib/supabase/client";
@@ -198,10 +199,49 @@ function IconMail() {
   return <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#10C4C3" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 5L2 7"/></svg>;
 }
 
+// useSearchParams() (needed below for the ?property= deep-link filter)
+// requires a Suspense boundary around any usage during static export — same
+// reason dashboard/page.tsx wraps DashboardClient in one. This page has no
+// separate server component to wrap from outside (the whole file is a
+// client component), so the boundary is added here instead, around a
+// renamed inner component carrying all the previous page's logic.
 export default function AgentLeadsPage() {
+  return (
+    <Suspense fallback={<Shell><Spinner /></Shell>}>
+      <AgentLeadsPageInner />
+    </Suspense>
+  );
+}
+
+function AgentLeadsPageInner() {
   const [state, setState] = useState<LoadState>({ kind: "loading" });
   const [statusFilter, setStatusFilter] = useState<LeadStatus | "">("");
   const [sortBy, setSortBy] = useState<"created_at" | "priority">("created_at");
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const pathname = usePathname();
+  // Deep-linkable via ?property= (MyListingsList's "View Inquiries" ->
+  // DashboardClient routes an agent session here with this param). Read
+  // once on mount/param-change, same pattern DashboardClient.tsx itself
+  // uses for its own ?tab=&property= deep-link.
+  const [propertyFilter, setPropertyFilter] = useState<string | null>(null);
+  useEffect(() => {
+    const p = searchParams?.get("property");
+    if (p) setPropertyFilter(p);
+  }, [searchParams]);
+
+  // Clearing the filter must also strip ?property= from the URL — leaving
+  // it in place would mean a refresh (or any re-run of the effect above)
+  // silently reinstates a filter the user just explicitly dismissed.
+  // router.replace(), not push(): dismissing a filter is a correction, not
+  // a new navigation entry — it shouldn't leave a back-button stop behind.
+  function clearPropertyFilter() {
+    setPropertyFilter(null);
+    const params = new URLSearchParams(searchParams?.toString());
+    params.delete("property");
+    const query = params.toString();
+    router.replace(query ? `${pathname}?${query}` : pathname);
+  }
 
   useEffect(() => {
     const supabase = createClient();
@@ -314,7 +354,9 @@ export default function AgentLeadsPage() {
   }
 
   const { leads } = state;
-  const filtered = statusFilter ? leads.filter(l => l.status === statusFilter) : leads;
+  const filtered = leads
+    .filter(l => !statusFilter || l.status === statusFilter)
+    .filter(l => !propertyFilter || l.property_id === propertyFilter);
   const sorted = [...filtered].sort((a, b) => {
     if (sortBy === "priority") {
       const order: Record<string, number> = { high: 0, medium: 1, low: 2 };
@@ -322,6 +364,13 @@ export default function AgentLeadsPage() {
     }
     return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
   });
+  // Title comes from whichever matching lead carries it — no separate
+  // properties list needed here, unlike DashboardClient's InquiriesTab
+  // (which filters a shared `properties` prop), since every lead already
+  // carries its own property_title inline.
+  const filteredPropertyTitle = propertyFilter
+    ? (leads.find(l => l.property_id === propertyFilter)?.property_title ?? "this listing")
+    : null;
 
   return (
     <Shell>
@@ -329,7 +378,7 @@ export default function AgentLeadsPage() {
         <SectionHeading title={`My Leads (${leads.length})`} subtitle="Inquiries assigned to you, across all your listings." />
       </div>
 
-      <div className="leads-filters" style={{ display: "flex", gap: "10px", flexWrap: "wrap", marginBottom: "20px" }}>
+      <div className="leads-filters" style={{ display: "flex", gap: "10px", alignItems: "center", flexWrap: "wrap", marginBottom: "20px" }}>
         <SelectField label="Status" value={statusFilter} onChange={v => setStatusFilter(v as LeadStatus | "")}>
           <option value="">All statuses</option>
           {LEAD_STATUSES.map(s => <option key={s} value={s}>{STATUS_STYLE[s].label}</option>)}
@@ -338,6 +387,21 @@ export default function AgentLeadsPage() {
           <option value="created_at">Newest first</option>
           <option value="priority">Priority</option>
         </SelectField>
+        {/* Same dismissible-chip shape as DashboardClient.tsx's own
+            buyer-side InquiriesTab property filter — replicated exactly,
+            not reinvented. */}
+        {propertyFilter && (
+          <span style={{ display: "flex", alignItems: "center", gap: "8px", padding: "7px 12px", background: "rgba(16,196,195,0.1)", border: "1px solid rgba(16,196,195,0.25)", borderRadius: "100px", fontSize: "12px", color: "#10C4C3" }}>
+            Showing leads for: <strong>{filteredPropertyTitle}</strong>
+            <button
+              onClick={clearPropertyFilter}
+              aria-label="Clear property filter"
+              style={{ background: "none", border: "none", color: "#10C4C3", cursor: "pointer", fontSize: "14px", lineHeight: 1, padding: 0, fontWeight: 700 }}
+            >
+              ×
+            </button>
+          </span>
+        )}
       </div>
 
       <div style={{ marginBottom: "20px" }}>
@@ -362,7 +426,13 @@ export default function AgentLeadsPage() {
           <EmptyState
             icon={<IconInbox />}
             title="No leads yet"
-            subtitle={statusFilter ? `No leads with status "${STATUS_STYLE[statusFilter].label}" right now.` : "When a lead is assigned to you, it will show up here."}
+            subtitle={
+              propertyFilter
+                ? `No leads for "${filteredPropertyTitle}" right now.`
+                : statusFilter
+                ? `No leads with status "${STATUS_STYLE[statusFilter].label}" right now.`
+                : "When a lead is assigned to you, it will show up here."
+            }
           />
         </Card>
       ) : (

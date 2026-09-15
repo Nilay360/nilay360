@@ -47,7 +47,25 @@ export default function MyListingsPage() {
           .in("property_id", baseListings.map(l => l.id))
           .in("status", ["pending", "scheduled"]) as { data: { property_id: string; status: string }[] | null };
         const statusByProperty = new Map((requests ?? []).map(r => [r.property_id, r.status]));
-        setListings(baseListings.map(l => ({ ...l, capture_request_status: statusByProperty.get(l.id) ?? null })));
+
+        // One batched query for all listings' view events, not a per-row
+        // fetch — property_view_events' own RLS (066) already restricts
+        // this to rows this signed-in owner is allowed to see, so counting
+        // the returned rows client-side is safe by construction.
+        const { data: viewEvents } = await supabase
+          .from("property_view_events")
+          .select("property_id")
+          .in("property_id", baseListings.map(l => l.id)) as { data: { property_id: string }[] | null };
+        const viewCountByProperty = new Map<string, number>();
+        for (const row of viewEvents ?? []) {
+          viewCountByProperty.set(row.property_id, (viewCountByProperty.get(row.property_id) ?? 0) + 1);
+        }
+
+        setListings(baseListings.map(l => ({
+          ...l,
+          capture_request_status: statusByProperty.get(l.id) ?? null,
+          view_count: viewCountByProperty.get(l.id) ?? 0,
+        })));
       } else {
         setListings(baseListings);
       }

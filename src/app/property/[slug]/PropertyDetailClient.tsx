@@ -1,5 +1,6 @@
 ﻿"use client";
 import { useState, useEffect, useMemo, useCallback, useRef } from "react";
+import Link from "next/link";
 import { useParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import Reveal from "@/components/ui/Reveal";
@@ -9,6 +10,7 @@ import { useSavedProperties } from "@/hooks/useSavedProperties";
 import ReportButton from "@/components/shared/ReportButton";
 import { optimizedImageUrl } from "@/lib/image-url";
 import { loadGoogleMapsScript } from "@/lib/loadGoogleMapsScript";
+import { getVisitorKey } from "@/lib/visitorId";
 
 interface FloorPlanRow {
   id: string
@@ -126,6 +128,12 @@ type Property = {
   assigned_agent_id?: string | null;
   latitude?: number | null;
   longitude?: number | null;
+  // Real owner identity — added as foundation for the owner/agent-aware
+  // panel (item #12). More robust than the pre-existing seller_email
+  // string-match pattern (a free-typed form field, never validated
+  // against the submitter's actual login email — see 057_property_
+  // listings_owner_select.sql's own investigation of that exact gap).
+  user_id?: string | null;
 };
 
 // One category's cached row from nearby_places_cache (063_nearby_places_cache.sql,
@@ -238,6 +246,7 @@ function mapListingToProperty(row: Record<string, unknown>): Property {
     assigned_agent_id: typeof row.assigned_agent_id === "string" ? row.assigned_agent_id : null,
     latitude:  num(row.latitude),
     longitude: num(row.longitude),
+    user_id:   typeof row.user_id === "string" ? row.user_id : null,
   };
 }
 
@@ -536,6 +545,92 @@ function AgentInfoCard({ agent }: { agent: AssignedAgent }) {
   );
 }
 
+// ── Owner/agent stats + shortcuts panel (item #12) ─────────────
+// Replaces the buyer inquiry form's card contents when the signed-in
+// viewer is this listing's owner or assigned agent. Card chrome itself
+// (the outer <Card>) stays shared with the buyer-form branch — only the
+// contents differ, per the render-site diff below.
+function OwnerAgentStatTile({ value, label }: { value: number | null; label: string }) {
+  return (
+    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "2px", flex: 1 }}>
+      <span style={{ fontFamily: "var(--font-support-new)", fontSize: "20px", fontWeight: 700, color: "#FFFFFF" }}>
+        {value == null ? "—" : value.toLocaleString("en-IN")}
+      </span>
+      <span style={{ fontSize: "10px", color: "rgba(255,255,255,0.45)", textTransform: "uppercase", letterSpacing: "0.06em" }}>{label}</span>
+    </div>
+  );
+}
+
+function OwnerAgentPanel({
+  property, isAgentSession, realViewCount, savePropertyCount, imageClickCount,
+}: {
+  property: Property;
+  isAgentSession: boolean;
+  realViewCount: number | null;
+  savePropertyCount: number | null;
+  imageClickCount: number | null;
+}) {
+  // Same two destinations confirmed correct in prior investigation:
+  // agent sessions -> /agent/leads (the real, already-built leads view);
+  // owner/seller sessions -> /dashboard's own Inquiries tab. Both already
+  // support ?property= filtering (agent/leads/page.tsx's own fix, and
+  // DashboardClient's pre-existing InquiriesTab filter).
+  const inquiriesHref = isAgentSession
+    ? `/agent/leads?property=${property.id}`
+    : `/dashboard?tab=inquiries&property=${property.id}`;
+  // Same destination MyListingsList's own Edit button already uses
+  // (post-property/edit/[id]/page.tsx) — reused, not reinvented.
+  const editHref = `/post-property/edit/${property.id}`;
+
+  return (
+    <div>
+      <div style={{ fontSize: "12.5px", fontWeight: 600, color: "#10C4C3", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: "6px" }}>
+        {isAgentSession ? "You're the assigned agent" : "This is your listing"}
+      </div>
+      <div style={{ fontSize: "17px", fontWeight: 600, color: "#FFFFFF", marginBottom: "20px", lineHeight: 1.3 }}>{property.title}</div>
+
+      <div style={{ display: "flex", padding: "16px 0", borderTop: "1px solid rgba(255,255,255,0.08)", borderBottom: "1px solid rgba(255,255,255,0.08)", marginBottom: "20px" }}>
+        <OwnerAgentStatTile value={realViewCount} label="Views" />
+        <div style={{ alignSelf: "stretch", width: "1px", background: "rgba(255,255,255,0.08)" }} />
+        <OwnerAgentStatTile value={savePropertyCount} label="Saves" />
+        <div style={{ alignSelf: "stretch", width: "1px", background: "rgba(255,255,255,0.08)" }} />
+        <OwnerAgentStatTile value={imageClickCount} label="Photo Clicks" />
+      </div>
+
+      <Link href={inquiriesHref} style={{ textDecoration: "none" }}>
+        <button style={{ width: "100%", padding: "13px", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.10)", borderRadius: "16px", color: "#FFFFFF", fontSize: "13px", fontWeight: 600, letterSpacing: "0.04em", cursor: "pointer", fontFamily: "var(--font-body-new)", marginBottom: "10px" }}>
+          View Inquiries for This Listing
+        </button>
+      </Link>
+
+      <Link href={editHref} style={{ textDecoration: "none" }}>
+        <button style={{ width: "100%", padding: "13px", background: "#10C4C3", border: "none", borderRadius: "16px", color: "#020C1C", fontSize: "13px", fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", cursor: "pointer", fontFamily: "var(--font-body-new)", boxShadow: "0 10px 30px rgba(30,167,255,.35)" }}>
+          Quick Edit
+        </button>
+      </Link>
+    </div>
+  );
+}
+
+// Shown only while identityResolving is true — static placeholder blocks
+// (no animation added: this file's one existing "pulse" animation
+// reference has no matching @keyframes anywhere in the codebase, so
+// reusing that name would silently do nothing; not fixing that
+// pre-existing, unrelated gap here, just not compounding it with a
+// second broken reference). Same muted-glass tones already used
+// throughout this file, no new colors.
+function OwnerAgentPanelSkeleton() {
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+      <div style={{ height: "12px", width: "50%", background: "rgba(255,255,255,0.08)", borderRadius: "6px" }} />
+      <div style={{ height: "18px", width: "80%", background: "rgba(255,255,255,0.08)", borderRadius: "6px" }} />
+      <div style={{ height: "64px", background: "rgba(255,255,255,0.05)", borderRadius: "12px", marginTop: "6px" }} />
+      <div style={{ height: "44px", background: "rgba(255,255,255,0.05)", borderRadius: "16px" }} />
+      <div style={{ height: "44px", background: "rgba(255,255,255,0.05)", borderRadius: "16px" }} />
+    </div>
+  );
+}
+
 // ── Nearby & Around: map (item #10 redesign) ──────────────────
 // Property marker (larger, teal) + one marker per cached place, colored by
 // category. Rows with null latitude/longitude (cached before
@@ -604,6 +699,147 @@ function NearbyPlacesMap({
 
   if (mapFailed) return null;
   return <div ref={mapDivRef} style={{ width: "100%", height: "340px", borderRadius: "16px", overflow: "hidden", border: "1px solid rgba(255,255,255,0.08)", marginBottom: "16px", background: "#111F33" }} />;
+}
+
+// ── Location map (Maps Phase 2) ────────────────────────────────
+// Replaces the old google_maps_url-dependent iframe as the PRIMARY path —
+// driven directly by property.latitude/longitude, which (confirmed live,
+// 2026-09-14) 100% of listings already have. google_maps_url stays a
+// legacy override: only consulted if the SDK itself fails to load (see
+// mapFailed below), never removed.
+//
+// VIEWPORT-GATED, unlike NearbyPlacesMap (which loads the Maps JS SDK
+// unconditionally on mount): this card sits much higher on the page and
+// renders on every single property view, so eagerly loading the SDK here
+// the way NearbyPlacesMap does would multiply that cost across this
+// page's own traffic. An IntersectionObserver defers even starting the
+// script load until the card is within 300px of the viewport.
+function PropertyLocationMap({
+  latitude, longitude, title, fallbackEmbedUrl,
+}: { latitude: number; longitude: number; title: string; fallbackEmbedUrl: string | null }) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const mapDivRef = useRef<HTMLDivElement>(null);
+  const [inView, setInView] = useState(false);
+  const [mapReady, setMapReady] = useState(false);
+  const [mapFailed, setMapFailed] = useState(false);
+
+  useEffect(() => {
+    if (!containerRef.current || typeof IntersectionObserver === "undefined") {
+      // No IntersectionObserver support (very old browser) — fail open to
+      // an eager load rather than a map that silently never appears.
+      setInView(true);
+      return;
+    }
+    const observer = new IntersectionObserver(
+      entries => {
+        if (entries[0]?.isIntersecting) {
+          setInView(true);
+          observer.disconnect();
+        }
+      },
+      { rootMargin: "300px" }
+    );
+    observer.observe(containerRef.current);
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    if (!inView) return;
+    let cancelled = false;
+    loadGoogleMapsScript()
+      .then(maps => {
+        if (cancelled || !mapDivRef.current) return;
+
+        const map = new maps.Map(mapDivRef.current, {
+          center: { lat: latitude, lng: longitude },
+          zoom: 15,
+          disableDefaultUI: true,
+          zoomControl: true,
+          // Same dark theme as NearbyPlacesMap, for visual consistency
+          // between this page's two maps.
+          styles: [
+            { elementType: "geometry", stylers: [{ color: "#111F33" }] },
+            { elementType: "labels.text.stroke", stylers: [{ color: "#020C1C" }] },
+            { elementType: "labels.text.fill", stylers: [{ color: "#A9B4C2" }] },
+            { featureType: "road", elementType: "geometry", stylers: [{ color: "#1B2C45" }] },
+            { featureType: "water", elementType: "geometry", stylers: [{ color: "#0A1526" }] },
+            { featureType: "poi", stylers: [{ visibility: "off" }] },
+          ],
+        });
+
+        const markerIcon = `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(
+          `<svg xmlns="http://www.w3.org/2000/svg" width="34" height="34" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="#10C4C3" stroke="#020C1C" stroke-width="2"/></svg>`
+        )}`;
+        new maps.Marker({
+          position: { lat: latitude, lng: longitude },
+          map,
+          title,
+          icon: { url: markerIcon, scaledSize: new maps.Size(34, 34), anchor: new maps.Point(17, 17) },
+        });
+
+        setMapReady(true);
+      })
+      .catch(err => {
+        console.error("[PropertyLocationMap] Failed to load Google Maps:", err);
+        if (!cancelled) setMapFailed(true);
+      });
+    return () => { cancelled = true; };
+  }, [inView, latitude, longitude, title]);
+
+  // Coordinate-based deep link (dir/?api=1&destination=lat,lng) — more
+  // accurate than the pre-existing locality-text search query, per spec.
+  const directionsUrl = `https://www.google.com/maps/dir/?api=1&destination=${latitude},${longitude}`;
+
+  if (mapFailed) {
+    // Same fallback as the no-coordinates case: the legacy admin-pasted
+    // embed link if one exists, else a plain Maps link — never a blank
+    // or broken card.
+    if (fallbackEmbedUrl) {
+      return (
+        <div style={{ position: "relative", width: "100%", paddingTop: "56.25%", borderRadius: "12px", overflow: "hidden", background: "#0A1526" }}>
+          <iframe
+            src={fallbackEmbedUrl}
+            title={`${title} — location map`}
+            loading="lazy"
+            allowFullScreen
+            style={{ position: "absolute", inset: 0, width: "100%", height: "100%", border: "none" }}
+          />
+        </div>
+      );
+    }
+    return (
+      <a
+        href={directionsUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        style={{ display: "inline-flex", alignItems: "center", gap: "6px", padding: "10px 16px", borderRadius: "100px", fontSize: "13px", fontWeight: 600, color: "#10C4C3", background: "rgba(16,196,195,0.1)", border: "1px solid rgba(16,196,195,0.3)", textDecoration: "none" }}
+      >
+        View on Google Maps
+      </a>
+    );
+  }
+
+  return (
+    <div ref={containerRef} style={{ position: "relative", width: "100%", height: "340px", borderRadius: "12px", overflow: "hidden", background: "#0A1526" }}>
+      {/* Fixed-height container from the first render, regardless of
+          loading state — the placeholder and the real map share the exact
+          same box, so mounting the map never shifts layout. */}
+      {!mapReady && (
+        <div style={{ position: "absolute", inset: 0, background: "#111F33" }} />
+      )}
+      <div ref={mapDivRef} style={{ position: "absolute", inset: 0, width: "100%", height: "100%" }} />
+      {mapReady && (
+        <a
+          href={directionsUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{ position: "absolute", bottom: "12px", right: "12px", zIndex: 2, display: "flex", alignItems: "center", gap: "6px", padding: "8px 14px", borderRadius: "100px", fontSize: "12px", fontWeight: 700, color: "#020C1C", background: "#10C4C3", textDecoration: "none", boxShadow: "0 4px 16px rgba(0,0,0,0.3)" }}
+        >
+          Get Directions
+        </a>
+      )}
+    </div>
+  );
 }
 
 // ── Nearby & Around: category card (item #10 redesign) ────────
@@ -767,6 +1003,28 @@ export default function PropertyDetailClient() {
   const [assignedAgent, setAssignedAgent] = useState<AssignedAgent | null>(null);
   const similarScrollRef = useRef<HTMLDivElement>(null);
   const [nearbyPlaces, setNearbyPlaces] = useState<Record<string, NearbyPlace[]> | null>(null);
+  // number | null (not a plain number defaulting to 0) so the new owner/
+  // agent stats panel can distinguish "still loading" from "genuinely
+  // zero saves" — tightened alongside that panel's build, since the
+  // previous plain-0 default couldn't make that distinction.
+  const [savePropertyCount, setSavePropertyCount] = useState<number | null>(null);
+  // Real view count (item #2) — null means "not shown", not "zero". Only
+  // fetched for this listing's own owner or assigned agent (via the shared
+  // isOwnerOrAgent identity above — previously this only checked isSeller,
+  // which meant an assigned agent viewing their own managed listing never
+  // saw the real count; fixed as part of item #12's foundation work) or an
+  // admin: property_view_events' RLS (066) restricts SELECT to owner/
+  // assigned-agent/admin anyway, but a non-owner's query would come back as
+  // an RLS-filtered *empty* result — indistinguishable from a genuinely-
+  // zero count — so this stat is only even attempted for roles this page
+  // can confirm client-side, rather than ever risking showing a false "0"
+  // to an ordinary visitor browsing the listing.
+  const [realViewCount, setRealViewCount] = useState<number | null>(null);
+  // Image-click count (item #2's property_image_clicks) — same RLS-scoped
+  // shape as realViewCount above. Not yet displayed anywhere in this file;
+  // built now as foundation for item #12's owner/agent stats panel, which
+  // will consume it directly rather than re-deriving a separate query.
+  const [imageClickCount, setImageClickCount] = useState<number | null>(null);
 
   // Gallery state
   const [activeImg, setActiveImg] = useState(0);
@@ -821,6 +1079,65 @@ export default function PropertyDetailClient() {
 
   // Feature 2 — schedule visit modal
   const { user, profile, loading: authLoading, openAuthModal } = useAuth();
+
+  // ── Shared owner/agent identity (foundation for item #12) ──────
+  // Single source of truth, computed once, rather than the inline
+  // isSeller/isAssignedAgent checks duplicated ad-hoc elsewhere in this
+  // file (load()'s non-active-listing gate does its own separate,
+  // narrower check — see that block's own comment for why it's
+  // intentionally NOT replaced by this).
+  //
+  // myAgentProfileId: undefined = not yet looked up, null = looked up,
+  // this user has no agent_profiles row (or lookup failed — fails
+  // closed, never assumes agent access on an error), string = their
+  // real agent_profiles.id. Tracked separately from a plain boolean so
+  // "still checking" is distinguishable from "checked, and no."
+  const [myAgentProfileId, setMyAgentProfileId] = useState<string | null | undefined>(undefined);
+
+  useEffect(() => {
+    if (authLoading) return; // wait for the real user.id, don't fetch on a stale/undefined one
+    if (!user?.id) { setMyAgentProfileId(null); return; }
+    let cancelled = false;
+    setMyAgentProfileId(undefined); // re-enter "checking" for the new user id
+    (async () => {
+      const supabase = createClient();
+      const { data, error } = await supabase
+        .from("agent_profiles")
+        .select("id")
+        .eq("user_id", user.id)
+        .maybeSingle();
+      if (cancelled) return;
+      if (error) {
+        console.error("[PropertyDetailClient] agent_profiles identity lookup failed:", error);
+        setMyAgentProfileId(null); // fail closed — never assume agent access on error
+      } else {
+        setMyAgentProfileId(data?.id ?? null);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [authLoading, user?.id]);
+
+  // true while any input this decision depends on hasn't resolved yet —
+  // property itself, auth, or the agent_profiles lookup. Consumers (the
+  // view-count gate below, and item #12's owner panel later) should wait
+  // for this to go false before rendering an identity-dependent UI, so a
+  // real owner/agent never sees a buyer view first and then a swap.
+  const identityResolving = !property || authLoading || myAgentProfileId === undefined;
+
+  const isOwner = useMemo(
+    () => !!user?.id && !!property?.user_id && user.id === property.user_id,
+    [user?.id, property?.user_id]
+  );
+  const isAssignedAgent = useMemo(
+    () => !!myAgentProfileId && !!property?.assigned_agent_id && myAgentProfileId === property.assigned_agent_id,
+    [myAgentProfileId, property?.assigned_agent_id]
+  );
+  const isOwnerOrAgent = isOwner || isAssignedAgent;
+  // Same role check DashboardClient.tsx's own isAgent uses (profile.role,
+  // from useAuth() — already destructured above), reused here to decide
+  // which destination "View Inquiries for this listing" should link to.
+  const isAgentSession = profile?.role === "agent" || profile?.role === "builder";
+
   const [visitOpen, setVisitOpen] = useState(false);
   const [visitDate, setVisitDate] = useState("");
   const [visitSlot, setVisitSlot] = useState<"morning" | "afternoon" | "evening">("morning");
@@ -893,7 +1210,12 @@ export default function PropertyDetailClient() {
         // is needed on this side: we're filtering that text column against
         // a plain string literal (row.id), not joining it to a uuid column
         // in SQL, so there's no operator-mismatch risk here.
-        let isAssignedAgent = false;
+        // Named distinctly from the component-level `isAssignedAgent` (added
+        // later, in Part 2 of item #12's foundation work) — that one checks
+        // property.assigned_agent_id directly; this one is a narrower,
+        // inquiry-based proxy used only for this specific visibility gate.
+        // Same variable would mean two different things in the same file.
+        let isAssignedAgentViaInquiry = false;
         if (!isSeller && uid) {
           const { data: myAgentProfile } = await supabase
             .from("agent_profiles")
@@ -909,11 +1231,11 @@ export default function PropertyDetailClient() {
               .eq("assigned_to", myAgentProfile.id)
               .limit(1)
               .maybeSingle();
-            isAssignedAgent = !!myAssignedInquiry;
+            isAssignedAgentViaInquiry = !!myAssignedInquiry;
           }
         }
 
-        if (!isSeller && !isAssignedAgent) {
+        if (!isSeller && !isAssignedAgentViaInquiry) {
           setNotFound(true);
           setLoading(false);
           return;
@@ -1010,6 +1332,82 @@ export default function PropertyDetailClient() {
     return () => { cancelled = true; };
   }, [property?.id, property?.latitude, property?.longitude]);
 
+  // Record one page-view event (item #2) — fire-and-forget, never blocks
+  // render. Deduped server-side to one row per property+visitor+day by
+  // property_view_events' own UNIQUE constraint (066), so this can safely
+  // fire on every mount without inflating anything.
+  useEffect(() => {
+    if (!property?.id) return;
+    fetch("/api/track-property-view", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ propertyId: property.id, viewerKey: getVisitorKey(userId) }),
+    }).catch(err => console.error("[PropertyDetailClient] track-property-view failed:", err));
+  }, [property?.id, userId]);
+
+  // Public save count for this one property — public_property_save_counts
+  // (065) is a public view, safe to read regardless of sign-in state.
+  useEffect(() => {
+    if (!property?.id) { setSavePropertyCount(null); return; }
+    setSavePropertyCount(null); // resolving for this property
+    let cancelled = false;
+    (async () => {
+      const supabase = createClient();
+      const { data, error } = await supabase
+        .from("public_property_save_counts")
+        .select("save_count")
+        .eq("property_id", property.id)
+        .maybeSingle();
+      if (cancelled) return;
+      if (error) { console.error("Save count load error:", error); return; }
+      setSavePropertyCount(data?.save_count ?? 0);
+    })();
+    return () => { cancelled = true; };
+  }, [property?.id]);
+
+  useEffect(() => {
+    const isAdmin = profile?.role === "admin" || profile?.role === "super_admin";
+    // Waits on identityResolving too — not strictly required for correctness
+    // (isOwnerOrAgent is already a tracked dependency and starts false, so
+    // this effect re-fires once it resolves either way), but makes the
+    // "don't fetch on a still-resolving identity" intent explicit rather
+    // than relying on that being an incidental side effect of dependency
+    // tracking.
+    if (!property?.id || identityResolving || !(isAdmin || isOwnerOrAgent)) { setRealViewCount(null); return; }
+    let cancelled = false;
+    (async () => {
+      const supabase = createClient();
+      const { count, error } = await supabase
+        .from("property_view_events")
+        .select("id", { count: "exact", head: true })
+        .eq("property_id", property.id);
+      if (cancelled) return;
+      if (error) { console.error("View count load error:", error); return; }
+      setRealViewCount(count ?? 0);
+    })();
+    return () => { cancelled = true; };
+  }, [property?.id, isOwnerOrAgent, identityResolving, profile?.role]);
+
+  // Image-click count — same shape/gating as the view-count effect above,
+  // just a different table. Built for item #12's owner/agent panel to
+  // consume; nothing renders this yet.
+  useEffect(() => {
+    const isAdmin = profile?.role === "admin" || profile?.role === "super_admin";
+    if (!property?.id || identityResolving || !(isAdmin || isOwnerOrAgent)) { setImageClickCount(null); return; }
+    let cancelled = false;
+    (async () => {
+      const supabase = createClient();
+      const { count, error } = await supabase
+        .from("property_image_clicks")
+        .select("id", { count: "exact", head: true })
+        .eq("property_id", property.id);
+      if (cancelled) return;
+      if (error) { console.error("Image click count load error:", error); return; }
+      setImageClickCount(count ?? 0);
+    })();
+    return () => { cancelled = true; };
+  }, [property?.id, isOwnerOrAgent, identityResolving, profile?.role]);
+
   const scrollSimilar = useCallback((direction: "left" | "right") => {
     const el = similarScrollRef.current;
     if (!el) return;
@@ -1073,6 +1471,21 @@ export default function PropertyDetailClient() {
 
   const nextImg = useCallback(() => setActiveImg(i => (i + 1) % images.length), [images.length]);
   const prevImg = useCallback(() => setActiveImg(i => (i - 1 + images.length) % images.length), [images.length]);
+
+  // Opening the lightbox is this page's "photo click" engagement event
+  // (item #2) — one handler shared by every entry point (main image,
+  // "View All Photos" buttons) so the tracking call only lives in one
+  // place rather than being duplicated at each onClick.
+  const openLightbox = useCallback(() => {
+    setLightboxOpen(true);
+    if (property?.id) {
+      fetch("/api/track-image-click", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ propertyId: property.id, imageUrl: images[activeImg], viewerKey: getVisitorKey(userId) }),
+      }).catch(err => console.error("[PropertyDetailClient] track-image-click failed:", err));
+    }
+  }, [property?.id, images, activeImg, userId]);
 
   // Lightbox keyboard nav + scroll lock
   useEffect(() => {
@@ -1350,6 +1763,9 @@ export default function PropertyDetailClient() {
         >
           <svg width="13" height="13" viewBox="0 0 24 24" fill={savedIds.has(property.id) ? "#10C4C3" : "none"} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" /></svg>
           {savedIds.has(property.id) ? "Saved" : "Save"}
+          {/* Only shown for a real positive count — a "Save · 0" reads as
+              "nobody wants this", so a zero/unknown count shows nothing. */}
+          {(savePropertyCount ?? 0) > 0 && ` · ${savePropertyCount}`}
         </button>
         <ReportButton entityType="listing" entityId={property.id} variant="dark" />
       </div>
@@ -1459,13 +1875,13 @@ export default function PropertyDetailClient() {
                   <img
                     src={optimizedImageUrl(images[activeImg], 1600)}
                     alt={property.title}
-                    onClick={() => setLightboxOpen(true)}
+                    onClick={openLightbox}
                     style={{ width: "100%", height: "100%", objectFit: "cover", display: "block", transition: "opacity 0.3s", cursor: "zoom-in" }}
                   />
                   <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(0,0,0,0.55) 0%, transparent 50%)", pointerEvents: "none" }} />
 
                   <button
-                    onClick={() => setLightboxOpen(true)}
+                    onClick={openLightbox}
                     className="pd-lb-btn"
                     style={{ position: "absolute", bottom: "16px", left: "24px", display: "flex", alignItems: "center", gap: "7px", padding: "8px 16px", borderRadius: "999px", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.10)", color: "#fff", fontSize: "12px", fontWeight: 600, cursor: "pointer", fontFamily: "var(--font-body-new)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)" }}
                   >
@@ -1500,7 +1916,7 @@ export default function PropertyDetailClient() {
                 <img
                   src={optimizedImageUrl(images[activeImg], 1600)}
                   alt={property.title}
-                  onClick={() => setLightboxOpen(true)}
+                  onClick={openLightbox}
                   style={{ width: "100%", height: "100%", objectFit: "cover", display: "block", transition: "opacity 0.3s", cursor: "zoom-in" }}
                 />
                 {/* Dark overlay gradient */}
@@ -1508,7 +1924,7 @@ export default function PropertyDetailClient() {
 
                 {/* View all photos */}
                 <button
-                  onClick={() => setLightboxOpen(true)}
+                  onClick={openLightbox}
                   className="pd-lb-btn"
                   style={{ position: "absolute", bottom: "100px", left: "24px", display: "flex", alignItems: "center", gap: "7px", padding: "8px 16px", borderRadius: "999px", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.10)", color: "#fff", fontSize: "12px", fontWeight: 600, cursor: "pointer", fontFamily: "var(--font-body-new)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)" }}
                 >
@@ -1737,7 +2153,20 @@ export default function PropertyDetailClient() {
               )}
 
               {/* ── LOCATION MAP ── */}
-              {embedMapsUrl && (
+              {property.latitude != null && property.longitude != null ? (
+                <Card>
+                  <SectionHeading>Location</SectionHeading>
+                  <PropertyLocationMap
+                    latitude={property.latitude}
+                    longitude={property.longitude}
+                    title={property.title}
+                    fallbackEmbedUrl={embedMapsUrl}
+                  />
+                </Card>
+              ) : embedMapsUrl ? (
+                // No coordinates (rare, per live spot-check — verified
+                // 100% of listings have them today) — same legacy behavior
+                // as before this change, untouched.
                 <Card>
                   <SectionHeading>Location</SectionHeading>
                   <div style={{ position: "relative", width: "100%", paddingTop: "56.25%", borderRadius: "12px", overflow: "hidden", background: "#0A1526" }}>
@@ -1750,7 +2179,7 @@ export default function PropertyDetailClient() {
                     />
                   </div>
                 </Card>
-              )}
+              ) : null}
 
               {/* ── DESCRIPTION ── */}
               <Card>
@@ -1904,8 +2333,23 @@ export default function PropertyDetailClient() {
             {/* ══ RIGHT SIDEBAR ══ */}
             <div className="pd-right" style={{ flex: "0 0 35%", position: "sticky", top: "72px" }}>
 
-              {/* ── CONTACT FORM ── */}
+              {/* ── CONTACT FORM (buyer) / OWNER-AGENT PANEL (item #12) ── */}
               <Card style={{ marginBottom: "20px" }}>
+                {identityResolving ? (
+                  // Skeleton while property/auth/agent-profile identity is
+                  // still resolving — never the buyer form or the owner
+                  // panel first, to avoid a visible swap either direction.
+                  <OwnerAgentPanelSkeleton />
+                ) : isOwnerOrAgent && property ? (
+                  <OwnerAgentPanel
+                    property={property}
+                    isAgentSession={isAgentSession}
+                    realViewCount={realViewCount}
+                    savePropertyCount={savePropertyCount}
+                    imageClickCount={imageClickCount}
+                  />
+                ) : (
+                <>
                 {/* Agent header */}
                 <div style={{ display: "flex", alignItems: "center", gap: "14px", marginBottom: "20px", paddingBottom: "20px", borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
                   <div style={{ width: "48px", height: "48px", borderRadius: "50%", background: "linear-gradient(135deg, #020C1C 0%, #111F33 100%)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
@@ -2134,6 +2578,8 @@ export default function PropertyDetailClient() {
                     </button>
                   </>
                 )}
+                </>
+                )}
               </Card>
 
               {/* ── DOWNLOAD BROCHURE ── */}
@@ -2151,7 +2597,7 @@ export default function PropertyDetailClient() {
                   {[
                     { label: "Listed On", value: formatDate(property.created_at) },
                     { label: "Property ID", value: property.id.slice(0, 8).toUpperCase() },
-                    { label: "Views", value: property.views?.toLocaleString("en-IN") ?? "0" },
+                    ...(realViewCount != null ? [{ label: "Views", value: realViewCount.toLocaleString("en-IN") }] : []),
                     { label: "Property Type", value: property.type.charAt(0).toUpperCase() + property.type.slice(1) },
                     { label: "Status", value: property.status.charAt(0).toUpperCase() + property.status.slice(1) },
                     ...(property.pincode ? [{ label: "Pincode", value: property.pincode }] : []),

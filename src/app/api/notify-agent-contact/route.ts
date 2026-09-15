@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+import { sendWhatsAppMessage } from "@/lib/whatsapp";
 
 function adminClient() {
   return createClient(
@@ -40,10 +41,11 @@ export async function POST(req: NextRequest) {
   try {
     const supabase = adminClient();
     const contact = phone?.trim() || email?.trim() || "no contact info provided";
+    const notificationBody = `${name?.trim() || "Someone"} wants to connect — ${contact}`;
     const { error } = await supabase.from("notifications").insert({
       user_id: agentUserId,
       title: "New contact request",
-      body: `${name?.trim() || "Someone"} wants to connect — ${contact}`,
+      body: notificationBody,
       type: "agent_contact",
       action_url: "/agent/leads",
     });
@@ -51,6 +53,22 @@ export async function POST(req: NextRequest) {
       console.error("[notify-agent-contact] Failed to insert notification:", error);
       return NextResponse.json({ error: "Notification insert failed" }, { status: 500 });
     }
+
+    // WhatsApp, alongside the in-app notification above — fire-and-forget,
+    // never blocks this route's response. Requires its own lookup since this
+    // route is only ever called with agentUserId, never the agent's phone.
+    const { data: agentProfile } = await supabase
+      .from("profiles")
+      .select("phone, full_name")
+      .eq("id", agentUserId)
+      .maybeSingle();
+    if (agentProfile?.phone) {
+      console.log(`[notify-agent-contact] Calling sendWhatsAppMessage for agent ${agentUserId}...`);
+      void sendWhatsAppMessage(agentProfile.phone, agentProfile.full_name?.trim() || "there", notificationBody);
+    } else {
+      console.log(`[notify-agent-contact] Skipping — no phone on file for agent ${agentUserId}`);
+    }
+
     return NextResponse.json({ success: true });
   } catch (err) {
     console.error("[notify-agent-contact] Unexpected error:", err);

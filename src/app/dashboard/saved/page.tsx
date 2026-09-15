@@ -275,7 +275,7 @@ export default function SavedPropertiesPage() {
 
                         <div className="sv-actions" style={{ display: "flex", gap: 8, flexShrink: 0 }}>
                           {d.slug && (
-                            <Link href={`/properties/${d.slug}`} style={{ textDecoration: "none" }}>
+                            <Link href={`/property/${d.slug}`} style={{ textDecoration: "none" }}>
                               <button style={{
                                 padding: "7px 14px", fontSize: 13, fontWeight: 600,
                                 color: "#020C1C", background: G.gold,

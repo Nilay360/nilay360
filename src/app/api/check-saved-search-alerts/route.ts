@@ -69,7 +69,7 @@ function buildAlertEmail(listing: Listing, searchName: string | null, userEmail:
   const name  = escHtml(searchName ?? "your saved search");
   const price = listing.price ? `₹${(listing.price / 1e7).toFixed(2)} Cr` : "";
   const url   = listing.slug
-    ? `https://nilay360.com/properties/${listing.slug}`
+    ? `https://nilay360.com/property/${listing.slug}`
     : "https://nilay360.com/properties";
 
   return `<!DOCTYPE html>

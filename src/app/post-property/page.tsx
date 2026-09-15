@@ -4,6 +4,8 @@ import React, {
   useReducer, useEffect, useRef, useCallback, DragEvent,
 } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import { useAuth } from '@/context/AuthContext'
+import LocationPicker, { ReverseGeocodedAddress } from '@/components/LocationPicker'
 
 // ─── Types ─────────────────────────────────────────────────────────────────────
 
@@ -36,6 +38,8 @@ interface FormState {
   stateField: string
   pincode: string
   landmark: string
+  latitude: number | null
+  longitude: number | null
   // Step 3
   areaSqft: string
   bedrooms: string
@@ -83,10 +87,13 @@ type Action =
   | { type: 'SET_FLOOR_PLAN_LABEL'; id: string; label: string }
   | { type: 'LOAD_DRAFT'; partial: Partial<Omit<FormState, 'photos' | 'floorPlans'>> }
   | { type: 'PREFILL_SELLER_EMAIL'; email: string }
+  | { type: 'PREFILL_SELLER_NAME'; name: string }
+  | { type: 'PREFILL_SELLER_PHONE'; phone: string }
 
 const INITIAL: FormState = {
   listingType: '', propertyCategory: '',
   address: '', locality: '', city: '', stateField: '', pincode: '', landmark: '',
+  latitude: null, longitude: null,
   areaSqft: '', bedrooms: '', bathrooms: '', balconies: '', floor: '',
   totalFloors: '', facing: '', propertyAge: '', furnishing: '',
   coveredParking: '', openParking: '',
@@ -130,6 +137,11 @@ function reducer(s: FormState, a: Action): FormState {
     // user already typed or restored from a saved draft, regardless of
     // whether this resolves before or after LOAD_DRAFT.
     case 'PREFILL_SELLER_EMAIL': return s.sellerEmail ? s : { ...s, sellerEmail: a.email }
+    // Same "only fill if still blank" rule as PREFILL_SELLER_EMAIL above,
+    // applied to name/phone sourced from the profiles table instead of
+    // the raw auth session.
+    case 'PREFILL_SELLER_NAME': return s.sellerName ? s : { ...s, sellerName: a.name }
+    case 'PREFILL_SELLER_PHONE': return s.sellerPhone ? s : { ...s, sellerPhone: a.phone }
     default: return s
   }
 }
@@ -328,6 +340,18 @@ const AMENITIES_LIST = [
 const STEP_LABELS = ['Listing Type', 'Location', 'Details', 'Pricing', 'Amenities', 'Photos', 'Floor Plans', 'Review']
 
 // ─── Helpers ───────────────────────────────────────────────────────────────────
+
+// profile.phone is stored as "+91" + 10 digits (see api/verify-otp/route.ts) —
+// sellerPhone here is a bare 10-digit field (validated as /^\d{10}$/ in
+// validate() below), so the stored prefix must be stripped before
+// prefilling or it fails that validation. Same helper as
+// PropertyDetailClient.tsx / contact/page.tsx, duplicated rather than
+// shared per this codebase's existing convention for small file-local
+// utilities.
+function stripIndianCountryCode(phone: string): string {
+  const digitsOnly = phone.replace(/\D/g, '')
+  return digitsOnly.length === 12 && digitsOnly.startsWith('91') ? digitsOnly.slice(2) : digitsOnly
+}
 
 function toCrore(raw: string): string {
   const n = Number(raw)
@@ -580,6 +604,23 @@ function Step2({ state, dispatch }: { state: FormState; dispatch: React.Dispatch
     }
   }
 
+  // "Confirm Location" fills each field only if it is still blank — a
+  // seller who already typed their own address (Path A) keeps exactly
+  // what they typed; a seller who dropped/searched a pin first (Path B)
+  // gets the fields filled from the reverse-geocoded result. Same
+  // non-destructive rule as PREFILL_SELLER_EMAIL/NAME/PHONE. city/state
+  // arrive already normalized against this form's own CITIES/STATES
+  // lists (or omitted when LocationPicker couldn't match either) — never
+  // dispatched at all when omitted, so a non-matching value is never
+  // written into those <select>s.
+  const handleConfirmLocation = (addr: ReverseGeocodedAddress) => {
+    if (!state.address && addr.address) dispatch({ type: 'SET', field: 'address', value: addr.address })
+    if (!state.locality && addr.locality) dispatch({ type: 'SET', field: 'locality', value: addr.locality })
+    if (!state.city && addr.city) dispatch({ type: 'SET', field: 'city', value: addr.city })
+    if (!state.stateField && addr.state) dispatch({ type: 'SET', field: 'stateField', value: addr.state })
+    if (!state.pincode && addr.pincode) dispatch({ type: 'SET', field: 'pincode', value: addr.pincode })
+  }
+
   return (
     <div>
       <h2 style={S.stepTitle}>Where is the property?</h2>
@@ -624,6 +665,23 @@ function Step2({ state, dispatch }: { state: FormState; dispatch: React.Dispatch
 
         <FField label="Landmark (Optional)">
           <TInput value={state.landmark} onChange={f('landmark')} placeholder="e.g., Near Inorbit Mall, opposite HDFC Bank" />
+        </FField>
+
+        <FField label="Pin the exact location (Optional)">
+          <LocationPicker
+            latitude={state.latitude}
+            longitude={state.longitude}
+            address={state.address}
+            locality={state.locality}
+            city={state.city}
+            state={state.stateField}
+            pincode={state.pincode}
+            onChange={(lat, lng) => {
+              dispatch({ type: 'SET', field: 'latitude', value: lat })
+              dispatch({ type: 'SET', field: 'longitude', value: lng })
+            }}
+            onConfirm={handleConfirmLocation}
+          />
         </FField>
       </div>
     </div>
@@ -1542,6 +1600,7 @@ function validate(step: number, s: FormState): string | null {
 // ─── Main page ─────────────────────────────────────────────────────────────────
 
 export default function PostPropertyPage() {
+  const { profile } = useAuth()
   const [state, dispatch] = useReducer(reducer, INITIAL)
   const [step, setStep] = React.useState(1)
   const [stepError, setStepError] = React.useState('')
@@ -1584,6 +1643,20 @@ export default function PostPropertyPage() {
       if (email) dispatch({ type: 'PREFILL_SELLER_EMAIL', email })
     })
   }, [])
+
+  // Same pre-fill-not-lock behavior as the email effect above, but sourced
+  // from useAuth()'s profile (the profiles table) rather than a raw
+  // session lookup — the same pattern already used for this exact purpose
+  // in PropertyDetailClient.tsx's inquiry/site-visit forms, agents/[slug]'s
+  // contact form, and DashboardClient.tsx. Keyed on `profile` rather than
+  // run once on mount: AuthProvider fetches the profile row asynchronously
+  // after this component has already rendered, so `profile` is typically
+  // still null on first mount and arrives later — this effect re-fires
+  // when it does, rather than needing its own independent fetch.
+  useEffect(() => {
+    if (profile?.full_name) dispatch({ type: 'PREFILL_SELLER_NAME', name: profile.full_name })
+    if (profile?.phone) dispatch({ type: 'PREFILL_SELLER_PHONE', phone: stripIndianCountryCode(profile.phone) })
+  }, [profile])
 
   const goNext = () => {
     const err = validate(step, state)
@@ -1672,23 +1745,32 @@ export default function PostPropertyPage() {
 
       const isCommTitle = COMMERCIAL_CATEGORIES.includes(state.propertyCategory)
 
-      // Best-effort geocoding — never blocks submission. A network failure,
-      // a missing/misconfigured API key, or Google returning no match all
-      // resolve to `geo = null`, and the listing still submits exactly as
-      // it does today, just without coordinates.
+      // Prefer the coordinates the seller confirmed via LocationPicker
+      // (search + optional drag-to-adjust) during Step 2. Only fall back to
+      // the best-effort geocode-at-submit-time call below if the seller
+      // never interacted with the picker at all (state.latitude/longitude
+      // still null) — never blocks submission either way. A network
+      // failure, a missing/misconfigured API key, or Google returning no
+      // match all resolve to `geo = null`, and the listing still submits
+      // exactly as it does today, just without coordinates.
       const addressString = [state.address, state.locality, state.city, state.stateField, state.pincode]
         .filter(Boolean).join(', ')
-      let geo: { latitude: number; longitude: number } | null = null
-      try {
-        const geoRes = await fetch('/api/geocode-address', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ address: addressString }),
-        })
-        const geoJson = await geoRes.json()
-        geo = geoJson.result ?? null
-      } catch (err) {
-        console.error('Geocoding request failed:', err)
+      let geo: { latitude: number; longitude: number } | null =
+        state.latitude != null && state.longitude != null
+          ? { latitude: state.latitude, longitude: state.longitude }
+          : null
+      if (!geo) {
+        try {
+          const geoRes = await fetch('/api/geocode-address', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ address: addressString }),
+          })
+          const geoJson = await geoRes.json()
+          geo = geoJson.result ?? null
+        } catch (err) {
+          console.error('Geocoding request failed:', err)
+        }
       }
 
       const { data: insertedListing, error: insertErr } = await supabase.from('property_listings').insert([{

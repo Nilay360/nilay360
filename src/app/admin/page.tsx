@@ -22,6 +22,7 @@ type Stats = {
   users: number;
   inquiries: number;
   reportsOpen: number;
+  totalViews: number;
 };
 
 type AdminListing = {
@@ -790,6 +791,7 @@ function OverviewSection({ stats, loading }: { stats: Stats; loading: boolean })
           <StatCard label="Rejected"         value={stats.rejected}  icon={<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>} accent="red" />
           <StatCard label="Total Users"      value={stats.users}     icon={<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>} accent="blue" />
           <StatCard label="Total Inquiries"  value={stats.inquiries} icon={<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>} accent="blue" />
+          <StatCard label="Total Property Views" value={stats.totalViews} icon={<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>} accent="gold" note="Across all listings" />
         </div>
       )}
 
@@ -936,6 +938,101 @@ function PendingSection({
   );
 }
 
+// ── Unpublish modal — reason dropdown + note, replacing the old bare
+// window.confirm(). Same dark modal-overlay pattern as
+// Capture360ScheduleModal (fixed inset:0 scrim, centered card,
+// Escape-to-close, backdrop-click-to-close) — reused, not reinvented.
+// Reason values match property_listings.unpublish_reason's CHECK
+// constraint (067_unpublish_reason_and_history.sql) exactly.
+const UNPUBLISH_REASONS = [
+  { value: "deal_closed",     label: "Deal Closed" },
+  { value: "expired",         label: "Expired" },
+  { value: "owner_requested", label: "Owner Requested" },
+  { value: "admin_review",    label: "Admin Review" },
+  { value: "other",           label: "Other" },
+] as const;
+
+function UnpublishListingModal({
+  listing, onConfirm, onCancel,
+}: {
+  listing: AdminListing;
+  onConfirm: (reason: string, note: string | null) => void;
+  onCancel: () => void;
+}) {
+  const [reason, setReason] = useState<string>(UNPUBLISH_REASONS[0].value);
+  const [note, setNote] = useState("");
+  // Note is required only when "Other" is picked — every other reason is
+  // already self-explanatory enough to stand alone.
+  const noteRequired = reason === "other";
+  const canConfirm = !noteRequired || note.trim().length > 0;
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onCancel(); };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [onCancel]);
+
+  return (
+    <div
+      onClick={onCancel}
+      role="dialog"
+      aria-modal="true"
+      aria-label="Unpublish listing"
+      style={{ position: "fixed", inset: 0, zIndex: 500, background: "rgba(0,0,0,0.6)", backdropFilter: "blur(4px)", display: "flex", alignItems: "center", justifyContent: "center", padding: "20px" }}
+    >
+      <div
+        onClick={e => e.stopPropagation()}
+        style={{ background: "#0A1526", borderRadius: "18px", border: "1px solid rgba(255,255,255,0.1)", boxShadow: "0 12px 48px rgba(0,0,0,0.5)", width: "100%", maxWidth: "480px", maxHeight: "88vh", overflowY: "auto", padding: "26px 28px", animation: "fadeSlide 0.18s ease-out", fontFamily: "var(--font-body-new)" }}
+      >
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "6px" }}>
+          <h3 style={{ fontFamily: "var(--font-heading-new)", fontSize: "22px", fontWeight: 600, color: "#FFFFFF" }}>Unpublish Listing</h3>
+          <button onClick={onCancel} aria-label="Close" style={{ width: "30px", height: "30px", borderRadius: "8px", background: "rgba(255,255,255,0.06)", border: "none", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: "#FFFFFF" }}>
+            <IconX />
+          </button>
+        </div>
+
+        <div style={{ marginBottom: "18px" }}>
+          <p style={{ fontSize: "14px", fontWeight: 600, color: "#FFFFFF", marginBottom: "2px" }}>{listing.title ?? "Untitled listing"}</p>
+          <p style={{ fontSize: "12px", color: "#A9B4C2" }}>Will return to Pending Review.</p>
+        </div>
+
+        <label style={{ display: "block", fontSize: "10px", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: "#6B7686", marginBottom: "6px" }}>Reason</label>
+        <select
+          value={reason} onChange={e => setReason(e.target.value)}
+          style={{ width: "100%", boxSizing: "border-box", padding: "10px 12px", borderRadius: "8px", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.15)", color: "#FFFFFF", fontSize: "13px", fontFamily: "var(--font-body-new)", marginBottom: "16px" }}
+        >
+          {UNPUBLISH_REASONS.map(r => <option key={r.value} value={r.value} style={{ background: "#0A1526", color: "#FFFFFF" }}>{r.label}</option>)}
+        </select>
+
+        <label style={{ display: "block", fontSize: "10px", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: "#6B7686", marginBottom: "6px" }}>
+          Note {noteRequired ? "(required)" : "(optional)"}
+        </label>
+        <textarea
+          value={note} onChange={e => setNote(e.target.value)} rows={3}
+          placeholder={noteRequired ? "Please describe the reason…" : "Optional context…"}
+          style={{ width: "100%", boxSizing: "border-box", padding: "9px 12px", borderRadius: "8px", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.15)", color: "#FFFFFF", fontSize: "12px", fontFamily: "var(--font-body-new)", resize: "vertical", marginBottom: "18px" }}
+        />
+
+        <div style={{ display: "flex", gap: "10px" }}>
+          <button
+            onClick={() => { if (canConfirm) onConfirm(reason, note.trim() || null); }}
+            disabled={!canConfirm}
+            style={{ flex: 1, padding: "11px", borderRadius: "8px", fontSize: "12px", fontWeight: 700, letterSpacing: "0.04em", textTransform: "uppercase" as const, background: "#F59E0B", color: "#020C1C", border: "none", cursor: !canConfirm ? "not-allowed" : "pointer", fontFamily: "var(--font-body-new)", opacity: !canConfirm ? 0.6 : 1 }}
+          >
+            Confirm Unpublish
+          </button>
+          <button
+            onClick={onCancel}
+            style={{ padding: "11px 18px", borderRadius: "8px", fontSize: "12px", fontWeight: 700, letterSpacing: "0.04em", textTransform: "uppercase" as const, background: "rgba(255,255,255,0.06)", color: "#A9B4C2", border: "1.5px solid rgba(255,255,255,0.12)", cursor: "pointer", fontFamily: "var(--font-body-new)" }}
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ── Section: Approved Listings ─────────────────────────────────────────────────
 
 function ApprovedSection({
@@ -944,12 +1041,13 @@ function ApprovedSection({
   listings: AdminListing[];
   loading: boolean;
   inFlight: string | null;
-  onUnpublish: (id: string) => void;
+  onUnpublish: (id: string, reason: string, note: string | null) => void;
   agents: ApprovedAgentOption[];
   onAssignAgent: (id: string, agentId: string | null) => void;
   onKuulaTourUrl: (id: string, url: string | null) => void;
   onGoogleMapsUrl: (id: string, url: string | null) => void;
 }) {
+  const [unpublishTarget, setUnpublishTarget] = useState<AdminListing | null>(null);
   if (loading) return <Spinner />;
   return (
     <div>
@@ -989,9 +1087,7 @@ function ApprovedSection({
               }
               actions={
                 <button
-                  onClick={() => {
-                    if (window.confirm("Unpublish this listing? It will return to pending review.")) onUnpublish(l.id);
-                  }}
+                  onClick={() => setUnpublishTarget(l)}
                   disabled={inFlight === l.id}
                   style={{ display: "flex", alignItems: "center", gap: "6px", padding: "7px 14px", borderRadius: "7px", fontSize: "11px", fontWeight: 600, background: "rgba(245,158,11,0.1)", color: "#F59E0B", border: "1.5px solid rgba(245,158,11,0.3)", cursor: inFlight === l.id ? "not-allowed" : "pointer", fontFamily: "var(--font-body-new)", opacity: inFlight === l.id ? 0.6 : 1 }}
                 >
@@ -1001,6 +1097,16 @@ function ApprovedSection({
             />
           ))}
         </div>
+      )}
+      {unpublishTarget && (
+        <UnpublishListingModal
+          listing={unpublishTarget}
+          onConfirm={(reason, note) => {
+            onUnpublish(unpublishTarget.id, reason, note);
+            setUnpublishTarget(null);
+          }}
+          onCancel={() => setUnpublishTarget(null)}
+        />
       )}
     </div>
   );
@@ -2873,7 +2979,7 @@ function AdminPageInner() {
   const [sidebarOpen,  setSidebarOpen]  = useState(true);
   const [toast,        setToast]        = useState<{ ok: boolean; msg: string } | null>(null);
 
-  const [stats,        setStats]        = useState<Stats>({ pending: 0, active: 0, rejected: 0, users: 0, inquiries: 0, reportsOpen: 0 });
+  const [stats,        setStats]        = useState<Stats>({ pending: 0, active: 0, rejected: 0, users: 0, inquiries: 0, reportsOpen: 0, totalViews: 0 });
   const [statsLoading, setStatsLoading] = useState(true);
 
   const [pendingListings,  setPendingListings]  = useState<AdminListing[]>([]);
@@ -2951,6 +3057,7 @@ function AdminPageInner() {
         { count: users },
         { count: inquiries },
         { count: reportsOpen },
+        { count: totalViews },
       ] = await Promise.all([
         supabase.from("property_listings").select("*", { count: "exact", head: true }).eq("status", "pending_review"),
         supabase.from("property_listings").select("*", { count: "exact", head: true }).eq("status", "active"),
@@ -2958,6 +3065,10 @@ function AdminPageInner() {
         supabase.from("profiles").select("*", { count: "exact", head: true }),
         supabase.from("inquiries").select("*", { count: "exact", head: true }),
         supabase.from("reports").select("*", { count: "exact", head: true }).eq("status", "open"),
+        // is_admin() bypasses property_view_events' owner/agent-scoped RLS
+        // (066), so this plain head-count genuinely spans every listing —
+        // exactly the site-wide total this stat is meant to show.
+        supabase.from("property_view_events").select("*", { count: "exact", head: true }),
       ]);
       setStats({
         pending:   pending   ?? 0,
@@ -2966,6 +3077,7 @@ function AdminPageInner() {
         users:     users     ?? 0,
         inquiries: inquiries ?? 0,
         reportsOpen: reportsOpen ?? 0,
+        totalViews: totalViews ?? 0,
       });
       setStatsLoading(false);
     }
@@ -3266,6 +3378,50 @@ function AdminPageInner() {
           body: JSON.stringify({ listingId: id }),
         }).catch(() => {});
       }
+    }
+    setInFlight(null);
+    setTimeout(() => setToast(null), 3000);
+  }, [logAdminAction]);
+
+  // Unpublish, specifically — replaces the old window.confirm ->
+  // handleListingStatus(id, "pending_review", "approved") path. Calls
+  // log_listing_status_change() (067_unpublish_reason_and_history.sql)
+  // instead of a plain .update(): that RPC does the status update AND the
+  // listing_status_history insert atomically in one transaction, so this
+  // never also calls handleListingStatus's own .update() for this action
+  // — doing both would be redundant and could race. Approve/Reject/
+  // Re-approve are untouched and keep using handleListingStatus exactly
+  // as before.
+  const handleUnpublishWithReason = useCallback(async (id: string, reason: string, note: string | null) => {
+    setInFlight(id);
+    const supabase = createClient();
+    const { error } = await supabase.rpc("log_listing_status_change", {
+      p_property_id: id,
+      p_new_status: "pending_review",
+      p_reason: reason,
+      p_note: note,
+    });
+
+    if (error) {
+      console.error("Admin — unpublish (log_listing_status_change) error:", error);
+      const msg = error.message?.includes("not authorized")
+        ? "You're not authorized to unpublish this listing."
+        : error.message?.includes("invalid new_status")
+        ? "Invalid status transition."
+        : error.message?.includes("listing not found")
+        ? "Listing not found — it may have been deleted."
+        : "Unpublish failed — please try again.";
+      setToast({ ok: false, msg });
+    } else {
+      // Still recorded in admin_audit_log too, same as every other admin
+      // mutation in this file — listing_status_history is the richer,
+      // reason/note-carrying record specific to this workflow, not a
+      // replacement for the general cross-entity audit trail.
+      void logAdminAction("update_listing_status", "property_listing", id, { status: "active" }, { status: "pending_review", reason, note });
+      setApprovedListings(prev => prev.filter(l => l.id !== id));
+      setStats(s => ({ ...s, active: Math.max(0, s.active - 1), pending: s.pending + 1 }));
+      loaded.current.delete("pending");
+      setToast({ ok: true, msg: "Listing unpublished — returned to review." });
     }
     setInFlight(null);
     setTimeout(() => setToast(null), 3000);
@@ -3886,7 +4042,7 @@ function AdminPageInner() {
         listings={approvedListings}
         loading={approvedLoading}
         inFlight={inFlight}
-        onUnpublish={id => void handleListingStatus(id, "pending_review", "approved")}
+        onUnpublish={(id, reason, note) => void handleUnpublishWithReason(id, reason, note)}
         agents={approvedAgents}
         onAssignAgent={(id, agentId) => void handleAssignAgent(id, agentId, "approved")}
         onKuulaTourUrl={(id, url) => void handleKuulaTourUrl(id, url, "approved")}

@@ -3,6 +3,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
+import LocationPicker, { ReverseGeocodedAddress } from '@/components/LocationPicker'
 
 // ─── Types ─────────────────────────────────────────────────────────────────────
 
@@ -26,6 +27,7 @@ interface ListingRow {
   listing_type?: string | null; property_category?: string | null;
   address?: string | null; locality?: string | null; city?: string | null;
   state?: string | null; pincode?: string | null; landmark?: string | null;
+  latitude?: number | null; longitude?: number | null;
   built_up_area?: number | null; bedrooms?: number | null; bathrooms?: number | null;
   balconies?: number | null; floor_number?: number | null; total_floors?: number | null;
   facing?: string | null; property_age?: string | null; furnishing?: string | null;
@@ -169,6 +171,12 @@ export default function EditListingPage() {
   const id      = params.id
 
   const [form,     setForm]     = useState<EditForm>(EMPTY)
+  // Kept separate from EditForm/set() rather than folded in — set() is
+  // typed for string | boolean | string[] values only, too narrow for
+  // numeric coordinates, and lat/lng don't need the same per-field setter
+  // plumbing as the plain text inputs.
+  const [latitude,  setLatitude]  = useState<number | null>(null)
+  const [longitude, setLongitude] = useState<number | null>(null)
   const [loading,  setLoading]  = useState(true)
   const [saving,   setSaving]   = useState(false)
   const [error,    setError]    = useState<string | null>(null)
@@ -203,6 +211,25 @@ export default function EditListingPage() {
 
   const set = (field: keyof EditForm) => (v: string | boolean | string[]) =>
     setForm(prev => ({ ...prev, [field]: v }))
+
+  // "Confirm Location" fills each field only if it is still blank — same
+  // non-destructive rule as the create flow's handleConfirmLocation
+  // (post-property/page.tsx). Uses a functional setForm update since this
+  // is invoked from an async child (LocationPicker's reverse-geocode
+  // call), so it always checks the form's latest values rather than
+  // whatever `form` was when this closure was created. city/state arrive
+  // already normalized against this page's own CITIES/STATES lists (or
+  // omitted when unmatched) — never written when omitted.
+  const handleConfirmLocation = (addr: ReverseGeocodedAddress) => {
+    setForm(prev => ({
+      ...prev,
+      address:  !prev.address && addr.address ? addr.address : prev.address,
+      locality: !prev.locality && addr.locality ? addr.locality : prev.locality,
+      city:     !prev.city && addr.city ? addr.city : prev.city,
+      state:    !prev.state && addr.state ? addr.state : prev.state,
+      pincode:  !prev.pincode && addr.pincode ? addr.pincode : prev.pincode,
+    }))
+  }
 
   const toggleAmenity = (a: string) =>
     setForm(prev => ({
@@ -251,6 +278,8 @@ export default function EditListingPage() {
           seller_phone:       data.seller_phone       ?? '',
           seller_whatsapp:    data.seller_whatsapp    ?? '',
         })
+        setLatitude(data.latitude ?? null)
+        setLongitude(data.longitude ?? null)
         const existingUrls = Array.isArray(data.photo_urls) ? data.photo_urls : []
         setPhotos(existingUrls.map(url => ({ id: uid(), url, kind: 'existing' as const })))
         setCoverIndex(0)
@@ -445,24 +474,29 @@ export default function EditListingPage() {
       return
     }
 
-    // Best-effort re-geocode — same as post-property/page.tsx's create flow,
-    // and never blocks saving. Address fields are always re-sent on every
-    // edit save below (not diffed against the prior value), so re-geocoding
-    // unconditionally here keeps latitude/longitude honest without needing
-    // to track whether the address specifically changed.
+    // Prefer the coordinates confirmed via LocationPicker (initialized from
+    // the listing's existing lat/lng, or from a search + optional
+    // drag-to-adjust). Only fall back to the best-effort re-geocode below —
+    // same as post-property/page.tsx's create flow, and never blocks
+    // saving — when latitude/longitude state is still null (e.g. a listing
+    // that had none to begin with, and the seller never interacted with
+    // the picker either).
     const addressString = [form.address, form.locality, form.city, form.state, form.pincode]
       .filter(Boolean).join(', ')
-    let geo: { latitude: number; longitude: number } | null = null
-    try {
-      const geoRes = await fetch('/api/geocode-address', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ address: addressString }),
-      })
-      const geoJson = await geoRes.json()
-      geo = geoJson.result ?? null
-    } catch (err) {
-      console.error('Geocoding request failed:', err)
+    let geo: { latitude: number; longitude: number } | null =
+      latitude != null && longitude != null ? { latitude, longitude } : null
+    if (!geo) {
+      try {
+        const geoRes = await fetch('/api/geocode-address', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ address: addressString }),
+        })
+        const geoJson = await geoRes.json()
+        geo = geoJson.result ?? null
+      } catch (err) {
+        console.error('Geocoding request failed:', err)
+      }
     }
 
     try {
@@ -618,6 +652,21 @@ export default function EditListingPage() {
               <Field label="Landmark">
                 <TInput value={form.landmark} onChange={set('landmark') as (v: string) => void} placeholder="Near..." />
               </Field>
+            </div>
+
+            <div style={{ marginTop: 18 }}>
+              <div style={{ fontSize: '0.8125rem', fontWeight: 600, color: C.textSub, marginBottom: 8 }}>Pin the exact location (Optional)</div>
+              <LocationPicker
+                latitude={latitude}
+                longitude={longitude}
+                address={form.address}
+                locality={form.locality}
+                city={form.city}
+                state={form.state}
+                pincode={form.pincode}
+                onChange={(lat, lng) => { setLatitude(lat); setLongitude(lng) }}
+                onConfirm={handleConfirmLocation}
+              />
             </div>
           </SectionCard>
 

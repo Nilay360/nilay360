@@ -27,9 +27,24 @@ export function loadGoogleMapsScript(): Promise<typeof google.maps> {
   }
 
   // Already loaded (this call, an earlier call, or some other script on the
-  // page) — resolve immediately, no duplicate <script> tag.
+  // page) — but "loaded" alone isn't enough to resolve on: an earlier
+  // caller may have initialized google.maps before this loader requested
+  // "places" (e.g. a stale cached bundle, or in principle any other
+  // script that inits Maps first). Resolving with that object as-is would
+  // hand LocationPicker a maps.places that's undefined, and
+  // `new maps.places.Autocomplete(...)` would throw. So: only resolve
+  // immediately if the places library is actually attached; otherwise
+  // lazy-load just that missing piece via Google's own importLibrary API,
+  // which works on an already-initialized google.maps regardless of what
+  // the original <script> tag's `libraries=` param requested — safer than
+  // injecting a second script tag, which Google's loader does not
+  // reliably merge library sets for and logs a duplicate-script warning
+  // for instead.
   if (window.google?.maps) {
-    return Promise.resolve(window.google.maps);
+    if (window.google.maps.places) {
+      return Promise.resolve(window.google.maps);
+    }
+    return window.google.maps.importLibrary("places").then(() => window.google.maps);
   }
 
   if (loadPromise) return loadPromise;
@@ -51,7 +66,12 @@ export function loadGoogleMapsScript(): Promise<typeof google.maps> {
 
     const script = document.createElement("script");
     script.id = "google-maps-js-api";
-    script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=marker`;
+    // "places" added for LocationPicker's Places Autocomplete (the location-
+    // picker phase) — confirmed additive-only before adding this: neither
+    // NearbyPlacesMap nor PropertyLocationMap (Phase 2) reference
+    // google.maps.places anywhere, only Map/Marker/Size/Point, so widening
+    // the requested library list doesn't change what those two already use.
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=marker,places`;
     script.async = true;
     script.defer = true;
     script.onload = () => {

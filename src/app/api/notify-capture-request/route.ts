@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { sendWhatsAppMessage } from '@/lib/whatsapp'
 
 function adminClient() {
   return createClient(
@@ -24,7 +25,7 @@ export async function POST(req: NextRequest) {
     const supabase = adminClient()
     const { data: admins, error: adminsErr } = await supabase
       .from('profiles')
-      .select('id')
+      .select('id, phone, full_name')
       .in('role', ['admin', 'super_admin'])
 
     if (adminsErr) {
@@ -33,10 +34,11 @@ export async function POST(req: NextRequest) {
     }
 
     if (admins?.length) {
+      const notificationBody = `${requesterName ?? 'Someone'} requested a 360° capture for "${propertyTitle ?? 'a listing'}"${propertyAddress ? ` — ${propertyAddress}` : ''}.`
       const rows = admins.map((a) => ({
         user_id: a.id,
         title: '360° capture request',
-        body: `${requesterName ?? 'Someone'} requested a 360° capture for "${propertyTitle ?? 'a listing'}"${propertyAddress ? ` — ${propertyAddress}` : ''}.`,
+        body: notificationBody,
         type: 'capture_360_request',
         action_url: '/admin?section=capture360',
       }))
@@ -44,6 +46,17 @@ export async function POST(req: NextRequest) {
       if (notifErr) {
         console.error('[notify-capture-request] Failed to insert admin notifications:', notifErr)
         return NextResponse.json({ notified: false })
+      }
+
+      // WhatsApp, alongside the in-app notifications above — fire-and-forget
+      // per admin, never blocks or fails this route.
+      for (const admin of admins) {
+        if (admin.phone) {
+          console.log(`[notify-capture-request] Calling sendWhatsAppMessage for admin ${admin.id}...`)
+          void sendWhatsAppMessage(admin.phone, admin.full_name?.trim() || 'there', notificationBody)
+        } else {
+          console.log(`[notify-capture-request] Skipping — no phone on file for admin ${admin.id}`)
+        }
       }
     }
 

@@ -56,7 +56,28 @@ type Listing = {
   status: string;
   submitted_at: string;
   photo_urls?: string[] | null;
+  view_count?: number | null;
 };
+
+// One batched query for all of a caller's listings' view events, not a
+// per-row fetch — property_view_events' own RLS (066) already restricts
+// this to rows the signed-in owner/assigned agent is allowed to see, so
+// counting the returned rows client-side is safe by construction.
+async function withViewCounts<T extends { id: string }>(
+  supabase: ReturnType<typeof createClient>,
+  listings: T[],
+): Promise<(T & { view_count: number })[]> {
+  if (listings.length === 0) return [];
+  const { data: viewEvents } = await supabase
+    .from("property_view_events")
+    .select("property_id")
+    .in("property_id", listings.map(l => l.id)) as { data: { property_id: string }[] | null };
+  const viewCountByProperty = new Map<string, number>();
+  for (const row of viewEvents ?? []) {
+    viewCountByProperty.set(row.property_id, (viewCountByProperty.get(row.property_id) ?? 0) + 1);
+  }
+  return listings.map(l => ({ ...l, view_count: viewCountByProperty.get(l.id) ?? 0 }));
+}
 
 type AgentProfileData = {
   id:               string;
@@ -236,6 +257,14 @@ const NAV_AGENT: SidebarNavItem[] = [
   { href: "/agent/teams",       label: "Teams",        icon: <IconTeam /> },
   { href: "/agent/analytics",   label: "Analytics",    icon: <IconChart /> },
   { href: "/agent/leaderboard", label: "Leaderboard",  icon: <IconAward /> },
+  // "My Listings" (listings this agent personally posted, property_listings.
+  // user_id/seller_email) vs. "Assigned Listings" (assigned_agent_id, set only
+  // by an admin — confirmed the only write site in the whole codebase is
+  // admin/page.tsx's handleAssignAgent) are deliberately kept as two separate
+  // tabs: different relationships to a listing, and a self-posted listing an
+  // admin later assigns back to its own creator can legitimately appear in
+  // both — that's correct, not a duplicate to dedupe.
+  { id: "listings",  label: "My Listings",            icon: <IconBuilding /> },
   { id: "assigned",  label: "View Assigned Listings", icon: <IconBriefcase /> },
   { id: "profile",   label: "Edit Profile",           icon: <IconUser /> },
   { id: "settings",  label: "Settings",               icon: <IconGear /> },
@@ -1839,8 +1868,29 @@ export default function DashboardClient({ email, userId, fullName, accountType }
           .eq("assigned_agent_id", apRow.id)
           .order("submitted_at", { ascending: false });
         if (listErr) console.error("Dashboard — assigned listings query error:", listErr);
-        if (!cancelled) setAssignedListings((listData as Listing[] | null) ?? []);
+        const assignedBase = (listData as Listing[] | null) ?? [];
+        if (!cancelled) setAssignedListings(await withViewCounts(supabase, assignedBase));
       }
+
+      // ── My Listings (this agent's own posted listings) ──────────
+      // Same query shape loadBuyerSeller() uses for a seller's own listings —
+      // deliberately NOT calling loadBuyerSeller() itself, which also loads
+      // Saved Properties, seller-received Inquiries, and the buyer/seller
+      // Profile shape, none of which apply to (or are even rendered for) an
+      // agent session. assigned_agent_id is unrelated to this: it's only
+      // ever set later by an admin (admin/page.tsx's handleAssignAgent), so
+      // an agent's own posted listing has assigned_agent_id = NULL until/
+      // unless an admin separately assigns it — including possibly back to
+      // this same agent, in which case it correctly appears in both tabs.
+      const ownListingsFilter = `seller_email.eq.${email},user_id.eq.${userId}`;
+      const { data: ownListData, error: ownListErr } = await supabase
+        .from("property_listings")
+        .select("id, slug, title, property_category, listing_type, city, locality, price, status, submitted_at, photo_urls")
+        .or(ownListingsFilter)
+        .order("submitted_at", { ascending: false });
+      if (ownListErr) console.error("Dashboard — agent's own listings query error:", ownListErr);
+      const ownListingsBase = (ownListData as Listing[] | null) ?? [];
+      if (!cancelled) setListings(await withViewCounts(supabase, ownListingsBase));
 
       if (!cancelled) setDataLoading(false);
     };
@@ -1854,7 +1904,8 @@ export default function DashboardClient({ email, userId, fullName, accountType }
         .or(listingsFilter)
         .order("submitted_at", { ascending: false });
       if (listErr) console.error("Dashboard — property_listings query error:", listErr);
-      if (!cancelled) setListings((listData as Listing[] | null) ?? []);
+      const listingsBase = (listData as Listing[] | null) ?? [];
+      if (!cancelled) setListings(await withViewCounts(supabase, listingsBase));
 
       // ── Saved Properties ──────────────────────────────────────
       const { data: saveData, error: saveErr } = await supabase
@@ -2010,7 +2061,7 @@ export default function DashboardClient({ email, userId, fullName, accountType }
     overview:     isAgent
       ? <AgentOverviewTab fullName={fullName} email={email} assignedListings={assignedListings} agentProfileId={agentProfile?.id ?? null} userId={userId} />
       : <OverviewTab      email={email} fullName={fullName} listings={listings} savedItems={savedItems} profile={profile} userId={userId} />,
-    listings:     <ListingsTab     listings={listings} loading={dataLoading} onDelete={deleteListing} onViewInquiries={listing => router.push(`/dashboard?tab=inquiries&property=${listing.id}`)} />,
+    listings:     <ListingsTab     listings={listings} loading={dataLoading} onDelete={deleteListing} onViewInquiries={listing => router.push(isAgent ? `/agent/leads?property=${listing.id}` : `/dashboard?tab=inquiries&property=${listing.id}`)} />,
     assigned:     <AssignedListingsTab listings={assignedListings} loading={dataLoading} userId={userId} />,
     saved:        <SavedTab        savedItems={savedItems} loading={dataLoading} onRemove={removeSave} />,
     searches:     <SearchesTab />,

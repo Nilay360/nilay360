@@ -238,6 +238,26 @@ export default function HomePage() {
     loadProperties();
   }, []);
 
+  // Batched save-count lookup — one query for every carousel property, not
+  // one per card. public_property_save_counts (065) is a public view, safe
+  // to read regardless of sign-in state.
+  const [saveCounts, setSaveCounts] = useState<Map<string, number>>(new Map());
+  useEffect(() => {
+    if (properties.length === 0) return;
+    let cancelled = false;
+    (async () => {
+      const supabase = createClient();
+      const { data, error } = await supabase
+        .from("public_property_save_counts")
+        .select("property_id, save_count")
+        .in("property_id", properties.map(p => p.id));
+      if (cancelled) return;
+      if (error) { console.error("Save counts load error:", error); return; }
+      setSaveCounts(new Map((data ?? []).map((r: { property_id: string; save_count: number }) => [r.property_id, r.save_count])));
+    })();
+    return () => { cancelled = true; };
+  }, [properties]);
+
   const [searchTab, setSearchTab] = useState("Buy");
   const [searchCity, setSearchCity] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
@@ -1037,14 +1057,24 @@ export default function HomePage() {
                   <div className="card-img" style={{position:"absolute", inset:0, backgroundImage:`url(${optimizedImageUrl(p.img, 400)})`, backgroundSize:"cover", backgroundPosition:"center"}} />
                   <div style={{position:"absolute", inset:0, background:"linear-gradient(to top, rgba(0,0,0,0.4) 0%, transparent 50%)"}} />
                   <span className="badge-tag" style={{position:"absolute", top:12, left:12, zIndex:1}}>{p.tag}</span>
-                  <button
-                    onClick={(e) => { e.preventDefault(); toggleSave(p.id) }}
-                    style={{position:"absolute", top:8, right:8, zIndex:2, background:"rgba(0,0,0,0.5)", backdropFilter:"blur(6px)", border:"1px solid rgba(255,255,255,0.15)", borderRadius:"50%", width:44, height:44, display:"flex", alignItems:"center", justifyContent:"center", cursor:"pointer", transition:"all 0.2s"}}
-                  >
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill={savedIds.has(p.id) ? "#10C4C3" : "none"} stroke={savedIds.has(p.id) ? "#10C4C3" : "rgba(255,255,255,0.8)"} strokeWidth="2">
-                      <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
-                    </svg>
-                  </button>
+                  <div style={{position:"absolute", top:8, right:8, zIndex:2, display:"flex", flexDirection:"column", alignItems:"center", gap:4}}>
+                    <button
+                      onClick={(e) => { e.preventDefault(); toggleSave(p.id) }}
+                      style={{background:"rgba(0,0,0,0.5)", backdropFilter:"blur(6px)", border:"1px solid rgba(255,255,255,0.15)", borderRadius:"50%", width:44, height:44, display:"flex", alignItems:"center", justifyContent:"center", cursor:"pointer", transition:"all 0.2s"}}
+                    >
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill={savedIds.has(p.id) ? "#10C4C3" : "none"} stroke={savedIds.has(p.id) ? "#10C4C3" : "rgba(255,255,255,0.8)"} strokeWidth="2">
+                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+                      </svg>
+                    </button>
+                    {/* Only shown for a real positive count — a "♥ 0" reads as
+                        "nobody wants this", so zero/unknown counts show
+                        nothing rather than a discouraging number. */}
+                    {(saveCounts.get(p.id) ?? 0) > 0 && (
+                      <span style={{fontSize:10, fontWeight:700, color:"#10C4C3", background:"rgba(0,0,0,0.5)", padding:"2px 7px", borderRadius:100, backdropFilter:"blur(4px)"}}>
+                        {saveCounts.get(p.id)}
+                      </span>
+                    )}
+                  </div>
                   <div style={{position:"absolute", bottom:12, right:12, zIndex:1, background:"rgba(0,0,0,0.5)", backdropFilter:"blur(6px)", borderRadius:6, padding:"4px 10px"}}>
                     <span style={{fontFamily:"var(--font-support-new)", fontSize:18, fontWeight:700, color:"#fff"}}>{p.price}</span>
                   </div>
