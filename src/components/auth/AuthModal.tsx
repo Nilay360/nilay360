@@ -18,6 +18,31 @@ const GOOGLE_OAUTH_ENABLED = process.env.NEXT_PUBLIC_GOOGLE_OAUTH_ENABLED === "t
 
 const CITIES = ["Hyderabad", "Bengaluru", "Mumbai", "Delhi", "Pune", "Chennai", "Others"];
 
+// Exchanges the server-issued token_hash for a real Supabase session. By
+// the time this runs, /api/verify-otp has already verified the real OTP
+// against MSG91 and consumed it — MSG91 will reject any later re-
+// verification of that same code. Confirmed via production runtime logs
+// (2026-09-16 investigation): every real /api/verify-otp 400 in the
+// prior 24h followed the identical shape — a successful verify, then the
+// SAME code resubmitted 15-55s later with no new OTP sent in between,
+// rejected by MSG91 as already-used. Root cause: this exchange step had
+// a bare single attempt with no retry, so a transient failure here (e.g.
+// a network blip) left the user with a vague error and no good recovery
+// path except resubmitting a code that could never work again — this
+// helper gives a genuine transient failure one real chance to resolve
+// silently before ever bothering the user with a confusing message.
+async function verifySessionWithRetry(
+  supabase: ReturnType<typeof createClient>,
+  tokenHash: string,
+  type: string
+) {
+  const attempt = () => supabase.auth.verifyOtp({ token_hash: tokenHash, type: type as never });
+  const first = await attempt();
+  if (!first.error) return first;
+  await new Promise(resolve => setTimeout(resolve, 800));
+  return attempt();
+}
+
 type AccountType = "individual" | "agent" | "builder";
 
 const GOLD = "#10C4C3";
@@ -201,7 +226,14 @@ function AuthModalInner({
           redirectTo: `${window.location.origin}/auth/callback`,
         },
       });
-      if (oauthErr) setError(oauthErr.message);
+      if (oauthErr) {
+        // Never show the raw provider error text — every other message in
+        // this file is hand-written, friendly copy; this was the one place
+        // that passed a raw Supabase/provider string straight through.
+        // Logged for debugging, not shown.
+        console.error("Google sign-in error:", oauthErr.message);
+        setError("Something went wrong signing in with Google. Please try again or use your phone number instead.");
+      }
       // On success the browser redirects to Google — nothing more to do here.
     } catch {
       setError("Couldn't start Google sign-in. Please try again.");
@@ -264,12 +296,17 @@ function AuthModalInner({
 
       // Exchange the server-issued token_hash for a real Supabase session
       const supabase = createClient();
-      const { error: sessionErr } = await supabase.auth.verifyOtp({
-        token_hash: data.token_hash,
-        type: data.type,
-      });
+      const { error: sessionErr } = await verifySessionWithRetry(supabase, data.token_hash, data.type);
       if (sessionErr) {
-        setError("Something went wrong completing sign-in. Please try again.");
+        // The OTP itself was genuinely valid — /api/verify-otp above
+        // already succeeded and consumed it. This is a distinct failure
+        // completing sign-in, not an invalid code, so it must not be
+        // described as one. Clear the OTP boxes too: leaving the
+        // now-permanently-used code sitting there is exactly what invited
+        // the user to resubmit it, which is what produced the confusing
+        // "Invalid or expired OTP" 400s this was found from.
+        setError("Your code was verified, but we couldn't complete sign-in. Please request a new code and try again.");
+        setSiOtp(["", "", "", "", "", ""]);
         setLoading(false);
         return;
       }
@@ -340,12 +377,15 @@ function AuthModalInner({
 
       // Exchange the server-issued token_hash for a real Supabase session
       const supabase = createClient();
-      const { data: sessionData, error: sessionErr } = await supabase.auth.verifyOtp({
-        token_hash: data.token_hash,
-        type: data.type,
-      });
+      const { data: sessionData, error: sessionErr } = await verifySessionWithRetry(supabase, data.token_hash, data.type);
       if (sessionErr) {
-        setError("Something went wrong completing sign-in. Please try again.");
+        // Same reasoning as handleSiVerify above: the OTP itself was
+        // genuinely valid and already consumed by /api/verify-otp, so this
+        // failure is specifically about completing sign-in, not the code.
+        // Clear the OTP boxes so the user can't resubmit the
+        // now-permanently-used code.
+        setError("Your code was verified, but we couldn't complete sign-in. Please request a new code and try again.");
+        setReOtp(["", "", "", "", "", ""]);
         setLoading(false);
         return;
       }

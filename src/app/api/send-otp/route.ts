@@ -62,14 +62,35 @@ export async function POST(req: NextRequest) {
     // DIAGNOSTIC — remove after OTP-length instability is resolved
     console.log(`[send-otp DIAG ${new Date().toISOString()}] payload=${JSON.stringify(payload)}`)
 
-    const response = await fetch('https://control.msg91.com/api/v5/otp', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'authkey': process.env.MSG91_AUTH_KEY!,
-      },
-      body: JSON.stringify(payload),
-    })
+    // Explicit timeout — without this, a MSG91 connection that's accepted
+    // but never responds (as opposed to erroring immediately) would hang
+    // until the platform's own function timeout, leaving the user staring
+    // at "Sending OTP…" with zero feedback for minutes. Caught separately
+    // from other fetch failures below so a genuine timeout gets its own
+    // distinct message/status, not the same generic 500 as a real MSG91
+    // rejection or network error — useful both to the user and to anyone
+    // reading logs later trying to tell the two apart.
+    let response: Response
+    try {
+      response = await fetch('https://control.msg91.com/api/v5/otp', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'authkey': process.env.MSG91_AUTH_KEY!,
+        },
+        body: JSON.stringify(payload),
+        signal: AbortSignal.timeout(12000),
+      })
+    } catch (fetchErr) {
+      if (fetchErr instanceof Error && fetchErr.name === 'TimeoutError') {
+        console.error('[send-otp] MSG91 request timed out after 12s')
+        return NextResponse.json(
+          { error: 'The OTP service is taking too long to respond. Please try again in a moment.' },
+          { status: 504 }
+        )
+      }
+      throw fetchErr // any other fetch failure (DNS, connection refused, ...) falls through to the outer catch below
+    }
 
     const data = await response.json()
 

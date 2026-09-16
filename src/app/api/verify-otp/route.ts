@@ -108,10 +108,27 @@ export async function POST(req: NextRequest) {
       process.env.NODE_ENV !== 'production'
 
     if (!isTestMode || otp !== '123456') {
-      const msg91Res = await fetch(
-        `https://control.msg91.com/api/v5/otp/verify?otp=${otp}&mobile=91${phone}`,
-        { method: 'GET', headers: { authkey: process.env.MSG91_AUTH_KEY! } }
-      )
+      // Explicit timeout — same reasoning as send-otp/route.ts's identical
+      // change: a MSG91 connection that hangs rather than erroring should
+      // fail fast with its own distinct message, not the generic 500 below
+      // or an indefinite wait bounded only by the platform's own function
+      // timeout.
+      let msg91Res: Response
+      try {
+        msg91Res = await fetch(
+          `https://control.msg91.com/api/v5/otp/verify?otp=${otp}&mobile=91${phone}`,
+          { method: 'GET', headers: { authkey: process.env.MSG91_AUTH_KEY! }, signal: AbortSignal.timeout(12000) }
+        )
+      } catch (fetchErr) {
+        if (fetchErr instanceof Error && fetchErr.name === 'TimeoutError') {
+          console.error('[verify-otp] MSG91 verify request timed out after 12s')
+          return NextResponse.json(
+            { error: 'The OTP service is taking too long to respond. Please try again in a moment.' },
+            { status: 504 }
+          )
+        }
+        throw fetchErr // any other fetch failure falls through to the outer catch below
+      }
       const msg91Data = await msg91Res.json()
       if (!msg91Res.ok || msg91Data.type === 'error') {
         return NextResponse.json(
