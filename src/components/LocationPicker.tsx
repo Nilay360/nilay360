@@ -266,7 +266,16 @@ export default function LocationPicker({
       map.setCenter(pos);
       map.setZoom(16);
       marker.setPosition(pos);
-      setLastGeocodedPosition(pos);
+      // Deferred rather than called synchronously in the effect body: this
+      // effect's real job is syncing the external Maps SDK objects above
+      // (map/marker) — lastGeocodedPosition is only React state, and only
+      // actually needs updating here for the race case where latitude/
+      // longitude arrive asynchronously AFTER mount (e.g. the edit page's
+      // DB fetch resolving late); when they're already present at mount,
+      // useState's own initializer below already set this to the same
+      // value, making a synchronous re-set here redundant on top of being
+      // the wrong place for it.
+      queueMicrotask(() => setLastGeocodedPosition(pos));
       return; // already had real coordinates — nothing to derive, no need to notify (parent already knows)
     }
 

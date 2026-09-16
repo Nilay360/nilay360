@@ -227,7 +227,13 @@ function AgentLeadsPageInner() {
   const [propertyFilter, setPropertyFilter] = useState<string | null>(null);
   useEffect(() => {
     const p = searchParams?.get("property");
-    if (p) setPropertyFilter(p);
+    // Deferred rather than called synchronously in the effect body —
+    // propertyFilter starts synced from the URL but can diverge from it
+    // (clearPropertyFilter below clears local state immediately while its
+    // router.replace() URL update is still in flight), so it has to stay
+    // real local state rather than a value derived directly from
+    // searchParams on every render.
+    if (p) queueMicrotask(() => setPropertyFilter(p));
   }, [searchParams]);
 
   // Clearing the filter must also strip ?property= from the URL — leaving

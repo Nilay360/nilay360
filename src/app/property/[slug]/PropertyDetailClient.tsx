@@ -1096,9 +1096,16 @@ export default function PropertyDetailClient() {
 
   useEffect(() => {
     if (authLoading) return; // wait for the real user.id, don't fetch on a stale/undefined one
-    if (!user?.id) { setMyAgentProfileId(null); return; }
+    // Deferred rather than called synchronously in the effect body — same
+    // pattern as LocationPicker.tsx's initial-sync effect: this only
+    // avoids a same-commit cascading render, behavior is unchanged.
+    if (!user?.id) { queueMicrotask(() => setMyAgentProfileId(null)); return; }
     let cancelled = false;
-    setMyAgentProfileId(undefined); // re-enter "checking" for the new user id
+    // Deferred — same reasoning as above. This call was only surfaced by
+    // eslint after the first violation in this same effect was fixed —
+    // both are part of the same identity-lookup effect from tonight's
+    // item #12 work.
+    queueMicrotask(() => setMyAgentProfileId(undefined)); // re-enter "checking" for the new user id
     (async () => {
       const supabase = createClient();
       const { data, error } = await supabase
@@ -1129,8 +1136,16 @@ export default function PropertyDetailClient() {
     [user?.id, property?.user_id]
   );
   const isAssignedAgent = useMemo(
+    // Dependency widened from property?.assigned_agent_id to the whole
+    // `property` object — React Compiler's static analysis infers this
+    // memo actually depends on `property` broadly (any optional-chained
+    // access off a value that can be reassigned wholesale widens to the
+    // parent reference), and a narrower manually-specified array than
+    // what it infers makes it skip optimizing this component entirely.
+    // property only changes reference on a genuine refetch, so this
+    // doesn't meaningfully change how often this recomputes in practice.
     () => !!myAgentProfileId && !!property?.assigned_agent_id && myAgentProfileId === property.assigned_agent_id,
-    [myAgentProfileId, property?.assigned_agent_id]
+    [myAgentProfileId, property]
   );
   const isOwnerOrAgent = isOwner || isAssignedAgent;
   // Same role check DashboardClient.tsx's own isAgent uses (profile.role,
@@ -1348,8 +1363,11 @@ export default function PropertyDetailClient() {
   // Public save count for this one property — public_property_save_counts
   // (065) is a public view, safe to read regardless of sign-in state.
   useEffect(() => {
-    if (!property?.id) { setSavePropertyCount(null); return; }
-    setSavePropertyCount(null); // resolving for this property
+    // Deferred — see the identity-lookup effect above for why.
+    if (!property?.id) { queueMicrotask(() => setSavePropertyCount(null)); return; }
+    // Same "surfaces only after the first fix" case as the identity-lookup
+    // effect above.
+    queueMicrotask(() => setSavePropertyCount(null)); // resolving for this property
     let cancelled = false;
     (async () => {
       const supabase = createClient();
@@ -1373,7 +1391,8 @@ export default function PropertyDetailClient() {
     // "don't fetch on a still-resolving identity" intent explicit rather
     // than relying on that being an incidental side effect of dependency
     // tracking.
-    if (!property?.id || identityResolving || !(isAdmin || isOwnerOrAgent)) { setRealViewCount(null); return; }
+    // Deferred — see the identity-lookup effect above for why.
+    if (!property?.id || identityResolving || !(isAdmin || isOwnerOrAgent)) { queueMicrotask(() => setRealViewCount(null)); return; }
     let cancelled = false;
     (async () => {
       const supabase = createClient();
@@ -1393,7 +1412,8 @@ export default function PropertyDetailClient() {
   // consume; nothing renders this yet.
   useEffect(() => {
     const isAdmin = profile?.role === "admin" || profile?.role === "super_admin";
-    if (!property?.id || identityResolving || !(isAdmin || isOwnerOrAgent)) { setImageClickCount(null); return; }
+    // Deferred — see the identity-lookup effect above for why.
+    if (!property?.id || identityResolving || !(isAdmin || isOwnerOrAgent)) { queueMicrotask(() => setImageClickCount(null)); return; }
     let cancelled = false;
     (async () => {
       const supabase = createClient();
@@ -1485,7 +1505,11 @@ export default function PropertyDetailClient() {
         body: JSON.stringify({ propertyId: property.id, imageUrl: images[activeImg], viewerKey: getVisitorKey(userId) }),
       }).catch(err => console.error("[PropertyDetailClient] track-image-click failed:", err));
     }
-  }, [property?.id, images, activeImg, userId]);
+    // Dependency widened from property?.id to the whole `property` object —
+    // same React Compiler inference-mismatch reasoning as isAssignedAgent
+    // above. property only changes reference on a genuine refetch, so this
+    // doesn't meaningfully change how often this callback gets recreated.
+  }, [property, images, activeImg, userId]);
 
   // Lightbox keyboard nav + scroll lock
   useEffect(() => {
