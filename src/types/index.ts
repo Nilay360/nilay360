@@ -46,6 +46,17 @@ export interface Property {
   longitude?: number
   images: string[]
   video_url?: string
+  // Seller-uploaded walkthrough clip (Bunny Stream), distinct from
+  // video_url (a pasted YouTube/Vimeo link, rendered by its own separate
+  // "Video Tour" section) — see supabase/migrations/
+  // 068_property_video_upload.sql for the full naming rationale. Only
+  // rendered as a gallery slide when video_asset_status === 'ready';
+  // any other value (processing/failed/null) means the slide doesn't
+  // exist in the gallery at all — never a broken placeholder.
+  video_asset_provider?: string | null
+  video_asset_id?: string | null
+  video_asset_status?: 'processing' | 'ready' | 'failed' | null
+  video_asset_thumbnail_url?: string | null
   virtual_tour_url?: string
   floor_plan_url?: string
   amenities: string[]

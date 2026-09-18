@@ -6,6 +6,7 @@ import React, {
 import { createClient } from '@/lib/supabase/client'
 import { useAuth } from '@/context/AuthContext'
 import LocationPicker, { ReverseGeocodedAddress } from '@/components/LocationPicker'
+import { useVideoUpload, MAX_VIDEO_BYTES as VIDEO_MAX_BYTES, MAX_VIDEO_SECONDS } from '@/hooks/useVideoUpload'
 
 // ─── Types ─────────────────────────────────────────────────────────────────────
 
@@ -63,6 +64,16 @@ interface FormState {
   // Step 6
   photos: UploadedPhoto[]
   coverPhotoIndex: number
+  videoAssetProvider: string | null
+  videoAssetId: string | null
+  videoAssetStatus: 'processing' | 'ready' | 'failed' | null
+  videoAssetThumbnailUrl: string | null
+  // True only while a video is actively validating/uploading (mirrors
+  // useVideoUpload's phase) — used solely to gate "Continue →" at step 6,
+  // since Step6 unmounts on navigation and the hook's own local state
+  // would otherwise be lost the moment that happens. Never sent to the
+  // server; not part of any submit payload.
+  videoUploadBusy: boolean
   // Step 7
   floorPlans: UploadedFloorPlan[]
   // Step 8
@@ -100,6 +111,8 @@ const INITIAL: FormState = {
   price: '', isNegotiable: false, possessionStatus: '', maintenanceCharges: '',
   amenities: [], highlights: '',
   photos: [], coverPhotoIndex: 0,
+  videoAssetProvider: null, videoAssetId: null, videoAssetStatus: null, videoAssetThumbnailUrl: null,
+  videoUploadBusy: false,
   floorPlans: [],
   sellerName: '', sellerEmail: '', sellerPhone: '', sellerWhatsapp: '',
   agreeToTerms: false,
@@ -1000,6 +1013,32 @@ function Step6({ state, dispatch }: { state: FormState; dispatch: React.Dispatch
   const dragItem = useRef<number | null>(null)
   const dragTarget = useRef<number | null>(null)
 
+  // Video tile — separate from the photo grid above (one slot, not a
+  // growing array). The hook does its own client-side validation +
+  // direct-to-Bunny TUS upload; here we just mirror its result into
+  // FormState the same way photo uploads land in state.photos, so
+  // Step8's review + the final submit payload can read it uniformly.
+  const videoUpload = useVideoUpload()
+  const videoFileRef = useRef<HTMLInputElement | null>(null)
+  React.useEffect(() => {
+    if (videoUpload.state.videoAssetId) {
+      dispatch({ type: 'SET', field: 'videoAssetProvider', value: videoUpload.state.videoAssetProvider })
+      dispatch({ type: 'SET', field: 'videoAssetId', value: videoUpload.state.videoAssetId })
+      dispatch({ type: 'SET', field: 'videoAssetStatus', value: videoUpload.state.videoAssetStatus })
+      dispatch({ type: 'SET', field: 'videoAssetThumbnailUrl', value: videoUpload.state.videoAssetThumbnailUrl })
+    }
+  }, [videoUpload.state.videoAssetId, videoUpload.state.videoAssetProvider, videoUpload.state.videoAssetStatus, videoUpload.state.videoAssetThumbnailUrl, dispatch])
+
+  // Mirrors videoUpload.state.phase into FormState.videoUploadBusy —
+  // this is the ONLY thing that survives Step6 unmounting (goNext's
+  // validate() call happens in the parent, which has no visibility into
+  // this hook's local state otherwise). See FormState.videoUploadBusy's
+  // own comment for why this exists.
+  React.useEffect(() => {
+    const busy = videoUpload.state.phase === 'validating' || videoUpload.state.phase === 'uploading'
+    dispatch({ type: 'SET', field: 'videoUploadBusy', value: busy })
+  }, [videoUpload.state.phase, dispatch])
+
   // Matches Cloudinary's max_bytes in api/upload-image/route.ts exactly —
   // previously 10*1024*1024 (10,485,760), which let a ~486 KB band of files
   // pass this check and still get rejected server-side.
@@ -1170,6 +1209,102 @@ function Step6({ state, dispatch }: { state: FormState; dispatch: React.Dispatch
           </div>
         </>
       )}
+
+      {/* Video tile — one optional slot, distinct from the photo grid above */}
+      <div style={{ marginTop: 28 }}>
+        <h3 style={{ ...S.stepTitle, fontSize: '1.05rem', marginBottom: 4 }}>Add a Walkthrough Video (Optional)</h3>
+        <p style={{ ...S.stepSub, marginBottom: 16 }}>
+          A short tap-to-play clip shown as a slide alongside your photos · Max {MAX_VIDEO_SECONDS}s · Max {Math.round(VIDEO_MAX_BYTES / 1024 / 1024)} MB
+        </p>
+
+        <input
+          ref={videoFileRef}
+          type="file"
+          accept="video/mp4,video/quicktime,video/webm"
+          style={{ display: 'none' }}
+          onChange={e => { const f = e.target.files?.[0]; if (f) videoUpload.pickFile(f); e.target.value = '' }}
+        />
+
+        {videoUpload.state.phase === 'idle' && !state.videoAssetId && (
+          <div
+            onClick={() => videoFileRef.current?.click()}
+            style={{
+              border: `2px dashed ${C.border}`, borderRadius: 14, padding: '32px 24px',
+              textAlign: 'center', cursor: 'pointer', background: C.surface2,
+            }}
+          >
+            <div style={{ fontSize: '1.75rem', marginBottom: 8 }}>🎬</div>
+            <div style={{ fontFamily: FD, fontSize: '1rem', color: C.text, marginBottom: 4 }}>Click to select a video</div>
+            <div style={{ fontSize: '0.75rem', color: C.textMuted }}>MP4, MOV, or WEBM</div>
+          </div>
+        )}
+
+        {(videoUpload.state.phase === 'validating' || videoUpload.state.phase === 'uploading') && (
+          <div style={{
+            display: 'flex', alignItems: 'center', gap: 14, padding: '16px 18px',
+            background: C.surface2, border: `1px solid ${C.border}`, borderRadius: 10,
+          }}>
+            {videoUpload.state.previewUrl && (
+              <video src={videoUpload.state.previewUrl} muted style={{ width: 64, height: 48, objectFit: 'cover', borderRadius: 6, flexShrink: 0 }} />
+            )}
+            <div style={{ flex: 1 }}>
+              <div style={{ fontSize: '0.875rem', color: C.text, fontFamily: FB, marginBottom: 4 }}>
+                {videoUpload.state.phase === 'validating' ? 'Checking video…' : `Uploading… ${videoUpload.state.progress}%`}
+              </div>
+              <div style={{ height: 4, borderRadius: 2, background: C.border, overflow: 'hidden' }}>
+                <div style={{ height: '100%', width: `${videoUpload.state.phase === 'validating' ? 5 : videoUpload.state.progress}%`, background: C.gold, transition: 'width 0.2s' }} />
+              </div>
+            </div>
+          </div>
+        )}
+
+        {(videoUpload.state.phase === 'processing' || state.videoAssetId) && videoUpload.state.phase !== 'failed' && (
+          <div style={{
+            display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 14,
+            padding: '16px 18px', background: C.goldDim, border: `1px solid ${C.goldBorder}`, borderRadius: 10,
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+              {videoUpload.state.previewUrl && (
+                <video src={videoUpload.state.previewUrl} muted style={{ width: 64, height: 48, objectFit: 'cover', borderRadius: 6, flexShrink: 0 }} />
+              )}
+              <div>
+                <div style={{ fontSize: '0.875rem', color: C.gold, fontFamily: FB, fontWeight: 600 }}>Video uploaded</div>
+                <div style={{ fontSize: '0.75rem', color: C.textMuted }}>Processing — it&apos;ll be ready to view shortly</div>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={() => {
+                videoUpload.reset()
+                dispatch({ type: 'SET', field: 'videoAssetProvider', value: null })
+                dispatch({ type: 'SET', field: 'videoAssetId', value: null })
+                dispatch({ type: 'SET', field: 'videoAssetStatus', value: null })
+                dispatch({ type: 'SET', field: 'videoAssetThumbnailUrl', value: null })
+              }}
+              style={{
+                width: 28, height: 28, borderRadius: '50%', flexShrink: 0,
+                background: 'rgba(0,0,0,0.35)', border: `1px solid ${C.border}`, color: C.text,
+                cursor: 'pointer', fontSize: '0.9rem', fontFamily: FB,
+              }}
+            >×</button>
+          </div>
+        )}
+
+        {videoUpload.state.phase === 'failed' && (
+          <div style={{
+            padding: '14px 18px', background: C.errorBg, border: `1px solid ${C.errorBorder}`,
+            borderRadius: 10, color: C.error, fontSize: '0.875rem', fontFamily: FB,
+            display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12,
+          }}>
+            <span>{videoUpload.state.error}</span>
+            <button
+              type="button"
+              onClick={() => videoUpload.reset()}
+              style={{ background: 'transparent', border: `1px solid ${C.error}`, color: C.error, borderRadius: 6, padding: '5px 12px', fontSize: '0.8rem', cursor: 'pointer', fontFamily: FB, flexShrink: 0 }}
+            >Try again</button>
+          </div>
+        )}
+      </div>
     </div>
   )
 }
@@ -1586,6 +1721,7 @@ function validate(step: number, s: FormState): string | null {
   }
   if (step === 6) {
     if (s.photos.length === 0) return 'Please upload at least 1 photo'
+    if (s.videoUploadBusy) return 'Please wait for your video to finish uploading before continuing'
   }
   if (step === 8) {
     if (!s.sellerName.trim()) return 'Your full name is required'
@@ -1804,6 +1940,17 @@ export default function PostPropertyPage() {
         longitude:          geo?.longitude ?? null,
         highlights:         state.highlights || null,
         photo_urls:         imageUrls,
+        // Copied from FormState as of this exact submit moment — see
+        // migration 068_property_video_upload.sql for why this is a
+        // point-in-time copy rather than a live reference: if Bunny's
+        // webhook hasn't fired yet, video_asset_status lands here as
+        // 'processing' and the webhook's own best-effort direct sync
+        // (src/app/api/bunny-webhook/route.ts) picks it up once this
+        // row exists.
+        video_asset_provider:      state.videoAssetProvider,
+        video_asset_id:            state.videoAssetId,
+        video_asset_status:        state.videoAssetStatus,
+        video_asset_thumbnail_url: state.videoAssetThumbnailUrl,
         amenities:          state.amenities,
         seller_name:        state.sellerName,
         seller_email:       state.sellerEmail,
@@ -1946,6 +2093,20 @@ export default function PostPropertyPage() {
             </div>
           )}
 
+          {/* Proactive notice while a video is uploading on step 6 — shown
+              regardless of whether "Continue →" has been clicked yet, not
+              only as a reactive error after the fact. */}
+          {step === 6 && state.videoUploadBusy && (
+            <div style={{
+              marginTop: 18, padding: '12px 16px',
+              background: C.goldDim, border: `1px solid ${C.goldBorder}`,
+              borderRadius: 8, color: C.gold, fontSize: '0.875rem', fontFamily: FB,
+              display: 'flex', alignItems: 'center', gap: 8,
+            }}>
+              <span>⏳</span> Please wait for your video to finish uploading before continuing
+            </div>
+          )}
+
           {/* Navigation */}
           <div style={{
             display: 'flex', justifyContent: 'space-between', alignItems: 'center',
@@ -1957,7 +2118,13 @@ export default function PostPropertyPage() {
             }
 
             {step < 8
-              ? <button onClick={goNext} style={S.btnPrimary}>Continue →</button>
+              ? (
+                <button
+                  onClick={goNext}
+                  disabled={step === 6 && state.videoUploadBusy}
+                  style={{ ...S.btnPrimary, ...(step === 6 && state.videoUploadBusy ? { opacity: 0.6, cursor: 'not-allowed' } : {}) }}
+                >Continue →</button>
+              )
               : (
                 <button
                   onClick={handleSubmit}

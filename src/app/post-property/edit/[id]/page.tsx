@@ -4,6 +4,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import LocationPicker, { ReverseGeocodedAddress } from '@/components/LocationPicker'
+import { useVideoUpload, MAX_VIDEO_BYTES as VIDEO_MAX_BYTES, MAX_VIDEO_SECONDS } from '@/hooks/useVideoUpload'
 
 // ─── Types ─────────────────────────────────────────────────────────────────────
 
@@ -36,6 +37,8 @@ interface ListingRow {
   maintenance_charge?: number | null; amenities?: string[] | null;
   highlights?: string | null; seller_name?: string | null;
   seller_phone?: string | null; seller_whatsapp?: string | null;
+  video_asset_provider?: string | null; video_asset_id?: string | null;
+  video_asset_status?: string | null; video_asset_thumbnail_url?: string | null;
 }
 
 interface FloorPlanRow {
@@ -177,6 +180,40 @@ export default function EditListingPage() {
   // plumbing as the plain text inputs.
   const [latitude,  setLatitude]  = useState<number | null>(null)
   const [longitude, setLongitude] = useState<number | null>(null)
+
+  // Video — mirrors post-property/page.tsx's Step6 wiring exactly (one
+  // slot, kept outside EditForm for the same reason lat/lng are: set()
+  // is typed for string | boolean | string[] only). videoAsset* starts
+  // from whatever's already saved on the listing; a fresh upload via
+  // the hook below overwrites it, the same "hook state is the source of
+  // truth once it fires" rule as the create flow.
+  const [videoAsset, setVideoAsset] = useState<{
+    provider: string | null; id: string | null
+    status: 'processing' | 'ready' | 'failed' | null; thumbnailUrl: string | null
+  }>({ provider: null, id: null, status: null, thumbnailUrl: null })
+  // Explicit "user clicked X" signal — separate from videoAsset being
+  // merely empty, which can also mean "haven't loaded it yet" (see the
+  // previous fix). Only this flag, never an empty videoAsset on its own,
+  // means handleSubmit should actually null out video_asset_* in the DB.
+  const [videoRemoved, setVideoRemoved] = useState(false)
+  const videoUpload = useVideoUpload()
+  const videoFileRef = useRef<HTMLInputElement | null>(null)
+  useEffect(() => {
+    if (videoUpload.state.videoAssetId) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- intentional: syncing local state from useVideoUpload's async result, not a derivable-during-render value
+      setVideoAsset({
+        provider: videoUpload.state.videoAssetProvider,
+        id: videoUpload.state.videoAssetId,
+        status: videoUpload.state.videoAssetStatus,
+        thumbnailUrl: videoUpload.state.videoAssetThumbnailUrl,
+      })
+      // A genuinely new upload landing here means the user picked a
+      // replacement after previously clicking X — that supersedes the
+      // earlier removal, or handleSubmit's videoRemoved-first check
+      // would null out this brand-new video instead of saving it.
+      setVideoRemoved(false)
+    }
+  }, [videoUpload.state.videoAssetId, videoUpload.state.videoAssetProvider, videoUpload.state.videoAssetStatus, videoUpload.state.videoAssetThumbnailUrl])
   const [loading,  setLoading]  = useState(true)
   const [saving,   setSaving]   = useState(false)
   const [error,    setError]    = useState<string | null>(null)
@@ -280,6 +317,12 @@ export default function EditListingPage() {
         })
         setLatitude(data.latitude ?? null)
         setLongitude(data.longitude ?? null)
+        setVideoAsset({
+          provider: data.video_asset_provider ?? null,
+          id: data.video_asset_id ?? null,
+          status: (data.video_asset_status as 'processing' | 'ready' | 'failed' | null) ?? null,
+          thumbnailUrl: data.video_asset_thumbnail_url ?? null,
+        })
         const existingUrls = Array.isArray(data.photo_urls) ? data.photo_urls : []
         setPhotos(existingUrls.map(url => ({ id: uid(), url, kind: 'existing' as const })))
         setCoverIndex(0)
@@ -411,6 +454,16 @@ export default function EditListingPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    // Same gate as the create wizard's Step6 (post-property/page.tsx),
+    // adapted to this page's single-submit structure rather than a
+    // step-navigation one — this page's useVideoUpload() instance lives
+    // at the top of the component (never unmounts mid-upload the way
+    // create's Step6 does), so this only needs to guard the submit
+    // itself, not a "leave the step" action.
+    if (videoUpload.state.phase === 'validating' || videoUpload.state.phase === 'uploading') {
+      setError('Please wait for your video to finish uploading before saving.')
+      return
+    }
     if (!form.listing_type || !form.price) {
       setError('Listing type and price are required.')
       return
@@ -501,10 +554,30 @@ export default function EditListingPage() {
 
     try {
       const supabase = createClient()
-      const { error: upErr } = await supabase
+      const { data: updatedRows, error: upErr } = await supabase
         .from('property_listings')
         .update({
           photo_urls:          finalPhotoUrls,
+          // Three-way, videoRemoved checked first: an empty videoAsset is
+          // ambiguous on its own (see the comment this replaced — it can
+          // mean "haven't loaded it yet" just as easily as "no video"),
+          // so explicit removal needs its own signal rather than being
+          // inferred from videoAsset.id being falsy. videoRemoved is only
+          // ever set true by the X button's onClick, and reset false the
+          // moment a replacement upload lands (see the sync effect above)
+          // — so by the time Save runs, it unambiguously means "the user
+          // clicked X and never replaced it since."
+          ...(videoRemoved ? {
+            video_asset_provider:      null,
+            video_asset_id:            null,
+            video_asset_status:        null,
+            video_asset_thumbnail_url: null,
+          } : videoAsset.id ? {
+            video_asset_provider:      videoAsset.provider,
+            video_asset_id:            videoAsset.id,
+            video_asset_status:        videoAsset.status,
+            video_asset_thumbnail_url: videoAsset.thumbnailUrl,
+          } : {}),
           listing_type:       form.listing_type       || null,
           property_category:  form.property_category  || null,
           address:            form.address            || null,
@@ -541,10 +614,20 @@ export default function EditListingPage() {
           updated_at:         new Date().toISOString(),
         })
         .eq('id', id)
+        // TEMPORARY DIAGNOSTIC: without .select(), a zero-row match (e.g.
+        // RLS silently excluding this row, or a wrong `id`) returns no
+        // error and this code treats it as success — same failure class
+        // just found and fixed in api/bunny-webhook/route.ts. Remove once
+        // confirmed this isn't happening here too.
+        .select('id, video_asset_id, video_asset_status')
       setSaving(false)
+      console.log('[edit-save] rows actually updated by this save:', updatedRows)
       if (upErr) {
         console.error('Edit listing — update error code:', upErr.code, '| message:', upErr.message, '| details:', upErr.details)
         setError('Could not save changes. Please try again.')
+      } else if (!updatedRows || updatedRows.length === 0) {
+        console.error('[edit-save] ZERO ROWS MATCHED on save — listing id used:', id, '(RLS or a bad id would cause exactly this: no error, no effect)')
+        setError('Save did not apply — no matching listing was found to update. Please refresh and try again.')
       } else {
         router.push('/dashboard/my-listings')
       }
@@ -873,6 +956,83 @@ export default function EditListingPage() {
                 </div>
               </>
             )}
+
+            {/* Video tile — one optional slot, distinct from the photo grid above */}
+            <div style={{ marginTop: 24, paddingTop: 20, borderTop: `1px solid ${C.border}` }}>
+              <h4 style={{ fontFamily: FD, fontSize: '1rem', fontWeight: 600, color: C.text, marginBottom: 4 }}>Walkthrough Video (Optional)</h4>
+              <p style={{ fontSize: 13, color: C.textMuted, marginBottom: 14 }}>
+                A short tap-to-play clip shown as a slide alongside your photos · Max {MAX_VIDEO_SECONDS}s · Max {Math.round(VIDEO_MAX_BYTES / 1024 / 1024)} MB
+              </p>
+
+              <input
+                ref={videoFileRef}
+                type="file"
+                accept="video/mp4,video/quicktime,video/webm"
+                style={{ display: 'none' }}
+                onChange={e => { const f = e.target.files?.[0]; if (f) videoUpload.pickFile(f); e.target.value = '' }}
+              />
+
+              {videoUpload.state.phase === 'idle' && !videoAsset.id && (
+                <div
+                  onClick={() => videoFileRef.current?.click()}
+                  style={{ border: `2px dashed ${C.border}`, borderRadius: 14, padding: '28px 24px', textAlign: 'center', cursor: 'pointer', background: C.surface2 }}
+                >
+                  <div style={{ fontSize: '1.5rem', marginBottom: 6 }}>🎬</div>
+                  <div style={{ fontFamily: FD, fontSize: '0.95rem', color: C.text }}>Click to select a video</div>
+                  <div style={{ fontSize: '0.75rem', color: C.textMuted, marginTop: 2 }}>MP4, MOV, or WEBM</div>
+                </div>
+              )}
+
+              {(videoUpload.state.phase === 'validating' || videoUpload.state.phase === 'uploading') && (
+                <div style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '14px 16px', background: C.surface2, border: `1px solid ${C.border}`, borderRadius: 10 }}>
+                  {videoUpload.state.previewUrl && (
+                    <video src={videoUpload.state.previewUrl} muted style={{ width: 60, height: 44, objectFit: 'cover', borderRadius: 6, flexShrink: 0 }} />
+                  )}
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: 13, color: C.text, marginBottom: 4 }}>
+                      {videoUpload.state.phase === 'validating' ? 'Checking video…' : `Uploading… ${videoUpload.state.progress}%`}
+                    </div>
+                    <div style={{ height: 4, borderRadius: 2, background: C.border, overflow: 'hidden' }}>
+                      <div style={{ height: '100%', width: `${videoUpload.state.phase === 'validating' ? 5 : videoUpload.state.progress}%`, background: C.gold, transition: 'width 0.2s' }} />
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {(videoUpload.state.phase === 'processing' || videoAsset.id) && videoUpload.state.phase !== 'failed' && (
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 14, padding: '14px 16px', background: C.goldDim, border: `1px solid ${C.goldBorder}`, borderRadius: 10 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+                    {videoUpload.state.previewUrl && (
+                      <video src={videoUpload.state.previewUrl} muted style={{ width: 60, height: 44, objectFit: 'cover', borderRadius: 6, flexShrink: 0 }} />
+                    )}
+                    <div>
+                      <div style={{ fontSize: 13, color: C.gold, fontWeight: 600 }}>
+                        {videoAsset.status === 'ready' ? 'Video ready' : videoAsset.status === 'failed' ? 'Processing failed' : 'Video uploaded'}
+                      </div>
+                      <div style={{ fontSize: 12, color: C.textMuted }}>
+                        {videoAsset.status === 'ready' ? 'Live on the listing' : videoAsset.status === 'failed' ? 'Please remove and try again' : "Processing — it'll be ready to view shortly"}
+                      </div>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      videoUpload.reset()
+                      setVideoAsset({ provider: null, id: null, status: null, thumbnailUrl: null })
+                      setVideoRemoved(true)
+                    }}
+                    style={{ width: 28, height: 28, borderRadius: '50%', flexShrink: 0, background: 'rgba(0,0,0,0.35)', border: `1px solid ${C.border}`, color: C.text, cursor: 'pointer', fontSize: '0.9rem' }}
+                  >×</button>
+                </div>
+              )}
+
+              {videoUpload.state.phase === 'failed' && (
+                <div style={{ padding: '12px 16px', background: 'rgba(224,85,85,0.1)', border: '1px solid rgba(224,85,85,0.3)', borderRadius: 10, color: '#e05555', fontSize: 13, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
+                  <span>{videoUpload.state.error}</span>
+                  <button type="button" onClick={() => videoUpload.reset()} style={{ background: 'transparent', border: '1px solid #e05555', color: '#e05555', borderRadius: 6, padding: '5px 12px', fontSize: 12, cursor: 'pointer', flexShrink: 0 }}>Try again</button>
+                </div>
+              )}
+            </div>
           </SectionCard>
 
           {/* Step 7 — Contact */}
@@ -954,14 +1114,20 @@ export default function EditListingPage() {
             </div>
           )}
 
+          {(videoUpload.state.phase === 'validating' || videoUpload.state.phase === 'uploading') && (
+            <div style={{ padding: '14px 20px', background: C.goldDim, border: `1px solid ${C.goldBorder}`, borderRadius: 10, color: C.gold, fontSize: 14, fontFamily: FB, marginBottom: 20 }}>
+              Please wait for your video to finish uploading before saving.
+            </div>
+          )}
+
           {/* Actions */}
           <div style={{ display: 'flex', gap: 12, justifyContent: 'flex-end', flexWrap: 'wrap' }}>
             <a href="/dashboard/my-listings"
               style={{ padding: '13px 24px', borderRadius: 8, border: `1px solid ${C.border}`, color: C.textSub, fontFamily: FB, fontWeight: 500, fontSize: '0.9375rem', textDecoration: 'none', display: 'inline-flex', alignItems: 'center' }}>
               Cancel
             </a>
-            <button type="submit" disabled={saving}
-              style={{ background: `linear-gradient(135deg, ${C.gold} 0%, #0B9C9B 100%)`, color: '#0a0a0a', fontFamily: FB, fontWeight: 600, fontSize: '0.9375rem', padding: '13px 36px', borderRadius: 8, border: 'none', cursor: saving ? 'not-allowed' : 'pointer', opacity: saving ? 0.7 : 1, letterSpacing: '0.02em', transition: 'opacity 0.15s' }}>
+            <button type="submit" disabled={saving || videoUpload.state.phase === 'validating' || videoUpload.state.phase === 'uploading'}
+              style={{ background: `linear-gradient(135deg, ${C.gold} 0%, #0B9C9B 100%)`, color: '#0a0a0a', fontFamily: FB, fontWeight: 600, fontSize: '0.9375rem', padding: '13px 36px', borderRadius: 8, border: 'none', cursor: (saving || videoUpload.state.phase === 'validating' || videoUpload.state.phase === 'uploading') ? 'not-allowed' : 'pointer', opacity: (saving || videoUpload.state.phase === 'validating' || videoUpload.state.phase === 'uploading') ? 0.7 : 1, letterSpacing: '0.02em', transition: 'opacity 0.15s' }}>
               {saving ? 'Saving…' : 'Save Changes'}
             </button>
           </div>

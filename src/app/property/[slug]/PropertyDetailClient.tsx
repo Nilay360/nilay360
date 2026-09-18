@@ -9,6 +9,7 @@ import { useAuth } from "@/context/AuthContext";
 import { useSavedProperties } from "@/hooks/useSavedProperties";
 import ReportButton from "@/components/shared/ReportButton";
 import { optimizedImageUrl } from "@/lib/image-url";
+import VideoSlide from "@/components/property/VideoSlide";
 import { loadGoogleMapsScript } from "@/lib/loadGoogleMapsScript";
 import { getVisitorKey } from "@/lib/visitorId";
 
@@ -119,6 +120,14 @@ type Property = {
   saves: number;
   created_at: string;
   video_url: string | null;
+  // Seller-uploaded walkthrough clip (Bunny Stream) — distinct from
+  // video_url above (a pasted YouTube/Vimeo link, its own separate
+  // "Video Tour" section, untouched). See supabase/migrations/
+  // 068_property_video_upload.sql for the full naming rationale.
+  video_asset_provider: string | null;
+  video_asset_id: string | null;
+  video_asset_status: "processing" | "ready" | "failed" | null;
+  video_asset_thumbnail_url: string | null;
   kuula_tour_url: string | null;
   google_maps_url: string | null;
   seller_email?: string;
@@ -237,6 +246,13 @@ function mapListingToProperty(row: Record<string, unknown>): Property {
       ? row.created_at
       : (typeof row.submitted_at === "string" ? row.submitted_at : new Date().toISOString()),
     video_url:      typeof row.video_url === "string" && row.video_url.trim() ? row.video_url : null,
+    // Confirmed missing from Phase 1 — property_listings has these columns
+    // and the wizard writes them, but this mapping never read them until now.
+    video_asset_provider:      typeof row.video_asset_provider === "string" ? row.video_asset_provider : null,
+    video_asset_id:            typeof row.video_asset_id === "string" && row.video_asset_id.trim() ? row.video_asset_id : null,
+    video_asset_status:        row.video_asset_status === "processing" || row.video_asset_status === "ready" || row.video_asset_status === "failed"
+      ? row.video_asset_status : null,
+    video_asset_thumbnail_url: typeof row.video_asset_thumbnail_url === "string" && row.video_asset_thumbnail_url.trim() ? row.video_asset_thumbnail_url : null,
     kuula_tour_url: typeof row.kuula_tour_url === "string" && row.kuula_tour_url.trim() ? row.kuula_tour_url : null,
     google_maps_url: typeof row.google_maps_url === "string" && row.google_maps_url.trim() ? row.google_maps_url : null,
     seller_email:    typeof row.seller_email === "string" ? row.seller_email : undefined,
@@ -1489,8 +1505,31 @@ export default function PropertyDetailClient() {
         `https://images.unsplash.com/photo-1600585154526-990dced4db0d?w=1200&q=80`,
       ];
 
-  const nextImg = useCallback(() => setActiveImg(i => (i + 1) % images.length), [images.length]);
-  const prevImg = useCallback(() => setActiveImg(i => (i - 1 + images.length) % images.length), [images.length]);
+  // Video slide — a distinct, always-last slide in the nav sequence, never
+  // merged into `images` (Option B, decided explicitly): keeps every
+  // existing photo render path (optimizedImageUrl, track-image-click,
+  // the lightbox) completely untouched, since none of them ever see a
+  // non-URL entry in `images` itself.
+  //
+  // Gated on THREE things, all of which fail this closed (no video slide
+  // at all, never a broken one) rather than open:
+  //   - video_asset_status === 'ready' — 'processing'/'failed'/null all
+  //     mean the slide doesn't exist yet, per spec (no placeholder ever
+  //     shown for an in-progress or failed upload).
+  //   - video_asset_id present — malformed/empty defensively excluded too.
+  //   - NEXT_PUBLIC_BUNNY_STREAM_LIBRARY_ID configured — without it,
+  //     VideoSlide has no way to build a playable embed URL at all, so
+  //     the slide is skipped entirely rather than existing-but-broken.
+  const hasVideoSlide = Boolean(
+    property?.video_asset_status === "ready" &&
+    property.video_asset_id &&
+    process.env.NEXT_PUBLIC_BUNNY_STREAM_LIBRARY_ID
+  );
+  const videoSlideIndex = images.length; // always last, only meaningful when hasVideoSlide
+  const slideCount = images.length + (hasVideoSlide ? 1 : 0);
+
+  const nextImg = useCallback(() => setActiveImg(i => (i + 1) % slideCount), [slideCount]);
+  const prevImg = useCallback(() => setActiveImg(i => (i - 1 + slideCount) % slideCount), [slideCount]);
 
   // Opening the lightbox is this page's "photo click" engagement event
   // (item #2) — one handler shared by every entry point (main image,
@@ -1498,7 +1537,10 @@ export default function PropertyDetailClient() {
   // place rather than being duplicated at each onClick.
   const openLightbox = useCallback(() => {
     setLightboxOpen(true);
-    if (property?.id) {
+    // activeImg can point at the video slide (index === images.length,
+    // when hasVideoSlide) — images[activeImg] would be undefined there,
+    // so this only fires the click-tracking call for an actual photo.
+    if (property?.id && activeImg < images.length) {
       fetch("/api/track-image-click", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -1896,12 +1938,21 @@ export default function PropertyDetailClient() {
                   <div style={{ fontSize: "11px", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "#A9B4C2" }}>View More Photos</div>
                 </div>
                 <div style={{ position: "relative", height: "320px", overflow: "hidden" }}>
-                  <img
-                    src={optimizedImageUrl(images[activeImg], 1600)}
-                    alt={property.title}
-                    onClick={openLightbox}
-                    style={{ width: "100%", height: "100%", objectFit: "cover", display: "block", transition: "opacity 0.3s", cursor: "zoom-in" }}
-                  />
+                  {hasVideoSlide && activeImg === videoSlideIndex ? (
+                    <VideoSlide
+                      videoAssetId={property.video_asset_id as string}
+                      thumbnailUrl={property.video_asset_thumbnail_url ?? null}
+                      title={property.title}
+                      height="320px"
+                    />
+                  ) : (
+                    <img
+                      src={optimizedImageUrl(images[activeImg], 1600)}
+                      alt={property.title}
+                      onClick={openLightbox}
+                      style={{ width: "100%", height: "100%", objectFit: "cover", display: "block", transition: "opacity 0.3s", cursor: "zoom-in" }}
+                    />
+                  )}
                   <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(0,0,0,0.55) 0%, transparent 50%)", pointerEvents: "none" }} />
 
                   <button
@@ -1914,7 +1965,7 @@ export default function PropertyDetailClient() {
                   </button>
 
                   <div style={{ position: "absolute", bottom: "16px", right: "24px", padding: "5px 12px", borderRadius: "999px", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.10)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", color: "#fff", fontSize: "12px" }}>
-                    {activeImg + 1} / {images.length}
+                    {activeImg + 1} / {slideCount}
                   </div>
                 </div>
 
@@ -1929,6 +1980,21 @@ export default function PropertyDetailClient() {
                       <img src={optimizedImageUrl(img, 200)} alt={`View ${i + 1}`} loading="lazy" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
                     </div>
                   ))}
+                  {hasVideoSlide && (
+                    <div
+                      onClick={() => setActiveImg(videoSlideIndex)}
+                      style={{ flex: 1, height: "80px", overflow: "hidden", cursor: "pointer", position: "relative", opacity: activeImg === videoSlideIndex ? 1 : 0.55, border: activeImg === videoSlideIndex ? "2px solid #10C4C3" : "2px solid transparent", borderRadius: "4px", transition: "opacity 0.15s, border-color 0.15s" }}
+                    >
+                      {property.video_asset_thumbnail_url ? (
+                        <img src={optimizedImageUrl(property.video_asset_thumbnail_url, 200)} alt="Walkthrough video" loading="lazy" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+                      ) : (
+                        <div style={{ width: "100%", height: "100%", background: "linear-gradient(135deg, #020C1C 0%, #0A1526 100%)" }} />
+                      )}
+                      <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(0,0,0,0.25)" }}>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="#fff"><path d="M8 5v14l11-7z" /></svg>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             </>
@@ -1937,12 +2003,21 @@ export default function PropertyDetailClient() {
             <div style={{ background: "#0A1526", position: "relative" }}>
               {/* Main image */}
               <div style={{ position: "relative", height: "520px", overflow: "hidden" }}>
-                <img
-                  src={optimizedImageUrl(images[activeImg], 1600)}
-                  alt={property.title}
-                  onClick={openLightbox}
-                  style={{ width: "100%", height: "100%", objectFit: "cover", display: "block", transition: "opacity 0.3s", cursor: "zoom-in" }}
-                />
+                {hasVideoSlide && activeImg === videoSlideIndex ? (
+                  <VideoSlide
+                    videoAssetId={property.video_asset_id as string}
+                    thumbnailUrl={property.video_asset_thumbnail_url ?? null}
+                    title={property.title}
+                    height="520px"
+                  />
+                ) : (
+                  <img
+                    src={optimizedImageUrl(images[activeImg], 1600)}
+                    alt={property.title}
+                    onClick={openLightbox}
+                    style={{ width: "100%", height: "100%", objectFit: "cover", display: "block", transition: "opacity 0.3s", cursor: "zoom-in" }}
+                  />
+                )}
                 {/* Dark overlay gradient */}
                 <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(0,0,0,0.55) 0%, transparent 50%)", pointerEvents: "none" }} />
 
@@ -1960,7 +2035,7 @@ export default function PropertyDetailClient() {
 
                 {/* Image counter */}
                 <div style={{ position: "absolute", bottom: "100px", right: "24px", padding: "5px 12px", borderRadius: "999px", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.10)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", color: "#fff", fontSize: "12px" }}>
-                  {activeImg + 1} / {images.length}
+                  {activeImg + 1} / {slideCount}
                 </div>
               </div>
 
@@ -1975,6 +2050,21 @@ export default function PropertyDetailClient() {
                     <img src={optimizedImageUrl(img, 200)} alt={`View ${i + 1}`} loading="lazy" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
                   </div>
                 ))}
+                {hasVideoSlide && (
+                  <div
+                    onClick={() => setActiveImg(videoSlideIndex)}
+                    style={{ flex: 1, height: "80px", overflow: "hidden", cursor: "pointer", position: "relative", opacity: activeImg === videoSlideIndex ? 1 : 0.55, border: activeImg === videoSlideIndex ? "2px solid #10C4C3" : "2px solid transparent", borderRadius: "4px", transition: "opacity 0.15s, border-color 0.15s" }}
+                  >
+                    {property.video_asset_thumbnail_url ? (
+                      <img src={optimizedImageUrl(property.video_asset_thumbnail_url, 200)} alt="Walkthrough video" loading="lazy" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+                    ) : (
+                      <div style={{ width: "100%", height: "100%", background: "linear-gradient(135deg, #020C1C 0%, #0A1526 100%)" }} />
+                    )}
+                    <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(0,0,0,0.25)" }}>
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="#fff"><path d="M8 5v14l11-7z" /></svg>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           )}
@@ -2709,7 +2799,7 @@ export default function PropertyDetailClient() {
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M18 6L6 18M6 6l12 12" /></svg>
           </button>
 
-          {images.length > 1 && (
+          {slideCount > 1 && (
             <button
               onClick={(e) => { e.stopPropagation(); prevImg(); }}
               aria-label="Previous photo"
@@ -2720,15 +2810,26 @@ export default function PropertyDetailClient() {
             </button>
           )}
 
-          <img
-            key={activeImg}
-            src={optimizedImageUrl(images[activeImg], 1920)}
-            alt={`${property.title} — photo ${activeImg + 1}`}
-            onClick={(e) => e.stopPropagation()}
-            style={{ maxWidth: "86vw", maxHeight: "82vh", objectFit: "contain", borderRadius: "6px", animation: "lbFade 0.25s ease" }}
-          />
+          {hasVideoSlide && activeImg === videoSlideIndex ? (
+            <div key={activeImg} onClick={(e) => e.stopPropagation()} style={{ width: "86vw", maxWidth: "1100px", aspectRatio: "16/9", borderRadius: "6px", overflow: "hidden", animation: "lbFade 0.25s ease" }}>
+              <VideoSlide
+                videoAssetId={property.video_asset_id as string}
+                thumbnailUrl={property.video_asset_thumbnail_url ?? null}
+                title={property.title}
+                height="100%"
+              />
+            </div>
+          ) : (
+            <img
+              key={activeImg}
+              src={optimizedImageUrl(images[activeImg], 1920)}
+              alt={`${property.title} — photo ${activeImg + 1}`}
+              onClick={(e) => e.stopPropagation()}
+              style={{ maxWidth: "86vw", maxHeight: "82vh", objectFit: "contain", borderRadius: "6px", animation: "lbFade 0.25s ease" }}
+            />
+          )}
 
-          {images.length > 1 && (
+          {slideCount > 1 && (
             <button
               onClick={(e) => { e.stopPropagation(); nextImg(); }}
               aria-label="Next photo"
@@ -2740,7 +2841,7 @@ export default function PropertyDetailClient() {
           )}
 
           <div style={{ position: "absolute", bottom: "28px", left: "50%", transform: "translateX(-50%)", padding: "6px 16px", borderRadius: "999px", background: "rgba(255,255,255,0.06)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", border: "1px solid rgba(255,255,255,0.10)", color: "#fff", fontSize: "13px", fontWeight: 600, letterSpacing: "0.04em" }}>
-            {activeImg + 1} / {images.length}
+            {activeImg + 1} / {slideCount}
           </div>
         </div>
       )}
