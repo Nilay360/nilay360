@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { motion, useScroll, useTransform } from "framer-motion";
 import Reveal from "@/components/ui/Reveal";
 import { createClient } from "@/lib/supabase/client";
+import { useAuth } from "@/context/AuthContext";
 import { useSavedProperties } from "@/hooks/useSavedProperties";
 import { useLiveStats } from "@/lib/liveStats";
 import ResultsGate from "@/components/property/ResultsGate";
@@ -165,6 +166,10 @@ export default function HomePage() {
   const router = useRouter();
   const [userId, setUserId] = useState<string | null>(null)
   const { savedIds, toggleSave } = useSavedProperties(userId)
+  // Same admin check as admin/page.tsx's isAdmin guard — reused, not
+  // reinvented, for the hero stat tiles' destination below.
+  const { profile } = useAuth();
+  const isAdmin = profile?.role === "admin" || profile?.role === "super_admin";
 
   useEffect(() => {
     const supabase = createClient()
@@ -453,6 +458,9 @@ export default function HomePage() {
         /* ── Stats as glass pills ── */
         .hero-stat { flex:0 0 auto; padding:8px 18px; border-left:1px solid rgba(16,196,195,0.15); position:relative; box-sizing:border-box; }
         .hero-stat:first-child { border-left:none; }
+        .hero-stat-clickable { cursor:pointer; transition:transform 0.15s ease, background 0.15s ease; }
+        .hero-stat-clickable:hover { background:rgba(16,196,195,0.08); transform:translateY(-1px); }
+        .hero-stat-clickable:focus-visible { outline:1.5px solid ${G.gold}; outline-offset:2px; }
 
         .section-divider { height: 1px; background: linear-gradient(90deg, transparent 0%, rgba(16,196,195,0.20) 50%, transparent 100%); margin: 0; }
 
@@ -872,12 +880,31 @@ export default function HomePage() {
 
           {/* 4 — Stats strip */}
           <div className="hero-stats" style={{display:"flex", flexWrap:"wrap", justifyContent:"center", gap:"12px", width:"100%", maxWidth:"100%", boxSizing:"border-box", marginTop:32, marginBottom:40, paddingBottom:32, borderBottom:"1px solid rgba(16,196,195,0.12)", position:"relative", zIndex:2}}>
-            {[[liveStats.listings.toLocaleString("en-IN"),"Listings"],[liveStats.agents.toLocaleString("en-IN"),"Agents"],[String(liveStats.cities),"Cities"]].map(([v,l])=>(
-              <div key={l} className="hero-stat" style={{background:"rgba(255,255,255,0.04)", backdropFilter:"blur(12px)", WebkitBackdropFilter:"blur(12px)", border:"1px solid rgba(16,196,195,0.12)", borderRadius:12, flex:"0 0 auto"}}>
+            {[[liveStats.listings.toLocaleString("en-IN"),"Listings"],[liveStats.agents.toLocaleString("en-IN"),"Agents"],[String(liveStats.cities),"Cities"]].map(([v,l])=>{
+              // Cities has no natural destination for either audience — left
+              // non-clickable rather than pointed at Overview, since Overview
+              // isn't city-scoped and would be a misleading link.
+              const href =
+                l === "Listings" ? (isAdmin ? "/admin?section=listings" : "/buy") :
+                l === "Agents"   ? (isAdmin ? "/admin?section=agents"   : "/agents") :
+                null;
+              return (
+              <div
+                key={l}
+                className={href ? "hero-stat hero-stat-clickable" : "hero-stat"}
+                style={{background:"rgba(255,255,255,0.04)", backdropFilter:"blur(12px)", WebkitBackdropFilter:"blur(12px)", border:"1px solid rgba(16,196,195,0.12)", borderRadius:12, flex:"0 0 auto"}}
+                {...(href ? {
+                  role: "link" as const,
+                  tabIndex: 0,
+                  onClick: () => router.push(href),
+                  onKeyDown: (e: React.KeyboardEvent) => { if (e.key === "Enter") router.push(href); },
+                } : {})}
+              >
                 <div className="stat-value" style={{fontFamily:"var(--font-support-new)", fontSize:19, fontWeight:600, background:"linear-gradient(135deg, #FFFFFF 0%, #10C4C3 100%)", WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent"}}>{v}</div>
                 <div style={{fontSize:9.5, color:"rgba(255,255,255,0.50)", marginTop:2, letterSpacing:"0.06em", textTransform:"uppercase"}}>{l}</div>
               </div>
-            ))}
+              );
+            })}
           </div>
           {siteContent.trust_bar_note && (
             <p style={{fontSize:11, color:"rgba(255,255,255,0.4)", textAlign:"center", marginTop:-28, marginBottom:32}}>{siteContent.trust_bar_note}</p>

@@ -263,6 +263,13 @@ export default function AgentProfilePage() {
   // viewer, signed out or signed in as any other role, uses the Send Message
   // form instead. Same check already established in admin/page.tsx:2480.
   const isAdmin = profile?.role === "admin" || profile?.role === "super_admin";
+  // Self-view: hides the "Get in Touch" card (ContactForm — this page's
+  // only contact/enquiry mechanism; confirmed no separate "Enquiry"
+  // button exists anywhere on this page or the directory listing) when
+  // the signed-in visitor is this exact agent. agent.userId is
+  // profiles.id (mapAgent's userId: row.user_id), the same id
+  // useAuth()'s user.id carries.
+  const isOwnProfile = !!user?.id && !!agent && user.id === agent?.userId;
 
   useEffect(() => {
     async function load() {
@@ -454,10 +461,17 @@ export default function AgentProfilePage() {
                     WhatsApp
                   </a>
                 )}
-                <a href="#send-message" style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", padding: "12px 22px", background: "transparent", border: "1.5px solid rgba(245,242,236,0.18)", borderRadius: "10px", color: "rgba(245,242,236,0.65)", fontSize: "13px", fontWeight: 600, textDecoration: "none" }}>
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-                  Send Message
-                </a>
+                {/* This is the actual "Contact" button (scrolls to the
+                    #send-message card below, hidden for isOwnProfile) —
+                    hiding it here too, not just the card it targets, so
+                    an owner never sees a dead link to a section that no
+                    longer exists on their own profile. */}
+                {!isOwnProfile && (
+                  <a href="#send-message" style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", padding: "12px 22px", background: "transparent", border: "1.5px solid rgba(245,242,236,0.18)", borderRadius: "10px", color: "rgba(245,242,236,0.65)", fontSize: "13px", fontWeight: 600, textDecoration: "none" }}>
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                    Send Message
+                  </a>
+                )}
               </div>
             </div>
           </div>
@@ -531,42 +545,65 @@ export default function AgentProfilePage() {
           </div>
 
           <div className="as-right" style={{ position: "sticky", top: "84px", display: "flex", flexDirection: "column", gap: "18px" }}>
-            <div id="send-message" style={{ background: "#fff", border: "1px solid rgba(13,43,31,0.07)", borderRadius: "18px", padding: "26px 22px", boxShadow: "0 4px 20px rgba(13,43,31,0.06)" }}>
-              <div style={{ marginBottom: "16px" }}><Eyebrow label="Get in Touch" /></div>
-              <h3 style={{ fontFamily: "var(--font-heading-new)", fontSize: "22px", fontWeight: 600, color: "#020C1C", marginBottom: "18px" }}>Message {agent.full_name.split(" ")[0]}</h3>
-              {user ? (
-                <ContactForm agent={agent} prefillName={profile?.full_name} prefillEmail={user.email} prefillPhone={profile?.phone} />
-              ) : (
-                <div style={{ textAlign: "center", padding: "24px 12px" }}>
-                  <p style={{ fontSize: "13px", color: "#6B7C72", lineHeight: 1.6, marginBottom: "16px" }}>
-                    Sign in to contact {agent.full_name.split(" ")[0]} directly.
-                  </p>
-                  <button
-                    onClick={() => openAuthModal("signin")}
-                    style={{ width: "100%", padding: "13px", background: "#10C4C3", border: "none", borderRadius: "9px", color: "#020C1C", fontSize: "12px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", cursor: "pointer", fontFamily: "var(--font-body-new)" }}
-                  >
-                    Sign In
-                  </button>
-                </div>
-              )}
-            </div>
+            {/* Self-view: no reason to contact yourself. Other viewers
+                (signed in as anyone else, or signed out) keep this
+                exactly as before. */}
+            {!isOwnProfile && (
+              <div id="send-message" style={{ background: "#fff", border: "1px solid rgba(13,43,31,0.07)", borderRadius: "18px", padding: "26px 22px", boxShadow: "0 4px 20px rgba(13,43,31,0.06)" }}>
+                <div style={{ marginBottom: "16px" }}><Eyebrow label="Get in Touch" /></div>
+                <h3 style={{ fontFamily: "var(--font-heading-new)", fontSize: "22px", fontWeight: 600, color: "#020C1C", marginBottom: "18px" }}>Message {agent.full_name.split(" ")[0]}</h3>
+                {user ? (
+                  <ContactForm agent={agent} prefillName={profile?.full_name} prefillEmail={user.email} prefillPhone={profile?.phone} />
+                ) : (
+                  <div style={{ textAlign: "center", padding: "24px 12px" }}>
+                    <p style={{ fontSize: "13px", color: "#6B7C72", lineHeight: 1.6, marginBottom: "16px" }}>
+                      Sign in to contact {agent.full_name.split(" ")[0]} directly.
+                    </p>
+                    <button
+                      onClick={() => openAuthModal("signin")}
+                      style={{ width: "100%", padding: "13px", background: "#10C4C3", border: "none", borderRadius: "9px", color: "#020C1C", fontSize: "12px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", cursor: "pointer", fontFamily: "var(--font-body-new)" }}
+                    >
+                      Sign In
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
 
-            {isAdmin && (agent.phone || agent.email || agent.whatsapp) && (
-              <div style={{ background: "#020C1C", borderRadius: "14px", padding: "20px 18px" }}>
-                <p style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.14em", color: "rgba(201,168,76,0.55)", textTransform: "uppercase", marginBottom: "14px" }}>Quick Contact</p>
-                {[
-                  agent.phone && { icon: "📞", label: "Call directly", value: agent.phone, href: `tel:${agent.phone}` },
-                  agent.whatsapp && { icon: "💬", label: "WhatsApp",   value: agent.whatsapp, href: `https://wa.me/${agent.whatsapp.replace(/\+/g,"")}` },
-                  agent.email && { icon: "✉️", label: "Email",         value: agent.email, href: `mailto:${agent.email}` },
-                ].filter(Boolean).map((c: any) => (
-                  <a key={c.label} href={c.href} style={{ display: "flex", alignItems: "center", gap: "10px", padding: "11px 0", borderBottom: "1px solid rgba(245,242,236,0.06)", textDecoration: "none" }}>
-                    <span style={{ fontSize: "16px" }}>{c.icon}</span>
-                    <div>
-                      <p style={{ fontSize: "9px", fontWeight: 700, letterSpacing: "0.1em", color: "rgba(245,242,236,0.3)", textTransform: "uppercase" }}>{c.label}</p>
+            {/* Quick Contact — previously admin-only (hidden entirely for
+                every other viewer). Now: admins still see it fully, real
+                and functional, unchanged. Every other non-self viewer now
+                sees the SAME real block rendered underneath a blur + lock
+                overlay, as a visual placeholder for a future NILAY360 Pro
+                unlock — purely presentational (CSS blur/overlay only, no
+                subscription tier, payment, or unlock logic, no new DB
+                fields, per explicit scope). isOwnProfile still hides it
+                entirely — an agent has no reason to see a paywall over
+                their own contact details. */}
+            {!isOwnProfile && (agent.phone || agent.email || agent.whatsapp) && (
+              <div style={{ background: "#020C1C", borderRadius: "14px", padding: "20px 18px", position: "relative", overflow: "hidden" }}>
+                <div style={!isAdmin ? { filter: "blur(5px)", userSelect: "none", pointerEvents: "none" } : undefined}>
+                  <p style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.14em", color: "rgba(201,168,76,0.55)", textTransform: "uppercase", marginBottom: "14px" }}>Quick Contact</p>
+                  {[
+                    agent.phone && { icon: "📞", label: "Call directly", value: agent.phone, href: `tel:${agent.phone}` },
+                    agent.whatsapp && { icon: "💬", label: "WhatsApp",   value: agent.whatsapp, href: `https://wa.me/${agent.whatsapp.replace(/\+/g,"")}` },
+                    agent.email && { icon: "✉️", label: "Email",         value: agent.email, href: `mailto:${agent.email}` },
+                  ].filter(Boolean).map((c: any) => (
+                    <a key={c.label} href={c.href} style={{ display: "flex", alignItems: "center", gap: "10px", padding: "11px 0", borderBottom: "1px solid rgba(245,242,236,0.06)", textDecoration: "none" }}>
+                      <span style={{ fontSize: "16px" }}>{c.icon}</span>
+                      <div>
+                        <p style={{ fontSize: "9px", fontWeight: 700, letterSpacing: "0.1em", color: "rgba(245,242,236,0.3)", textTransform: "uppercase" }}>{c.label}</p>
                       <p style={{ fontSize: "12px", fontWeight: 600, color: "rgba(245,242,236,0.75)" }}>{c.value}</p>
                     </div>
                   </a>
                 ))}
+                </div>
+                {!isAdmin && (
+                  <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "8px", background: "rgba(2,12,28,0.62)", padding: "16px" }}>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#10C4C3" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>
+                    <span style={{ fontSize: "11px", fontWeight: 700, letterSpacing: "0.06em", color: "#FFFFFF", textAlign: "center" }}>Unlock with NILAY360 Pro — coming soon</span>
+                  </div>
+                )}
               </div>
             )}
 

@@ -1,5 +1,5 @@
 ﻿"use client";
-import React, { Suspense, useState, useEffect, useCallback, useRef } from "react";
+import React, { Suspense, useState, useEffect, useCallback, useRef, useMemo } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { useAuth } from "@/context/AuthContext";
@@ -10,10 +10,11 @@ import LeaderboardSection from "./LeaderboardSection";
 import ListingsSubmittedOverTimeChart from "./ListingsSubmittedOverTimeChart";
 import AgentApplicationsOverTimeChart from "./AgentApplicationsOverTimeChart";
 import InquiriesOverTimeChart from "./InquiriesOverTimeChart";
+import VideoSlide from "@/components/property/VideoSlide";
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
-type AdminSection = "overview" | "pending" | "approved" | "rejected" | "users" | "inquiries" | "agents" | "capture360" | "performance" | "leaderboard" | "reports" | "content" | "audit";
+type AdminSection = "overview" | "listings" | "users" | "inquiries" | "agents" | "capture360" | "performance" | "leaderboard" | "reports" | "content" | "audit";
 
 type Stats = {
   pending: number;
@@ -23,6 +24,16 @@ type Stats = {
   inquiries: number;
   reportsOpen: number;
   totalViews: number;
+};
+
+// Maps a property_listings.status value to its Stats bucket key —
+// changes_requested/frozen intentionally have no entry (no counters for
+// them exist on Stats), so bumpStats treats those as a no-op rather than
+// an error.
+const LISTING_STATS_KEY: Record<string, keyof Stats | undefined> = {
+  pending_review: "pending",
+  active: "active",
+  rejected: "rejected",
 };
 
 type AdminListing = {
@@ -120,6 +131,14 @@ type Capture360Request = {
   admin_notes: string | null;
   created_at: string;
   updated_at: string;
+  // Requester's own preference at request time (migration 071) —
+  // distinct from scheduled_date/scheduled_time_slot above, which are
+  // the admin's later-confirmed values and may differ.
+  preferred_date: string | null;
+  preferred_time_slot: string | null;
+  // Admin-entered on decline only (migration 072).
+  suggested_alternative_date_1: string | null;
+  suggested_alternative_date_2: string | null;
   property_listings: { title: string | null; address: string | null; city: string | null } | null;
   profiles: { full_name: string | null; phone: string | null } | null;
 };
@@ -392,6 +411,7 @@ function ListingCard({
   assignControl,
   kuulaTourControl,
   googleMapsUrlControl,
+  previewControl,
 }: {
   listing: AdminListing;
   actions: React.ReactNode;
@@ -402,6 +422,12 @@ function ListingCard({
   kuulaTourControl?: React.ReactNode;
   /** Optional slot for the Google Maps URL control — only Pending/Approved sections supply this. */
   googleMapsUrlControl?: React.ReactNode;
+  /** Optional replacement for the "View Full →" public-page link — Pending
+   * supplies this instead, since /property/[slug] 404s for non-active
+   * listings (no admin bypass on that route, by design — see
+   * AdminListingFullPreview). When supplied, the public-page link is
+   * omitted entirely rather than shown alongside it. */
+  previewControl?: React.ReactNode;
 }) {
   const thumb = Array.isArray(listing.photo_urls) ? listing.photo_urls[0] ?? null : null;
   const label = listing.listing_type === "sale" ? "For Sale" : listing.listing_type === "rent" ? "For Rent" : (listing.listing_type ?? "");
@@ -485,7 +511,7 @@ function ListingCard({
 
           {/* Actions */}
           <div style={{ display: "flex", gap: "8px", alignItems: "center", flexWrap: "wrap" }}>
-            {listing.slug && (
+            {previewControl ? previewControl : listing.slug && (
               <a
                 href={`/property/${listing.slug}`}
                 target="_blank"
@@ -856,88 +882,6 @@ function OverviewSection({ stats, loading }: { stats: Stats; loading: boolean })
   );
 }
 
-// ── Section: Pending Review ────────────────────────────────────────────────────
-
-function PendingSection({
-  listings, loading, inFlight, onApprove, onReject, agents, onAssignAgent, onKuulaTourUrl, onGoogleMapsUrl,
-}: {
-  listings: AdminListing[];
-  loading: boolean;
-  inFlight: string | null;
-  onApprove: (id: string) => void;
-  onReject: (id: string) => void;
-  agents: ApprovedAgentOption[];
-  onAssignAgent: (id: string, agentId: string | null) => void;
-  onKuulaTourUrl: (id: string, url: string | null) => void;
-  onGoogleMapsUrl: (id: string, url: string | null) => void;
-}) {
-  if (loading) return <Spinner />;
-  return (
-    <div>
-      <SectionHeading title="Pending Review" subtitle="Oldest submissions first — approve or reject each listing." count={listings.length} />
-      {listings.length === 0 ? (
-        <div style={{ padding: "72px 24px", textAlign: "center", background: "rgba(255,255,255,0.05)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", borderRadius: "18px", border: "1px solid rgba(255,255,255,0.08)" }}>
-          <div style={{ width: "52px", height: "52px", borderRadius: "50%", background: "rgba(52,211,153,0.08)", border: "1.5px solid rgba(52,211,153,0.2)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px", color: "#34D399" }}>
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75"><polyline points="20 6 9 17 4 12"/></svg>
-          </div>
-          <p style={{ fontFamily: "var(--font-heading-new)", fontSize: "22px", color: "#FFFFFF", marginBottom: "8px" }}>All clear</p>
-          <p style={{ fontSize: "13px", color: "rgba(255,255,255,0.45)" }}>No listings pending review.</p>
-        </div>
-      ) : (
-        <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
-          {listings.map(l => (
-            <ListingCard
-              key={l.id}
-              listing={l}
-              inFlight={inFlight === l.id}
-              assignControl={
-                <AssignAgentControl
-                  currentAgentId={l.assigned_agent_id}
-                  agents={agents}
-                  disabled={inFlight === l.id}
-                  onAssign={agentId => onAssignAgent(l.id, agentId)}
-                />
-              }
-              kuulaTourControl={
-                <KuulaTourControl
-                  currentUrl={l.kuula_tour_url}
-                  disabled={inFlight === l.id}
-                  onSave={url => onKuulaTourUrl(l.id, url)}
-                />
-              }
-              googleMapsUrlControl={
-                <GoogleMapsUrlControl
-                  currentUrl={l.google_maps_url}
-                  disabled={inFlight === l.id}
-                  onSave={url => onGoogleMapsUrl(l.id, url)}
-                />
-              }
-              actions={
-                <>
-                  <button
-                    onClick={() => onApprove(l.id)}
-                    disabled={inFlight === l.id}
-                    style={{ display: "flex", alignItems: "center", gap: "6px", padding: "7px 16px", borderRadius: "7px", fontSize: "11px", fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase" as const, background: "#10C4C3", color: "#020C1C", border: "none", cursor: inFlight === l.id ? "not-allowed" : "pointer", fontFamily: "var(--font-body-new)", opacity: inFlight === l.id ? 0.6 : 1 }}
-                  >
-                    <IconApprove /> Approve
-                  </button>
-                  <button
-                    onClick={() => onReject(l.id)}
-                    disabled={inFlight === l.id}
-                    style={{ display: "flex", alignItems: "center", gap: "6px", padding: "7px 16px", borderRadius: "7px", fontSize: "11px", fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase" as const, background: "rgba(248,113,113,0.1)", color: "#F87171", border: "1.5px solid rgba(248,113,113,0.3)", cursor: inFlight === l.id ? "not-allowed" : "pointer", fontFamily: "var(--font-body-new)", opacity: inFlight === l.id ? 0.6 : 1 }}
-                  >
-                    <IconReject /> Reject
-                  </button>
-                </>
-              }
-            />
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
-
 // ── Unpublish modal — reason dropdown + note, replacing the old bare
 // window.confirm(). Same dark modal-overlay pattern as
 // Capture360ScheduleModal (fixed inset:0 scrim, centered card,
@@ -1033,32 +977,436 @@ function UnpublishListingModal({
   );
 }
 
-// ── Section: Approved Listings ─────────────────────────────────────────────────
+// ── Request Changes modal — same shell as UnpublishListingModal above, but
+// a single free-text note instead of a fixed-vocabulary reason dropdown:
+// there's no CHECK-constrained reason list for this transition (migration
+// 074 only adds changes_requested_note, no vocabulary), so the note itself
+// IS the whole message, always required — there's no fallback reason label
+// to fall back on if it's left blank.
+function RequestChangesModal({
+  listing, onConfirm, onCancel,
+}: {
+  listing: AdminListing;
+  onConfirm: (note: string) => void;
+  onCancel: () => void;
+}) {
+  const [note, setNote] = useState("");
+  const canConfirm = note.trim().length > 0;
 
-function ApprovedSection({
-  listings, loading, inFlight, onUnpublish, agents, onAssignAgent, onKuulaTourUrl, onGoogleMapsUrl,
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onCancel(); };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [onCancel]);
+
+  return (
+    <div
+      onClick={onCancel}
+      role="dialog"
+      aria-modal="true"
+      aria-label="Request changes"
+      style={{ position: "fixed", inset: 0, zIndex: 600, background: "rgba(0,0,0,0.6)", backdropFilter: "blur(4px)", display: "flex", alignItems: "center", justifyContent: "center", padding: "20px" }}
+    >
+      <div
+        onClick={e => e.stopPropagation()}
+        style={{ background: "#0A1526", borderRadius: "18px", border: "1px solid rgba(255,255,255,0.1)", boxShadow: "0 12px 48px rgba(0,0,0,0.5)", width: "100%", maxWidth: "480px", maxHeight: "88vh", overflowY: "auto", padding: "26px 28px", animation: "fadeSlide 0.18s ease-out", fontFamily: "var(--font-body-new)" }}
+      >
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "6px" }}>
+          <h3 style={{ fontFamily: "var(--font-heading-new)", fontSize: "22px", fontWeight: 600, color: "#FFFFFF" }}>Request Changes</h3>
+          <button onClick={onCancel} aria-label="Close" style={{ width: "30px", height: "30px", borderRadius: "8px", background: "rgba(255,255,255,0.06)", border: "none", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: "#FFFFFF" }}>
+            <IconX />
+          </button>
+        </div>
+
+        <div style={{ marginBottom: "18px" }}>
+          <p style={{ fontSize: "14px", fontWeight: 600, color: "#FFFFFF", marginBottom: "2px" }}>{listing.title ?? "Untitled listing"}</p>
+          <p style={{ fontSize: "12px", color: "#A9B4C2" }}>Stays in Pending Review. Submitter is notified with your note.</p>
+        </div>
+
+        <label style={{ display: "block", fontSize: "10px", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: "#6B7686", marginBottom: "6px" }}>
+          Note (required)
+        </label>
+        <textarea
+          value={note} onChange={e => setNote(e.target.value)} rows={4}
+          placeholder="e.g. Photos are unclear, please reupload. Please add RERA number."
+          style={{ width: "100%", boxSizing: "border-box", padding: "9px 12px", borderRadius: "8px", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.15)", color: "#FFFFFF", fontSize: "12px", fontFamily: "var(--font-body-new)", resize: "vertical", marginBottom: "18px" }}
+        />
+
+        <div style={{ display: "flex", gap: "10px" }}>
+          <button
+            onClick={() => { if (canConfirm) onConfirm(note.trim()); }}
+            disabled={!canConfirm}
+            style={{ flex: 1, padding: "11px", borderRadius: "8px", fontSize: "12px", fontWeight: 700, letterSpacing: "0.04em", textTransform: "uppercase" as const, background: "#F59E0B", color: "#020C1C", border: "none", cursor: !canConfirm ? "not-allowed" : "pointer", fontFamily: "var(--font-body-new)", opacity: !canConfirm ? 0.6 : 1 }}
+          >
+            Send to Submitter
+          </button>
+          <button
+            onClick={onCancel}
+            style={{ padding: "11px 18px", borderRadius: "8px", fontSize: "12px", fontWeight: 700, letterSpacing: "0.04em", textTransform: "uppercase" as const, background: "rgba(255,255,255,0.06)", color: "#A9B4C2", border: "1.5px solid rgba(255,255,255,0.12)", cursor: "pointer", fontFamily: "var(--font-body-new)" }}
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Full-listing preview modal for Pending Review — built to solve the
+// /property/[slug] 404 problem for unapproved listings (that public route's
+// PropertyDetailClient gates on status === 'active' with no admin bypass,
+// deliberately left untouched; see this feature's investigation). Renders
+// admin-side, standalone, without navigating to the public route at all.
+// A purpose-built simple gallery here (not the public page's full hero/
+// lightbox JSX) since this is a review tool, not the buyer-facing page.
+type FloorPlanRow = { id: string; image_url: string; label: string | null };
+
+function fmtINR(n: number | null | undefined): string {
+  if (n == null) return "—";
+  return `₹${n.toLocaleString("en-IN")}`;
+}
+
+function AdminListingFullPreview({
+  listing, row, floorPlans, loading, inFlight, onClose, onApprove, onReject, onRequestChanges,
+}: {
+  listing: AdminListing;
+  row: Record<string, unknown> | null;
+  floorPlans: FloorPlanRow[];
+  loading: boolean;
+  inFlight: boolean;
+  onClose: () => void;
+  onApprove: () => void;
+  onReject: () => void;
+  onRequestChanges: () => void;
+}) {
+  const photos = listing.photo_urls ?? [];
+  const [activeImg, setActiveImg] = useState(0);
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [onClose]);
+
+  const s = (key: string): string | null => (row && typeof row[key] === "string" && (row[key] as string).trim()) ? (row[key] as string) : null;
+  const n = (key: string): number | null => (row && typeof row[key] === "number") ? (row[key] as number) : null;
+  const b = (key: string): boolean => Boolean(row?.[key]);
+  const isRent = listing.listing_type === "rent";
+  const videoAssetId = s("video_asset_id");
+  const videoReady = row?.video_asset_status === "ready" && videoAssetId;
+  const amenities = row && Array.isArray(row.amenities) ? (row.amenities as string[]) : [];
+
+  return (
+    <div
+      onClick={onClose}
+      role="dialog"
+      aria-modal="true"
+      aria-label="Preview listing"
+      style={{ position: "fixed", inset: 0, zIndex: 550, background: "rgba(0,0,0,0.72)", backdropFilter: "blur(4px)", display: "flex", alignItems: "flex-start", justifyContent: "center", padding: "24px", overflowY: "auto" }}
+    >
+      <div
+        onClick={e => e.stopPropagation()}
+        style={{ background: "#0A1526", borderRadius: "18px", border: "1px solid rgba(255,255,255,0.1)", boxShadow: "0 12px 48px rgba(0,0,0,0.5)", width: "100%", maxWidth: "780px", padding: "26px 28px 22px", animation: "fadeSlide 0.18s ease-out", fontFamily: "var(--font-body-new)", marginBottom: "24px" }}
+      >
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "14px" }}>
+          <div>
+            <h3 style={{ fontFamily: "var(--font-heading-new)", fontSize: "22px", fontWeight: 600, color: "#FFFFFF", marginBottom: "4px" }}>{listing.title ?? "Untitled listing"}</h3>
+            <p style={{ fontSize: "12px", color: "#A9B4C2" }}>{[listing.locality, listing.city].filter(Boolean).join(", ") || "—"}</p>
+          </div>
+          <button onClick={onClose} aria-label="Close" style={{ width: "30px", height: "30px", borderRadius: "8px", background: "rgba(255,255,255,0.06)", border: "none", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: "#FFFFFF", flexShrink: 0 }}>
+            <IconX />
+          </button>
+        </div>
+
+        {loading ? (
+          <div style={{ padding: "60px 0" }}><Spinner /></div>
+        ) : (
+          <>
+            {/* Gallery — main image + thumbnail strip, local activeImg state only. */}
+            {photos.length > 0 && (
+              <div style={{ marginBottom: "18px" }}>
+                <div style={{ borderRadius: "12px", overflow: "hidden", height: "320px", background: "#000" }}>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={optimizedImageUrl(photos[activeImg], 900)} alt={listing.title ?? "Listing photo"} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+                </div>
+                {photos.length > 1 && (
+                  <div style={{ display: "flex", gap: "8px", marginTop: "8px", overflowX: "auto" }}>
+                    {photos.map((url, i) => (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        key={url + i}
+                        src={optimizedImageUrl(url, 160)}
+                        alt=""
+                        onClick={() => setActiveImg(i)}
+                        style={{ width: "72px", height: "56px", objectFit: "cover", borderRadius: "6px", cursor: "pointer", flexShrink: 0, border: i === activeImg ? "2px solid #10C4C3" : "2px solid transparent" }}
+                      />
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Video — same VideoSlide component the public page uses, reused
+                standalone with no coupling to PropertyDetailClient. */}
+            {videoReady && (
+              <div style={{ borderRadius: "12px", overflow: "hidden", marginBottom: "18px" }}>
+                <VideoSlide videoAssetId={videoAssetId} thumbnailUrl={photos[0] ?? null} title={listing.title ?? "Listing"} height="320px" />
+              </div>
+            )}
+
+            {/* Floor plans */}
+            {floorPlans.length > 0 && (
+              <div style={{ marginBottom: "18px" }}>
+                <p style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: "#6B7686", marginBottom: "8px" }}>Floor Plans</p>
+                <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
+                  {floorPlans.map(fp => (
+                    <div key={fp.id} style={{ width: "140px" }}>
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={optimizedImageUrl(fp.image_url, 280)} alt={fp.label ?? "Floor plan"} style={{ width: "100%", height: "100px", objectFit: "cover", borderRadius: "8px" }} />
+                      {fp.label && <p style={{ fontSize: "11px", color: "#A9B4C2", marginTop: "4px" }}>{fp.label}</p>}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Price + core specs */}
+            <div style={{ display: "flex", flexWrap: "wrap", gap: "20px", padding: "14px 0", borderTop: "1px solid rgba(255,255,255,0.08)", borderBottom: "1px solid rgba(255,255,255,0.08)", marginBottom: "18px" }}>
+              <Spec label={isRent ? "Monthly Rent" : "Price"} value={fmtINR(listing.price)} />
+              <Spec label="Category" value={listing.property_category ?? "—"} />
+              <Spec label={isRent ? "Security Deposit" : "Built-up Area"} value={isRent ? fmtINR(n("security_deposit")) : (n("built_up_area") != null ? `${n("built_up_area")!.toLocaleString("en-IN")} sqft` : "—")} />
+              <Spec label="Bedrooms" value={n("bedrooms") != null ? String(n("bedrooms")) : "—"} />
+              <Spec label="Bathrooms" value={n("bathrooms") != null ? String(n("bathrooms")) : "—"} />
+              <Spec label="Facing" value={s("facing") ?? "—"} />
+              <Spec label="Furnishing" value={s("furnishing") ?? "—"} />
+              {isRent && <Spec label="Maintenance" value={n("maintenance_charge") != null ? fmtINR(n("maintenance_charge")) : "—"} />}
+            </div>
+
+            {/* Brokerage + RERA + listed-by */}
+            <div style={{ display: "flex", flexWrap: "wrap", gap: "20px", marginBottom: "18px" }}>
+              <Spec label="Listed By" value={s("listed_by") ? s("listed_by")!.charAt(0).toUpperCase() + s("listed_by")!.slice(1) : "—"} />
+              <Spec label="RERA Number" value={s("rera_number") ?? "—"} />
+              <Spec
+                label="Brokerage"
+                value={
+                  b("show_brokerage_details") && s("brokerage_mode") && n("brokerage_value") != null
+                    ? (s("brokerage_mode") === "days_rent" ? `${n("brokerage_value")} days' rent`
+                      : s("brokerage_mode") === "months_rent" ? `${n("brokerage_value")} months' rent`
+                      : s("brokerage_mode") === "percentage" ? `${n("brokerage_value")}%`
+                      : fmtINR(n("brokerage_value")))
+                    : "Not disclosed"
+                }
+              />
+            </div>
+
+            {/* Amenities */}
+            {amenities.length > 0 && (
+              <div style={{ marginBottom: "18px" }}>
+                <p style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: "#6B7686", marginBottom: "8px" }}>Amenities</p>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
+                  {amenities.map(a => (
+                    <span key={a} style={{ fontSize: "11px", padding: "5px 12px", background: "rgba(16,196,195,0.12)", border: "1px solid rgba(16,196,195,0.3)", borderRadius: "100px", color: "#10C4C3" }}>{a}</span>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Highlights / description */}
+            {s("highlights") && (
+              <div style={{ marginBottom: "18px" }}>
+                <p style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: "#6B7686", marginBottom: "8px" }}>Highlights</p>
+                <p style={{ fontSize: "13px", color: "#E5E9F0", lineHeight: 1.6, whiteSpace: "pre-wrap" }}>{s("highlights")}</p>
+              </div>
+            )}
+
+            {/* Seller contact */}
+            <div style={{ display: "flex", flexWrap: "wrap", gap: "20px", marginBottom: "22px" }}>
+              <Spec label="Submitted By" value={listing.seller_name ?? "—"} />
+              <Spec label="Email" value={listing.seller_email ?? "—"} />
+              <Spec label="Phone" value={listing.seller_phone ?? "—"} />
+            </div>
+
+            {/* Actions */}
+            <div style={{ display: "flex", flexWrap: "wrap", gap: "10px" }}>
+              <button onClick={onApprove} disabled={inFlight} style={{ display: "flex", alignItems: "center", gap: "6px", padding: "10px 18px", borderRadius: "8px", fontSize: "12px", fontWeight: 700, background: "rgba(16,196,195,0.12)", color: "#10C4C3", border: "1.5px solid rgba(16,196,195,0.35)", cursor: inFlight ? "not-allowed" : "pointer", fontFamily: "var(--font-body-new)", opacity: inFlight ? 0.6 : 1 }}>
+                <IconApprove /> Approve
+              </button>
+              <button onClick={onReject} disabled={inFlight} style={{ display: "flex", alignItems: "center", gap: "6px", padding: "10px 18px", borderRadius: "8px", fontSize: "12px", fontWeight: 700, background: "rgba(239,68,68,0.1)", color: "#EF4444", border: "1.5px solid rgba(239,68,68,0.3)", cursor: inFlight ? "not-allowed" : "pointer", fontFamily: "var(--font-body-new)", opacity: inFlight ? 0.6 : 1 }}>
+                <IconReject /> Reject
+              </button>
+              <button onClick={onRequestChanges} disabled={inFlight} style={{ padding: "10px 18px", borderRadius: "8px", fontSize: "12px", fontWeight: 700, background: "rgba(245,158,11,0.1)", color: "#F59E0B", border: "1.5px solid rgba(245,158,11,0.3)", cursor: inFlight ? "not-allowed" : "pointer", fontFamily: "var(--font-body-new)", opacity: inFlight ? 0.6 : 1 }}>
+                Request Changes
+              </button>
+              <a
+                href={`/post-property/edit/${listing.id}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ padding: "10px 18px", borderRadius: "8px", fontSize: "12px", fontWeight: 700, background: "rgba(255,255,255,0.06)", color: "#FFFFFF", border: "1.5px solid rgba(255,255,255,0.15)", textDecoration: "none", fontFamily: "var(--font-body-new)", display: "inline-flex", alignItems: "center" }}
+              >
+                Edit as Admin ↗
+              </a>
+            </div>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function Spec({ label, value }: { label: string; value: string }) {
+  return (
+    <div>
+      <p style={{ fontSize: "9px", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: "#6B7686", marginBottom: "3px" }}>{label}</p>
+      <p style={{ fontSize: "13px", color: "#FFFFFF" }}>{value}</p>
+    </div>
+  );
+}
+
+// ── Section: Listings (unified) ─────────────────────────────────────────────────
+// Replaces the former Pending Review / Approved Listings / Rejected Listings
+// sidebar entries: those were nothing but .eq("status", X) on the exact same
+// property_listings table, same AdminListing type, same ListingCard — three
+// screens with no structural difference. Consolidated here into one list with
+// a real status filter, which also closes a live gap the three-way split had:
+// 'frozen' (report-freeze workflow) and 'changes_requested' (this session's
+// Request Changes flow) listings belonged to none of the three old sections
+// and were invisible in the sidebar entirely. Confirmed via a live
+// `select status, count(*) group by status` before committing to this shape
+// (2026-09-19): real values in production data are pending_review, active,
+// rejected, changes_requested — no sold/rented/expired/flagged ever existed.
+// frozen is included below despite 0 live rows today because it's a real,
+// reachable status via handleReportFreezeListing.
+const LISTING_STATUS_FILTERS = [
+  { value: "pending_review",    label: "Pending Review" },
+  { value: "active",            label: "Active" },
+  { value: "rejected",          label: "Rejected" },
+  { value: "changes_requested", label: "Changes Requested" },
+  { value: "frozen",            label: "Frozen" },
+] as const;
+
+const LISTING_STATUS_QUERY_COLUMNS =
+  "id, slug, title, property_category, listing_type, city, locality, price, photo_urls, seller_name, seller_email, seller_phone, submitted_at, status, assigned_agent_id, kuula_tour_url, google_maps_url";
+
+function ListingsSection({
+  listings, loading, statusFilter, onStatusFilterChange, inFlight, agents,
+  onApprove, onReject, onRequestChanges, onUnpublish, onReApprove,
+  onAssignAgent, onKuulaTourUrl, onGoogleMapsUrl,
 }: {
   listings: AdminListing[];
   loading: boolean;
+  statusFilter: string;
+  onStatusFilterChange: (status: string) => void;
   inFlight: string | null;
-  onUnpublish: (id: string, reason: string, note: string | null) => void;
   agents: ApprovedAgentOption[];
+  onApprove: (id: string) => void;
+  onReject: (id: string) => void;
+  onRequestChanges: (id: string, note: string) => void;
+  onUnpublish: (id: string, reason: string, note: string | null) => void;
+  onReApprove: (id: string) => void;
   onAssignAgent: (id: string, agentId: string | null) => void;
   onKuulaTourUrl: (id: string, url: string | null) => void;
   onGoogleMapsUrl: (id: string, url: string | null) => void;
 }) {
+  const [search, setSearch] = useState("");
+  const [sortDir, setSortDir] = useState<"asc" | "desc">(statusFilter === "pending_review" ? "asc" : "desc");
   const [unpublishTarget, setUnpublishTarget] = useState<AdminListing | null>(null);
-  if (loading) return <Spinner />;
+  const [requestChangesTarget, setRequestChangesTarget] = useState<AdminListing | null>(null);
+
+  // On-demand full-row fetch for the preview modal — AdminListing's own
+  // column set is deliberately limited (main list query), so pricing/
+  // brokerage/amenity/video fields are fetched fresh only when a listing
+  // is actually opened, not bloating the list query for every row.
+  const [previewListing, setPreviewListing] = useState<AdminListing | null>(null);
+  const [previewRow, setPreviewRow] = useState<Record<string, unknown> | null>(null);
+  const [previewFloorPlans, setPreviewFloorPlans] = useState<FloorPlanRow[]>([]);
+  const [previewLoading, setPreviewLoading] = useState(false);
+
+  const openPreview = useCallback(async (l: AdminListing) => {
+    setPreviewListing(l);
+    setPreviewLoading(true);
+    setPreviewRow(null);
+    setPreviewFloorPlans([]);
+    const supabase = createClient();
+    const [{ data: row }, { data: floorPlans }] = await Promise.all([
+      supabase.from("property_listings").select("*").eq("id", l.id).maybeSingle(),
+      supabase.from("property_floor_plans").select("id, image_url, label").eq("property_id", l.id).order("display_order"),
+    ]);
+    setPreviewRow(row ?? null);
+    setPreviewFloorPlans(floorPlans ?? []);
+    setPreviewLoading(false);
+  }, []);
+
+  // Client-side search (title/city/locality/seller name/agent name) and
+  // sort-by-listed-date on top of the server-filtered-by-status list — no
+  // extra round trip for either, since `listings` is already the full set
+  // for the current status filter.
+  const displayedListings = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    const agentNameById = new Map(agents.map(a => [a.id, a.name.toLowerCase()]));
+    const filtered = q
+      ? listings.filter(l => {
+          const agentName = l.assigned_agent_id ? agentNameById.get(l.assigned_agent_id) ?? "" : "";
+          return [l.title, l.city, l.locality, l.seller_name, agentName].some(v => v?.toLowerCase().includes(q));
+        })
+      : listings;
+    return [...filtered].sort((a, b) => {
+      const diff = new Date(a.submitted_at).getTime() - new Date(b.submitted_at).getTime();
+      return sortDir === "asc" ? diff : -diff;
+    });
+  }, [listings, search, sortDir, agents]);
+
+  const emptyLabel = LISTING_STATUS_FILTERS.find(f => f.value === statusFilter)?.label ?? "listings";
+
   return (
     <div>
-      <SectionHeading title="Approved Listings" subtitle="Currently live on the platform." count={listings.length} />
-      {listings.length === 0 ? (
+      <SectionHeading title="Listings" subtitle="All submissions, filterable by status." count={listings.length} />
+
+      {/* Status filter tabs */}
+      <div style={{ display: "flex", gap: "8px", flexWrap: "wrap", marginBottom: "16px" }}>
+        {LISTING_STATUS_FILTERS.map(f => (
+          <button
+            key={f.value}
+            onClick={() => onStatusFilterChange(f.value)}
+            style={{
+              padding: "8px 16px", borderRadius: "100px", fontSize: "12px", fontWeight: 600,
+              fontFamily: "var(--font-body-new)", cursor: "pointer",
+              background: statusFilter === f.value ? "#10C4C3" : "rgba(255,255,255,0.06)",
+              color: statusFilter === f.value ? "#020C1C" : "#A9B4C2",
+              border: statusFilter === f.value ? "1.5px solid #10C4C3" : "1.5px solid rgba(255,255,255,0.12)",
+            }}
+          >
+            {f.label}
+          </button>
+        ))}
+      </div>
+
+      {/* Search + sort */}
+      <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", marginBottom: "18px" }}>
+        <input
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+          placeholder="Search title, city, locality, seller, or agent…"
+          style={{ flex: 1, minWidth: "220px", boxSizing: "border-box", padding: "10px 14px", borderRadius: "8px", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.15)", color: "#FFFFFF", fontSize: "13px", fontFamily: "var(--font-body-new)" }}
+        />
+        <button
+          onClick={() => setSortDir(d => d === "asc" ? "desc" : "asc")}
+          style={{ padding: "10px 16px", borderRadius: "8px", fontSize: "12px", fontWeight: 600, color: "#FFFFFF", border: "1.5px solid rgba(255,255,255,0.15)", background: "transparent", cursor: "pointer", fontFamily: "var(--font-body-new)", whiteSpace: "nowrap" }}
+        >
+          Listed Date: {sortDir === "asc" ? "Oldest first" : "Newest first"}
+        </button>
+      </div>
+
+      {loading ? (
+        <Spinner />
+      ) : displayedListings.length === 0 ? (
         <div style={{ padding: "60px 24px", textAlign: "center", background: "rgba(255,255,255,0.05)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", borderRadius: "18px", border: "1px solid rgba(255,255,255,0.08)" }}>
-          <p style={{ fontFamily: "var(--font-heading-new)", fontSize: "20px", color: "#FFFFFF" }}>No active listings</p>
+          <p style={{ fontFamily: "var(--font-heading-new)", fontSize: "20px", color: "#FFFFFF" }}>
+            {search.trim() ? "No listings match your search" : `No ${emptyLabel.toLowerCase()} listings`}
+          </p>
         </div>
       ) : (
         <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
-          {listings.map(l => (
+          {displayedListings.map(l => (
             <ListingCard
               key={l.id}
               listing={l}
@@ -1085,19 +1433,91 @@ function ApprovedSection({
                   onSave={url => onGoogleMapsUrl(l.id, url)}
                 />
               }
-              actions={
+              previewControl={
                 <button
-                  onClick={() => setUnpublishTarget(l)}
+                  onClick={() => void openPreview(l)}
                   disabled={inFlight === l.id}
-                  style={{ display: "flex", alignItems: "center", gap: "6px", padding: "7px 14px", borderRadius: "7px", fontSize: "11px", fontWeight: 600, background: "rgba(245,158,11,0.1)", color: "#F59E0B", border: "1.5px solid rgba(245,158,11,0.3)", cursor: inFlight === l.id ? "not-allowed" : "pointer", fontFamily: "var(--font-body-new)", opacity: inFlight === l.id ? 0.6 : 1 }}
+                  style={{ display: "flex", alignItems: "center", gap: "5px", padding: "7px 14px", borderRadius: "7px", fontSize: "11px", fontWeight: 600, color: "#FFFFFF", border: "1.5px solid rgba(255,255,255,0.15)", background: "transparent", cursor: inFlight === l.id ? "not-allowed" : "pointer", letterSpacing: "0.04em", fontFamily: "var(--font-body-new)" }}
                 >
-                  Unpublish
+                  Preview <IconArrow />
                 </button>
+              }
+              actions={
+                l.status === "pending_review" ? (
+                  <>
+                    <button
+                      onClick={() => onApprove(l.id)}
+                      disabled={inFlight === l.id}
+                      style={{ display: "flex", alignItems: "center", gap: "6px", padding: "7px 16px", borderRadius: "7px", fontSize: "11px", fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase" as const, background: "#10C4C3", color: "#020C1C", border: "none", cursor: inFlight === l.id ? "not-allowed" : "pointer", fontFamily: "var(--font-body-new)", opacity: inFlight === l.id ? 0.6 : 1 }}
+                    >
+                      <IconApprove /> Approve
+                    </button>
+                    <button
+                      onClick={() => onReject(l.id)}
+                      disabled={inFlight === l.id}
+                      style={{ display: "flex", alignItems: "center", gap: "6px", padding: "7px 16px", borderRadius: "7px", fontSize: "11px", fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase" as const, background: "rgba(248,113,113,0.1)", color: "#F87171", border: "1.5px solid rgba(248,113,113,0.3)", cursor: inFlight === l.id ? "not-allowed" : "pointer", fontFamily: "var(--font-body-new)", opacity: inFlight === l.id ? 0.6 : 1 }}
+                    >
+                      <IconReject /> Reject
+                    </button>
+                    <button
+                      onClick={() => setRequestChangesTarget(l)}
+                      disabled={inFlight === l.id}
+                      style={{ display: "flex", alignItems: "center", gap: "6px", padding: "7px 16px", borderRadius: "7px", fontSize: "11px", fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase" as const, background: "rgba(245,158,11,0.1)", color: "#F59E0B", border: "1.5px solid rgba(245,158,11,0.3)", cursor: inFlight === l.id ? "not-allowed" : "pointer", fontFamily: "var(--font-body-new)", opacity: inFlight === l.id ? 0.6 : 1 }}
+                    >
+                      Request Changes
+                    </button>
+                  </>
+                ) : l.status === "active" ? (
+                  <button
+                    onClick={() => setUnpublishTarget(l)}
+                    disabled={inFlight === l.id}
+                    style={{ display: "flex", alignItems: "center", gap: "6px", padding: "7px 14px", borderRadius: "7px", fontSize: "11px", fontWeight: 600, background: "rgba(245,158,11,0.1)", color: "#F59E0B", border: "1.5px solid rgba(245,158,11,0.3)", cursor: inFlight === l.id ? "not-allowed" : "pointer", fontFamily: "var(--font-body-new)", opacity: inFlight === l.id ? 0.6 : 1 }}
+                  >
+                    Unpublish
+                  </button>
+                ) : l.status === "rejected" ? (
+                  <button
+                    onClick={() => onReApprove(l.id)}
+                    disabled={inFlight === l.id}
+                    style={{ display: "flex", alignItems: "center", gap: "6px", padding: "7px 14px", borderRadius: "7px", fontSize: "11px", fontWeight: 700, background: "#10C4C3", color: "#020C1C", border: "none", cursor: inFlight === l.id ? "not-allowed" : "pointer", fontFamily: "var(--font-body-new)", opacity: inFlight === l.id ? 0.6 : 1 }}
+                  >
+                    <IconApprove /> Re-approve
+                  </button>
+                ) : null
+                // changes_requested / frozen: no direct action here by design.
+                // changes_requested is waiting on the submitter (Preview shows
+                // the note); frozen stays Reports-section-only (unfreeze lives
+                // in handleReportUnfreezeListing, tied to the report that froze
+                // it) — not duplicated here to avoid two paths to the same
+                // action drifting out of sync.
               }
             />
           ))}
         </div>
       )}
+
+      {previewListing && (
+        <AdminListingFullPreview
+          listing={previewListing}
+          row={previewRow}
+          floorPlans={previewFloorPlans}
+          loading={previewLoading}
+          inFlight={inFlight === previewListing.id}
+          onClose={() => setPreviewListing(null)}
+          onApprove={() => { onApprove(previewListing.id); setPreviewListing(null); }}
+          onReject={() => { onReject(previewListing.id); setPreviewListing(null); }}
+          onRequestChanges={() => { setRequestChangesTarget(previewListing); setPreviewListing(null); }}
+        />
+      )}
+
+      {requestChangesTarget && (
+        <RequestChangesModal
+          listing={requestChangesTarget}
+          onConfirm={note => { onRequestChanges(requestChangesTarget.id, note); setRequestChangesTarget(null); }}
+          onCancel={() => setRequestChangesTarget(null)}
+        />
+      )}
+
       {unpublishTarget && (
         <UnpublishListingModal
           listing={unpublishTarget}
@@ -1107,48 +1527,6 @@ function ApprovedSection({
           }}
           onCancel={() => setUnpublishTarget(null)}
         />
-      )}
-    </div>
-  );
-}
-
-// ── Section: Rejected Listings ─────────────────────────────────────────────────
-
-function RejectedSection({
-  listings, loading, inFlight, onReApprove,
-}: {
-  listings: AdminListing[];
-  loading: boolean;
-  inFlight: string | null;
-  onReApprove: (id: string) => void;
-}) {
-  if (loading) return <Spinner />;
-  return (
-    <div>
-      <SectionHeading title="Rejected Listings" subtitle="Listings that have been declined." count={listings.length} />
-      {listings.length === 0 ? (
-        <div style={{ padding: "60px 24px", textAlign: "center", background: "rgba(255,255,255,0.05)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", borderRadius: "18px", border: "1px solid rgba(255,255,255,0.08)" }}>
-          <p style={{ fontFamily: "var(--font-heading-new)", fontSize: "20px", color: "#FFFFFF" }}>No rejected listings</p>
-        </div>
-      ) : (
-        <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
-          {listings.map(l => (
-            <ListingCard
-              key={l.id}
-              listing={l}
-              inFlight={inFlight === l.id}
-              actions={
-                <button
-                  onClick={() => onReApprove(l.id)}
-                  disabled={inFlight === l.id}
-                  style={{ display: "flex", alignItems: "center", gap: "6px", padding: "7px 14px", borderRadius: "7px", fontSize: "11px", fontWeight: 700, background: "#10C4C3", color: "#020C1C", border: "none", cursor: inFlight === l.id ? "not-allowed" : "pointer", fontFamily: "var(--font-body-new)", opacity: inFlight === l.id ? 0.6 : 1 }}
-                >
-                  <IconApprove /> Re-approve
-                </button>
-              }
-            />
-          ))}
-        </div>
       )}
     </div>
   );
@@ -1788,15 +2166,20 @@ const AGENT_STATUS_FILTERS = ["pending", "approved", "rejected", "incomplete"] a
 type AgentStatusFilter = typeof AGENT_STATUS_FILTERS[number];
 
 function AgentCard({
-  app, inFlight, actions, documents,
+  app, inFlight, actions, documents, listings, leadCount, expanded, onToggleExpand,
 }: {
   app: AgentApplication;
   inFlight: boolean;
   actions: React.ReactNode;
   documents: AgentDocumentRow[];
+  listings: AdminListing[];
+  leadCount: number;
+  expanded: boolean;
+  onToggleExpand: () => void;
 }) {
   const cities = (app.agent_service_cities ?? []).map(c => c.city);
   const missing = incompleteAgentAppReasons(app);
+  const activeListingsCount = listings.filter(l => l.status === "active").length;
   return (
     <div style={{ background: "rgba(255,255,255,0.05)", backdropFilter: "blur(24px)", WebkitBackdropFilter: "blur(24px)", borderRadius: "16px", border: "1px solid rgba(255,255,255,0.08)", boxShadow: "0 4px 24px rgba(0,0,0,0.18)", padding: "18px 22px", opacity: inFlight ? 0.55 : 1, transition: "opacity 0.2s" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: "12px", flexWrap: "wrap", marginBottom: "10px" }}>
@@ -1820,6 +2203,17 @@ function AgentCard({
             {app.years_experience != null && <span>{app.years_experience} yrs experience</span>}
           </div>
         </div>
+      </div>
+
+      {/* Stats — computed from property_listings.assigned_agent_id and
+          inquiries.assigned_to (both existing FKs), passed down already
+          grouped by AgentsSection. Shown regardless of application
+          status: an approved agent's ongoing activity is exactly what
+          this is for, not just pending-application review context. */}
+      <div style={{ display: "flex", gap: "18px", marginBottom: "10px", fontSize: "12px", color: "#A9B4C2" }}>
+        <span><strong style={{ color: "#FFFFFF" }}>{listings.length}</strong> Listings</span>
+        <span><strong style={{ color: "#FFFFFF" }}>{activeListingsCount}</strong> Active</span>
+        <span><strong style={{ color: "#FFFFFF" }}>{leadCount}</strong> Leads</span>
       </div>
 
       {app.license_number && (
@@ -1876,7 +2270,45 @@ function AgentCard({
 
       <div style={{ display: "flex", gap: "8px", alignItems: "center", flexWrap: "wrap" }}>
         {actions}
+        {listings.length > 0 && (
+          <button
+            onClick={onToggleExpand}
+            style={{ display: "flex", alignItems: "center", gap: "6px", padding: "7px 16px", borderRadius: "7px", fontSize: "11px", fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase" as const, background: "rgba(255,255,255,0.06)", color: "#FFFFFF", border: "1.5px solid rgba(255,255,255,0.15)", cursor: "pointer", fontFamily: "var(--font-body-new)" }}
+          >
+            {expanded ? "Hide Properties" : `View Properties (${listings.length})`}
+          </button>
+        )}
       </div>
+
+      {/* Drill-down — reuses the same ListingCard already used by the
+          Pending/Approved/Rejected sections, rather than a second
+          listing-row component. Read-only here (View link only): this
+          is a browse view of the agent's properties, not a place to
+          change listing status — that already exists in the Listings-
+          scoped sections. */}
+      {expanded && listings.length > 0 && (
+        <div style={{ display: "flex", flexDirection: "column", gap: "12px", marginTop: "14px", paddingTop: "14px", borderTop: "1px solid rgba(255,255,255,0.08)" }}>
+          {listings.map(l => (
+            <ListingCard
+              key={l.id}
+              listing={l}
+              inFlight={false}
+              actions={
+                l.slug ? (
+                  <a
+                    href={`/property/${l.slug}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{ display: "inline-flex", alignItems: "center", gap: "6px", padding: "7px 14px", borderRadius: "7px", fontSize: "11px", fontWeight: 700, background: "rgba(16,196,195,0.1)", color: "#10C4C3", border: "1.5px solid rgba(16,196,195,0.3)", textDecoration: "none", fontFamily: "var(--font-body-new)" }}
+                  >
+                    View Listing
+                  </a>
+                ) : <></>
+              }
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 }
@@ -2061,6 +2493,7 @@ function AddAgentModal({ onClose, onSubmit }: {
 
 function AgentsSection({
   applications, loading, inFlight, onApprove, onReject, onToggleBadge, onAddAgent, documentsByProfile,
+  listingsForStats, leadsForStats,
 }: {
   applications: AgentApplication[];
   loading: boolean;
@@ -2073,9 +2506,17 @@ function AgentsSection({
     yearsExperience: string; cities: string[];
   }) => Promise<{ ok: boolean; error?: string }>;
   documentsByProfile: Record<string, AgentDocumentRow[]>;
+  // Total/active listings and leads counts per agent — grouped here
+  // (not passed pre-aggregated) so AgentCard's "View Properties"
+  // drill-down can reuse the same per-agent listings array the counts
+  // were derived from, rather than fetching it a second time.
+  listingsForStats: AdminListing[];
+  leadsForStats: { assigned_to: string | null }[];
 }) {
   const [filter, setFilter] = useState<AgentStatusFilter>("pending");
   const [showAddModal, setShowAddModal] = useState(false);
+  const [search, setSearch] = useState("");
+  const [expandedAgentId, setExpandedAgentId] = useState<string | null>(null);
 
   // "incomplete" is a derived flag, not a status value — an application can
   // be pending/approved/rejected AND incomplete at the same time, so this
@@ -2085,15 +2526,55 @@ function AgentsSection({
       ? applications.filter(a => incompleteAgentAppReasons(a).length > 0).length
       : applications.filter(a => a.status === f).length;
 
-  const filtered = filter === "incomplete"
+  const statusFiltered = filter === "incomplete"
     ? applications.filter(a => incompleteAgentAppReasons(a).length > 0)
     : applications.filter(a => a.status === filter);
+
+  // Search narrows within whichever status tab is active — by agent
+  // name (profiles.full_name) or agency name, case-insensitive.
+  const q = search.trim().toLowerCase();
+  const filtered = q
+    ? statusFiltered.filter(a =>
+        (a.profiles?.full_name ?? "").toLowerCase().includes(q) ||
+        (a.agency_name ?? "").toLowerCase().includes(q)
+      )
+    : statusFiltered;
+
+  // Grouped once per render from the raw arrays passed down — assigned_
+  // agent_id / assigned_to are both existing FKs to agent_profiles.id
+  // (property_listings: migration 011; inquiries: migration 014), no
+  // new columns needed.
+  const listingsByAgent = React.useMemo(() => {
+    const map: Record<string, AdminListing[]> = {};
+    for (const l of listingsForStats) {
+      if (!l.assigned_agent_id) continue;
+      (map[l.assigned_agent_id] ??= []).push(l);
+    }
+    return map;
+  }, [listingsForStats]);
+
+  const leadCountByAgent = React.useMemo(() => {
+    const map: Record<string, number> = {};
+    for (const lead of leadsForStats) {
+      if (!lead.assigned_to) continue;
+      map[lead.assigned_to] = (map[lead.assigned_to] ?? 0) + 1;
+    }
+    return map;
+  }, [leadsForStats]);
 
   if (loading) return <Spinner />;
 
   return (
     <div>
-      <SectionHeading title="Agent Applications" subtitle="Review public applications or add agents directly." count={filtered.length} />
+      <SectionHeading title="Agents" subtitle="Review public applications, add agents directly, and track established agents' listings and leads." count={filtered.length} />
+
+      <input
+        type="text"
+        value={search}
+        onChange={e => setSearch(e.target.value)}
+        placeholder="Search by agent or agency name…"
+        style={{ width: "100%", boxSizing: "border-box", padding: "10px 14px", borderRadius: "9px", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.15)", color: "#FFFFFF", fontSize: "13px", fontFamily: "var(--font-body-new)", marginBottom: "14px" }}
+      />
 
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "12px", flexWrap: "wrap", marginBottom: "18px" }}>
         <div style={{ display: "flex", gap: "6px", flexWrap: "wrap" }}>
@@ -2130,6 +2611,10 @@ function AgentsSection({
               app={app}
               inFlight={inFlight === app.id}
               documents={documentsByProfile[app.id] ?? []}
+              listings={listingsByAgent[app.id] ?? []}
+              leadCount={leadCountByAgent[app.id] ?? 0}
+              expanded={expandedAgentId === app.id}
+              onToggleExpand={() => setExpandedAgentId(prev => prev === app.id ? null : app.id)}
               actions={
                 <>
                   {filter === "pending" && (
@@ -2193,6 +2678,16 @@ const CAPTURE_360_STATUS_FILTERS = ["pending", "scheduled", "completed", "declin
 type Capture360StatusFilter = typeof CAPTURE_360_STATUS_FILTERS[number];
 
 const CAPTURE_360_TIME_SLOTS = ["Morning (9 AM – 12 PM)", "Afternoon (12 – 4 PM)", "Evening (4 – 7 PM)"] as const;
+// Maps preferred_time_slot's strict enum ('morning'/'afternoon'/
+// 'evening', migration 071's CHECK constraint) to the matching full
+// option string above — scheduled_time_slot itself is free text with
+// no CHECK, so these are two different vocabularies for "time slot"
+// and a direct value comparison between them would never match.
+const PREFERRED_SLOT_TO_SCHEDULE_OPTION: Record<string, string> = {
+  morning: CAPTURE_360_TIME_SLOTS[0],
+  afternoon: CAPTURE_360_TIME_SLOTS[1],
+  evening: CAPTURE_360_TIME_SLOTS[2],
+};
 
 function daysFromNow(iso: string | null): number | null {
   if (!iso) return null;
@@ -2214,8 +2709,14 @@ function Capture360ScheduleModal({
   onCancel: () => void;
 }) {
   const todayStr = new Date().toISOString().slice(0, 10);
-  const [date, setDate] = useState("");
-  const [slotChoice, setSlotChoice] = useState<string>(CAPTURE_360_TIME_SLOTS[0]);
+  // Pre-filled from the requester's own preference (071), still fully
+  // editable — the admin can confirm as-is or pick something different
+  // before submitting. Falls back to today's defaults when no
+  // preference was given, exactly as before this change.
+  const [date, setDate] = useState(req.preferred_date ?? "");
+  const [slotChoice, setSlotChoice] = useState<string>(
+    (req.preferred_time_slot && PREFERRED_SLOT_TO_SCHEDULE_OPTION[req.preferred_time_slot]) || CAPTURE_360_TIME_SLOTS[0]
+  );
   const [customSlot, setCustomSlot] = useState("");
   const [notes, setNotes] = useState("");
   const usingCustom = slotChoice === "other";
@@ -2319,13 +2820,104 @@ function Capture360ScheduleModal({
   );
 }
 
+// ── Decline modal — replaces the previous window.prompt() reason
+// capture. Same modal shell/interaction pattern as
+// Capture360ScheduleModal (fixed inset:0 scrim, centered card,
+// Escape-to-close, backdrop-click-to-close) for consistency. Notes are
+// still free text (unchanged, "reason, as today"); the two alternative
+// dates are structured date inputs (migration 072), not free text —
+// per explicit scope, so notify-capture-requester can format them
+// cleanly rather than parsing them back out of a sentence.
+function Capture360DeclineModal({
+  req, submitting, onConfirm, onCancel,
+}: {
+  req: Capture360Request;
+  submitting: boolean;
+  onConfirm: (notes: string, altDate1: string, altDate2: string) => void;
+  onCancel: () => void;
+}) {
+  const todayStr = new Date().toISOString().slice(0, 10);
+  const [notes, setNotes] = useState("");
+  const [altDate1, setAltDate1] = useState("");
+  const [altDate2, setAltDate2] = useState("");
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onCancel(); };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [onCancel]);
+
+  return (
+    <div
+      onClick={onCancel}
+      role="dialog"
+      aria-modal="true"
+      aria-label="Decline 360° capture request"
+      style={{ position: "fixed", inset: 0, zIndex: 500, background: "rgba(0,0,0,0.6)", backdropFilter: "blur(4px)", display: "flex", alignItems: "center", justifyContent: "center", padding: "20px" }}
+    >
+      <div
+        onClick={e => e.stopPropagation()}
+        style={{ background: "#0A1526", borderRadius: "18px", border: "1px solid rgba(255,255,255,0.1)", boxShadow: "0 12px 48px rgba(0,0,0,0.5)", width: "100%", maxWidth: "480px", maxHeight: "88vh", overflowY: "auto", padding: "26px 28px", animation: "fadeSlide 0.18s ease-out", fontFamily: "var(--font-body-new)" }}
+      >
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "6px" }}>
+          <h3 style={{ fontFamily: "var(--font-heading-new)", fontSize: "22px", fontWeight: 600, color: "#FFFFFF" }}>Decline Request</h3>
+          <button onClick={onCancel} aria-label="Close" style={{ width: "30px", height: "30px", borderRadius: "8px", background: "rgba(255,255,255,0.06)", border: "none", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: "#FFFFFF" }}>
+            <IconX />
+          </button>
+        </div>
+
+        <div style={{ marginBottom: "18px" }}>
+          <p style={{ fontSize: "14px", fontWeight: 600, color: "#FFFFFF", marginBottom: "2px" }}>{req.property_listings?.title ?? "Untitled listing"}</p>
+          <p style={{ fontSize: "12px", color: "#6B7686" }}>
+            {[req.profiles?.full_name, req.profiles?.phone].filter(Boolean).join(" · ")}
+          </p>
+        </div>
+
+        <label style={{ display: "block", fontSize: "10px", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: "#6B7686", marginBottom: "6px" }}>Reason for declining (optional, shown to the requester)</label>
+        <textarea
+          value={notes} onChange={e => setNotes(e.target.value)} rows={2}
+          style={{ width: "100%", boxSizing: "border-box", padding: "9px 12px", borderRadius: "8px", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.15)", color: "#FFFFFF", fontSize: "12px", fontFamily: "var(--font-body-new)", resize: "vertical", marginBottom: "16px" }}
+        />
+
+        <label style={{ display: "block", fontSize: "10px", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: "#6B7686", marginBottom: "6px" }}>Suggest alternative date 1 (optional)</label>
+        <input
+          type="date" value={altDate1} min={todayStr} onChange={e => setAltDate1(e.target.value)}
+          style={{ width: "100%", boxSizing: "border-box", padding: "10px 12px", borderRadius: "8px", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.15)", color: "#FFFFFF", fontSize: "13px", fontFamily: "var(--font-body-new)", marginBottom: "14px" }}
+        />
+
+        <label style={{ display: "block", fontSize: "10px", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: "#6B7686", marginBottom: "6px" }}>Suggest alternative date 2 (optional)</label>
+        <input
+          type="date" value={altDate2} min={todayStr} onChange={e => setAltDate2(e.target.value)}
+          style={{ width: "100%", boxSizing: "border-box", padding: "10px 12px", borderRadius: "8px", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.15)", color: "#FFFFFF", fontSize: "13px", fontFamily: "var(--font-body-new)", marginBottom: "18px" }}
+        />
+
+        <div style={{ display: "flex", gap: "10px" }}>
+          <button
+            onClick={() => onConfirm(notes, altDate1, altDate2)}
+            disabled={submitting}
+            style={{ flex: 1, padding: "11px", borderRadius: "8px", fontSize: "12px", fontWeight: 700, letterSpacing: "0.04em", textTransform: "uppercase" as const, background: "rgba(248,113,113,0.15)", color: "#F87171", border: "1.5px solid rgba(248,113,113,0.35)", cursor: submitting ? "not-allowed" : "pointer", fontFamily: "var(--font-body-new)", opacity: submitting ? 0.6 : 1 }}
+          >
+            {submitting ? "Declining…" : "Confirm Decline"}
+          </button>
+          <button
+            onClick={onCancel}
+            style={{ padding: "11px 18px", borderRadius: "8px", fontSize: "12px", fontWeight: 700, letterSpacing: "0.04em", textTransform: "uppercase" as const, background: "rgba(255,255,255,0.06)", color: "#A9B4C2", border: "1.5px solid rgba(255,255,255,0.12)", cursor: "pointer", fontFamily: "var(--font-body-new)" }}
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function Capture360Card({
-  req, inFlight, onScheduleClick, onDecline, onComplete,
+  req, inFlight, onScheduleClick, onDeclineClick, onComplete,
 }: {
   req: Capture360Request;
   inFlight: boolean;
   onScheduleClick: () => void;
-  onDecline: (notes: string) => void;
+  onDeclineClick: () => void;
   onComplete: () => void;
 }) {
   const statusColors: Record<string, { text: string; bg: string; border: string }> = {
@@ -2361,6 +2953,17 @@ function Capture360Card({
         {req.profiles?.phone && <a href={`tel:${req.profiles.phone}`} style={{ color: "#A9B4C2", textDecoration: "none" }}>· {req.profiles.phone}</a>}
       </div>
 
+      {/* Requester's own preference (071) — distinct from the admin's
+          confirmed scheduled_date/scheduled_time_slot badge below, shown
+          regardless of status since it's useful context throughout the
+          request's lifecycle, not just while pending. */}
+      {req.preferred_date && (
+        <p style={{ fontSize: "12px", color: "#A9B4C2", marginBottom: "8px" }}>
+          Requested: {fmtDate(req.preferred_date)}
+          {req.preferred_time_slot ? `, ${req.preferred_time_slot.charAt(0).toUpperCase()}${req.preferred_time_slot.slice(1)}` : ""}
+        </p>
+      )}
+
       {req.status === "scheduled" && (
         <div style={{ display: "inline-flex", alignItems: "center", gap: "6px", padding: "6px 12px", background: "rgba(16,196,195,0.1)", border: "1px solid rgba(16,196,195,0.25)", borderRadius: "100px", fontSize: "12px", fontWeight: 600, color: "#10C4C3", marginBottom: "10px" }}>
           <IconClock /> {req.scheduled_date ?? "—"}{req.scheduled_time_slot ? ` · ${req.scheduled_time_slot}` : ""}
@@ -2369,6 +2972,11 @@ function Capture360Card({
       {req.admin_notes && (
         <p style={{ fontSize: "12px", color: "#A9B4C2", marginBottom: "10px", fontStyle: "italic" }}>
           Note: {req.admin_notes}
+        </p>
+      )}
+      {(req.suggested_alternative_date_1 || req.suggested_alternative_date_2) && (
+        <p style={{ fontSize: "12px", color: "#A9B4C2", marginBottom: "10px" }}>
+          Suggested alternatives: {[req.suggested_alternative_date_1, req.suggested_alternative_date_2].filter(Boolean).map(d => fmtDate(d as string)).join(", ")}
         </p>
       )}
 
@@ -2383,10 +2991,7 @@ function Capture360Card({
               <IconApprove /> Schedule
             </button>
             <button
-              onClick={() => {
-                const reason = window.prompt("Reason for declining (optional, shown to the requester):", "") ?? "";
-                onDecline(reason);
-              }}
+              onClick={onDeclineClick}
               disabled={inFlight}
               style={{ display: "flex", alignItems: "center", gap: "6px", padding: "7px 16px", borderRadius: "7px", fontSize: "11px", fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase" as const, background: "rgba(248,113,113,0.1)", color: "#F87171", border: "1.5px solid rgba(248,113,113,0.3)", cursor: inFlight ? "not-allowed" : "pointer", fontFamily: "var(--font-body-new)", opacity: inFlight ? 0.6 : 1 }}
             >
@@ -2415,11 +3020,12 @@ function Capture360Section({
   loading: boolean;
   inFlight: string | null;
   onSchedule: (req: Capture360Request, date: string, slot: string, notes: string) => void;
-  onDecline: (req: Capture360Request, notes: string) => void;
+  onDecline: (req: Capture360Request, notes: string, altDate1: string, altDate2: string) => void;
   onComplete: (id: string) => void;
 }) {
   const [filter, setFilter] = useState<Capture360StatusFilter>("pending");
   const [schedulingReq, setSchedulingReq] = useState<Capture360Request | null>(null);
+  const [decliningReq, setDecliningReq] = useState<Capture360Request | null>(null);
   const filtered = requests.filter(r => r.status === filter);
 
   const pendingCount = requests.filter(r => r.status === "pending").length;
@@ -2476,7 +3082,7 @@ function Capture360Section({
               req={req}
               inFlight={inFlight === req.id}
               onScheduleClick={() => setSchedulingReq(req)}
-              onDecline={notes => onDecline(req, notes)}
+              onDeclineClick={() => setDecliningReq(req)}
               onComplete={() => onComplete(req.id)}
             />
           ))}
@@ -2492,6 +3098,18 @@ function Capture360Section({
             setSchedulingReq(null);
           }}
           onCancel={() => setSchedulingReq(null)}
+        />
+      )}
+
+      {decliningReq && (
+        <Capture360DeclineModal
+          req={decliningReq}
+          submitting={inFlight === decliningReq.id}
+          onConfirm={(notes, altDate1, altDate2) => {
+            onDecline(decliningReq, notes, altDate1, altDate2);
+            setDecliningReq(null);
+          }}
+          onCancel={() => setDecliningReq(null)}
         />
       )}
     </div>
@@ -2920,10 +3538,8 @@ function AuditLogSection({ entries, loading }: { entries: AuditLogRow[]; loading
 
 const NAV: { id: AdminSection; label: string; icon: React.ReactNode }[] = [
   { id: "overview",   label: "Overview",          icon: <IconHome /> },
-  { id: "pending",    label: "Pending Review",     icon: <IconClock /> },
-  { id: "approved",   label: "Approved Listings",  icon: <IconCheck /> },
-  { id: "rejected",   label: "Rejected Listings",  icon: <IconX /> },
-  { id: "agents",     label: "Agent Applications", icon: <IconBriefcase /> },
+  { id: "listings",   label: "Listings",          icon: <IconClock /> },
+  { id: "agents",     label: "Agents",              icon: <IconBriefcase /> },
   { id: "capture360", label: "360° Requests",      icon: <IconCamera /> },
   { id: "users",      label: "All Users",          icon: <IconUsers /> },
   { id: "inquiries",  label: "All Inquiries",      icon: <IconMsg /> },
@@ -2982,12 +3598,16 @@ function AdminPageInner() {
   const [stats,        setStats]        = useState<Stats>({ pending: 0, active: 0, rejected: 0, users: 0, inquiries: 0, reportsOpen: 0, totalViews: 0 });
   const [statsLoading, setStatsLoading] = useState(true);
 
-  const [pendingListings,  setPendingListings]  = useState<AdminListing[]>([]);
-  const [approvedListings, setApprovedListings] = useState<AdminListing[]>([]);
-  const [rejectedListings, setRejectedListings] = useState<AdminListing[]>([]);
+  const [listings,          setListings]          = useState<AdminListing[]>([]);
+  const [listingsStatusFilter, setListingsStatusFilter] = useState<string>("pending_review");
   const [users,            setUsers]            = useState<UserRow[]>([]);
   const [inquiries,        setInquiries]        = useState<InquiryRow[]>([]);
   const [agentApps,        setAgentApps]        = useState<AgentApplication[]>([]);
+  // Per-agent stats source data — see the "agents" tab's fetch branch
+  // below for why these are separate, minimal fetches rather than
+  // reusing the (lazy, tab-scoped) `listings`/`inquiries` state.
+  const [agentListingsForStats, setAgentListingsForStats] = useState<AdminListing[]>([]);
+  const [agentLeadsForStats,    setAgentLeadsForStats]    = useState<{ assigned_to: string | null }[]>([]);
   const [capture360Requests, setCapture360Requests] = useState<Capture360Request[]>([]);
   const [agentDocsByProfile, setAgentDocsByProfile] = useState<Record<string, AgentDocumentRow[]>>({});
   const [approvedAgents,   setApprovedAgents]   = useState<ApprovedAgentOption[]>([]);
@@ -2997,9 +3617,7 @@ function AdminPageInner() {
   const [reportListingPreviews, setReportListingPreviews] = useState<Record<string, ReportListingPreview>>({});
   const [reportProfilePreviews, setReportProfilePreviews] = useState<Record<string, ReportProfilePreview>>({});
 
-  const [pendingLoading,  setPendingLoading]  = useState(false);
-  const [approvedLoading, setApprovedLoading] = useState(false);
-  const [rejectedLoading, setRejectedLoading] = useState(false);
+  const [listingsLoading, setListingsLoading] = useState(false);
   const [usersLoading,    setUsersLoading]    = useState(false);
   const [activeUsers,        setActiveUsers]        = useState<number | null>(null);
   const [activeUsersLoading, setActiveUsersLoading] = useState(false);
@@ -3099,45 +3717,35 @@ function AdminPageInner() {
       });
   }, [isAdmin]);
 
+  // Listings — kept OUTSIDE the loaded.current cache-gated effect below on
+  // purpose: that cache fetches a tab once and never again, but this tab's
+  // status filter can change while the tab stays open, and each filter
+  // change needs its own fetch. Rejected's query used to select a reduced
+  // column set (no assigned_agent_id/kuula_tour_url/google_maps_url) back
+  // when it was a separate, action-less section — now that all statuses
+  // share one AdminListing shape and one ListingCard, every status gets the
+  // full column set.
+  useEffect(() => {
+    if (!isAdmin || active !== "listings") return;
+    setListingsLoading(true);
+    const supabase = createClient();
+    supabase
+      .from("property_listings")
+      .select(LISTING_STATUS_QUERY_COLUMNS)
+      .eq("status", listingsStatusFilter)
+      .order("submitted_at", { ascending: listingsStatusFilter === "pending_review" })
+      .then((res: { data: unknown }) => {
+        setListings((res.data as AdminListing[] | null) ?? []);
+        setListingsLoading(false);
+      });
+  }, [isAdmin, active, listingsStatusFilter]);
+
   useEffect(() => {
     if (!isAdmin || loaded.current.has(active)) return;
     loaded.current.add(active);
     const supabase = createClient();
 
-    if (active === "pending") {
-      setPendingLoading(true);
-      supabase
-        .from("property_listings")
-        .select("id, slug, title, property_category, listing_type, city, locality, price, photo_urls, seller_name, seller_email, seller_phone, submitted_at, status, assigned_agent_id, kuula_tour_url, google_maps_url")
-        .eq("status", "pending_review")
-        .order("submitted_at", { ascending: true })
-        .then((res: { data: unknown }) => {
-          setPendingListings((res.data as AdminListing[] | null) ?? []);
-          setPendingLoading(false);
-        });
-    } else if (active === "approved") {
-      setApprovedLoading(true);
-      supabase
-        .from("property_listings")
-        .select("id, slug, title, property_category, listing_type, city, locality, price, photo_urls, seller_name, seller_email, seller_phone, submitted_at, status, assigned_agent_id, kuula_tour_url, google_maps_url")
-        .eq("status", "active")
-        .order("submitted_at", { ascending: false })
-        .then((res: { data: unknown }) => {
-          setApprovedListings((res.data as AdminListing[] | null) ?? []);
-          setApprovedLoading(false);
-        });
-    } else if (active === "rejected") {
-      setRejectedLoading(true);
-      supabase
-        .from("property_listings")
-        .select("id, slug, title, property_category, listing_type, city, locality, price, photo_urls, seller_name, seller_email, seller_phone, submitted_at, status")
-        .eq("status", "rejected")
-        .order("submitted_at", { ascending: false })
-        .then((res: { data: unknown }) => {
-          setRejectedListings((res.data as AdminListing[] | null) ?? []);
-          setRejectedLoading(false);
-        });
-    } else if (active === "users") {
+    if (active === "users") {
       setUsersLoading(true);
       supabase
         .from("profiles")
@@ -3177,6 +3785,21 @@ function AdminPageInner() {
           setAgentApps(apps);
           setAgentAppsLoading(false);
 
+          // Per-agent stats (listings/active-listings/leads counts) —
+          // two lightweight, minimal-column fetches scoped to this tab's
+          // activation, computed client-side by grouping on
+          // assigned_agent_id / assigned_to (both existing FKs to
+          // agent_profiles.id — confirmed via migrations 011 and 014
+          // respectively, no new columns needed). Independent of the
+          // "inquiries" tab's own InquiryRow-typed state, which is only
+          // ever loaded when that tab has actually been visited.
+          const [{ data: listingsForStats }, { data: leadsForStats }] = await Promise.all([
+            supabase.from("property_listings").select("id, slug, title, property_category, listing_type, city, locality, price, photo_urls, seller_name, seller_email, seller_phone, submitted_at, status, assigned_agent_id, kuula_tour_url, google_maps_url"),
+            supabase.from("inquiries").select("assigned_to"),
+          ]);
+          setAgentListingsForStats((listingsForStats as AdminListing[] | null) ?? []);
+          setAgentLeadsForStats((leadsForStats as { assigned_to: string | null }[] | null) ?? []);
+
           // KYC documents — batched second query keyed by agent_profile_id,
           // same "fetch then map" pattern already used elsewhere in this
           // codebase (e.g. approvedAgents above) rather than a nested
@@ -3200,7 +3823,7 @@ function AdminPageInner() {
       setCapture360Loading(true);
       supabase
         .from("capture_360_requests")
-        .select("id, property_id, requester_id, status, scheduled_date, scheduled_time_slot, admin_notes, created_at, updated_at, property_listings(title, address, city), profiles(full_name, phone)")
+        .select("id, property_id, requester_id, status, scheduled_date, scheduled_time_slot, admin_notes, created_at, updated_at, preferred_date, preferred_time_slot, suggested_alternative_date_1, suggested_alternative_date_2, property_listings(title, address, city), profiles(full_name, phone)")
         .order("created_at", { ascending: false })
         .then((res: { data: unknown }) => {
           setCapture360Requests((res.data as Capture360Request[] | null) ?? []);
@@ -3336,35 +3959,50 @@ function AdminPageInner() {
     setTimeout(() => setToast(null), 2500);
   }, [siteContentRows, logAdminAction, user]);
 
-  const handleListingStatus = useCallback(async (
-    id: string,
-    newStatus: "active" | "rejected" | "pending_review",
-    fromSection: "pending" | "approved" | "rejected",
-  ) => {
+  // bumpStats — Stats only tracks pending/active/rejected buckets (no
+  // changes_requested/frozen counters were asked for), so a transition
+  // into or out of either of those two is simply a no-op on stats rather
+  // than an error; every listing-status handler below routes through this
+  // instead of hand-rolling its own +1/-1 pair per transition.
+  const bumpStats = useCallback((prev: Stats, oldStatus: string | null, newStatus: string): Stats => {
+    let next = prev;
+    const oldKey = oldStatus ? LISTING_STATS_KEY[oldStatus] : undefined;
+    const newKey = LISTING_STATS_KEY[newStatus];
+    if (oldKey) next = { ...next, [oldKey]: Math.max(0, (next[oldKey] as number) - 1) };
+    if (newKey) next = { ...next, [newKey]: (next[newKey] as number) + 1 };
+    return next;
+  }, []);
+
+  // Every listing in `listings` shares the same status (it's a server-side
+  // .eq("status", listingsStatusFilter) fetch — see the dedicated effect
+  // above), so any status change always moves the item out of the
+  // currently-viewed filter; removing it from `listings` is therefore
+  // always correct, never a "should this stay in place?" branch.
+  const handleListingStatus = useCallback(async (id: string, newStatus: string) => {
     setInFlight(id);
-    const oldStatus = fromSection === "pending" ? "pending_review" : fromSection === "approved" ? "active" : "rejected";
+    const oldStatus = listings.find(l => l.id === id)?.status ?? null;
     const supabase = createClient();
-    const { error } = await supabase.from("property_listings").update({ status: newStatus }).eq("id", id);
+    // .select() + row-count check — same pattern already applied to
+    // handleDeclineCapture and the post-property edit page tonight.
+    // Without it, an RLS mismatch (or a stale/bad id) would match zero
+    // rows, report no error, and this code would proceed exactly as if
+    // it succeeded — silently no-op'ing an Approve/Reject click.
+    const { data: updatedRows, error } = await supabase
+      .from("property_listings")
+      .update({ status: newStatus })
+      .eq("id", id)
+      .select("id");
 
     if (error) {
       console.error("Admin — listing status error:", error);
       setToast({ ok: false, msg: "Update failed — please try again." });
+    } else if (!updatedRows || updatedRows.length === 0) {
+      console.error("Admin — listing status update matched zero rows. id:", id, "attempted status:", newStatus);
+      setToast({ ok: false, msg: "Update did not apply — no matching listing found. Please refresh and try again." });
     } else {
       void logAdminAction("update_listing_status", "property_listing", id, { status: oldStatus }, { status: newStatus });
-      if (fromSection === "pending") {
-        setPendingListings(prev => prev.filter(l => l.id !== id));
-        setStats(s => ({ ...s, pending: Math.max(0, s.pending - 1), ...(newStatus === "active" ? { active: s.active + 1 } : { rejected: s.rejected + 1 }) }));
-        if (newStatus === "active")   loaded.current.delete("approved");
-        if (newStatus === "rejected") loaded.current.delete("rejected");
-      } else if (fromSection === "approved") {
-        setApprovedListings(prev => prev.filter(l => l.id !== id));
-        setStats(s => ({ ...s, active: Math.max(0, s.active - 1), pending: s.pending + 1 }));
-        loaded.current.delete("pending");
-      } else if (fromSection === "rejected") {
-        setRejectedListings(prev => prev.filter(l => l.id !== id));
-        setStats(s => ({ ...s, rejected: Math.max(0, s.rejected - 1), active: s.active + 1 }));
-        loaded.current.delete("approved");
-      }
+      setListings(prev => prev.filter(l => l.id !== id));
+      setStats(s => bumpStats(s, oldStatus, newStatus));
       const msgs: Record<string, string> = {
         active: "Listing approved and live.",
         rejected: "Listing rejected.",
@@ -3381,7 +4019,44 @@ function AdminPageInner() {
     }
     setInFlight(null);
     setTimeout(() => setToast(null), 3000);
-  }, [logAdminAction]);
+  }, [listings, bumpStats, logAdminAction]);
+
+  // Request Changes — a pending-only transition, deliberately not routed
+  // through log_listing_status_change() (067): that RPC validates
+  // p_new_status against a fixed set that doesn't include
+  // 'changes_requested' (see migration 074's comment). Same plain
+  // .update() + logAdminAction() shape as handleListingStatus above,
+  // its closest sibling, plus a row-count check from the start (not a
+  // later fix, unlike handleListingStatus).
+  const handleRequestChanges = useCallback(async (id: string, note: string) => {
+    setInFlight(id);
+    const supabase = createClient();
+    const { data: updatedRows, error } = await supabase
+      .from("property_listings")
+      .update({ status: "changes_requested", changes_requested_note: note || null })
+      .eq("id", id)
+      .select("id");
+
+    if (error) {
+      console.error("Admin — request changes error:", error);
+      setToast({ ok: false, msg: "Could not request changes — please try again." });
+    } else if (!updatedRows || updatedRows.length === 0) {
+      console.error("Admin — request changes matched zero rows. id:", id);
+      setToast({ ok: false, msg: "Update did not apply — no matching listing found. Please refresh and try again." });
+    } else {
+      void logAdminAction("request_listing_changes", "property_listing", id, { status: "pending_review" }, { status: "changes_requested", note });
+      setListings(prev => prev.filter(l => l.id !== id));
+      setStats(s => bumpStats(s, "pending_review", "changes_requested"));
+      setToast({ ok: true, msg: "Changes requested — submitter notified." });
+      fetch("/api/notify-listing-changes-requested", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ propertyId: id, note }),
+      }).catch(err => console.error("[Admin] Changes-requested notification failed:", err));
+    }
+    setInFlight(null);
+    setTimeout(() => setToast(null), 3000);
+  }, [bumpStats, logAdminAction]);
 
   // Unpublish, specifically — replaces the old window.confirm ->
   // handleListingStatus(id, "pending_review", "approved") path. Calls
@@ -3418,22 +4093,17 @@ function AdminPageInner() {
       // reason/note-carrying record specific to this workflow, not a
       // replacement for the general cross-entity audit trail.
       void logAdminAction("update_listing_status", "property_listing", id, { status: "active" }, { status: "pending_review", reason, note });
-      setApprovedListings(prev => prev.filter(l => l.id !== id));
-      setStats(s => ({ ...s, active: Math.max(0, s.active - 1), pending: s.pending + 1 }));
-      loaded.current.delete("pending");
+      setListings(prev => prev.filter(l => l.id !== id));
+      setStats(s => bumpStats(s, "active", "pending_review"));
       setToast({ ok: true, msg: "Listing unpublished — returned to review." });
     }
     setInFlight(null);
     setTimeout(() => setToast(null), 3000);
-  }, [logAdminAction]);
+  }, [bumpStats, logAdminAction]);
 
-  const handleAssignAgent = useCallback(async (
-    id: string,
-    agentId: string | null,
-    fromSection: "pending" | "approved",
-  ) => {
+  const handleAssignAgent = useCallback(async (id: string, agentId: string | null) => {
     setInFlight(id);
-    const oldAgentId = (fromSection === "pending" ? pendingListings : approvedListings).find(l => l.id === id)?.assigned_agent_id ?? null;
+    const oldAgentId = listings.find(l => l.id === id)?.assigned_agent_id ?? null;
     const supabase = createClient();
     const { error } = await supabase.from("property_listings").update({ assigned_agent_id: agentId }).eq("id", id);
 
@@ -3442,22 +4112,16 @@ function AdminPageInner() {
       setToast({ ok: false, msg: "Assignment failed — please try again." });
     } else {
       void logAdminAction("assign_agent", "property_listing", id, { assigned_agent_id: oldAgentId }, { assigned_agent_id: agentId });
-      const updater = (prev: AdminListing[]) => prev.map(l => l.id === id ? { ...l, assigned_agent_id: agentId } : l);
-      if (fromSection === "pending") setPendingListings(updater);
-      else setApprovedListings(updater);
+      setListings(prev => prev.map(l => l.id === id ? { ...l, assigned_agent_id: agentId } : l));
       setToast({ ok: true, msg: agentId ? "Agent assigned." : "Agent unassigned." });
     }
     setInFlight(null);
     setTimeout(() => setToast(null), 2500);
-  }, [pendingListings, approvedListings, logAdminAction]);
+  }, [listings, logAdminAction]);
 
-  const handleKuulaTourUrl = useCallback(async (
-    id: string,
-    url: string | null,
-    fromSection: "pending" | "approved",
-  ) => {
+  const handleKuulaTourUrl = useCallback(async (id: string, url: string | null) => {
     setInFlight(id);
-    const oldUrl = (fromSection === "pending" ? pendingListings : approvedListings).find(l => l.id === id)?.kuula_tour_url ?? null;
+    const oldUrl = listings.find(l => l.id === id)?.kuula_tour_url ?? null;
     const supabase = createClient();
     const { error } = await supabase.from("property_listings").update({ kuula_tour_url: url }).eq("id", id);
 
@@ -3466,22 +4130,16 @@ function AdminPageInner() {
       setToast({ ok: false, msg: "Update failed — please try again." });
     } else {
       void logAdminAction("update_kuula_tour_url", "property_listing", id, { kuula_tour_url: oldUrl }, { kuula_tour_url: url });
-      const updater = (prev: AdminListing[]) => prev.map(l => l.id === id ? { ...l, kuula_tour_url: url } : l);
-      if (fromSection === "pending") setPendingListings(updater);
-      else setApprovedListings(updater);
+      setListings(prev => prev.map(l => l.id === id ? { ...l, kuula_tour_url: url } : l));
       setToast({ ok: true, msg: url ? "360° tour URL saved." : "360° tour URL cleared." });
     }
     setInFlight(null);
     setTimeout(() => setToast(null), 2500);
-  }, [pendingListings, approvedListings, logAdminAction]);
+  }, [listings, logAdminAction]);
 
-  const handleGoogleMapsUrl = useCallback(async (
-    id: string,
-    url: string | null,
-    fromSection: "pending" | "approved",
-  ) => {
+  const handleGoogleMapsUrl = useCallback(async (id: string, url: string | null) => {
     setInFlight(id);
-    const oldUrl = (fromSection === "pending" ? pendingListings : approvedListings).find(l => l.id === id)?.google_maps_url ?? null;
+    const oldUrl = listings.find(l => l.id === id)?.google_maps_url ?? null;
     const supabase = createClient();
     const { error } = await supabase.from("property_listings").update({ google_maps_url: url }).eq("id", id);
 
@@ -3490,14 +4148,12 @@ function AdminPageInner() {
       setToast({ ok: false, msg: "Update failed — please try again." });
     } else {
       void logAdminAction("update_google_maps_url", "property_listing", id, { google_maps_url: oldUrl }, { google_maps_url: url });
-      const updater = (prev: AdminListing[]) => prev.map(l => l.id === id ? { ...l, google_maps_url: url } : l);
-      if (fromSection === "pending") setPendingListings(updater);
-      else setApprovedListings(updater);
+      setListings(prev => prev.map(l => l.id === id ? { ...l, google_maps_url: url } : l));
       setToast({ ok: true, msg: url ? "Google Maps URL saved." : "Google Maps URL cleared." });
     }
     setInFlight(null);
     setTimeout(() => setToast(null), 2500);
-  }, [pendingListings, approvedListings, logAdminAction]);
+  }, [listings, logAdminAction]);
 
   const handleUserRole = useCallback(async (userId: string, newRole: string) => {
     const prev = users.find(u => u.id === userId)?.role ?? null;
@@ -3648,11 +4304,17 @@ function AdminPageInner() {
   }, [reports, user, logAdminAction]);
 
   const handleReportRejectListing = useCallback(async (report: ReportRow) => {
-    const preview = reportListingPreviews[report.entity_id];
-    const fromSection = preview?.status === "active" ? "approved" : preview?.status === "rejected" ? "rejected" : "pending";
-    await handleListingStatus(report.entity_id, "rejected", fromSection);
+    // handleListingStatus derives its own "before" status from the currently
+    // loaded Listings tab (`listings`); a report-driven reject can target a
+    // listing that tab isn't showing right now (report.entity_id isn't
+    // necessarily in view), in which case it degrades gracefully to a null
+    // "before" value in the audit log rather than a wrong one. reportListingPreviews'
+    // own status (used elsewhere on this card) isn't threaded through for
+    // that reason — passing a value handleListingStatus's signature no
+    // longer accepts would be dead code, not a real fix.
+    await handleListingStatus(report.entity_id, "rejected");
     await handleReportResolve(report.id, "resolved");
-  }, [reportListingPreviews, handleListingStatus, handleReportResolve]);
+  }, [handleListingStatus, handleReportResolve]);
 
   const handleReportDeactivateUser = useCallback(async (report: ReportRow) => {
     await handleUserUpdate(report.entity_id, { is_active: false });
@@ -3738,9 +4400,11 @@ function AdminPageInner() {
       ...prev,
       [report.entity_id]: { ...prev[report.entity_id], id: report.entity_id, status: "frozen" },
     }));
-    loaded.current.delete("pending");
-    loaded.current.delete("approved");
-    loaded.current.delete("rejected");
+    // No loaded.current invalidation needed here — the Listings tab's
+    // dedicated fetch effect re-runs every time that tab activates (it's
+    // deliberately outside the loaded.current cache, since its status
+    // filter can also change within the same tab visit), so it always
+    // picks up this freeze on next visit without help from here.
 
     const oldReportStatus = report.status;
     const { error: reportErr } = await supabase.from("reports").update({ status: "frozen" }).eq("id", report.id);
@@ -3778,9 +4442,6 @@ function AdminPageInner() {
         ...prev,
         [report.entity_id]: { ...prev[report.entity_id], id: report.entity_id, status: "active" },
       }));
-      loaded.current.delete("pending");
-      loaded.current.delete("approved");
-      loaded.current.delete("rejected");
       setToast({ ok: true, msg: "Listing unfrozen and restored to active." });
     }
     setInFlight(null);
@@ -3883,12 +4544,20 @@ function AdminPageInner() {
     setTimeout(() => setToast(null), 3000);
   }, [logAdminAction]);
 
-  const handleDeclineCapture = useCallback(async (req: Capture360Request, adminNotes: string) => {
+  const handleDeclineCapture = useCallback(async (
+    req: Capture360Request, adminNotes: string, altDate1: string, altDate2: string
+  ) => {
     setInFlight(req.id);
     const supabase = createClient();
     const { error } = await supabase
       .from("capture_360_requests")
-      .update({ status: "declined", admin_notes: adminNotes || null, updated_at: new Date().toISOString() })
+      .update({
+        status: "declined",
+        admin_notes: adminNotes || null,
+        suggested_alternative_date_1: altDate1 || null,
+        suggested_alternative_date_2: altDate2 || null,
+        updated_at: new Date().toISOString(),
+      })
       .eq("id", req.id);
 
     if (error) {
@@ -3896,7 +4565,9 @@ function AdminPageInner() {
       setToast({ ok: false, msg: "Could not decline — please try again." });
     } else {
       void logAdminAction("decline_capture_360", "capture_360_request", req.id, { status: req.status }, { status: "declined" });
-      setCapture360Requests(prev => prev.map(r => r.id === req.id ? { ...r, status: "declined", admin_notes: adminNotes || null } : r));
+      setCapture360Requests(prev => prev.map(r => r.id === req.id
+        ? { ...r, status: "declined", admin_notes: adminNotes || null, suggested_alternative_date_1: altDate1 || null, suggested_alternative_date_2: altDate2 || null }
+        : r));
       setToast({ ok: true, msg: "Request declined." });
       fetch("/api/notify-capture-requester", {
         method: "POST",
@@ -3906,6 +4577,8 @@ function AdminPageInner() {
           status: "declined",
           propertyTitle: req.property_listings?.title,
           adminNotes,
+          suggestedAlternativeDate1: altDate1 || null,
+          suggestedAlternativeDate2: altDate2 || null,
         }),
       }).catch(err => console.error("[Capture360] Requester notification failed:", err));
     }
@@ -4022,40 +4695,23 @@ function AdminPageInner() {
   let content: React.ReactNode;
   if (active === "overview") {
     content = <OverviewSection stats={stats} loading={statsLoading} />;
-  } else if (active === "pending") {
+  } else if (active === "listings") {
     content = (
-      <PendingSection
-        listings={pendingListings}
-        loading={pendingLoading}
+      <ListingsSection
+        listings={listings}
+        loading={listingsLoading}
+        statusFilter={listingsStatusFilter}
+        onStatusFilterChange={setListingsStatusFilter}
         inFlight={inFlight}
-        onApprove={id => void handleListingStatus(id, "active", "pending")}
-        onReject={id => void handleListingStatus(id, "rejected", "pending")}
         agents={approvedAgents}
-        onAssignAgent={(id, agentId) => void handleAssignAgent(id, agentId, "pending")}
-        onKuulaTourUrl={(id, url) => void handleKuulaTourUrl(id, url, "pending")}
-        onGoogleMapsUrl={(id, url) => void handleGoogleMapsUrl(id, url, "pending")}
-      />
-    );
-  } else if (active === "approved") {
-    content = (
-      <ApprovedSection
-        listings={approvedListings}
-        loading={approvedLoading}
-        inFlight={inFlight}
+        onApprove={id => void handleListingStatus(id, "active")}
+        onReject={id => void handleListingStatus(id, "rejected")}
+        onRequestChanges={(id, note) => void handleRequestChanges(id, note)}
         onUnpublish={(id, reason, note) => void handleUnpublishWithReason(id, reason, note)}
-        agents={approvedAgents}
-        onAssignAgent={(id, agentId) => void handleAssignAgent(id, agentId, "approved")}
-        onKuulaTourUrl={(id, url) => void handleKuulaTourUrl(id, url, "approved")}
-        onGoogleMapsUrl={(id, url) => void handleGoogleMapsUrl(id, url, "approved")}
-      />
-    );
-  } else if (active === "rejected") {
-    content = (
-      <RejectedSection
-        listings={rejectedListings}
-        loading={rejectedLoading}
-        inFlight={inFlight}
-        onReApprove={id => void handleListingStatus(id, "active", "rejected")}
+        onReApprove={id => void handleListingStatus(id, "active")}
+        onAssignAgent={(id, agentId) => void handleAssignAgent(id, agentId)}
+        onKuulaTourUrl={(id, url) => void handleKuulaTourUrl(id, url)}
+        onGoogleMapsUrl={(id, url) => void handleGoogleMapsUrl(id, url)}
       />
     );
   } else if (active === "agents") {
@@ -4069,6 +4725,8 @@ function AdminPageInner() {
         onToggleBadge={(id, current) => void handleAgentToggleBadge(id, current)}
         onAddAgent={handleAddAgent}
         documentsByProfile={agentDocsByProfile}
+        listingsForStats={agentListingsForStats}
+        leadsForStats={agentLeadsForStats}
       />
     );
   } else if (active === "capture360") {
@@ -4078,7 +4736,7 @@ function AdminPageInner() {
         loading={capture360Loading}
         inFlight={inFlight}
         onSchedule={(req, date, slot, notes) => void handleScheduleCapture(req, date, slot, notes)}
-        onDecline={(req, notes) => void handleDeclineCapture(req, notes)}
+        onDecline={(req, notes, altDate1, altDate2) => void handleDeclineCapture(req, notes, altDate1, altDate2)}
         onComplete={id => void handleCompleteCapture(id)}
       />
     );
@@ -4213,9 +4871,7 @@ function AdminPageInner() {
               <nav style={{ flex: 1, padding: "12px 10px" }}>
                 {NAV.map(item => {
                   const badge =
-                    item.id === "pending"   ? stats.pending     :
-                    item.id === "approved"  ? stats.active      :
-                    item.id === "rejected"  ? stats.rejected    :
+                    item.id === "listings"  ? stats.pending     :
                     item.id === "users"     ? stats.users       :
                     item.id === "inquiries" ? stats.inquiries   :
                     item.id === "reports"   ? stats.reportsOpen : 0;

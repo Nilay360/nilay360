@@ -1,0 +1,38 @@
+-- ═══════════════════════════════════════════════════════════════
+-- 074 — property_listings.changes_requested_note
+-- DRAFTED FOR REVIEW, NOT APPLIED. Same review discipline as every
+-- prior migration tonight: this file has not been run against the
+-- database. Do not apply until reviewed line by line.
+--
+-- New optional admin write, distinct from unpublish_reason/
+-- unpublish_note (067) — those are validated against a fixed
+-- unpublish-specific vocabulary ('deal_closed'/'expired'/
+-- 'owner_requested'/'admin_review'/'other') and mean "why this listing
+-- is currently NOT live." changes_requested_note is a different
+-- concept: free-text feedback on a still-pending submission ("photos
+-- unclear, please reupload" / "please add RERA number"), telling the
+-- submitter what to fix before resubmission — not why something was
+-- taken down. Kept as its own column rather than overloading
+-- unpublish_note with a second meaning.
+--
+-- status itself needs no CHECK-constraint change to accept
+-- 'changes_requested' as a new value — property_listings.status is
+-- plain text with no CHECK constraint at the table level (confirmed by
+-- 051_grievance_queue_extension.sql's own comment, and independently
+-- re-confirmed by reading 001_property_listings_and_storage.sql's
+-- column definition directly for this migration: `status text not
+-- null default 'pending_review'`, no CHECK anywhere).
+--
+-- Deliberately NOT routed through log_listing_status_change()
+-- (067) — that function validates p_new_status against a fixed set
+-- ('pending_review'/'active'/'rejected'/'frozen') and does not include
+-- 'changes_requested'; extending that SECURITY DEFINER function's
+-- validation logic is a bigger, separate change than this feature
+-- needs. This status transition instead uses the same plain
+-- .update() + logAdminAction() (admin_audit_log) pattern
+-- handleListingStatus already uses for Approve/Reject — consistent
+-- with its sibling actions in the same function, not a new pattern.
+-- ═══════════════════════════════════════════════════════════════
+
+ALTER TABLE public.property_listings
+  ADD COLUMN IF NOT EXISTS changes_requested_note text;

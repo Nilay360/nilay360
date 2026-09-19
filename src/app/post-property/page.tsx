@@ -58,6 +58,27 @@ interface FormState {
   isNegotiable: boolean
   possessionStatus: string
   maintenanceCharges: string
+  // ₹/sq.ft calculator (sale only) — separate from areaSqft (Step 3's
+  // built-up area) by deliberate decision, never derived from or
+  // written into price or areaSqft.
+  pricePerSqftArea: string
+  pricePerSqft: string
+  showPricePerSqft: boolean
+  // Rental-only: maintenance mode (amount still uses maintenanceCharges
+  // above — see migration 070's comment), deposit, availability, tenant
+  maintenanceType: 'included' | 'additional'
+  depositAmount: string
+  availableFrom: string
+  preferredTenant: string
+  // Sale-only
+  listedBy: string
+  reraNumber: string
+  // Shared (brokerage): mode's option set differs by listing type
+  // (days'/months' rent vs percentage/fixed) but it's one field either
+  // way, since a listing is only ever one type.
+  brokerageMode: string
+  brokerageValue: string
+  showBrokerageDetails: boolean
   // Step 5
   amenities: string[]
   highlights: string
@@ -84,6 +105,11 @@ interface FormState {
   agreeToTerms: boolean
   ownershipWarranty: boolean
   capture360Requested: boolean
+  // Requester's preference, distinct from capture_360_requests'
+  // admin-set scheduled_date/scheduled_time_slot — see migration 071's
+  // comment. Both optional even when the toggle is on.
+  capture360PreferredDate: string
+  capture360PreferredTimeSlot: string
 }
 
 type Action =
@@ -109,6 +135,10 @@ const INITIAL: FormState = {
   totalFloors: '', facing: '', propertyAge: '', furnishing: '',
   coveredParking: '', openParking: '',
   price: '', isNegotiable: false, possessionStatus: '', maintenanceCharges: '',
+  pricePerSqftArea: '', pricePerSqft: '', showPricePerSqft: false,
+  maintenanceType: 'included', depositAmount: '', availableFrom: '', preferredTenant: '',
+  listedBy: '', reraNumber: '',
+  brokerageMode: '', brokerageValue: '', showBrokerageDetails: false,
   amenities: [], highlights: '',
   photos: [], coverPhotoIndex: 0,
   videoAssetProvider: null, videoAssetId: null, videoAssetStatus: null, videoAssetThumbnailUrl: null,
@@ -118,6 +148,7 @@ const INITIAL: FormState = {
   agreeToTerms: false,
   ownershipWarranty: false,
   capture360Requested: false,
+  capture360PreferredDate: '', capture360PreferredTimeSlot: '',
 }
 
 function reducer(s: FormState, a: Action): FormState {
@@ -366,17 +397,24 @@ function stripIndianCountryCode(phone: string): string {
   return digitsOnly.length === 12 && digitsOnly.startsWith('91') ? digitsOnly.slice(2) : digitsOnly
 }
 
+// Fixed truncation bug: the previous version split the price into
+// separate crore/lakh/thousand integer buckets via floor+modulo, and
+// only showed the thousands remainder when `!cr && !lk` — so any
+// amount with a non-zero lakh AND a non-zero thousands remainder (e.g.
+// 1,575,000 = 15 lakh + 75 thousand) silently dropped the 75,000,
+// displaying "₹15 Lakh" instead of the real amount. Fixed by reusing
+// the same divide-and-.toFixed(2) approach already verified correct in
+// PropertyDetailClient.tsx's formatPrice() (sale branch) — a single
+// decimal division has no separate remainder bucket to lose precision
+// on. Not imported directly (that function lives in a different file/
+// rendering context, matching this codebase's existing convention of
+// small per-file local helpers), but the logic itself is the same.
 function toCrore(raw: string): string {
   const n = Number(raw)
   if (!n || isNaN(n)) return ''
-  const cr = Math.floor(n / 1e7)
-  const lk = Math.floor((n % 1e7) / 1e5)
-  const th = Math.floor((n % 1e5) / 1e3)
-  const parts: string[] = []
-  if (cr) parts.push(`${cr} Crore`)
-  if (lk) parts.push(`${lk} Lakh`)
-  if (th && !cr && !lk) parts.push(`${th}K`)
-  return parts.length ? `₹ ${parts.join(' ')}` : `₹${n.toLocaleString('en-IN')}`
+  if (n >= 1e7) return `₹${(n / 1e7).toFixed(2)} Cr`
+  if (n >= 1e5) return `₹${(n / 1e5).toFixed(2)} L`
+  return `₹${n.toLocaleString('en-IN')}`
 }
 
 function uid() { return Math.random().toString(36).slice(2, 10) }
@@ -846,10 +884,21 @@ function Step3({ state, dispatch }: { state: FormState; dispatch: React.Dispatch
 function Step4({ state, dispatch }: { state: FormState; dispatch: React.Dispatch<Action> }) {
   const set = (field: keyof FormState, value: unknown) => dispatch({ type: 'SET', field, value })
   const isRent = state.listingType === 'rent'
+  const isSale = state.listingType === 'sale'
   const crore = toCrore(state.price)
   const priceNum = Number(state.price)
   const areaNum = Number(state.areaSqft)
   const ppsf = !isRent && priceNum && areaNum ? Math.round(priceNum / areaNum) : 0
+
+  // ₹/sq.ft calculator (sale only) — deliberately separate from areaSqft
+  // (Step 3's required Built-up Area, used for the informational ppsf
+  // badge above) per an explicit decision: this is its own optional
+  // pair of fields an agent fills in only to compute/display a public
+  // ₹/sq.ft figure, never derived from or written back into built-up
+  // area or the main price.
+  const psfAreaNum = Number(state.pricePerSqftArea)
+  const psfRateNum = Number(state.pricePerSqft)
+  const psfPreviewTotal = psfAreaNum > 0 && psfRateNum > 0 ? Math.round(psfAreaNum * psfRateNum) : null
 
   return (
     <div>
@@ -861,7 +910,7 @@ function Step4({ state, dispatch }: { state: FormState; dispatch: React.Dispatch
         <div>
           <label style={S.lbl}>Expected {isRent ? 'Monthly Rent' : 'Price'} (₹) *</label>
           <TInput
-            value={state.price}
+            value={state.price ? Number(state.price).toLocaleString('en-IN') : ''}
             onChange={v => set('price', v.replace(/\D/g, ''))}
             placeholder={isRent ? 'Monthly rent in rupees' : 'Sale price in rupees'}
             prefix="₹"
@@ -925,16 +974,270 @@ function Step4({ state, dispatch }: { state: FormState; dispatch: React.Dispatch
           </div>
         </div>
 
-        {/* Maintenance */}
-        <FField label="Monthly Maintenance Charges (Optional)">
-          <TInput
-            value={state.maintenanceCharges}
-            onChange={v => set('maintenanceCharges', v.replace(/\D/g, ''))}
-            placeholder="e.g., 5000"
-            prefix="₹"
-          />
-        </FField>
+        {/* Maintenance — sale keeps the original plain ₹/month field
+            unchanged; rent upgrades it to a mode toggle, reusing the
+            same maintenanceCharges field for the amount (see migration
+            070's comment) rather than adding a second ₹ field. */}
+        {isRent ? (
+          <div>
+            <p style={S.lbl}>Maintenance *</p>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, marginBottom: state.maintenanceType === 'additional' ? 12 : 0 }}>
+              <Pill text="Included" active={state.maintenanceType === 'included'}
+                onClick={() => set('maintenanceType', 'included')} />
+              <Pill text="Additional" active={state.maintenanceType === 'additional'}
+                onClick={() => set('maintenanceType', 'additional')} />
+            </div>
+            {state.maintenanceType === 'additional' && (
+              <TInput
+                value={state.maintenanceCharges}
+                onChange={v => set('maintenanceCharges', v.replace(/\D/g, ''))}
+                placeholder="e.g., 5000"
+                prefix="₹"
+              />
+            )}
+          </div>
+        ) : (
+          <FField label="Monthly Maintenance Charges (Optional)">
+            <TInput
+              value={state.maintenanceCharges}
+              onChange={v => set('maintenanceCharges', v.replace(/\D/g, ''))}
+              placeholder="e.g., 5000"
+              prefix="₹"
+            />
+          </FField>
+        )}
+
+        {/* Rental-only: deposit, availability, tenant preference */}
+        {isRent && (
+          <div style={S.grid2}>
+            <FField label="Security Deposit (Optional)">
+              <TInput
+                value={state.depositAmount}
+                onChange={v => set('depositAmount', v.replace(/\D/g, ''))}
+                placeholder="e.g., 100000"
+                prefix="₹"
+              />
+            </FField>
+            <FField label="Available From (Optional)">
+              <input
+                type="date"
+                value={state.availableFrom}
+                onChange={e => set('availableFrom', e.target.value)}
+                style={S.inp}
+              />
+            </FField>
+          </div>
+        )}
+        {isRent && (
+          <div>
+            <p style={S.lbl}>Preferred Tenant (Optional)</p>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>
+              {[{ v: 'family', l: 'Family' }, { v: 'bachelor', l: 'Bachelor' }, { v: 'anyone', l: 'Anyone' }].map(t => (
+                <Pill key={t.v} text={t.l} active={state.preferredTenant === t.v}
+                  onClick={() => set('preferredTenant', state.preferredTenant === t.v ? '' : t.v)} />
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Sale-only: ownership + RERA */}
+        {isSale && (
+          <div style={S.grid2}>
+            <FField label="Ownership (Optional)">
+              <SInput
+                value={state.listedBy}
+                onChange={v => set('listedBy', v)}
+                options={[{ value: 'owner', label: 'Owner' }, { value: 'agent', label: 'Agent' }, { value: 'builder', label: 'Builder' }]}
+                placeholder="Select"
+              />
+            </FField>
+            <FField label="RERA Number (Optional)">
+              <TInput
+                value={state.reraNumber}
+                onChange={v => set('reraNumber', v)}
+                placeholder="e.g., P01100001234"
+              />
+            </FField>
+          </div>
+        )}
+
+        {/* Brokerage — shared UI, option set differs by listing type */}
+        {(isRent || isSale) && (
+          <BrokerageField state={state} dispatch={dispatch} isRent={isRent} />
+        )}
+
+        {/* ₹/sq.ft (sale only) */}
+        {isSale && (
+          <div style={{
+            padding: '18px 20px', borderRadius: 10,
+            background: C.surface2, border: `1px solid ${C.border}`,
+          }}>
+            <p style={{ ...S.lbl, marginBottom: 4 }}>₹/sq.ft (Optional)</p>
+            <p style={{ fontSize: '0.8rem', color: C.textMuted, marginBottom: 16 }}>
+              A separate area and rate you can choose to display publicly — never affects your Expected Price above.
+            </p>
+            <div style={S.grid2}>
+              <FField label="Area (sq.ft)">
+                <TInput
+                  value={state.pricePerSqftArea}
+                  onChange={v => set('pricePerSqftArea', v.replace(/\D/g, ''))}
+                  placeholder="e.g., 1500"
+                />
+              </FField>
+              <FField label="₹/sq.ft">
+                <TInput
+                  value={state.pricePerSqft}
+                  onChange={v => set('pricePerSqft', v.replace(/\D/g, ''))}
+                  placeholder="e.g., 12500"
+                  prefix="₹"
+                />
+              </FField>
+            </div>
+
+            {psfPreviewTotal != null && (
+              <div style={{
+                marginTop: 14, padding: '10px 14px', borderRadius: 8,
+                background: C.goldDim, border: `1px solid ${C.goldBorder}`,
+                fontSize: '0.8125rem', color: C.gold, fontFamily: FB,
+              }}>
+                Preview total: ₹{psfPreviewTotal.toLocaleString('en-IN')}
+                <span style={{ color: C.textMuted, marginLeft: 6 }}>
+                  ({state.pricePerSqftArea} sq.ft × ₹{Number(state.pricePerSqft).toLocaleString('en-IN')}/sq.ft) — for reference only, does not change your Expected Price
+                </span>
+              </div>
+            )}
+
+            <button
+              type="button"
+              onClick={() => set('showPricePerSqft', !state.showPricePerSqft)}
+              style={{
+                display: 'flex', alignItems: 'center', gap: 10, marginTop: 16,
+                background: 'transparent', border: 'none', padding: 0, cursor: 'pointer',
+              }}
+            >
+              <span style={{
+                width: 18, height: 18, borderRadius: 4, flexShrink: 0,
+                border: `1.5px solid ${state.showPricePerSqft ? C.gold : C.textMuted}`,
+                background: state.showPricePerSqft ? C.gold : 'transparent',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                fontSize: '0.7rem', color: '#0a0a0a', fontWeight: 800,
+              }}>{state.showPricePerSqft ? '✓' : ''}</span>
+              <span style={{ fontSize: '0.875rem', color: C.text, fontFamily: FB }}>Show ₹/sq.ft on listing page</span>
+            </button>
+          </div>
+        )}
       </div>
+    </div>
+  )
+}
+
+// ─── Brokerage field (shared by Step4's rent/sale variants) ──────────────────
+
+function BrokerageField({
+  state, dispatch, isRent,
+}: { state: FormState; dispatch: React.Dispatch<Action>; isRent: boolean }) {
+  const set = (field: keyof FormState, value: unknown) => dispatch({ type: 'SET', field, value })
+  // UI-only: whether "Custom" is the active choice for rent's preset
+  // pills. Not derived from state.brokerageValue (a blank/typed value
+  // there doesn't necessarily mean "Custom was clicked") — kept as its
+  // own local toggle so the pills reflect what was actually clicked.
+  const [customMode, setCustomMode] = React.useState(false)
+
+  const DAY_PRESETS = ['15', '20', '30', '45', '60']
+  const MONTH_PRESETS = ['0.5', '1', '1.5', '2']
+  const presets = state.brokerageMode === 'days_rent' ? DAY_PRESETS : state.brokerageMode === 'months_rent' ? MONTH_PRESETS : []
+
+  const rentNum = Number(state.price)
+  const multiplier = Number(state.brokerageValue)
+  // "Days' rent" suggestion approximates a per-day rate from the monthly
+  // rent (rent ÷ 30) — Bunny-style disclosure: this is a read-only
+  // helper figure, never itself stored; only brokerageMode/brokerageValue
+  // (the agent's actual selection) are persisted.
+  const suggestion = isRent && rentNum > 0 && multiplier > 0
+    ? (state.brokerageMode === 'days_rent' ? Math.round((rentNum / 30) * multiplier) : Math.round(rentNum * multiplier))
+    : null
+
+  const selectMode = (mode: string) => {
+    set('brokerageMode', mode)
+    set('brokerageValue', '')
+    setCustomMode(false)
+  }
+
+  return (
+    <div style={{ padding: '18px 20px', borderRadius: 10, background: C.surface2, border: `1px solid ${C.border}` }}>
+      <p style={{ ...S.lbl, marginBottom: 12 }}>Brokerage (Optional)</p>
+
+      {isRent ? (
+        <>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, marginBottom: 12 }}>
+            <Pill text="Days' Rent" active={state.brokerageMode === 'days_rent'} onClick={() => selectMode('days_rent')} />
+            <Pill text="Months' Rent" active={state.brokerageMode === 'months_rent'} onClick={() => selectMode('months_rent')} />
+          </div>
+          {(state.brokerageMode === 'days_rent' || state.brokerageMode === 'months_rent') && (
+            <>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 10 }}>
+                {presets.map(p => (
+                  <Pill key={p} text={state.brokerageMode === 'days_rent' ? `${p} days` : `${p} mo`}
+                    active={!customMode && state.brokerageValue === p}
+                    onClick={() => { setCustomMode(false); set('brokerageValue', p) }} />
+                ))}
+                <Pill text="Custom" active={customMode}
+                  onClick={() => { setCustomMode(true); set('brokerageValue', '') }} />
+              </div>
+              {customMode && (
+                <TInput
+                  value={state.brokerageValue}
+                  onChange={v => set('brokerageValue', v.replace(/[^\d.]/g, ''))}
+                  placeholder={state.brokerageMode === 'days_rent' ? 'Custom number of days' : 'Custom number of months'}
+                />
+              )}
+              {suggestion != null && (
+                <div style={{ marginTop: 10, fontSize: '0.8125rem', color: C.textMuted, fontFamily: FB }}>
+                  Suggested: <span style={{ color: C.gold, fontWeight: 600 }}>₹{suggestion.toLocaleString('en-IN')}</span>
+                  {' '}({state.brokerageValue}{state.brokerageMode === 'days_rent' ? " days' rent" : " months' rent"}) — read-only, not stored separately
+                </div>
+              )}
+            </>
+          )}
+        </>
+      ) : (
+        <>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, marginBottom: 12 }}>
+            <Pill text="Percentage" active={state.brokerageMode === 'percentage'} onClick={() => selectMode('percentage')} />
+            <Pill text="Fixed Amount" active={state.brokerageMode === 'fixed'} onClick={() => selectMode('fixed')} />
+          </div>
+          {state.brokerageMode === 'percentage' && (
+            <TInput
+              value={state.brokerageValue}
+              onChange={v => set('brokerageValue', v.replace(/[^\d.]/g, ''))}
+              placeholder="e.g., 2"
+            />
+          )}
+          {state.brokerageMode === 'fixed' && (
+            <TInput
+              value={state.brokerageValue}
+              onChange={v => set('brokerageValue', v.replace(/[^\d.]/g, ''))}
+              placeholder="e.g., 50000"
+              prefix="₹"
+            />
+          )}
+        </>
+      )}
+
+      <button
+        type="button"
+        onClick={() => set('showBrokerageDetails', !state.showBrokerageDetails)}
+        style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 16, background: 'transparent', border: 'none', padding: 0, cursor: 'pointer' }}
+      >
+        <span style={{
+          width: 18, height: 18, borderRadius: 4, flexShrink: 0,
+          border: `1.5px solid ${state.showBrokerageDetails ? C.gold : C.textMuted}`,
+          background: state.showBrokerageDetails ? C.gold : 'transparent',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          fontSize: '0.7rem', color: '#0a0a0a', fontWeight: 800,
+        }}>{state.showBrokerageDetails ? '✓' : ''}</span>
+        <span style={{ fontSize: '0.875rem', color: C.text, fontFamily: FB }}>Show brokerage details on listing page</span>
+      </button>
     </div>
   )
 }
@@ -1482,6 +1785,42 @@ function Step7({ state, dispatch }: { state: FormState; dispatch: React.Dispatch
           }} />
         </button>
       </div>
+
+      {/* Preferred visit date & time — only shown while the toggle above
+          is on; optional even then (the team can still call to schedule
+          if skipped). Stored separately from capture_360_requests'
+          admin-set scheduled_date/scheduled_time_slot — see migration
+          071's comment for why these aren't the same columns. */}
+      {state.capture360Requested && (
+        <div style={{
+          padding: '16px 18px', background: C.surface2,
+          borderRadius: 10, border: `1px solid ${C.border}`, marginTop: 12,
+        }}>
+          <p style={{ ...S.lbl, marginBottom: 4 }}>Preferred visit date & time (Optional)</p>
+          <p style={{ fontSize: '0.8rem', color: C.textMuted, marginBottom: 14 }}>
+            Skip this and our team will call to schedule instead.
+          </p>
+          <div style={S.grid2}>
+            <FField label="Date">
+              <input
+                type="date"
+                value={state.capture360PreferredDate}
+                onChange={e => dispatch({ type: 'SET', field: 'capture360PreferredDate', value: e.target.value })}
+                style={S.inp}
+              />
+            </FField>
+            <div>
+              <p style={S.lbl}>Time Slot</p>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                {[{ v: 'morning', l: 'Morning' }, { v: 'afternoon', l: 'Afternoon' }, { v: 'evening', l: 'Evening' }].map(t => (
+                  <Pill key={t.v} text={t.l} active={state.capture360PreferredTimeSlot === t.v}
+                    onClick={() => dispatch({ type: 'SET', field: 'capture360PreferredTimeSlot', value: state.capture360PreferredTimeSlot === t.v ? '' : t.v })} />
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
@@ -1919,6 +2258,27 @@ export default function PostPropertyPage() {
         price:              Number(state.price),
         price_negotiable:   state.isNegotiable,
         maintenance_charge: state.maintenanceCharges ? Number(state.maintenanceCharges) : null,
+        // ₹/sq.ft calculator — see FormState.pricePerSqftArea's own
+        // comment. Stored as entered regardless of the checkbox; the
+        // checkbox only controls PUBLIC display (read on the detail
+        // page), not whether the values are saved at all.
+        area_sqft:            state.pricePerSqftArea ? Number(state.pricePerSqftArea) : null,
+        price_per_sqft:       state.pricePerSqft      ? Number(state.pricePerSqft)      : null,
+        show_price_per_sqft:  state.showPricePerSqft,
+        // Rental-only fields — null for sale/commercial, matching how
+        // every other conditionally-shown field in this payload already
+        // behaves (e.g. bedrooms below for plots).
+        maintenance_type:     state.listingType === 'rent' ? state.maintenanceType : null,
+        deposit_amount:       state.listingType === 'rent' && state.depositAmount ? Number(state.depositAmount) : null,
+        available_from:       state.listingType === 'rent' && state.availableFrom ? state.availableFrom : null,
+        preferred_tenant:     state.listingType === 'rent' && state.preferredTenant ? state.preferredTenant : null,
+        // Sale-only fields
+        listed_by:            state.listingType === 'sale' && state.listedBy ? state.listedBy : null,
+        rera_number:          state.listingType === 'sale' && state.reraNumber ? state.reraNumber : null,
+        // Brokerage — shared, applies to whichever type the listing is
+        brokerage_mode:          state.brokerageMode || null,
+        brokerage_value:         state.brokerageValue ? Number(state.brokerageValue) : null,
+        show_brokerage_details:  state.showBrokerageDetails,
         built_up_area:      Number(state.areaSqft),
         bedrooms:           state.bedrooms || null,
         bathrooms:          state.bathrooms || null,
@@ -1990,6 +2350,8 @@ export default function PostPropertyPage() {
             property_id: insertedListing.id,
             requester_id: authUserId,
             status: 'pending',
+            preferred_date:      state.capture360PreferredDate      || null,
+            preferred_time_slot: state.capture360PreferredTimeSlot  || null,
           })
           if (captureErr) {
             console.error('Capture 360 request insert failed:', captureErr)

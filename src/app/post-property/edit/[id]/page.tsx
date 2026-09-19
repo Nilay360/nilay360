@@ -39,6 +39,10 @@ interface ListingRow {
   seller_phone?: string | null; seller_whatsapp?: string | null;
   video_asset_provider?: string | null; video_asset_id?: string | null;
   video_asset_status?: string | null; video_asset_thumbnail_url?: string | null;
+  area_sqft?: number | null; price_per_sqft?: number | null; show_price_per_sqft?: boolean | null;
+  maintenance_type?: string | null; deposit_amount?: number | null; available_from?: string | null;
+  preferred_tenant?: string | null; listed_by?: string | null; rera_number?: string | null;
+  brokerage_mode?: string | null; brokerage_value?: number | null; show_brokerage_details?: boolean | null;
 }
 
 interface FloorPlanRow {
@@ -71,6 +75,23 @@ interface EditForm {
   price_negotiable:   boolean
   possession_status:  string
   maintenance_charge: string
+  // ₹/sq.ft calculator (sale only) — separate from built_up_area by
+  // deliberate decision (see migration 069's own comment), never
+  // derived from or written into price or built_up_area.
+  area_sqft:            string
+  price_per_sqft:       string
+  show_price_per_sqft:  boolean
+  // Rental-only (amount stays in maintenance_charge above), sale-only,
+  // and shared brokerage fields — see migration 070's comment.
+  maintenance_type:       'included' | 'additional'
+  deposit_amount:         string
+  available_from:         string
+  preferred_tenant:       string
+  listed_by:               string
+  rera_number:             string
+  brokerage_mode:          string
+  brokerage_value:         string
+  show_brokerage_details:  boolean
   amenities:          string[]
   highlights:         string
   seller_name:        string
@@ -85,6 +106,10 @@ const EMPTY: EditForm = {
   total_floors: '', facing: '', property_age: '', furnishing: '',
   parking: '',
   price: '', price_negotiable: false, possession_status: '', maintenance_charge: '',
+  area_sqft: '', price_per_sqft: '', show_price_per_sqft: false,
+  maintenance_type: 'included', deposit_amount: '', available_from: '', preferred_tenant: '',
+  listed_by: '', rera_number: '',
+  brokerage_mode: '', brokerage_value: '', show_brokerage_details: false,
   amenities: [], highlights: '',
   seller_name: '', seller_phone: '', seller_whatsapp: '',
 }
@@ -166,6 +191,19 @@ function SectionCard({ title, children }: { title: string; children: React.React
   )
 }
 
+// Same visual pattern as the existing AMENITIES_LIST toggle buttons
+// below — this file has no shared Pill component (unlike the create
+// wizard), so this is a small local equivalent rather than a plain
+// inline-styled <button> repeated at every new toggle-group site.
+function EPill({ text, active, onClick }: { text: string; active: boolean; onClick: () => void }) {
+  return (
+    <button type="button" onClick={onClick}
+      style={{ padding: '7px 16px', borderRadius: 999, border: `1px solid ${active ? C.gold : C.border}`, background: active ? C.goldDim : 'transparent', color: active ? C.gold : C.textSub, fontFamily: FB, fontSize: '0.875rem', fontWeight: active ? 600 : 400, cursor: 'pointer', whiteSpace: 'nowrap', transition: 'all 0.15s' }}>
+      {text}
+    </button>
+  )
+}
+
 // ─── Main component ─────────────────────────────────────────────────────────────
 
 export default function EditListingPage() {
@@ -217,6 +255,13 @@ export default function EditListingPage() {
   const [loading,  setLoading]  = useState(true)
   const [saving,   setSaving]   = useState(false)
   const [error,    setError]    = useState<string | null>(null)
+  // 'validation' = a precondition wasn't met (matches the existing
+  // gold/amber styling already used for the video-uploading notice);
+  // 'network'/'save' = the save attempt itself failed after being sent —
+  // both render in the existing red error styling, but with a distinct
+  // label so a transient network blip doesn't read the same as a real
+  // save failure worth investigating.
+  const [errorKind, setErrorKind] = useState<'validation' | 'network' | 'save' | null>(null)
   const [notFound, setNotFound] = useState(false)
   const [userId,   setUserId]   = useState<string | null>(null)
 
@@ -309,6 +354,18 @@ export default function EditListingPage() {
           price_negotiable:   data.price_negotiable   ?? false,
           possession_status:  data.possession_status  ?? '',
           maintenance_charge: data.maintenance_charge != null ? String(data.maintenance_charge) : '',
+          area_sqft:           data.area_sqft          != null ? String(data.area_sqft)          : '',
+          price_per_sqft:      data.price_per_sqft     != null ? String(data.price_per_sqft)     : '',
+          show_price_per_sqft: data.show_price_per_sqft ?? false,
+          maintenance_type:    data.maintenance_type === 'additional' ? 'additional' : 'included',
+          deposit_amount:      data.deposit_amount      != null ? String(data.deposit_amount)      : '',
+          available_from:      data.available_from         ?? '',
+          preferred_tenant:    data.preferred_tenant       ?? '',
+          listed_by:           data.listed_by              ?? '',
+          rera_number:         data.rera_number            ?? '',
+          brokerage_mode:      data.brokerage_mode         ?? '',
+          brokerage_value:     data.brokerage_value    != null ? String(data.brokerage_value)    : '',
+          show_brokerage_details: data.show_brokerage_details ?? false,
           amenities:          Array.isArray(data.amenities) ? (data.amenities as string[]) : [],
           highlights:         data.highlights         ?? '',
           seller_name:        data.seller_name        ?? '',
@@ -461,14 +518,17 @@ export default function EditListingPage() {
     // create's Step6 does), so this only needs to guard the submit
     // itself, not a "leave the step" action.
     if (videoUpload.state.phase === 'validating' || videoUpload.state.phase === 'uploading') {
+      setErrorKind('validation')
       setError('Please wait for your video to finish uploading before saving.')
       return
     }
     if (!form.listing_type || !form.price) {
+      setErrorKind('validation')
       setError('Listing type and price are required.')
       return
     }
     if (!userId) {
+      setErrorKind('validation')
       setError('You must be signed in to edit a listing.')
       return
     }
@@ -494,6 +554,7 @@ export default function EditListingPage() {
 
     setSaving(true)
     setError(null)
+    setErrorKind(null)
     setPhotoError(null)
 
     // Upload any newly picked files — try all of them (same as the create
@@ -606,6 +667,18 @@ export default function EditListingPage() {
           price_negotiable:   form.price_negotiable,
           possession_status:  form.possession_status  || null,
           maintenance_charge: form.maintenance_charge ? Number(form.maintenance_charge) : null,
+          area_sqft:            form.area_sqft      ? Number(form.area_sqft)      : null,
+          price_per_sqft:       form.price_per_sqft ? Number(form.price_per_sqft) : null,
+          show_price_per_sqft:  form.show_price_per_sqft,
+          maintenance_type:     form.listing_type === 'rent' ? form.maintenance_type : null,
+          deposit_amount:       form.listing_type === 'rent' && form.deposit_amount ? Number(form.deposit_amount) : null,
+          available_from:       form.listing_type === 'rent' && form.available_from ? form.available_from : null,
+          preferred_tenant:     form.listing_type === 'rent' && form.preferred_tenant ? form.preferred_tenant : null,
+          listed_by:            form.listing_type === 'sale' && form.listed_by ? form.listed_by : null,
+          rera_number:          form.listing_type === 'sale' && form.rera_number ? form.rera_number : null,
+          brokerage_mode:          form.brokerage_mode || null,
+          brokerage_value:         form.brokerage_value ? Number(form.brokerage_value) : null,
+          show_brokerage_details:  form.show_brokerage_details,
           amenities:          form.amenities,
           highlights:         form.highlights         || null,
           seller_name:        form.seller_name        || null,
@@ -614,27 +687,56 @@ export default function EditListingPage() {
           updated_at:         new Date().toISOString(),
         })
         .eq('id', id)
-        // TEMPORARY DIAGNOSTIC: without .select(), a zero-row match (e.g.
-        // RLS silently excluding this row, or a wrong `id`) returns no
-        // error and this code treats it as success — same failure class
-        // just found and fixed in api/bunny-webhook/route.ts. Remove once
-        // confirmed this isn't happening here too.
+        // Without .select(), a zero-row match (e.g. RLS silently excluding
+        // this row, or a wrong `id`) returns no error and this code would
+        // treat it as success — same failure class found and fixed in
+        // api/bunny-webhook/route.ts. The zero-rows check below is what
+        // actually uses this.
         .select('id, video_asset_id, video_asset_status')
       setSaving(false)
-      console.log('[edit-save] rows actually updated by this save:', updatedRows)
       if (upErr) {
         console.error('Edit listing — update error code:', upErr.code, '| message:', upErr.message, '| details:', upErr.details)
-        setError('Could not save changes. Please try again.')
+        // Was a hardcoded generic string before — the real Supabase error
+        // (upErr.message, plus its code when present) is what's actually
+        // useful for diagnosing why a save failed, and it was already
+        // being captured (see the console.error above) but never reached
+        // the UI. Showing it directly rather than re-hiding it behind
+        // another generic label. No "Save failed:" prefix here — the
+        // error box below already renders that label for errorKind
+        // 'save', so this is just the detail itself.
+        setErrorKind('save')
+        setError(
+          (upErr.message || 'Unknown database error') +
+          (upErr.code ? ` (code ${upErr.code})` : '') +
+          (upErr.details ? ` — ${upErr.details}` : '')
+        )
       } else if (!updatedRows || updatedRows.length === 0) {
         console.error('[edit-save] ZERO ROWS MATCHED on save — listing id used:', id, '(RLS or a bad id would cause exactly this: no error, no effect)')
-        setError('Save did not apply — no matching listing was found to update. Please refresh and try again.')
+        setErrorKind('save')
+        setError('No matching listing was found to update. Please refresh and try again.')
       } else {
         router.push('/dashboard/my-listings')
       }
     } catch (err) {
       console.error('Edit listing — unexpected error:', err)
       setSaving(false)
-      setError('An unexpected error occurred. Please try again.')
+      // A thrown TypeError whose message mentions fetch/network is the
+      // standard shape for "the request never reached the server at
+      // all" (offline, DNS failure, CORS) in both the browser's own
+      // fetch and supabase-js's underlying client — worth a distinct,
+      // actionable message from an error that actually reached the
+      // server and failed for some other reason (which still shows its
+      // real message rather than a generic one).
+      const isLikelyNetworkError = err instanceof TypeError && /fetch|network|failed to fetch/i.test(err.message)
+      setErrorKind(isLikelyNetworkError ? 'network' : 'save')
+      // No "Network error:"/"Save failed:" prefix here either, same
+      // reasoning as the upErr branch above — the error box supplies
+      // that label from errorKind.
+      setError(
+        isLikelyNetworkError
+          ? 'Could not reach the server. Please check your connection and try again.'
+          : err instanceof Error ? err.message : String(err)
+      )
     }
   }
 
@@ -795,17 +897,143 @@ export default function EditListingPage() {
           {/* Step 4 — Pricing */}
           <SectionCard title="4. Pricing">
             <div style={grid2}>
-              <Field label="Price (₹)">
-                <TInput value={form.price} onChange={set('price') as (v: string) => void} type="number" placeholder="e.g. 8500000" prefix="₹" />
+              <Field label={form.listing_type === 'rent' ? 'Expected Monthly Rent (₹)' : 'Expected Price (₹)'}>
+                <TInput
+                  value={form.price ? Number(form.price).toLocaleString('en-IN') : ''}
+                  onChange={v => set('price')(v.replace(/\D/g, ''))}
+                  placeholder={form.listing_type === 'rent' ? 'Monthly rent in rupees' : 'Sale price in rupees'}
+                  prefix="₹"
+                />
               </Field>
               <Field label="Possession Status">
                 <SInput value={form.possession_status} onChange={set('possession_status') as (v: string) => void}
                   options={POSSESSION_OPTS} placeholder="Select status" />
               </Field>
-              <Field label="Maintenance Charge (₹/mo)">
-                <TInput value={form.maintenance_charge} onChange={set('maintenance_charge') as (v: string) => void} type="number" placeholder="e.g. 5000" prefix="₹" />
-              </Field>
+              {form.listing_type === 'rent' ? (
+                <div>
+                  <label style={lbl}>Maintenance *</label>
+                  <div style={{ display: 'flex', gap: 8, marginBottom: form.maintenance_type === 'additional' ? 10 : 0 }}>
+                    <EPill text="Included" active={form.maintenance_type === 'included'} onClick={() => set('maintenance_type')('included')} />
+                    <EPill text="Additional" active={form.maintenance_type === 'additional'} onClick={() => set('maintenance_type')('additional')} />
+                  </div>
+                  {form.maintenance_type === 'additional' && (
+                    <TInput value={form.maintenance_charge} onChange={set('maintenance_charge') as (v: string) => void} placeholder="e.g. 5000" prefix="₹" />
+                  )}
+                </div>
+              ) : (
+                <Field label="Maintenance Charge (₹/mo)">
+                  <TInput value={form.maintenance_charge} onChange={set('maintenance_charge') as (v: string) => void} type="number" placeholder="e.g. 5000" prefix="₹" />
+                </Field>
+              )}
             </div>
+
+            {/* Rental-only: deposit, availability, tenant preference */}
+            {form.listing_type === 'rent' && (
+              <div style={{ ...grid2, marginTop: 16 }}>
+                <Field label="Security Deposit (Optional)">
+                  <TInput value={form.deposit_amount} onChange={v => set('deposit_amount')(v.replace(/\D/g, ''))} placeholder="e.g. 100000" prefix="₹" />
+                </Field>
+                <Field label="Available From (Optional)">
+                  <input type="date" value={form.available_from} onChange={e => set('available_from')(e.target.value)} style={inp} />
+                </Field>
+              </div>
+            )}
+            {form.listing_type === 'rent' && (
+              <div style={{ marginTop: 16 }}>
+                <label style={lbl}>Preferred Tenant (Optional)</label>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                  {[{ v: 'family', l: 'Family' }, { v: 'bachelor', l: 'Bachelor' }, { v: 'anyone', l: 'Anyone' }].map(t => (
+                    <EPill key={t.v} text={t.l} active={form.preferred_tenant === t.v}
+                      onClick={() => set('preferred_tenant')(form.preferred_tenant === t.v ? '' : t.v)} />
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Sale-only: ownership + RERA */}
+            {form.listing_type === 'sale' && (
+              <div style={{ ...grid2, marginTop: 16 }}>
+                <Field label="Ownership (Optional)">
+                  <SInput value={form.listed_by} onChange={set('listed_by') as (v: string) => void}
+                    options={[{ value: 'owner', label: 'Owner' }, { value: 'agent', label: 'Agent' }, { value: 'builder', label: 'Builder' }]}
+                    placeholder="Select" />
+                </Field>
+                <Field label="RERA Number (Optional)">
+                  <TInput value={form.rera_number} onChange={set('rera_number') as (v: string) => void} placeholder="e.g. P01100001234" />
+                </Field>
+              </div>
+            )}
+
+            {/* Brokerage — shared, option set differs by listing type */}
+            {(form.listing_type === 'rent' || form.listing_type === 'sale') && (() => {
+              const isRent = form.listing_type === 'rent'
+              const DAY_PRESETS = ['15', '20', '30', '45', '60']
+              const MONTH_PRESETS = ['0.5', '1', '1.5', '2']
+              const presets = form.brokerage_mode === 'days_rent' ? DAY_PRESETS : form.brokerage_mode === 'months_rent' ? MONTH_PRESETS : []
+              const rentNum = Number(form.price)
+              const multiplier = Number(form.brokerage_value)
+              const suggestion = isRent && rentNum > 0 && multiplier > 0
+                ? (form.brokerage_mode === 'days_rent' ? Math.round((rentNum / 30) * multiplier) : Math.round(rentNum * multiplier))
+                : null
+              const isCustomValue = form.brokerage_value !== '' && !presets.includes(form.brokerage_value)
+              const selectMode = (mode: string) => { set('brokerage_mode')(mode); set('brokerage_value')('') }
+
+              return (
+                <div style={{ marginTop: 16, padding: '16px 18px', borderRadius: 10, background: C.surface2, border: `1px solid ${C.border}` }}>
+                  <p style={{ ...lbl, marginBottom: 12 }}>Brokerage (Optional)</p>
+                  {isRent ? (
+                    <>
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 10 }}>
+                        <EPill text="Days' Rent" active={form.brokerage_mode === 'days_rent'} onClick={() => selectMode('days_rent')} />
+                        <EPill text="Months' Rent" active={form.brokerage_mode === 'months_rent'} onClick={() => selectMode('months_rent')} />
+                      </div>
+                      {(form.brokerage_mode === 'days_rent' || form.brokerage_mode === 'months_rent') && (
+                        <>
+                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 10 }}>
+                            {presets.map(p => (
+                              <EPill key={p} text={form.brokerage_mode === 'days_rent' ? `${p} days` : `${p} mo`}
+                                active={!isCustomValue && form.brokerage_value === p}
+                                onClick={() => set('brokerage_value')(p)} />
+                            ))}
+                            <EPill text="Custom" active={isCustomValue} onClick={() => set('brokerage_value')('')} />
+                          </div>
+                          {(isCustomValue || form.brokerage_value === '') && (
+                            <TInput value={form.brokerage_value} onChange={v => set('brokerage_value')(v.replace(/[^\d.]/g, ''))}
+                              placeholder={form.brokerage_mode === 'days_rent' ? 'Custom number of days' : 'Custom number of months'} />
+                          )}
+                          {suggestion != null && (
+                            <div style={{ marginTop: 10, fontSize: 13, color: C.textMuted, fontFamily: FB }}>
+                              Suggested: <span style={{ color: C.gold, fontWeight: 600 }}>₹{suggestion.toLocaleString('en-IN')}</span>
+                              {' '}({form.brokerage_value}{form.brokerage_mode === 'days_rent' ? " days' rent" : " months' rent"}) — read-only, not stored separately
+                            </div>
+                          )}
+                        </>
+                      )}
+                    </>
+                  ) : (
+                    <>
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 10 }}>
+                        <EPill text="Percentage" active={form.brokerage_mode === 'percentage'} onClick={() => selectMode('percentage')} />
+                        <EPill text="Fixed Amount" active={form.brokerage_mode === 'fixed'} onClick={() => selectMode('fixed')} />
+                      </div>
+                      {form.brokerage_mode === 'percentage' && (
+                        <TInput value={form.brokerage_value} onChange={v => set('brokerage_value')(v.replace(/[^\d.]/g, ''))} placeholder="e.g. 2" />
+                      )}
+                      {form.brokerage_mode === 'fixed' && (
+                        <TInput value={form.brokerage_value} onChange={v => set('brokerage_value')(v.replace(/[^\d.]/g, ''))} placeholder="e.g. 50000" prefix="₹" />
+                      )}
+                    </>
+                  )}
+                  <button type="button" onClick={() => set('show_brokerage_details')(!form.show_brokerage_details)}
+                    style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 14, background: 'transparent', border: 'none', padding: 0, cursor: 'pointer' }}>
+                    <span style={{ width: 18, height: 18, borderRadius: 4, flexShrink: 0, border: `1.5px solid ${form.show_brokerage_details ? C.gold : C.textMuted}`, background: form.show_brokerage_details ? C.gold : 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.7rem', color: '#0a0a0a', fontWeight: 800 }}>
+                      {form.show_brokerage_details ? '✓' : ''}
+                    </span>
+                    <span style={{ fontSize: 13, color: C.text, fontFamily: FB }}>Show brokerage details on listing page</span>
+                  </button>
+                </div>
+              )
+            })()}
             <div style={{ marginTop: 16 }}>
               <button type="button" onClick={() => set('price_negotiable')(!form.price_negotiable)}
                 style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 16px', background: form.price_negotiable ? C.goldDim : 'transparent', border: `1px solid ${form.price_negotiable ? C.goldBorder : C.border}`, borderRadius: 8, cursor: 'pointer', fontFamily: FB, color: form.price_negotiable ? C.gold : C.textSub, fontSize: 13, fontWeight: form.price_negotiable ? 600 : 400 }}>
@@ -815,6 +1043,45 @@ export default function EditListingPage() {
                 Price is negotiable
               </button>
             </div>
+
+            {/* ₹/sq.ft (sale only) — separate from Built-up Area above,
+                see migration 069's comment for why. */}
+            {form.listing_type === 'sale' && (() => {
+              const psfArea = Number(form.area_sqft)
+              const psfRate = Number(form.price_per_sqft)
+              const psfPreviewTotal = psfArea > 0 && psfRate > 0 ? Math.round(psfArea * psfRate) : null
+              return (
+                <div style={{ marginTop: 20, padding: '16px 18px', borderRadius: 10, background: C.surface2, border: `1px solid ${C.border}` }}>
+                  <p style={{ ...lbl, marginBottom: 4 }}>₹/sq.ft (Optional)</p>
+                  <p style={{ fontSize: 13, color: C.textMuted, marginBottom: 14 }}>
+                    A separate area and rate you can choose to display publicly — never affects Expected Price above.
+                  </p>
+                  <div style={grid2}>
+                    <Field label="Area (sq.ft)">
+                      <TInput value={form.area_sqft} onChange={v => set('area_sqft')(v.replace(/\D/g, ''))} placeholder="e.g. 1500" />
+                    </Field>
+                    <Field label="₹/sq.ft">
+                      <TInput value={form.price_per_sqft} onChange={v => set('price_per_sqft')(v.replace(/\D/g, ''))} placeholder="e.g. 12500" prefix="₹" />
+                    </Field>
+                  </div>
+                  {psfPreviewTotal != null && (
+                    <div style={{ marginTop: 12, padding: '10px 14px', borderRadius: 8, background: C.goldDim, border: `1px solid ${C.goldBorder}`, fontSize: 13, color: C.gold, fontFamily: FB }}>
+                      Preview total: ₹{psfPreviewTotal.toLocaleString('en-IN')}
+                      <span style={{ color: C.textMuted, marginLeft: 6 }}>
+                        ({form.area_sqft} sq.ft × ₹{psfRate.toLocaleString('en-IN')}/sq.ft) — for reference only, does not change Expected Price
+                      </span>
+                    </div>
+                  )}
+                  <button type="button" onClick={() => set('show_price_per_sqft')(!form.show_price_per_sqft)}
+                    style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 14, background: 'transparent', border: 'none', padding: 0, cursor: 'pointer' }}>
+                    <span style={{ width: 18, height: 18, borderRadius: 4, flexShrink: 0, border: `1.5px solid ${form.show_price_per_sqft ? C.gold : C.textMuted}`, background: form.show_price_per_sqft ? C.gold : 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.7rem', color: '#0a0a0a', fontWeight: 800 }}>
+                      {form.show_price_per_sqft ? '✓' : ''}
+                    </span>
+                    <span style={{ fontSize: 13, color: C.text, fontFamily: FB }}>Show ₹/sq.ft on listing page</span>
+                  </button>
+                </div>
+              )
+            })()}
           </SectionCard>
 
           {/* Step 5 — Amenities */}
@@ -1109,8 +1376,32 @@ export default function EditListingPage() {
 
           {/* Error */}
           {error && (
-            <div style={{ padding: '14px 20px', background: 'rgba(224,85,85,0.1)', border: '1px solid rgba(224,85,85,0.3)', borderRadius: 10, color: '#e05555', fontSize: 14, fontFamily: FB, marginBottom: 20 }}>
-              {error}
+            // 'validation' reuses the existing gold/amber notice styling
+            // (same tokens as the video-uploading notice above) since it's
+            // a precondition, not a failure; 'network'/'save' keep the
+            // existing red error styling, distinguished only by label —
+            // a full color-coded redesign wasn't asked for, this is the
+            // minimal distinction that actually helps someone reading it
+            // tell "fix this and retry" apart from "this genuinely failed".
+            <div style={{
+              padding: '14px 20px', borderRadius: 10, fontSize: 14, fontFamily: FB, marginBottom: 20,
+              display: 'flex', alignItems: 'flex-start', gap: 10,
+              ...(errorKind === 'validation'
+                ? { background: C.goldDim, border: `1px solid ${C.goldBorder}`, color: C.gold }
+                : { background: 'rgba(224,85,85,0.1)', border: '1px solid rgba(224,85,85,0.3)', color: '#e05555' }),
+            }}>
+              <span style={{ flexShrink: 0, fontSize: 15, lineHeight: '20px' }}>
+                {errorKind === 'validation' ? '⚠' : errorKind === 'network' ? '📡' : '✕'}
+              </span>
+              <span>
+                <strong style={{ fontWeight: 600 }}>
+                  {errorKind === 'validation' ? 'Check before saving: '
+                    : errorKind === 'network' ? 'Network error: '
+                    : errorKind === 'save' ? 'Save failed: '
+                    : ''}
+                </strong>
+                {error}
+              </span>
             </div>
           )}
 

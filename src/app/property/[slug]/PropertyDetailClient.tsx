@@ -95,7 +95,24 @@ type Property = {
   status: string;
   price: number;
   price_per_sqft: number | null;
+  // Deliberately NOT reusing area_sqft below (that field means built_up_
+  // area, mapped from property_listings.built_up_area) — this is the
+  // separate ₹/sq.ft-calculator area from migration 069, only ever used
+  // to compute price_per_sqft, never for the property's actual area
+  // display. show_price_per_sqft gates whether price_per_sqft is shown
+  // publicly at all.
+  price_per_sqft_area: number | null;
+  show_price_per_sqft: boolean;
   deposit_amount: number | null;
+  // Rental-only (migration 070). available_from/preferred_tenant render
+  // publicly whenever set — no separate toggle, same as deposit_amount's
+  // existing convention above. Brokerage is the one field with an
+  // explicit opt-in toggle, per spec.
+  available_from: string | null;
+  preferred_tenant: string | null;
+  brokerage_mode: string | null;
+  brokerage_value: number | null;
+  show_brokerage_details: boolean;
   area_sqft: number;
   bedrooms: number | null;
   bathrooms: number | null;
@@ -218,8 +235,21 @@ function mapListingToProperty(row: Record<string, unknown>): Property {
     listing_type:   typeof row.listing_type === "string" ? row.listing_type : "sale",
     status:         typeof row.status === "string" ? row.status : "pending_review",
     price:          num(row.price) ?? 0,
-    price_per_sqft: null,
-    deposit_amount: null,
+    // Previously hardcoded null — property_listings never had this
+    // column until migration 069; the type/render path already existed
+    // (see that migration's comment), it just had nothing to populate it.
+    price_per_sqft:       typeof row.show_price_per_sqft === "boolean" && row.show_price_per_sqft ? num(row.price_per_sqft) : null,
+    price_per_sqft_area:  num(row.area_sqft),
+    show_price_per_sqft:  Boolean(row.show_price_per_sqft),
+    // Previously hardcoded null — property_listings never had this
+    // column until migration 070; same "type/render path already
+    // existed, just nothing populated it" situation as price_per_sqft.
+    deposit_amount:          num(row.deposit_amount),
+    available_from:          typeof row.available_from === "string" ? row.available_from : null,
+    preferred_tenant:        typeof row.preferred_tenant === "string" ? row.preferred_tenant : null,
+    brokerage_mode:           typeof row.show_brokerage_details === "boolean" && row.show_brokerage_details && typeof row.brokerage_mode === "string" ? row.brokerage_mode : null,
+    brokerage_value:          typeof row.show_brokerage_details === "boolean" && row.show_brokerage_details ? num(row.brokerage_value) : null,
+    show_brokerage_details:   Boolean(row.show_brokerage_details),
     area_sqft:      num(row.built_up_area) ?? 0,
     bedrooms:       num(row.bedrooms),
     bathrooms:      num(row.bathrooms),
@@ -237,8 +267,20 @@ function mapListingToProperty(row: Record<string, unknown>): Property {
     amenities,
     facing:         typeof row.facing === "string" ? row.facing : null,
     vastu_compliant: amenities.some(a => a.toLowerCase().includes("vastu")),
-    rera_number:    null,
-    ownership_type: null,
+    // Previously hardcoded null, same situation as deposit_amount/
+    // price_per_sqft above — property_listings.rera_number is new
+    // (migration 070), a property/project-level RERA number, distinct
+    // from agent_profiles.rera_number (the AGENT's own registration).
+    rera_number:    typeof row.rera_number === "string" && row.rera_number.trim() ? row.rera_number : null,
+    // Populated from the new listed_by column (Owner/Agent/Builder,
+    // migration 070) — deliberately not renamed to match ownership_type's
+    // DB-side name, since that name is already taken (with a different
+    // meaning, Freehold/Leasehold) on the unrelated dead `properties`
+    // table. This reuses the existing "🏠 Ownership" render slot below,
+    // which previously had nothing to show.
+    ownership_type: typeof row.listed_by === "string" && row.listed_by
+      ? row.listed_by.charAt(0).toUpperCase() + row.listed_by.slice(1)
+      : null,
     is_featured:    Boolean(row.is_featured),
     views:          num(row.views) ?? 0,
     saves:          0,
@@ -316,6 +358,25 @@ function formatPrice(price: number, listingType: string): string {
   if (price >= 10000000) return `₹${(price / 10000000).toFixed(2)} Cr`;
   if (price >= 100000) return `₹${(price / 100000).toFixed(2)}L`;
   return `₹${price.toLocaleString("en-IN")}`;
+}
+
+// Full, never-rounded Indian comma grouping — for the PRIMARY price
+// figure only (the listing's actual asking price/rent). formatPrice()
+// above stays as the Cr/L/K shorthand used everywhere else (similar-
+// property cards, EMI/loan figures, and now also this price's own
+// secondary text) — deliberately not replaced, since those contexts
+// want the compact form, not full digits.
+function formatPriceFull(price: number): string {
+  return `₹${Math.round(price).toLocaleString("en-IN")}`;
+}
+
+// Secondary line next to the primary price: always the Cr/L/K shorthand,
+// plus " · ₹X/sq.ft" appended only when show_price_per_sqft is on and a
+// sale listing actually has both values — never for rent.
+function priceSecondaryText(property: Property): string {
+  const shorthand = formatPrice(property.price, property.listing_type);
+  const showPsf = property.listing_type !== "rent" && property.show_price_per_sqft && property.price_per_sqft;
+  return showPsf ? `≈ ${shorthand} · ₹${property.price_per_sqft!.toLocaleString("en-IN")}/sq.ft` : `≈ ${shorthand}`;
 }
 
 function formatDate(iso: string): string {
@@ -597,6 +658,18 @@ function OwnerAgentPanel({
   // Same destination MyListingsList's own Edit button already uses
   // (post-property/edit/[id]/page.tsx) — reused, not reinvented.
   const editHref = `/post-property/edit/${property.id}`;
+  // "View Listing" — same destination + label MyListingsList's own row
+  // action already uses (components/dashboard/MyListingsList.tsx:422,
+  // "View" -> /property/${slug}). Reused even though it's technically
+  // this same page: it's the established convention for "see this
+  // listing" elsewhere in the app, kept consistent rather than omitted
+  // just because it happens to resolve to where the owner already is.
+  const viewListingHref = `/property/${property.slug}`;
+  // "Manage Property" — MyListingsList's own row (Delete/Request
+  // Deletion/etc.) is where the actions beyond Edit/View Leads actually
+  // live; no separate per-property "manage" page exists, so this points
+  // at that same row rather than inventing a new destination.
+  const manageHref = `/dashboard/my-listings`;
 
   return (
     <div>
@@ -613,17 +686,28 @@ function OwnerAgentPanel({
         <OwnerAgentStatTile value={imageClickCount} label="Photo Clicks" />
       </div>
 
-      <Link href={inquiriesHref} style={{ textDecoration: "none" }}>
-        <button style={{ width: "100%", padding: "13px", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.10)", borderRadius: "16px", color: "#FFFFFF", fontSize: "13px", fontWeight: 600, letterSpacing: "0.04em", cursor: "pointer", fontFamily: "var(--font-body-new)", marginBottom: "10px" }}>
-          View Inquiries for This Listing
-        </button>
-      </Link>
-
-      <Link href={editHref} style={{ textDecoration: "none" }}>
-        <button style={{ width: "100%", padding: "13px", background: "#10C4C3", border: "none", borderRadius: "16px", color: "#020C1C", fontSize: "13px", fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", cursor: "pointer", fontFamily: "var(--font-body-new)", boxShadow: "0 10px 30px rgba(30,167,255,.35)" }}>
-          Quick Edit
-        </button>
-      </Link>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
+        <Link href={editHref} style={{ textDecoration: "none" }}>
+          <button style={{ width: "100%", padding: "13px", background: "#10C4C3", border: "none", borderRadius: "16px", color: "#020C1C", fontSize: "12.5px", fontWeight: 700, letterSpacing: "0.04em", textTransform: "uppercase", cursor: "pointer", fontFamily: "var(--font-body-new)", boxShadow: "0 10px 30px rgba(30,167,255,.35)" }}>
+            Edit Listing
+          </button>
+        </Link>
+        <Link href={inquiriesHref} style={{ textDecoration: "none" }}>
+          <button style={{ width: "100%", padding: "13px", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.10)", borderRadius: "16px", color: "#FFFFFF", fontSize: "12.5px", fontWeight: 600, letterSpacing: "0.04em", cursor: "pointer", fontFamily: "var(--font-body-new)" }}>
+            View Leads
+          </button>
+        </Link>
+        <Link href={viewListingHref} style={{ textDecoration: "none" }}>
+          <button style={{ width: "100%", padding: "13px", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.10)", borderRadius: "16px", color: "#FFFFFF", fontSize: "12.5px", fontWeight: 600, letterSpacing: "0.04em", cursor: "pointer", fontFamily: "var(--font-body-new)" }}>
+            View Listing
+          </button>
+        </Link>
+        <Link href={manageHref} style={{ textDecoration: "none" }}>
+          <button style={{ width: "100%", padding: "13px", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.10)", borderRadius: "16px", color: "#FFFFFF", fontSize: "12.5px", fontWeight: 600, letterSpacing: "0.04em", cursor: "pointer", fontFamily: "var(--font-body-new)" }}>
+            Manage Property
+          </button>
+        </Link>
+      </div>
     </div>
   );
 }
@@ -958,8 +1042,11 @@ function LockedPropertyPreview({
             <span style={{ padding: "6px 14px", borderRadius: "100px", fontSize: "11px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", background: property.listing_type === "rent" ? "rgba(11,13,16,0.85)" : "rgba(16,196,195,0.92)", color: property.listing_type === "rent" ? "#10C4C3" : "#020C1C", border: property.listing_type === "rent" ? "1px solid rgba(16,196,195,0.5)" : "none", marginBottom: "16px" }}>
               {property.listing_type === "rent" ? "For Rent" : "For Sale"}
             </span>
-            <div className="pd-lock-price" style={{ fontFamily: "var(--font-support-new)", fontSize: "36px", fontWeight: 700, color: "#10C4C3", marginBottom: "8px" }}>
-              {formatPrice(property.price, property.listing_type)}
+            <div className="pd-lock-price" style={{ fontFamily: "var(--font-support-new)", fontSize: "36px", fontWeight: 700, color: "#10C4C3", marginBottom: "4px" }}>
+              {formatPriceFull(property.price)}
+            </div>
+            <div style={{ fontSize: "13px", color: "#A9B4C2", marginBottom: "14px" }}>
+              {priceSecondaryText(property)}
             </div>
             <div style={{ fontSize: "14px", color: "#A9B4C2", marginBottom: "18px" }}>
               {property.neighbourhood ? `${property.neighbourhood}, ` : ""}{property.city}
@@ -2090,17 +2177,41 @@ export default function PropertyDetailClient() {
               <Card>
                 <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "16px", marginBottom: "16px", flexWrap: "wrap" }}>
                   <div>
-                    <div style={{ display: "flex", alignItems: "baseline", gap: "12px", marginBottom: "4px" }}>
+                    <div style={{ display: "flex", alignItems: "baseline", gap: "12px", marginBottom: "2px" }}>
                       <span style={{ fontFamily: "var(--font-support-new)", fontSize: "42px", fontWeight: 600, color: "#10C4C3", lineHeight: 1 }}>
-                        {formatPrice(property.price, property.listing_type)}
+                        {formatPriceFull(property.price)}
                       </span>
-                      {property.price_per_sqft && property.listing_type !== "rent" && (
-                        <span style={{ fontSize: "13px", color: "#A9B4C2" }}>₹{property.price_per_sqft.toLocaleString("en-IN")}/sqft</span>
-                      )}
+                    </div>
+                    <div style={{ fontSize: "13px", color: "#A9B4C2", marginBottom: "4px" }}>
+                      {priceSecondaryText(property)}
                     </div>
                     {property.listing_type === "rent" && property.deposit_amount && (
                       <div style={{ fontSize: "12px", color: "#A9B4C2", marginBottom: "4px" }}>
                         Deposit: {formatPrice(property.deposit_amount, "sale")}
+                      </div>
+                    )}
+                    {/* available_from/preferred_tenant render whenever
+                        set — same no-separate-toggle convention as
+                        deposit_amount above. Brokerage is the one field
+                        gated by its own explicit toggle, per spec. */}
+                    {property.listing_type === "rent" && property.available_from && (
+                      <div style={{ fontSize: "12px", color: "#A9B4C2", marginBottom: "4px" }}>
+                        Available from: {formatDate(property.available_from)}
+                      </div>
+                    )}
+                    {property.listing_type === "rent" && property.preferred_tenant && (
+                      <div style={{ fontSize: "12px", color: "#A9B4C2", marginBottom: "4px" }}>
+                        Preferred tenant: {property.preferred_tenant.charAt(0).toUpperCase() + property.preferred_tenant.slice(1)}
+                      </div>
+                    )}
+                    {property.show_brokerage_details && property.brokerage_mode && property.brokerage_value != null && (
+                      <div style={{ fontSize: "12px", color: "#A9B4C2", marginBottom: "4px" }}>
+                        Brokerage: {
+                          property.brokerage_mode === "days_rent" ? `${property.brokerage_value} days' rent`
+                          : property.brokerage_mode === "months_rent" ? `${property.brokerage_value} months' rent`
+                          : property.brokerage_mode === "percentage" ? `${property.brokerage_value}%`
+                          : `₹${property.brokerage_value.toLocaleString("en-IN")}`
+                        }
                       </div>
                     )}
                   </div>

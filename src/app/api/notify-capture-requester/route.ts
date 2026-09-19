@@ -22,16 +22,25 @@ function adminClient() {
 // this is called).
 export async function POST(req: NextRequest) {
   try {
-    const { requesterId, status, propertyTitle, scheduledDate, scheduledTimeSlot, adminNotes } = await req.json()
+    const {
+      requesterId, status, propertyTitle, scheduledDate, scheduledTimeSlot, adminNotes,
+      suggestedAlternativeDate1, suggestedAlternativeDate2,
+    } = await req.json()
 
     if (!requesterId || (status !== 'scheduled' && status !== 'declined')) {
       return NextResponse.json({ error: 'requesterId and a valid status are required' }, { status: 400 })
     }
 
     const title = status === 'scheduled' ? '360° capture scheduled' : '360° capture request declined'
+    // Alternatives are decline-only (migration 072) — admin-entered
+    // structured dates, not free text, so they're formatted here rather
+    // than expecting the admin to have typed them into adminNotes.
+    const alternatives = [suggestedAlternativeDate1, suggestedAlternativeDate2].filter(Boolean)
     const body = status === 'scheduled'
       ? `Your 360° capture for "${propertyTitle ?? 'your listing'}" is scheduled for ${scheduledDate ?? 'TBD'}${scheduledTimeSlot ? ` (${scheduledTimeSlot})` : ''}.${adminNotes ? ` Note: ${adminNotes}` : ''}`
-      : `Your 360° capture request for "${propertyTitle ?? 'your listing'}" was declined.${adminNotes ? ` Reason: ${adminNotes}` : ''}`
+      : `Your 360° capture request for "${propertyTitle ?? 'your listing'}" was declined.` +
+        (alternatives.length ? ` Suggested alternatives: ${alternatives.join(', ')}.` : '') +
+        (adminNotes ? ` Reason: ${adminNotes}` : '')
 
     const supabase = adminClient()
     const { error } = await supabase.from('notifications').insert({
@@ -56,10 +65,7 @@ export async function POST(req: NextRequest) {
       .eq('id', requesterId)
       .maybeSingle()
     if (requesterProfile?.phone) {
-      console.log(`[notify-capture-requester] Calling sendWhatsAppMessage for requester ${requesterId}...`)
       void sendWhatsAppMessage(requesterProfile.phone, requesterProfile.full_name?.trim() || 'there', body)
-    } else {
-      console.log(`[notify-capture-requester] Skipping — no phone on file for requester ${requesterId}`)
     }
 
     return NextResponse.json({ notified: true })
