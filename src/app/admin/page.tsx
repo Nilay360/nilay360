@@ -796,7 +796,8 @@ function ContactRowEditor({
   const [label, setLabel] = useState(row.label);
   const [phone, setPhone] = useState(row.phone);
   const [whatsapp, setWhatsapp] = useState(row.whatsapp ?? "");
-  useEffect(() => { setLabel(row.label); setPhone(row.phone); setWhatsapp(row.whatsapp ?? ""); }, [row.label, row.phone, row.whatsapp]);
+  // No resync effect: ContactsSection keys this editor on the saved values,
+  // so a saved change remounts it with fresh state.
   const dirty = label !== row.label || phone !== row.phone || whatsapp !== (row.whatsapp ?? "");
 
   return (
@@ -848,9 +849,16 @@ function ContactAddForm({
   disabled: boolean; existingTypes: string[];
   onAdd: (contactType: string, label: string, phone: string, whatsapp: string) => void;
 }) {
-  const available = CONTACT_TYPES.filter(t => !existingTypes.includes(t));
-  const [contactType, setContactType] = useState<string>(available[0] ?? "");
-  useEffect(() => { if (!available.includes(contactType as typeof CONTACT_TYPES[number])) setContactType(available[0] ?? ""); }, [available, contactType]);
+  // existingTypes is a fresh array every render, so memoize on its contents.
+  const existingKey = existingTypes.join(",");
+  const available = useMemo(
+    () => CONTACT_TYPES.filter(t => !existingKey.split(",").includes(t)),
+    [existingKey],
+  );
+  const [selectedType, setContactType] = useState<string>(available[0] ?? "");
+  // Derived during render instead of corrected in an effect: if the selected
+  // type was just added (no longer available), fall back to the first one left.
+  const contactType = (available as readonly string[]).includes(selectedType) ? selectedType : (available[0] ?? "");
   const [label, setLabel] = useState("");
   const [phone, setPhone] = useState("");
   const [whatsapp, setWhatsapp] = useState("");
@@ -904,7 +912,7 @@ function ContactsSection({
       ) : (
         rows.map(row => (
           <ContactRowEditor
-            key={row.contact_type}
+            key={`${row.contact_type}|${row.label}|${row.phone}|${row.whatsapp ?? ""}`}
             row={row}
             disabled={disabled === row.contact_type}
             onSave={onSave}

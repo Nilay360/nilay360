@@ -3,8 +3,7 @@
    placeholder / content pages). The root layout supplies the primary chrome.
    Server component (no client state) — safe to import anywhere. */
 import type { ReactNode } from "react";
-import { createClient } from "@/lib/supabase/server";
-import { telHref } from "@/lib/contactFormat";
+import { FooterPhone } from "./FooterPhone";
 
 const NAV = [
   ["Buy","/buy"],["Rent","/rent"],["New Projects","/new-projects"],
@@ -33,14 +32,7 @@ export function Navbar() {
   );
 }
 
-export async function Footer() {
-  const supabase = await createClient();
-  const { data: contact } = await supabase
-    .from("site_contacts")
-    .select("contact_type, label, phone, whatsapp")
-    .eq("contact_type", "general")
-    .maybeSingle();
-
+export function Footer() {
   const cols = [
     { heading:"Properties", links:[["Buy","/buy"],["Rent","/rent"],["New Projects","/new-projects"],["Commercial","/commercial"],["Builders","/builders"],["Blog","/blog"]] },
     { heading:"Company",    links:[["About Us","/about"],["Our Agents","/agents"],["NRI Services","/nri"],["Careers","/careers"],["Press","/press"],["Contact","/contact"]] },
@@ -56,11 +48,7 @@ export async function Footer() {
               <img src="/brand/Nilay360-09-Photoroom%20(1).png" alt="Nilay 360" style={{ height: 32, width: 'auto', objectFit: 'contain' }} />
             </a>
             <p style={{ fontSize:13, lineHeight:1.75, maxWidth:240, marginBottom:20 }}>India&apos;s premium real estate platform connecting discerning buyers with exceptional properties.</p>
-            {contact?.phone && (
-              <a href={telHref(contact.phone)} style={{ display:"block", fontSize:13, color:"rgba(255,255,255,0.55)", textDecoration:"none", marginBottom:20 }}>
-                📞 {contact.phone}
-              </a>
-            )}
+            <FooterPhone />
             <div style={{ display:"flex", gap:10 }}>
               {[
                 { label:"Instagram", icon:"IG", href:"https://www.instagram.com/nilay360_/" },

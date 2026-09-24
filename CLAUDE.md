@@ -39,6 +39,8 @@ three as snapshots, not live truth:
 11. Every new admin write must call `log_admin_action()` (→ `admin_audit_log`) and use the
     `.select()` + zero-rows-matched check.
 12. **Call the founder Ricky. Reply in short points and numbered steps, no long paragraphs.**
+13. **Always run `next build` locally before any push. tsc + eslint are not enough.** (They missed a
+    server-only import reaching client pages, which broke the Vercel build on 2026-09-25.)
 
 ## Stack (verified; README.md is stale — don't trust it)
 
