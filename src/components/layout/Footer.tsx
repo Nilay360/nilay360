@@ -1,6 +1,7 @@
 ﻿import React from "react"
 import Link from "next/link"
 import { BRAND, CITIES, NAV_LINKS } from "@/constants"
+import { createClient } from "@/lib/supabase/server"
 
 const footerLinks = {
   "Quick Links": NAV_LINKS,
@@ -31,7 +32,14 @@ const footerLinks = {
   ],
 }
 
-export function Footer() {
+export async function Footer() {
+  const supabase = await createClient()
+  const { data: contact } = await supabase
+    .from("site_contacts")
+    .select("contact_type, label, phone, whatsapp")
+    .eq("contact_type", "general")
+    .maybeSingle()
+
   return (
     <>
     <style>{`
@@ -70,7 +78,7 @@ export function Footer() {
             {/* Contact */}
             <div className="flex flex-col gap-2 text-[12px] text-white/50 mb-6">
               <span>📍 {BRAND.address}</span>
-              <span>📞 {BRAND.phone}</span>
+              {contact?.phone && <span>📞 {contact.phone}</span>}
               <a href={`mailto:${BRAND.email}`} className="hover:text-[#3DDAD9] transition-colors">
                 ✉️ {BRAND.email}
               </a>

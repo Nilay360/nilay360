@@ -7,6 +7,8 @@ import { useSearchParams } from "next/navigation";
 import posthog from "posthog-js";
 import { formatPrice, formatArea } from "@/lib/utils";
 import { optimizedImageUrl } from "@/lib/image-url";
+import { useSiteContact } from "@/hooks/useSiteContact";
+import { waHref } from "@/lib/contactFormat";
 import ScrollHero from "./ScrollHero";
 
 export interface SimilarProperty {
@@ -39,7 +41,6 @@ interface ThankYouClientProps {
 const STEPS = ["Enquiry Sent", "Under Review", "Team Contact"] as const;
 const CURRENT_STEP_INDEX = 1;
 
-const WHATSAPP_NUMBER = "917075792497";
 const GOOGLE_ADS_CONVERSION_ID = process.env.NEXT_PUBLIC_GOOGLE_ADS_CONVERSION_ID;
 const GOOGLE_ADS_CONVERSION_LABEL = process.env.NEXT_PUBLIC_GOOGLE_ADS_CONVERSION_LABEL;
 const META_PIXEL_ID = process.env.NEXT_PUBLIC_META_PIXEL_ID;
@@ -62,9 +63,10 @@ function ThankYouTracking() {
 }
 
 export default function ThankYouClient({ isMobile, properties, listingCount }: ThankYouClientProps) {
-  const whatsappHref = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(
-    "Hi, I just submitted an enquiry on Nilay 360"
-  )}`;
+  const contact = useSiteContact("general");
+  const whatsappHref = contact
+    ? waHref(contact.whatsapp ?? contact.phone, "Hi, I just submitted an enquiry on Nilay 360")
+    : undefined;
 
   return (
     <>
@@ -139,15 +141,17 @@ export default function ThankYouClient({ isMobile, properties, listingCount }: T
         }}
         data-viewport={isMobile ? "mobile" : "desktop"}
       >
-        <a
-          href={whatsappHref}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="flex-1 flex items-center justify-center text-[13px] font-semibold rounded-full transition-transform hover:scale-[1.02]"
-          style={{ color: "#10C4C3", border: "1.33px solid #10C4C3", background: "transparent", padding: "10px 16px" }}
-        >
-          Chat on WhatsApp
-        </a>
+        {whatsappHref && (
+          <a
+            href={whatsappHref}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex-1 flex items-center justify-center text-[13px] font-semibold rounded-full transition-transform hover:scale-[1.02]"
+            style={{ color: "#10C4C3", border: "1.33px solid #10C4C3", background: "transparent", padding: "10px 16px" }}
+          >
+            Chat on WhatsApp
+          </a>
+        )}
         <Link
           href="/properties"
           className="flex-1 flex items-center justify-center text-[13px] font-semibold rounded-full transition-transform hover:scale-[1.02]"

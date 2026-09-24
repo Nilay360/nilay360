@@ -147,7 +147,8 @@ export default function LocationPicker({
   latitude, longitude, address, locality, city, state, pincode, onChange, onConfirm,
 }: LocationPickerProps) {
   const mapDivRef = useRef<HTMLDivElement>(null);
-  const searchInputRef = useRef<HTMLInputElement>(null);
+  const autocompleteContainerRef = useRef<HTMLDivElement>(null);
+  const autocompleteElRef = useRef<google.maps.places.PlaceAutocompleteElement | null>(null);
   const mapObjRef = useRef<google.maps.Map | null>(null);
   const markerObjRef = useRef<google.maps.Marker | null>(null);
   const didInitialSyncRef = useRef(false);
@@ -215,15 +216,31 @@ export default function LocationPicker({
           onChangeRef.current(pos.lat(), pos.lng());
         });
 
-        if (searchInputRef.current) {
-          const autocomplete = new maps.places.Autocomplete(searchInputRef.current, {
-            componentRestrictions: { country: "in" },
-            fields: ["geometry"],
+        // Migrated from the deprecated google.maps.places.Autocomplete class
+        // (attached to a plain <input> we fully controlled) to
+        // PlaceAutocompleteElement — a custom element that IS the input,
+        // not something attached to one. componentRestrictions doesn't
+        // exist on the new API; includedRegionCodes is its replacement.
+        // fields: ["geometry"] -> fields: ["location"] (place.geometry.location
+        // -> place.location), and the selection event is "gmp-select" with
+        // a PlacePrediction that must be resolved via .toPlace().fetchFields()
+        // before its location is available — confirmed against the current
+        // @types/google.maps (3.66) and Google's own docs, not guessed.
+        if (autocompleteContainerRef.current && maps.places?.PlaceAutocompleteElement) {
+          const autocompleteEl = new maps.places.PlaceAutocompleteElement({
+            includedRegionCodes: ["in"],
           });
-          autocomplete.addListener("place_changed", () => {
-            const place = autocomplete.getPlace();
-            const loc = place.geometry?.location;
-            if (!loc) return; // no result selected (e.g. Enter pressed with no suggestion picked) — do nothing, never crash
+          autocompleteEl.placeholder = "Search for the address to drop a pin…";
+          autocompleteEl.classList.add("location-picker-autocomplete");
+          autocompleteContainerRef.current.appendChild(autocompleteEl);
+          autocompleteElRef.current = autocompleteEl;
+
+          autocompleteEl.addEventListener("gmp-select", async (event: google.maps.places.PlacePredictionSelectEvent) => {
+            const place = event.placePrediction?.toPlace();
+            if (!place) return;
+            await place.fetchFields({ fields: ["location"] });
+            const loc = place.location;
+            if (!loc) return; // no result selected — do nothing, never crash
             const pos: LatLng = { lat: loc.lat(), lng: loc.lng() };
             // Always remember the newest search result for "Reset", even
             // while a manual adjustment is active and the pin itself isn't
@@ -244,7 +261,14 @@ export default function LocationPicker({
         console.error("[LocationPicker] Failed to load Google Maps:", err);
         if (!cancelled) setSdkFailed(true);
       });
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+      // Remove the appended custom element on unmount/remount (React Strict
+      // Mode double-invokes this effect in dev) — otherwise a second mount
+      // would append a duplicate autocomplete element alongside the first.
+      autocompleteElRef.current?.remove();
+      autocompleteElRef.current = null;
+    };
     // Deliberately mount-once — see comment above the ref block for why
     // onChange/hasManualAdjustment don't belong in this dependency array.
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -369,22 +393,34 @@ export default function LocationPicker({
 
   return (
     <div>
-      <input
-        ref={searchInputRef}
-        type="text"
-        placeholder="Search for the address to drop a pin…"
-        autoComplete="off"
-        style={{
-          width: "100%", boxSizing: "border-box", padding: "11px 14px", marginBottom: "10px",
-          background: "rgba(255,255,255,0.06)", border: "1.5px solid rgba(255,255,255,0.12)",
-          // 16px, not 13px: iOS Safari auto-zooms the whole viewport on
-          // focus for any input with a computed font-size under 16px —
-          // 13px triggered a jarring zoom-in when tapping this field on
-          // an iPhone. 16px reads slightly larger than the original design
-          // but doesn't break the input's layout (padding/height unchanged).
-          borderRadius: "8px", fontSize: "16px", color: "#FFFFFF", fontFamily: "var(--font-body-new)", outline: "none",
-        }}
-      />
+      {/* PlaceAutocompleteElement is a custom element (it IS the input, not
+          attached to one), so it can't be styled with a plain inline style
+          object the way the old <input> was — ::part() targets its internal
+          shadow-DOM pieces instead. Google's own docs don't fully enumerate
+          these parts; "input"/"input-container" are the two documented by
+          Google's Places UI Kit styling guidance as of this migration.
+          16px on the input part specifically preserves the original
+          iOS-Safari zoom-on-focus fix (any computed font-size under 16px
+          triggers it) — NOT independently re-verified on a real iPhone
+          against this new element; flagged for a real-device check. */}
+      <style>{`
+        .location-picker-autocomplete-wrap gmp-place-autocomplete {
+          width: 100%;
+          display: block;
+          margin-bottom: 10px;
+        }
+        .location-picker-autocomplete-wrap gmp-place-autocomplete::part(input-container) {
+          background: rgba(255,255,255,0.06);
+          border: 1.5px solid rgba(255,255,255,0.12);
+          border-radius: 8px;
+        }
+        .location-picker-autocomplete-wrap gmp-place-autocomplete::part(input) {
+          font-size: 16px;
+          color: #FFFFFF;
+          font-family: var(--font-body-new);
+        }
+      `}</style>
+      <div className="location-picker-autocomplete-wrap" ref={autocompleteContainerRef} />
       <div style={{ position: "relative", width: "100%", height: "260px", borderRadius: "12px", overflow: "hidden", background: "#0A1526" }}>
         {!mapReady && <div style={{ position: "absolute", inset: 0, background: "#111F33" }} />}
         <div ref={mapDivRef} style={{ position: "absolute", inset: 0, width: "100%", height: "100%" }} />

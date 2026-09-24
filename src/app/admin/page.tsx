@@ -14,7 +14,7 @@ import VideoSlide from "@/components/property/VideoSlide";
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
-type AdminSection = "overview" | "listings" | "users" | "inquiries" | "agents" | "capture360" | "performance" | "leaderboard" | "reports" | "content" | "audit";
+type AdminSection = "overview" | "listings" | "users" | "inquiries" | "agents" | "capture360" | "performance" | "leaderboard" | "reports" | "content" | "contacts" | "audit";
 
 type Stats = {
   pending: number;
@@ -193,6 +193,22 @@ type AuditLogRow = {
 
 type SiteContentRow = { key: string; value: string; updated_at: string };
 
+const CONTACT_TYPES = ["general", "customer_care", "sales", "capture_team"] as const;
+const CONTACT_TYPE_LABELS: Record<string, string> = {
+  general: "General",
+  customer_care: "Customer Care",
+  sales: "Sales",
+  capture_team: "360° Capture Team",
+};
+type SiteContactRow = {
+  contact_type: string;
+  label: string;
+  phone: string;
+  whatsapp: string | null;
+  is_active: boolean;
+  updated_at: string;
+};
+
 type ReportRow = {
   id: string;
   reporter_id: string;
@@ -297,6 +313,7 @@ function IconAward()  { return <svg width="15" height="15" viewBox="0 0 24 24" f
 function IconCamera() { return <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>; }
 function IconFlag()   { return <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>; }
 function IconChevron(){ return <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"/></svg>; }
+function IconPhone()  { return <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg>; }
 
 // ── Shared UI ──────────────────────────────────────────────────────────────────
 
@@ -752,6 +769,146 @@ function SiteContentSection({
             disabled={disabled === row.key}
             onSave={onSave}
             onDelete={onDelete}
+          />
+        ))
+      )}
+    </div>
+  );
+}
+
+// ── Section: Contact Numbers ─────────────────────────────────────────────────
+// site_contacts (075) — replaces the phone number 7075792497, which was
+// previously hardcoded independently in 9 places across 6 files (plus 3
+// places reading src/constants/index.ts's now-removed BRAND.phone/
+// BRAND.whatsapp). One row per real contact purpose (general/customer_care/
+// sales/capture_team — contact_type is the table's PRIMARY KEY, so this is
+// edit-in-place per type, same as SiteContentRowEditor above, not a free
+// list). Only 'general' is seeded by migration 075; the other three types
+// exist as real, addable options here, not fabricated placeholder rows.
+
+function ContactRowEditor({
+  row, disabled, onSave, onToggleActive,
+}: {
+  row: SiteContactRow; disabled: boolean;
+  onSave: (contactType: string, label: string, phone: string, whatsapp: string) => void;
+  onToggleActive: (contactType: string, isActive: boolean) => void;
+}) {
+  const [label, setLabel] = useState(row.label);
+  const [phone, setPhone] = useState(row.phone);
+  const [whatsapp, setWhatsapp] = useState(row.whatsapp ?? "");
+  useEffect(() => { setLabel(row.label); setPhone(row.phone); setWhatsapp(row.whatsapp ?? ""); }, [row.label, row.phone, row.whatsapp]);
+  const dirty = label !== row.label || phone !== row.phone || whatsapp !== (row.whatsapp ?? "");
+
+  return (
+    <div style={{ background: "rgba(255,255,255,0.05)", backdropFilter: "blur(24px)", WebkitBackdropFilter: "blur(24px)", borderRadius: "16px", border: "1px solid rgba(255,255,255,0.08)", padding: "20px 22px", marginBottom: "14px", opacity: row.is_active ? 1 : 0.55 }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "14px", gap: "10px", flexWrap: "wrap" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+          <code style={{ fontSize: "12px", fontWeight: 700, color: "#10C4C3", background: "rgba(16,196,195,0.1)", padding: "3px 9px", borderRadius: "6px" }}>{CONTACT_TYPE_LABELS[row.contact_type] ?? row.contact_type}</code>
+          {!row.is_active && <span style={{ fontSize: "10px", fontWeight: 700, color: "#F59E0B", letterSpacing: "0.06em", textTransform: "uppercase" as const }}>Hidden from site</span>}
+        </div>
+        <button
+          onClick={() => onToggleActive(row.contact_type, !row.is_active)}
+          disabled={disabled}
+          style={{ padding: "6px 14px", borderRadius: "7px", fontSize: "11px", fontWeight: 700, background: row.is_active ? "rgba(255,255,255,0.06)" : "rgba(16,196,195,0.12)", color: row.is_active ? "#A9B4C2" : "#10C4C3", border: row.is_active ? "1.5px solid rgba(255,255,255,0.12)" : "1.5px solid rgba(16,196,195,0.35)", cursor: disabled ? "not-allowed" : "pointer", fontFamily: "var(--font-body-new)" }}
+        >
+          {row.is_active ? "Hide from site" : "Show on site"}
+        </button>
+      </div>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "10px", marginBottom: "12px" }}>
+        <div>
+          <label style={{ display: "block", fontSize: "10px", fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase" as const, color: "#6B7686", marginBottom: "5px" }}>Label</label>
+          <input value={label} disabled={disabled} onChange={e => setLabel(e.target.value)}
+            style={{ width: "100%", boxSizing: "border-box", padding: "9px 11px", background: "rgba(255,255,255,0.06)", border: "1.5px solid rgba(255,255,255,0.12)", borderRadius: "8px", fontSize: "13px", color: "#FFFFFF", fontFamily: "var(--font-body-new)", outline: "none" }} />
+        </div>
+        <div>
+          <label style={{ display: "block", fontSize: "10px", fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase" as const, color: "#6B7686", marginBottom: "5px" }}>Phone (e.g. +91 70933 36360)</label>
+          <input value={phone} disabled={disabled} onChange={e => setPhone(e.target.value)}
+            style={{ width: "100%", boxSizing: "border-box", padding: "9px 11px", background: "rgba(255,255,255,0.06)", border: "1.5px solid rgba(255,255,255,0.12)", borderRadius: "8px", fontSize: "13px", color: "#FFFFFF", fontFamily: "var(--font-body-new)", outline: "none" }} />
+        </div>
+        <div>
+          <label style={{ display: "block", fontSize: "10px", fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase" as const, color: "#6B7686", marginBottom: "5px" }}>WhatsApp (optional, same format)</label>
+          <input value={whatsapp} disabled={disabled} onChange={e => setWhatsapp(e.target.value)} placeholder="Same as phone if blank"
+            style={{ width: "100%", boxSizing: "border-box", padding: "9px 11px", background: "rgba(255,255,255,0.06)", border: "1.5px solid rgba(255,255,255,0.12)", borderRadius: "8px", fontSize: "13px", color: "#FFFFFF", fontFamily: "var(--font-body-new)", outline: "none" }} />
+        </div>
+      </div>
+      <button
+        onClick={() => onSave(row.contact_type, label.trim(), phone.trim(), whatsapp.trim())}
+        disabled={disabled || !dirty || !label.trim() || !phone.trim()}
+        style={{ padding: "9px 18px", borderRadius: "8px", fontSize: "12px", fontWeight: 700, background: dirty ? "#10C4C3" : "rgba(255,255,255,0.06)", color: dirty ? "#020C1C" : "rgba(255,255,255,0.4)", border: "none", cursor: disabled || !dirty ? "not-allowed" : "pointer", fontFamily: "var(--font-body-new)" }}
+      >
+        Save
+      </button>
+    </div>
+  );
+}
+
+function ContactAddForm({
+  disabled, existingTypes, onAdd,
+}: {
+  disabled: boolean; existingTypes: string[];
+  onAdd: (contactType: string, label: string, phone: string, whatsapp: string) => void;
+}) {
+  const available = CONTACT_TYPES.filter(t => !existingTypes.includes(t));
+  const [contactType, setContactType] = useState<string>(available[0] ?? "");
+  useEffect(() => { if (!available.includes(contactType as typeof CONTACT_TYPES[number])) setContactType(available[0] ?? ""); }, [available, contactType]);
+  const [label, setLabel] = useState("");
+  const [phone, setPhone] = useState("");
+  const [whatsapp, setWhatsapp] = useState("");
+  const canAdd = contactType !== "" && label.trim() !== "" && phone.trim() !== "";
+
+  if (available.length === 0) return null;
+
+  return (
+    <div style={{ background: "rgba(16,196,195,0.05)", border: "1.5px dashed rgba(16,196,195,0.3)", borderRadius: "14px", padding: "18px 20px", marginBottom: "20px" }}>
+      <p style={{ fontSize: "12px", fontWeight: 700, color: "#FFFFFF", marginBottom: "10px" }}>Add Contact Type</p>
+      <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", alignItems: "flex-end" }}>
+        <select value={contactType} disabled={disabled} onChange={e => setContactType(e.target.value)}
+          style={{ padding: "9px 11px", background: "rgba(255,255,255,0.06)", border: "1.5px solid rgba(255,255,255,0.12)", borderRadius: "8px", fontSize: "13px", color: "#FFFFFF", fontFamily: "var(--font-body-new)", outline: "none" }}>
+          {available.map(t => <option key={t} value={t} style={{ background: "#0A1526" }}>{CONTACT_TYPE_LABELS[t]}</option>)}
+        </select>
+        <input placeholder="Label" value={label} disabled={disabled} onChange={e => setLabel(e.target.value)}
+          style={{ flex: "0 1 160px", padding: "9px 11px", background: "rgba(255,255,255,0.06)", border: "1.5px solid rgba(255,255,255,0.12)", borderRadius: "8px", fontSize: "13px", color: "#FFFFFF", fontFamily: "var(--font-body-new)", outline: "none" }} />
+        <input placeholder="+91 XXXXX XXXXX" value={phone} disabled={disabled} onChange={e => setPhone(e.target.value)}
+          style={{ flex: "0 1 160px", padding: "9px 11px", background: "rgba(255,255,255,0.06)", border: "1.5px solid rgba(255,255,255,0.12)", borderRadius: "8px", fontSize: "13px", color: "#FFFFFF", fontFamily: "var(--font-body-new)", outline: "none" }} />
+        <input placeholder="WhatsApp (optional)" value={whatsapp} disabled={disabled} onChange={e => setWhatsapp(e.target.value)}
+          style={{ flex: "0 1 160px", padding: "9px 11px", background: "rgba(255,255,255,0.06)", border: "1.5px solid rgba(255,255,255,0.12)", borderRadius: "8px", fontSize: "13px", color: "#FFFFFF", fontFamily: "var(--font-body-new)", outline: "none" }} />
+        <button
+          onClick={() => { onAdd(contactType, label.trim(), phone.trim(), whatsapp.trim()); setLabel(""); setPhone(""); setWhatsapp(""); }}
+          disabled={disabled || !canAdd}
+          style={{ padding: "9px 20px", borderRadius: "8px", fontSize: "12px", fontWeight: 700, background: canAdd ? "#10C4C3" : "rgba(255,255,255,0.06)", color: canAdd ? "#020C1C" : "rgba(255,255,255,0.4)", border: "none", cursor: disabled || !canAdd ? "not-allowed" : "pointer", fontFamily: "var(--font-body-new)" }}
+        >
+          Add
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function ContactsSection({
+  rows, loading, disabled, onSave, onAdd, onToggleActive,
+}: {
+  rows: SiteContactRow[]; loading: boolean; disabled: string | null;
+  onSave: (contactType: string, label: string, phone: string, whatsapp: string) => void;
+  onAdd: (contactType: string, label: string, phone: string, whatsapp: string) => void;
+  onToggleActive: (contactType: string, isActive: boolean) => void;
+}) {
+  if (loading) return <Spinner />;
+  return (
+    <div>
+      <SectionHeading title="Contact Numbers" subtitle="The phone/WhatsApp numbers shown across the public site — changes appear immediately, no code deploy needed." count={rows.length} />
+      <ContactAddForm disabled={disabled !== null} existingTypes={rows.map(r => r.contact_type)} onAdd={onAdd} />
+      {rows.length === 0 ? (
+        <div style={{ padding: "60px 24px", textAlign: "center", background: "rgba(255,255,255,0.05)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", borderRadius: "18px", border: "1px solid rgba(255,255,255,0.08)" }}>
+          <p style={{ fontFamily: "var(--font-heading-new)", fontSize: "20px", color: "#FFFFFF" }}>No contact numbers yet</p>
+        </div>
+      ) : (
+        rows.map(row => (
+          <ContactRowEditor
+            key={row.contact_type}
+            row={row}
+            disabled={disabled === row.contact_type}
+            onSave={onSave}
+            onToggleActive={onToggleActive}
           />
         ))
       )}
@@ -3547,6 +3704,7 @@ const NAV: { id: AdminSection; label: string; icon: React.ReactNode }[] = [
   { id: "leaderboard", label: "Leaderboard",        icon: <IconAward /> },
   { id: "reports",    label: "Reports",            icon: <IconFlag /> },
   { id: "content",    label: "Site Content",       icon: <IconEdit /> },
+  { id: "contacts",   label: "Contact Numbers",    icon: <IconPhone /> },
   { id: "audit",      label: "Audit Log",          icon: <IconAudit /> },
 ];
 
@@ -3614,6 +3772,8 @@ function AdminPageInner() {
   const [auditLog,         setAuditLog]         = useState<AuditLogRow[]>([]);
   const [reports,          setReports]          = useState<ReportRow[]>([]);
   const [siteContentRows,  setSiteContentRows]  = useState<SiteContentRow[]>([]);
+  const [contactRows,      setContactRows]      = useState<SiteContactRow[]>([]);
+  const [contactsLoading,  setContactsLoading]  = useState(false);
   const [reportListingPreviews, setReportListingPreviews] = useState<Record<string, ReportListingPreview>>({});
   const [reportProfilePreviews, setReportProfilePreviews] = useState<Record<string, ReportProfilePreview>>({});
 
@@ -3850,6 +4010,16 @@ function AdminPageInner() {
           setSiteContentRows((res.data as SiteContentRow[] | null) ?? []);
           setContentLoading(false);
         });
+    } else if (active === "contacts") {
+      setContactsLoading(true);
+      supabase
+        .from("site_contacts")
+        .select("contact_type, label, phone, whatsapp, is_active, updated_at")
+        .order("contact_type", { ascending: true })
+        .then((res: { data: unknown }) => {
+          setContactRows((res.data as SiteContactRow[] | null) ?? []);
+          setContactsLoading(false);
+        });
     } else if (active === "reports") {
       setReportsLoading(true);
       (async () => {
@@ -3958,6 +4128,78 @@ function AdminPageInner() {
     setInFlight(null);
     setTimeout(() => setToast(null), 2500);
   }, [siteContentRows, logAdminAction, user]);
+
+  const handleContactSave = useCallback(async (contactType: string, label: string, phone: string, whatsapp: string) => {
+    setInFlight(contactType);
+    const oldRow = contactRows.find(r => r.contact_type === contactType);
+    const supabase = createClient();
+    const nowIso = new Date().toISOString();
+    // whatsapp is optional in the form but the column allows null — an
+    // empty string means "same as phone" from the admin's point of view,
+    // not "no WhatsApp at all", so it's never stored as "".
+    const whatsappValue = whatsapp || null;
+    const { error } = await supabase
+      .from("site_contacts")
+      .update({ label, phone, whatsapp: whatsappValue, updated_by: user?.id ?? null, updated_at: nowIso })
+      .eq("contact_type", contactType);
+
+    if (error) {
+      console.error("Admin — contact save error:", error);
+      setToast({ ok: false, msg: "Save failed — please try again." });
+    } else {
+      void logAdminAction(
+        "update_site_contact", "site_contact", null,
+        oldRow ? { contact_type: contactType, label: oldRow.label, phone: oldRow.phone, whatsapp: oldRow.whatsapp } : null,
+        { contact_type: contactType, label, phone, whatsapp: whatsappValue },
+      );
+      setContactRows(prev => prev.map(r => r.contact_type === contactType ? { ...r, label, phone, whatsapp: whatsappValue, updated_at: nowIso } : r));
+      setToast({ ok: true, msg: "Saved." });
+    }
+    setInFlight(null);
+    setTimeout(() => setToast(null), 2500);
+  }, [contactRows, logAdminAction, user]);
+
+  const handleContactAdd = useCallback(async (contactType: string, label: string, phone: string, whatsapp: string) => {
+    setInFlight(contactType);
+    const supabase = createClient();
+    const nowIso = new Date().toISOString();
+    const whatsappValue = whatsapp || null;
+    const { error } = await supabase
+      .from("site_contacts")
+      .insert({ contact_type: contactType, label, phone, whatsapp: whatsappValue, updated_by: user?.id ?? null });
+
+    if (error) {
+      console.error("Admin — contact add error:", error);
+      setToast({ ok: false, msg: error.code === "23505" ? "That contact type already exists." : "Add failed — please try again." });
+    } else {
+      void logAdminAction("create_site_contact", "site_contact", null, null, { contact_type: contactType, label, phone, whatsapp: whatsappValue });
+      setContactRows(prev => [...prev, { contact_type: contactType, label, phone, whatsapp: whatsappValue, is_active: true, updated_at: nowIso }].sort((a, b) => a.contact_type.localeCompare(b.contact_type)));
+      setToast({ ok: true, msg: "Contact added." });
+    }
+    setInFlight(null);
+    setTimeout(() => setToast(null), 2500);
+  }, [logAdminAction, user]);
+
+  const handleContactToggleActive = useCallback(async (contactType: string, isActive: boolean) => {
+    setInFlight(contactType);
+    const supabase = createClient();
+    const nowIso = new Date().toISOString();
+    const { error } = await supabase
+      .from("site_contacts")
+      .update({ is_active: isActive, updated_by: user?.id ?? null, updated_at: nowIso })
+      .eq("contact_type", contactType);
+
+    if (error) {
+      console.error("Admin — contact visibility toggle error:", error);
+      setToast({ ok: false, msg: "Update failed — please try again." });
+    } else {
+      void logAdminAction("toggle_site_contact_active", "site_contact", null, { contact_type: contactType, is_active: !isActive }, { contact_type: contactType, is_active: isActive });
+      setContactRows(prev => prev.map(r => r.contact_type === contactType ? { ...r, is_active: isActive, updated_at: nowIso } : r));
+      setToast({ ok: true, msg: isActive ? "Now shown on site." : "Hidden from site." });
+    }
+    setInFlight(null);
+    setTimeout(() => setToast(null), 2500);
+  }, [logAdminAction, user]);
 
   // bumpStats — Stats only tracks pending/active/rejected buckets (no
   // changes_requested/frozen counters were asked for), so a transition
@@ -4798,6 +5040,17 @@ function AdminPageInner() {
         onSave={(key, value) => void handleSiteContentSave(key, value)}
         onAdd={(key, value) => void handleSiteContentAdd(key, value)}
         onDelete={key => void handleSiteContentDelete(key)}
+      />
+    );
+  } else if (active === "contacts") {
+    content = (
+      <ContactsSection
+        rows={contactRows}
+        loading={contactsLoading}
+        disabled={inFlight}
+        onSave={(contactType, label, phone, whatsapp) => void handleContactSave(contactType, label, phone, whatsapp)}
+        onAdd={(contactType, label, phone, whatsapp) => void handleContactAdd(contactType, label, phone, whatsapp)}
+        onToggleActive={(contactType, isActive) => void handleContactToggleActive(contactType, isActive)}
       />
     );
   } else {

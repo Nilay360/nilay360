@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { IMAGES } from "@/constants/images";
 import { useSavedProperties } from "@/hooks/useSavedProperties";
@@ -7,6 +7,7 @@ import { useCompare } from "@/context/CompareContext";
 import RecentlyViewed from "@/components/property/RecentlyViewed";
 import { optimizedImageUrl } from "@/lib/image-url";
 import Reveal from "@/components/ui/Reveal";
+import { loadGoogleMapsScript } from "@/lib/loadGoogleMapsScript";
 
 type Property = {
   id: string;
@@ -31,6 +32,11 @@ type Property = {
   is_furnished: boolean;
   saves: number;
   created_at: string | null;
+  // Confirmed live (2026-09-23): 21 of 22 active property_listings rows have
+  // real coordinates; the map view must skip the one that doesn't rather
+  // than guess a position — never fabricate a pin.
+  latitude: number | null;
+  longitude: number | null;
 };
 
 // Mirrors post-property/page.tsx's COMMERCIAL_CATEGORIES — these categories
@@ -53,6 +59,29 @@ function formatPriceShort(v: number): string {
   if (v >= 10000000) return `₹${(v / 10000000).toFixed(2)} Cr`;
   if (v >= 100000) return `₹${(v / 100000).toFixed(1)} L`;
   return `₹${v.toLocaleString("en-IN")}`;
+}
+
+// Same rounding convention as PropertyDetailClient.tsx's formatDistance —
+// straight-line distance only, never drive-time (that would need a new,
+// separate Distance Matrix call, out of scope here).
+function formatNearbyDistance(meters: number | null): string {
+  if (meters == null) return "";
+  if (meters >= 1000) return `${(meters / 1000).toFixed(1)} km`;
+  return `${meters} m`;
+}
+const NEARBY_BADGE_LABEL: Record<string, string> = { hospital: "Hospital", school: "School" };
+
+// Maps Phase 5 — plain Haversine, no Google API call: both endpoints
+// (search origin + every listing's coordinates) are already known once the
+// origin is geocoded, so this is a pure client-side distance calculation,
+// same reasoning as /api/nearby-places' own distanceMeters().
+function haversineKm(lat1: number, lng1: number, lat2: number, lng2: number): number {
+  const R = 6371;
+  const toRad = (d: number) => (d * Math.PI) / 180;
+  const dLat = toRad(lat2 - lat1);
+  const dLng = toRad(lng2 - lng1);
+  const a = Math.sin(dLat / 2) ** 2 + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLng / 2) ** 2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
 
 function isNewListing(createdAt: string | null): boolean {
@@ -105,6 +134,8 @@ function mapListingToProperty(row: Record<string, unknown>): Property {
     is_furnished:   row.furnishing != null && row.furnishing !== "unfurnished",
     saves:          0,
     created_at:     typeof row.created_at === "string" ? row.created_at : null,
+    latitude:       num(row.latitude),
+    longitude:      num(row.longitude),
   };
 }
 
@@ -121,7 +152,7 @@ function SkeletonCard() {
   );
 }
 
-function PropertyCard({ property, savedIds, saveCounts, onToggleSave, reduceMotion }: { property: Property; savedIds: Set<string>; saveCounts: Map<string, number>; onToggleSave: (id: string, data?: Record<string, unknown>) => void; reduceMotion: boolean }) {
+function PropertyCard({ property, savedIds, saveCounts, nearbyBadge, onToggleSave, reduceMotion }: { property: Property; savedIds: Set<string>; saveCounts: Map<string, number>; nearbyBadge?: { category: string; distance_meters: number | null }; onToggleSave: (id: string, data?: Record<string, unknown>) => void; reduceMotion: boolean }) {
   const saved = savedIds.has(property.id);
   const saveCount = saveCounts.get(property.id) ?? 0;
   const [imgError, setImgError] = useState(false);
@@ -214,6 +245,11 @@ function PropertyCard({ property, savedIds, saveCounts, onToggleSave, reduceMoti
           </svg>
           <span style={{ fontSize: "12px", color: "var(--text-secondary)" }}>{property.neighbourhood ? `${property.neighbourhood}, ` : ""}{property.city}</span>
         </div>
+        {nearbyBadge && (
+          <div style={{ display: "inline-flex", alignItems: "center", gap: "5px", padding: "3px 9px", borderRadius: "100px", background: "rgba(16,196,195,0.08)", border: "1px solid var(--border-accent)", fontSize: "11px", color: "var(--brand-accent)", marginBottom: "14px" }}>
+            {NEARBY_BADGE_LABEL[nearbyBadge.category]} {formatNearbyDistance(nearbyBadge.distance_meters)} away
+          </div>
+        )}
         <div style={{ display: "flex", borderTop: "1px solid var(--border)", paddingTop: "14px" }}>
           {[{ value: property.bedrooms, label: COMMERCIAL_CATEGORIES.includes(property.type) ? "Rooms" : "Beds" }, { value: property.bathrooms, label: COMMERCIAL_CATEGORIES.includes(property.type) ? "Wash" : "Baths" }, { value: property.area_sqft?.toLocaleString("en-IN"), label: "sqft" }].map((s, i) => s.value != null && (
             <div key={i} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: "3px", borderRight: i < 2 ? "1px solid var(--border)" : "none" }}>
@@ -224,6 +260,215 @@ function PropertyCard({ property, savedIds, saveCounts, onToggleSave, reduceMoti
         </div>
       </div>
     </a>
+  );
+}
+
+// Extracted from the plain "list" view so the map split-screen's left column
+// can reuse the exact same row markup instead of a third copy — highlighted/
+// onHover/refCallback are all optional and no-op when omitted, so plain list
+// mode (no map) behaves exactly as it did before this existed.
+function PropertyListRow({
+  property: p, index: i, reduceMotion, highlighted, onHover, refCallback,
+}: {
+  property: Property; index: number; reduceMotion: boolean;
+  highlighted?: boolean; onHover?: (id: string | null) => void;
+  refCallback?: (el: HTMLAnchorElement | null) => void;
+}) {
+  const isNew = isNewListing(p.created_at);
+  return (
+    <Reveal delay={reduceMotion ? 0 : Math.min(i * 0.05, 0.3)}>
+      <a
+        ref={refCallback}
+        href={`/property/${p.slug}`}
+        className="pr-card pr-list-item"
+        style={{
+          display: "flex", textDecoration: "none", color: "inherit", cursor: "pointer",
+          background: "var(--bg-card)", borderRadius: "16px", overflow: "hidden",
+          transition: reduceMotion ? "none" : "border-color 0.2s, box-shadow 0.2s",
+          border: `1px solid ${highlighted ? "var(--brand-accent)" : "var(--border)"}`,
+          boxShadow: highlighted ? "0 0 0 1px var(--brand-accent), 0 8px 32px rgba(0,0,0,0.4)" : "0 4px 20px rgba(0,0,0,0.35)",
+        }}
+        onMouseEnter={e => { onHover?.(p.id); if (!reduceMotion) { const d = e.currentTarget as HTMLElement; d.style.borderColor = "var(--border-accent)"; d.style.boxShadow = "0 8px 32px rgba(0,0,0,0.4)"; } }}
+        onMouseLeave={e => { onHover?.(null); if (!reduceMotion) { const d = e.currentTarget as HTMLElement; d.style.borderColor = highlighted ? "var(--brand-accent)" : "var(--border)"; d.style.boxShadow = highlighted ? "0 0 0 1px var(--brand-accent), 0 8px 32px rgba(0,0,0,0.4)" : "0 4px 20px rgba(0,0,0,0.35)"; } }}
+      >
+        <div className="pr-list-img pr-img-wrap" style={{ width: "280px", flexShrink: 0, position: "relative", aspectRatio: "4 / 3", overflow: "hidden" }}>
+          <img src={optimizedImageUrl(p.images?.[0], 600) || IMAGES.properties[p.type?.toLowerCase() as keyof typeof IMAGES.properties] || IMAGES.properties.apartment} alt={p.title} loading="lazy" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+          <div style={{ position: "absolute", top: "12px", left: "12px", display: "flex", gap: "6px", flexWrap: "wrap" }}>
+            <span style={{ padding: "4px 10px", borderRadius: "100px", fontSize: "10px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", background: p.listing_type === "rent" ? "var(--blue-deep)" : "var(--brand-accent)", color: "var(--brand-primary)", backdropFilter: "blur(8px)" }}>
+              {p.listing_type === "rent" ? "For Rent" : "For Sale"}
+            </span>
+            {isNew && (
+              <span style={{ padding: "4px 10px", borderRadius: "100px", fontSize: "10px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", background: "var(--brand-primary)", color: "var(--brand-accent)", border: "1px solid var(--border-accent)", backdropFilter: "blur(8px)" }}>New</span>
+            )}
+          </div>
+        </div>
+        <div style={{ flex: 1, padding: "24px 28px", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
+          <div>
+            <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "16px", marginBottom: "8px" }}>
+              <h3 style={{ fontFamily: "var(--font-heading-new)", fontSize: "20px", fontWeight: 700, color: "var(--text-primary)", lineHeight: 1.3 }}>{p.title}</h3>
+              <span style={{ fontFamily: "var(--font-support-new)", fontSize: "22px", fontWeight: 700, color: "var(--brand-accent)", whiteSpace: "nowrap" }}>{formatPrice(p.price, p.listing_type)}</span>
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: "5px", marginBottom: "12px" }}>
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="var(--brand-accent)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" /><circle cx="12" cy="10" r="3" /></svg>
+              <span style={{ fontSize: "12px", color: "var(--text-secondary)" }}>{p.neighbourhood ? `${p.neighbourhood}, ` : ""}{p.city}</span>
+            </div>
+            {p.description && <p style={{ fontSize: "13px", color: "var(--text-secondary)", lineHeight: 1.6, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{p.description}</p>}
+          </div>
+          <div style={{ display: "flex", gap: "20px", marginTop: "16px", paddingTop: "16px", borderTop: "1px solid var(--border)" }}>
+            {[{ label: COMMERCIAL_CATEGORIES.includes(p.type) ? "Rooms" : "Beds", value: p.bedrooms }, { label: COMMERCIAL_CATEGORIES.includes(p.type) ? "Wash" : "Baths", value: p.bathrooms }, { label: "sqft", value: p.area_sqft?.toLocaleString("en-IN") }].map(s => s.value != null && (
+              <div key={s.label} style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
+                <span style={{ fontSize: "15px", fontWeight: 700, color: "var(--text-primary)" }}>{s.value}</span>
+                <span style={{ fontSize: "11px", color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.06em" }}>{s.label}</span>
+              </div>
+            ))}
+            {p.is_featured && <span style={{ marginLeft: "auto", padding: "4px 12px", borderRadius: "100px", alignSelf: "center", fontSize: "10px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--brand-accent)", border: "1px solid var(--border-accent)" }}>Premium</span>}
+          </div>
+        </div>
+      </a>
+    </Reveal>
+  );
+}
+
+// ── Multi-property map (Maps Phase 4) ──────────────────────────
+// Reuses the exact dark theme + circular teal marker pattern already
+// established by PropertyLocationMap/NearbyPlacesMap/LocationPicker — old
+// google.maps.Marker, not AdvancedMarkerElement, since the Cloud Console Map
+// ID + matching style profile that migration needs doesn't exist yet (same
+// blocker flagged during the Marker deprecation investigation). Duplicated
+// here rather than shared, matching this codebase's existing per-file
+// convention for this style constant (see LocationPicker.tsx's own comment
+// on the same choice).
+const DARK_MAP_STYLES = [
+  { elementType: "geometry", stylers: [{ color: "#111F33" }] },
+  { elementType: "labels.text.stroke", stylers: [{ color: "#020C1C" }] },
+  { elementType: "labels.text.fill", stylers: [{ color: "#A9B4C2" }] },
+  { featureType: "road", elementType: "geometry", stylers: [{ color: "#1B2C45" }] },
+  { featureType: "water", elementType: "geometry", stylers: [{ color: "#0A1526" }] },
+  { featureType: "poi", stylers: [{ visibility: "off" }] },
+];
+
+function propertyMarkerIcon(highlighted: boolean): google.maps.Icon {
+  const size = highlighted ? 40 : 30;
+  const fill = highlighted ? "#FFFFFF" : "#10C4C3";
+  const stroke = highlighted ? "#10C4C3" : "#020C1C";
+  const strokeWidth = highlighted ? 3 : 2;
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="${fill}" stroke="${stroke}" stroke-width="${strokeWidth}"/></svg>`;
+  return {
+    url: `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`,
+    scaledSize: new google.maps.Size(size, size),
+    anchor: new google.maps.Point(size / 2, size / 2),
+  };
+}
+
+function PropertiesMapView({
+  properties, hoveredId, onHoverProperty, onSelectProperty,
+}: {
+  properties: Property[]; hoveredId: string | null;
+  onHoverProperty: (id: string | null) => void;
+  onSelectProperty: (id: string) => void;
+}) {
+  const mapDivRef = useRef<HTMLDivElement>(null);
+  const mapObjRef = useRef<google.maps.Map | null>(null);
+  const markersRef = useRef<Map<string, google.maps.Marker>>(new Map());
+  const [mapReady, setMapReady] = useState(false);
+  const [mapFailed, setMapFailed] = useState(false);
+
+  // Handlers read the latest props via refs so long-lived marker listeners
+  // (registered once, when a marker is first created) never close over a
+  // stale onHoverProperty/onSelectProperty — same reasoning as
+  // LocationPicker's onChangeRef.
+  const onHoverRef = useRef(onHoverProperty);
+  useEffect(() => { onHoverRef.current = onHoverProperty; }, [onHoverProperty]);
+  const onSelectRef = useRef(onSelectProperty);
+  useEffect(() => { onSelectRef.current = onSelectProperty; }, [onSelectProperty]);
+
+  useEffect(() => {
+    let cancelled = false;
+    loadGoogleMapsScript()
+      .then(maps => {
+        if (cancelled || !mapDivRef.current) return;
+        const map = new maps.Map(mapDivRef.current, {
+          center: { lat: 20.5937, lng: 78.9629 }, // India-wide default; fitBounds below re-centers once real pins exist
+          zoom: 5,
+          disableDefaultUI: true,
+          zoomControl: true,
+          styles: DARK_MAP_STYLES,
+        });
+        mapObjRef.current = map;
+        setMapReady(true);
+      })
+      .catch(err => {
+        console.error("[PropertiesMapView] Failed to load Google Maps:", err);
+        if (!cancelled) setMapFailed(true);
+      });
+    return () => { cancelled = true; };
+  }, []);
+
+  // Rebuild markers whenever the filtered/paginated result set changes —
+  // never fabricates a pin for a listing missing real coordinates (confirmed
+  // live: 21 of 22 active listings have them, not all 22).
+  useEffect(() => {
+    const map = mapObjRef.current;
+    if (!map) return;
+
+    const withCoords = properties.filter(
+      (p): p is Property & { latitude: number; longitude: number } => p.latitude != null && p.longitude != null
+    );
+    const validIds = new Set(withCoords.map(p => p.id));
+    for (const [id, marker] of markersRef.current) {
+      if (!validIds.has(id)) {
+        marker.setMap(null);
+        markersRef.current.delete(id);
+      }
+    }
+
+    const bounds = new google.maps.LatLngBounds();
+    for (const p of withCoords) {
+      const pos = { lat: p.latitude, lng: p.longitude };
+      bounds.extend(pos);
+      let marker = markersRef.current.get(p.id);
+      if (!marker) {
+        marker = new google.maps.Marker({ position: pos, map, icon: propertyMarkerIcon(false), title: p.title });
+        marker.addListener("click", () => onSelectRef.current(p.id));
+        marker.addListener("mouseover", () => onHoverRef.current(p.id));
+        marker.addListener("mouseout", () => onHoverRef.current(null));
+        markersRef.current.set(p.id, marker);
+      } else {
+        marker.setPosition(pos);
+      }
+    }
+    if (withCoords.length > 0) {
+      if (withCoords.length === 1) {
+        map.setCenter({ lat: withCoords[0].latitude, lng: withCoords[0].longitude });
+        map.setZoom(14);
+      } else {
+        map.fitBounds(bounds, 48);
+      }
+    }
+  }, [properties, mapReady]);
+
+  // Re-style the affected markers on hover change — never rebuilds them.
+  useEffect(() => {
+    for (const [id, marker] of markersRef.current) {
+      const isHighlighted = id === hoveredId;
+      marker.setIcon(propertyMarkerIcon(isHighlighted));
+      marker.setZIndex(isHighlighted ? 999 : 1);
+    }
+  }, [hoveredId]);
+
+  if (mapFailed) {
+    return (
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100%", padding: "24px", textAlign: "center", background: "var(--bg-surface)", border: "1px solid var(--border)", borderRadius: "16px", fontSize: "13px", color: "var(--text-secondary)" }}>
+        Map unavailable right now — the list on the left still shows every matching property.
+      </div>
+    );
+  }
+
+  return (
+    <div style={{ position: "relative", width: "100%", height: "100%", borderRadius: "16px", overflow: "hidden", background: "#0A1526" }}>
+      {!mapReady && <div style={{ position: "absolute", inset: 0, background: "#111F33" }} />}
+      <div ref={mapDivRef} style={{ position: "absolute", inset: 0, width: "100%", height: "100%" }} />
+    </div>
   );
 }
 
@@ -271,6 +516,68 @@ function DualRangeSlider({
   );
 }
 
+// Maps Phase 5 — "Near a location" address input. Same
+// PlaceAutocompleteElement pattern as LocationPicker.tsx's migrated
+// Autocomplete (constructed via google.maps.places, DOM-appended into a
+// container ref, "gmp-select" event resolved via placePrediction.toPlace()
+// .fetchFields()) — reused rather than re-invented, per scope. Unlike
+// LocationPicker this never drops a pin/shows a map; it only needs the
+// selected place's lat/lng to become the radius search's origin.
+function RadiusSearchControl({
+  origin, onSelect, onClear,
+}: { origin: { lat: number; lng: number; label: string } | null; onSelect: (o: { lat: number; lng: number; label: string }) => void; onClear: () => void }) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const elRef = useRef<google.maps.places.PlaceAutocompleteElement | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    loadGoogleMapsScript().then(maps => {
+      if (cancelled || !containerRef.current || elRef.current || !maps.places?.PlaceAutocompleteElement) return;
+      const el = new maps.places.PlaceAutocompleteElement({ includedRegionCodes: ["in"] });
+      el.placeholder = "Search an address or locality…";
+      el.classList.add("radius-search-autocomplete");
+      containerRef.current.appendChild(el);
+      elRef.current = el;
+      el.addEventListener("gmp-select", async (event: google.maps.places.PlacePredictionSelectEvent) => {
+        const place = event.placePrediction?.toPlace();
+        if (!place) return;
+        await place.fetchFields({ fields: ["location", "displayName"] });
+        const loc = place.location;
+        if (!loc) return;
+        onSelect({ lat: loc.lat(), lng: loc.lng(), label: place.displayName ?? "Selected location" });
+      });
+    });
+    return () => {
+      cancelled = true;
+      elRef.current?.remove();
+      elRef.current = null;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  return (
+    <div>
+      <style>{`
+        .radius-search-wrap gmp-place-autocomplete { width: 100%; display: block; }
+        .radius-search-wrap gmp-place-autocomplete::part(input-container) {
+          background: rgba(255,255,255,0.05); border: 1px solid var(--border-hover); border-radius: 8px;
+        }
+        .radius-search-wrap gmp-place-autocomplete::part(input) {
+          font-size: 13px; color: var(--text-primary); font-family: var(--font-body-new);
+        }
+      `}</style>
+      {origin ? (
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "8px", padding: "9px 12px", background: "rgba(16,196,195,0.08)", border: "1px solid var(--border-accent)", borderRadius: "8px" }}>
+          <span style={{ fontSize: "12.5px", color: "var(--text-primary)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{origin.label}</span>
+          <button type="button" onClick={onClear} style={{ padding: 0, background: "none", border: "none", color: "var(--brand-accent)", fontSize: "12px", fontWeight: 600, cursor: "pointer", flexShrink: 0 }}>Clear</button>
+        </div>
+      ) : (
+        <div className="radius-search-wrap" ref={containerRef} />
+      )}
+    </div>
+  );
+}
+
 export default function PropertiesPage() {
   const [allProperties, setAllProperties] = useState<Property[]>([]);
   const [loading, setLoading] = useState(true);
@@ -307,6 +614,38 @@ export default function PropertiesPage() {
     return () => { cancelled = true; };
   }, [allProperties]);
 
+  // Maps Phase 6 — nearest hospital/school badge, read directly from
+  // nearby_places_cache (already-populated by NearbyPlacesSection on the
+  // detail page, see PropertyDetailClient.tsx) rather than calling
+  // /api/nearby-places per card — that route can trigger a live Google
+  // Places call per category, which is fine once per detail-page visit but
+  // would be N new Google calls per browse-page load here. A listing that
+  // has never been opened on its detail page simply has no cache rows yet,
+  // so its card shows no badge — never a fabricated distance.
+  const [nearbyBadges, setNearbyBadges] = useState<Map<string, { category: string; distance_meters: number | null }>>(new Map());
+  useEffect(() => {
+    if (allProperties.length === 0) return;
+    let cancelled = false;
+    (async () => {
+      const supabase = createClient();
+      const { data, error } = await supabase
+        .from("nearby_places_cache")
+        .select("property_id, category, distance_meters")
+        .in("property_id", allProperties.map(p => p.id))
+        .in("category", ["hospital", "school"])
+        .order("distance_meters", { ascending: true });
+      if (cancelled) return;
+      if (error) { console.error("Nearby-places badge load error:", error); return; }
+      // First row per property_id, in ascending-distance order, is the nearest.
+      const map = new Map<string, { category: string; distance_meters: number | null }>();
+      for (const r of (data ?? []) as { property_id: string; category: string; distance_meters: number | null }[]) {
+        if (!map.has(r.property_id)) map.set(r.property_id, { category: r.category, distance_meters: r.distance_meters });
+      }
+      setNearbyBadges(map);
+    })();
+    return () => { cancelled = true; };
+  }, [allProperties]);
+
   const [keyword, setKeyword] = useState("");
   const [listingType, setListingType] = useState<"all" | "sale" | "rent">("all");
   const [city, setCity] = useState("all");
@@ -318,9 +657,22 @@ export default function PropertiesPage() {
   const [minSqft, setMinSqft] = useState("");
   const [maxSqft, setMaxSqft] = useState("");
   const [sortBy, setSortBy] = useState("featured");
-  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
+  const [viewMode, setViewMode] = useState<"grid" | "list" | "map">("grid");
   const [page, setPage] = useState(1);
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+  // Map-mode-only interaction state — hovering a card highlights its pin and
+  // vice versa; clicking a pin scrolls the list to (and highlights) its card.
+  const [hoveredId, setHoveredId] = useState<string | null>(null);
+  const rowRefs = useRef<Map<string, HTMLAnchorElement>>(new Map());
+  function scrollToRow(id: string) {
+    setHoveredId(id);
+    rowRefs.current.get(id)?.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "center" });
+  }
+
+  // Maps Phase 5 — radius search. null origin means the filter is inactive;
+  // radiusKm only matters once an origin is set.
+  const [radiusOrigin, setRadiusOrigin] = useState<{ lat: number; lng: number; label: string } | null>(null);
+  const [radiusKm, setRadiusKm] = useState(5);
 
   useEffect(() => {
     async function load() {
@@ -375,11 +727,19 @@ export default function PropertiesPage() {
     if (maxPrice) list = list.filter(p => p.price <= Number(maxPrice));
     if (minSqft) list = list.filter(p => p.area_sqft >= Number(minSqft));
     if (maxSqft) list = list.filter(p => p.area_sqft <= Number(maxSqft));
+    if (radiusOrigin) {
+      // Listings without real coordinates are excluded, never guessed —
+      // same convention as the map view's pin-skipping.
+      list = list.filter(p =>
+        p.latitude != null && p.longitude != null &&
+        haversineKm(radiusOrigin.lat, radiusOrigin.lng, p.latitude, p.longitude) <= radiusKm
+      );
+    }
     if (sortBy === "price_asc") list.sort((a, b) => a.price - b.price);
     else if (sortBy === "price_desc") list.sort((a, b) => b.price - a.price);
     else list.sort((a, b) => (b.is_featured ? 1 : 0) - (a.is_featured ? 1 : 0));
     return list;
-  }, [allProperties, keyword, listingType, city, propTypes, bhk, amenityFilters, minPrice, maxPrice, minSqft, maxSqft, sortBy]);
+  }, [allProperties, keyword, listingType, city, propTypes, bhk, amenityFilters, minPrice, maxPrice, minSqft, maxSqft, radiusOrigin, radiusKm, sortBy]);
 
   const ITEMS_PER_PAGE = 9;
   const totalPages = Math.max(1, Math.ceil(filtered.length / ITEMS_PER_PAGE));
@@ -393,11 +753,11 @@ export default function PropertiesPage() {
   function clearFilters() {
     setKeyword(""); setListingType("all"); setCity("all"); setPropTypes(new Set());
     setBhk(new Set()); setAmenityFilters(new Set()); setMinPrice(""); setMaxPrice("");
-    setMinSqft(""); setMaxSqft("");
+    setMinSqft(""); setMaxSqft(""); setRadiusOrigin(null); setRadiusKm(5);
   }
 
   const activeFilterCount = [
-    !!keyword.trim(), listingType !== "all", city !== "all", propTypes.size > 0, bhk.size > 0,
+    !!keyword.trim(), listingType !== "all", city !== "all", propTypes.size > 0, bhk.size > 0, !!radiusOrigin,
     amenityFilters.size > 0, !!minPrice, !!maxPrice, !!minSqft, !!maxSqft,
   ].filter(Boolean).length;
   const hasFilters = activeFilterCount > 0;
@@ -439,6 +799,16 @@ export default function PropertiesPage() {
           .pr-cards-grid { grid-template-columns: repeat(auto-fill, minmax(240px,1fr)) !important; }
           .pr-list-item { flex-direction: column !important; }
           .pr-list-img { width: 100% !important; }
+          .pr-map-split { flex-direction: column !important; }
+          .pr-map-list { flex: 0 0 auto !important; max-height: 420px !important; }
+          /* .pr-map-panel keeps flex:1 1 0% from its inline style, which in a
+             column flex context makes its OWN height/width properties
+             inert (flex-basis:0% wins the main-axis size, not the height
+             property) — confirmed live: the panel silently collapsed to
+             0px height on mobile with only a height override. flex:none
+             forces it back to a real, explicit box instead of a flex-grown
+             one. */
+          .pr-map-panel { flex: none !important; width: 100% !important; height: 320px !important; position: static !important; }
         }
         @media (max-width: 480px) {
           .pr-skeleton-grid { grid-template-columns: 1fr !important; }
@@ -509,6 +879,26 @@ export default function PropertiesPage() {
                     </button>
                   ))}
                 </div>
+              </div>
+
+              {/* Maps Phase 5 — radius search */}
+              <div style={{ marginBottom: "24px" }}>
+                <div style={{ fontSize: "11px", fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--text-muted)", marginBottom: "12px" }}>Near a Location</div>
+                <RadiusSearchControl origin={radiusOrigin} onSelect={setRadiusOrigin} onClear={() => setRadiusOrigin(null)} />
+                {radiusOrigin && (
+                  <div style={{ marginTop: "12px" }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "8px" }}>
+                      <span style={{ fontSize: "12px", color: "var(--text-secondary)" }}>Within</span>
+                      <span style={{ fontSize: "12px", fontWeight: 700, color: "var(--text-primary)" }}>{radiusKm} km</span>
+                    </div>
+                    <input
+                      type="range" min={1} max={20} step={1} value={radiusKm}
+                      onChange={e => setRadiusKm(Number(e.target.value))}
+                      style={{ width: "100%" }}
+                      aria-label="Search radius in kilometers"
+                    />
+                  </div>
+                )}
               </div>
 
               {/* City */}
@@ -619,12 +1009,14 @@ export default function PropertiesPage() {
                   <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ position: "absolute", right: "12px", top: "50%", transform: "translateY(-50%)", pointerEvents: "none" }}><polyline points="6 9 12 15 18 9" /></svg>
                 </div>
                 <div style={{ display: "flex", background: "rgba(255,255,255,0.05)", border: "1px solid var(--border)", borderRadius: "8px", overflow: "hidden" }}>
-                  {(["grid", "list"] as const).map(mode => (
-                    <button key={mode} onClick={() => setViewMode(mode)} style={{ width: "36px", height: "36px", display: "flex", alignItems: "center", justifyContent: "center", background: viewMode === mode ? "rgba(16,196,195,0.15)" : "transparent", border: "none", cursor: "pointer", borderRight: mode === "grid" ? "1px solid var(--border)" : "none" }}>
+                  {(["grid", "list", "map"] as const).map((mode, idx) => (
+                    <button key={mode} onClick={() => setViewMode(mode)} title={mode === "map" ? "Map view" : mode === "grid" ? "Grid view" : "List view"} style={{ width: "36px", height: "36px", display: "flex", alignItems: "center", justifyContent: "center", background: viewMode === mode ? "rgba(16,196,195,0.15)" : "transparent", border: "none", cursor: "pointer", borderRight: idx < 2 ? "1px solid var(--border)" : "none" }}>
                       {mode === "grid" ? (
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={viewMode === "grid" ? "var(--brand-accent)" : "var(--text-muted)"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7" /><rect x="14" y="3" width="7" height="7" /><rect x="3" y="14" width="7" height="7" /><rect x="14" y="14" width="7" height="7" /></svg>
-                      ) : (
+                      ) : mode === "list" ? (
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={viewMode === "list" ? "var(--brand-accent)" : "var(--text-muted)"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="6" x2="21" y2="6" /><line x1="3" y1="12" x2="21" y2="12" /><line x1="3" y1="18" x2="21" y2="18" /></svg>
+                      ) : (
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={viewMode === "map" ? "var(--brand-accent)" : "var(--text-muted)"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" /><circle cx="12" cy="10" r="3" /></svg>
                       )}
                     </button>
                   ))}
@@ -648,57 +1040,44 @@ export default function PropertiesPage() {
               <div className="pr-cards-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", columnGap: "20px", rowGap: "32px" }}>
                 {paginatedItems.map((p, i) => (
                   <Reveal key={p.id} delay={reduceMotion ? 0 : Math.min(i * 0.05, 0.3)}>
-                    <PropertyCard property={p} savedIds={savedIds} saveCounts={saveCounts} onToggleSave={toggleSave} reduceMotion={reduceMotion} />
+                    <PropertyCard property={p} savedIds={savedIds} saveCounts={saveCounts} nearbyBadge={nearbyBadges.get(p.id)} onToggleSave={toggleSave} reduceMotion={reduceMotion} />
                   </Reveal>
                 ))}
               </div>
-            ) : (
+            ) : viewMode === "list" ? (
               <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
-                {paginatedItems.map((p, i) => {
-                  const isNew = isNewListing(p.created_at);
-                  return (
-                  <Reveal key={p.id} delay={reduceMotion ? 0 : Math.min(i * 0.05, 0.3)}>
-                    <a href={`/property/${p.slug}`} className="pr-card pr-list-item" style={{ display: "flex", textDecoration: "none", color: "inherit", cursor: "pointer", background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: "16px", overflow: "hidden", transition: reduceMotion ? "none" : "border-color 0.2s, box-shadow 0.2s", boxShadow: "0 4px 20px rgba(0,0,0,0.35)" }}
-                      onMouseEnter={e => { if (!reduceMotion) { const d = e.currentTarget as HTMLElement; d.style.borderColor = "var(--border-accent)"; d.style.boxShadow = "0 8px 32px rgba(0,0,0,0.4)"; } }}
-                      onMouseLeave={e => { if (!reduceMotion) { const d = e.currentTarget as HTMLElement; d.style.borderColor = "var(--border)"; d.style.boxShadow = "0 4px 20px rgba(0,0,0,0.35)"; } }}
-                    >
-                      <div className="pr-list-img pr-img-wrap" style={{ width: "280px", flexShrink: 0, position: "relative", aspectRatio: "4 / 3", overflow: "hidden" }}>
-                        <img src={optimizedImageUrl(p.images?.[0], 600) || IMAGES.properties[p.type?.toLowerCase() as keyof typeof IMAGES.properties] || IMAGES.properties.apartment} alt={p.title} loading="lazy" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
-                        <div style={{ position: "absolute", top: "12px", left: "12px", display: "flex", gap: "6px", flexWrap: "wrap" }}>
-                          <span style={{ padding: "4px 10px", borderRadius: "100px", fontSize: "10px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", background: p.listing_type === "rent" ? "var(--blue-deep)" : "var(--brand-accent)", color: "var(--brand-primary)", backdropFilter: "blur(8px)" }}>
-                            {p.listing_type === "rent" ? "For Rent" : "For Sale"}
-                          </span>
-                          {isNew && (
-                            <span style={{ padding: "4px 10px", borderRadius: "100px", fontSize: "10px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", background: "var(--brand-primary)", color: "var(--brand-accent)", border: "1px solid var(--border-accent)", backdropFilter: "blur(8px)" }}>New</span>
-                          )}
-                        </div>
-                      </div>
-                      <div style={{ flex: 1, padding: "24px 28px", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
-                        <div>
-                          <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "16px", marginBottom: "8px" }}>
-                            <h3 style={{ fontFamily: "var(--font-heading-new)", fontSize: "20px", fontWeight: 700, color: "var(--text-primary)", lineHeight: 1.3 }}>{p.title}</h3>
-                            <span style={{ fontFamily: "var(--font-support-new)", fontSize: "22px", fontWeight: 700, color: "var(--brand-accent)", whiteSpace: "nowrap" }}>{formatPrice(p.price, p.listing_type)}</span>
-                          </div>
-                          <div style={{ display: "flex", alignItems: "center", gap: "5px", marginBottom: "12px" }}>
-                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="var(--brand-accent)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" /><circle cx="12" cy="10" r="3" /></svg>
-                            <span style={{ fontSize: "12px", color: "var(--text-secondary)" }}>{p.neighbourhood ? `${p.neighbourhood}, ` : ""}{p.city}</span>
-                          </div>
-                          {p.description && <p style={{ fontSize: "13px", color: "var(--text-secondary)", lineHeight: 1.6, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{p.description}</p>}
-                        </div>
-                        <div style={{ display: "flex", gap: "20px", marginTop: "16px", paddingTop: "16px", borderTop: "1px solid var(--border)" }}>
-                          {[{ label: COMMERCIAL_CATEGORIES.includes(p.type) ? "Rooms" : "Beds", value: p.bedrooms }, { label: COMMERCIAL_CATEGORIES.includes(p.type) ? "Wash" : "Baths", value: p.bathrooms }, { label: "sqft", value: p.area_sqft?.toLocaleString("en-IN") }].map(s => s.value != null && (
-                            <div key={s.label} style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
-                              <span style={{ fontSize: "15px", fontWeight: 700, color: "var(--text-primary)" }}>{s.value}</span>
-                              <span style={{ fontSize: "11px", color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.06em" }}>{s.label}</span>
-                            </div>
-                          ))}
-                          {p.is_featured && <span style={{ marginLeft: "auto", padding: "4px 12px", borderRadius: "100px", alignSelf: "center", fontSize: "10px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--brand-accent)", border: "1px solid var(--border-accent)" }}>Premium</span>}
-                        </div>
-                      </div>
-                    </a>
-                  </Reveal>
-                  );
-                })}
+                {paginatedItems.map((p, i) => (
+                  <PropertyListRow key={p.id} property={p} index={i} reduceMotion={reduceMotion} />
+                ))}
+              </div>
+            ) : (
+              // Map split-screen — pins for exactly the currently-visible
+              // (filtered + paginated) list, same set the cards show, per
+              // spec: "map only shows pins for the currently-filtered result
+              // set." Stacks vertically under 768px via .pr-map-split below,
+              // same breakpoint the sidebar already collapses at.
+              <div className="pr-map-split" style={{ display: "flex", gap: "20px", alignItems: "flex-start" }}>
+                <div className="pr-map-list" style={{ flex: "0 0 420px", minWidth: 0, display: "flex", flexDirection: "column", gap: "16px", maxHeight: "760px", overflowY: "auto", paddingRight: "4px" }}>
+                  {paginatedItems.map((p, i) => (
+                    <PropertyListRow
+                      key={p.id}
+                      property={p}
+                      index={i}
+                      reduceMotion={reduceMotion}
+                      highlighted={hoveredId === p.id}
+                      onHover={setHoveredId}
+                      refCallback={el => { if (el) rowRefs.current.set(p.id, el); else rowRefs.current.delete(p.id); }}
+                    />
+                  ))}
+                </div>
+                <div className="pr-map-panel" style={{ flex: "1 1 0%", minWidth: 0, height: "760px", position: "sticky", top: "140px" }}>
+                  <PropertiesMapView
+                    properties={paginatedItems}
+                    hoveredId={hoveredId}
+                    onHoverProperty={setHoveredId}
+                    onSelectProperty={scrollToRow}
+                  />
+                </div>
               </div>
             )}
 

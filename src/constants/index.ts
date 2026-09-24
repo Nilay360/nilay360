@@ -4,8 +4,6 @@ export const BRAND = {
   name: "Nilay 360",
   tagline: "Your Trust. Our Promise.",
   email: "contact@nilay360.com",
-  phone: "+91 7075 792497",
-  whatsapp: "+917075792497",
   address: "Hyderabad, Telangana, India",
   social: {
     instagram: "https://www.instagram.com/nilay360_/",

@@ -258,20 +258,29 @@ export default function ComparePage() {
       try {
         const supabase = createClient();
         const { data } = await supabase
-          .from("properties")
-          .select(`*, city:cities(name), neighbourhood:neighbourhoods(name)`)
+          .from("property_listings")
+          .select("id, slug, title, price, listing_type, property_category, status, bedrooms, bathrooms, built_up_area, floor_number, total_floors, furnishing, amenities, address, city, locality, photo_urls")
           .eq("status", "active")
-          .eq("approval_status", "approved")
-          .order("created_at", { ascending: false })
+          .order("submitted_at", { ascending: false })
           .limit(30);
         if (data && data.length > 0) {
+          // property_listings has no parking_spaces or year_built columns
+          // (confirmed against PropertyDetailClient.tsx's own mapping,
+          // which hardcodes both to null for the same reason) — kept null
+          // here too rather than guessing a value. is_furnished is derived
+          // from the real `furnishing` text column, same derivation
+          // PropertyDetailClient.tsx already uses.
           const mapped: Property[] = data.map((p: any) => ({
             ...p,
-            city: p.city?.name ?? p.city,
-            neighbourhood: p.neighbourhood?.name ?? p.neighbourhood,
-            images: p.images ?? [],
+            property_type: p.property_category,
+            neighbourhood: p.locality,
+            area_sqft: p.built_up_area,
+            parking_spaces: null,
+            year_built: null,
+            is_furnished: p.furnishing != null && p.furnishing !== "unfurnished",
+            images: p.photo_urls ?? [],
             amenities: p.amenities ?? [],
-            featured_image: p.images?.[0] ?? null,
+            featured_image: p.photo_urls?.[0] ?? null,
           }));
           setAllProps(mapped);
           setSimilarProps(mapped.slice(0, 3));

@@ -880,7 +880,16 @@ export default function HomePage() {
 
           {/* 4 — Stats strip */}
           <div className="hero-stats" style={{display:"flex", flexWrap:"wrap", justifyContent:"center", gap:"12px", width:"100%", maxWidth:"100%", boxSizing:"border-box", marginTop:32, marginBottom:40, paddingBottom:32, borderBottom:"1px solid rgba(16,196,195,0.12)", position:"relative", zIndex:2}}>
-            {[[liveStats.listings.toLocaleString("en-IN"),"Listings"],[liveStats.agents.toLocaleString("en-IN"),"Agents"],[String(liveStats.cities),"Cities"]].map(([v,l])=>{
+            {/* "—" while loading or after a failed fetch (retries exhausted) —
+                never the raw 0 default, which would be indistinguishable from
+                a genuinely empty site. Confirmed tonight: a blocked/failed
+                request rendered identically to "0 Listings, 0 Agents, 0
+                Cities" and looked like a broken production site. */}
+            {[
+              [liveStats.status === "success" ? liveStats.listings.toLocaleString("en-IN") : "—", "Listings"],
+              [liveStats.status === "success" ? liveStats.agents.toLocaleString("en-IN") : "—", "Agents"],
+              [liveStats.status === "success" ? String(liveStats.cities) : "—", "Cities"],
+            ].map(([v,l])=>{
               // Cities has no natural destination for either audience — left
               // non-clickable rather than pointed at Overview, since Overview
               // isn't city-scoped and would be a misleading link.
@@ -984,7 +993,13 @@ export default function HomePage() {
           <div className="glow-dot" />
           <span style={{ fontSize:12, color:"rgba(255,255,255,0.5)", fontWeight:500, letterSpacing:"0.05em", whiteSpace:"nowrap" }}>INDIA'S PREMIUM REAL ESTATE PLATFORM</span>
           <div style={{ flex:1, height:1, background:"rgba(255,255,255,0.06)" }} />
-          {["Admin-Reviewed Listings", `${liveStats.agents}+ Expert Agents`, `${liveStats.cities} Cities`].map((t,i) => (
+          {/* Numeric fragments only appear once real numbers are in — an
+              error/loading state renders "Admin-Reviewed Listings" alone
+              rather than "0+ Expert Agents", which would misread as real. */}
+          {[
+            "Admin-Reviewed Listings",
+            ...(liveStats.status === "success" ? [`${liveStats.agents}+ Expert Agents`, `${liveStats.cities} Cities`] : []),
+          ].map((t,i) => (
             <div key={i} style={{ display:"flex", alignItems:"center", gap:8, flexShrink:0 }}>
               <div style={{ width:4, height:4, borderRadius:"50%", background:"#10C4C3" }} />
               <span style={{ fontSize:12, color:"rgba(255,255,255,0.45)", whiteSpace:"nowrap" }}>{t}</span>

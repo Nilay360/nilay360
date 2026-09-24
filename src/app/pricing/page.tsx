@@ -1,5 +1,6 @@
 ﻿"use client";
-import { BRAND } from "@/constants";
+import { useSiteContacts } from "@/hooks/useSiteContact";
+import { waHref } from "@/lib/contactFormat";
 
 // ── Card wrapper — same treatment as the property detail page's Card ──
 function Card({ children, style }: { children: React.ReactNode; style?: React.CSSProperties }) {
@@ -27,7 +28,13 @@ function CheckItem({ label, comingSoon }: { label: string; comingSoon?: boolean 
 }
 
 export default function PricingPage() {
-  const whatsappHref = `https://wa.me/${BRAND.whatsapp.replace(/\+/g, "")}?text=${encodeURIComponent("Hi, I'd like to request an upgrade to Nilay 360 Premium.")}`;
+  // "Request Upgrade" is a sales inquiry — prefer the sales contact type,
+  // falling back to general if it hasn't been added in site_contacts yet.
+  const contacts = useSiteContacts();
+  const contact = contacts.find(c => c.contact_type === "sales") ?? contacts.find(c => c.contact_type === "general") ?? null;
+  const whatsappHref = contact
+    ? waHref(contact.whatsapp ?? contact.phone, "Hi, I'd like to request an upgrade to Nilay 360 Premium.")
+    : undefined;
 
   return (
     <div style={{ background: "#020C1C", minHeight: "100vh", fontFamily: "var(--font-body-new)" }}>

@@ -1,14 +1,15 @@
 ﻿"use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
 import { usePathname } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import Link from "next/link";
 import { useCompare } from "@/context/CompareContext";
 import { createClient } from "@/lib/supabase/client";
+import { useSiteContact, useSiteContacts } from "@/hooks/useSiteContact";
+import { waHref, smsHref } from "@/lib/contactFormat";
 
 const GENERIC_WHATSAPP_TEXT = "Hi, I'm interested in a property on Nilay 360";
-const GENERIC_WHATSAPP_HREF = `https://wa.me/917075792497?text=${encodeURIComponent(GENERIC_WHATSAPP_TEXT)}`;
 
 function IconPhone() {
   return (
@@ -73,48 +74,10 @@ function IconClose() {
   );
 }
 
-const MENU_ITEMS = [
-  {
-    id: "callback",
-    label: "Request a Callback",
-    icon: <IconPhone />,
-    color: "#10C4C3",
-    action: "modal" as const,
-  },
-  {
-    id: "sms",
-    label: "Chat via SMS",
-    icon: <IconSMS />,
-    color: "#6366F1",
-    href: "sms:+917075792497?body=Hi%2C%20I%27m%20interested%20in%20a%20property%20on%20Nilay%20360",
-  },
-  {
-    id: "whatsapp",
-    label: "WhatsApp",
-    icon: <IconWhatsApp />,
-    color: "#25D366",
-    href: GENERIC_WHATSAPP_HREF,
-    external: true,
-  },
-  {
-    id: "enquiry",
-    label: "Enquiry",
-    icon: <IconMail />,
-    color: "#F59E0B",
-    href: "/contact",
-  },
-  {
-    id: "chatbot",
-    label: "AI Chatbot",
-    icon: <IconBot />,
-    color: "#8B5CF6",
-    comingSoon: true,
-  },
-] as const;
-
 export default function FloatingContactMenu() {
   const [open, setOpen] = useState(false);
   const [showCallback, setShowCallback] = useState(false);
+  const [showWhatsappOptions, setShowWhatsappOptions] = useState(false);
   const [form, setForm] = useState({ name: "", phone: "" });
   const [submitting, setSubmitting] = useState(false);
   const [callbackDone, setCallbackDone] = useState(false);
@@ -122,23 +85,68 @@ export default function FloatingContactMenu() {
   const { count: compareCount } = useCompare();
   const pathname = usePathname();
   const isPropertyPage = pathname?.startsWith("/property/") ?? false;
+  const contact = useSiteContact("general");
+  const allContacts = useSiteContacts();
 
   // Lift the FAB above CompareBar when it's visible (CompareBar is ~64px at bottom:0)
   const bottomOffset = compareCount > 0 ? 88 : 24;
 
   // On a property page, swap the generic WhatsApp message for one carrying the
   // actual listing title + link — read after mount since document.title/location
-  // aren't available during SSR. Falls back to the generic message otherwise.
-  const [whatsappHref, setWhatsappHref] = useState(GENERIC_WHATSAPP_HREF);
+  // aren't available during SSR. Shared across every department's WhatsApp
+  // link in the expanded options list below (message only, not the number).
+  const [whatsappMessage, setWhatsappMessage] = useState(GENERIC_WHATSAPP_TEXT);
   useEffect(() => {
     if (!isPropertyPage) {
-      setWhatsappHref(GENERIC_WHATSAPP_HREF);
+      setWhatsappMessage(GENERIC_WHATSAPP_TEXT);
       return;
     }
     const propertyTitle = document.title.split(" | ")[0] || document.title;
-    const message = `Hi, I'm interested in this property on Nilay360: ${propertyTitle} - ${window.location.href}`;
-    setWhatsappHref(`https://wa.me/917075792497?text=${encodeURIComponent(message)}`);
+    setWhatsappMessage(`Hi, I'm interested in this property on Nilay360: ${propertyTitle} - ${window.location.href}`);
   }, [isPropertyPage, pathname]);
+
+  const smsMenuHref = contact
+    ? smsHref(contact.phone, "Hi, I'm interested in a property on Nilay 360")
+    : undefined;
+
+  const MENU_ITEMS = useMemo(() => ([
+    {
+      id: "callback",
+      label: "Request a Callback",
+      icon: <IconPhone />,
+      color: "#10C4C3",
+      action: "modal" as const,
+    },
+    {
+      id: "sms",
+      label: "Chat via SMS",
+      icon: <IconSMS />,
+      color: "#6366F1",
+      href: smsMenuHref,
+    },
+    {
+      id: "whatsapp",
+      label: "WhatsApp",
+      icon: <IconWhatsApp />,
+      color: "#25D366",
+      action: "whatsapp-list" as const,
+      disabled: allContacts.length === 0,
+    },
+    {
+      id: "enquiry",
+      label: "Enquiry",
+      icon: <IconMail />,
+      color: "#F59E0B",
+      href: "/contact",
+    },
+    {
+      id: "chatbot",
+      label: "AI Chatbot",
+      icon: <IconBot />,
+      color: "#8B5CF6",
+      comingSoon: true,
+    },
+  ] as const), [smsMenuHref, allContacts.length]);
 
   // Prefill name/phone for a signed-in visitor — same "only if still blank"
   // rule as post-property.tsx's PREFILL_SELLER_EMAIL: never overwrites
@@ -166,6 +174,7 @@ export default function FloatingContactMenu() {
       if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
         setOpen(false);
         setShowCallback(false);
+        setShowWhatsappOptions(false);
       }
     }
     document.addEventListener("mousedown", onMouseDown);
@@ -177,6 +186,7 @@ export default function FloatingContactMenu() {
       if (e.key === "Escape") {
         setOpen(false);
         setShowCallback(false);
+        setShowWhatsappOptions(false);
       }
     }
     document.addEventListener("keydown", onKey);
@@ -211,6 +221,7 @@ export default function FloatingContactMenu() {
     if (open) {
       setOpen(false);
       setShowCallback(false);
+      setShowWhatsappOptions(false);
     } else {
       setOpen(true);
     }
@@ -285,7 +296,7 @@ export default function FloatingContactMenu() {
       >
         {/* Menu items */}
         <AnimatePresence>
-          {open && !showCallback && (
+          {open && !showCallback && !showWhatsappOptions && (
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -330,6 +341,15 @@ export default function FloatingContactMenu() {
                       >
                         {inner}
                       </div>
+                    ) : ("disabled" in item && item.disabled) || ("href" in item && !item.href) ? (
+                      <div
+                        className="fcm-pill fcm-pill--disabled"
+                        role="button"
+                        aria-disabled="true"
+                        aria-label={item.label}
+                      >
+                        {inner}
+                      </div>
                     ) : "action" in item && item.action === "modal" ? (
                       <button
                         className="fcm-pill"
@@ -339,9 +359,18 @@ export default function FloatingContactMenu() {
                       >
                         {inner}
                       </button>
+                    ) : "action" in item && item.action === "whatsapp-list" ? (
+                      <button
+                        className="fcm-pill"
+                        onClick={() => setShowWhatsappOptions(true)}
+                        aria-label={item.label}
+                        type="button"
+                      >
+                        {inner}
+                      </button>
                     ) : "external" in item && item.external ? (
                       <a
-                        href={item.id === "whatsapp" ? whatsappHref : (item as { href: string }).href}
+                        href={(item as { href?: string }).href}
                         className="fcm-pill"
                         target="_blank"
                         rel="noopener noreferrer"
@@ -440,6 +469,59 @@ export default function FloatingContactMenu() {
                   </button>
                 </form>
               )}
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* WhatsApp department picker — same card treatment as the callback
+            form, one pill per active site_contacts row so a visitor can reach
+            the right department instead of only ever hitting "general". */}
+        <AnimatePresence>
+          {open && showWhatsappOptions && (
+            <motion.div
+              initial={{ opacity: 0, y: 10, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 10, scale: 0.95 }}
+              transition={{ duration: 0.2, ease: "easeOut" }}
+              style={{
+                background: "rgba(8,8,14,0.92)",
+                backdropFilter: "blur(24px)",
+                WebkitBackdropFilter: "blur(24px)",
+                border: "1px solid rgba(255,255,255,0.12)",
+                borderRadius: 18,
+                padding: "16px 16px 12px",
+                width: 260,
+                fontFamily: "var(--font-body-new)",
+                boxShadow: "0 8px 32px rgba(0,0,0,0.5)",
+                display: "flex",
+                flexDirection: "column",
+                gap: 8,
+              }}
+            >
+              <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 4 }}>
+                <p style={{ fontSize: 13, fontWeight: 700, color: "#fff", margin: 0 }}>Chat on WhatsApp</p>
+                <button
+                  onClick={() => setShowWhatsappOptions(false)}
+                  style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "50%", width: 26, height: 26, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: "rgba(255,255,255,0.45)", padding: 0, flexShrink: 0 }}
+                  aria-label="Close WhatsApp options"
+                  type="button"
+                >
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
+                </button>
+              </div>
+              {allContacts.map(c => (
+                <a
+                  key={c.contact_type}
+                  href={waHref(c.whatsapp ?? c.phone, whatsappMessage)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => { setOpen(false); setShowWhatsappOptions(false); }}
+                  style={{ display: "flex", flexDirection: "column", gap: 2, padding: "9px 12px", background: "rgba(37,211,102,0.1)", border: "1px solid rgba(37,211,102,0.25)", borderRadius: 10, textDecoration: "none" }}
+                >
+                  <span style={{ fontSize: 12, fontWeight: 700, color: "#fff" }}>{c.label}</span>
+                  <span style={{ fontSize: 11, color: "rgba(255,255,255,0.5)" }}>{c.whatsapp ?? c.phone}</span>
+                </a>
+              ))}
             </motion.div>
           )}
         </AnimatePresence>

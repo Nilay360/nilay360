@@ -32,29 +32,50 @@ export default function LocationsPage() {
   const liveStats = useLiveStats();
   const [counts, setCounts] = useState<Record<string, number>>({});
   const [totalListings, setTotalListings] = useState(0);
+  // Distinct from "counts is empty" — an empty object during "error" must
+  // never be read as "every city genuinely has zero listings" (see the
+  // per-city label below, and liveStats.ts's status field for the same
+  // reasoning applied to the homepage stat tiles).
+  const [countsStatus, setCountsStatus] = useState<"loading" | "success" | "error">("loading");
 
+  // Two automatic retries (0.6s, then 1.8s) before giving up — same pattern
+  // as useLiveStats(), so a momentary blip here silently recovers instead of
+  // showing every city as "Coming soon".
   useEffect(() => {
-    async function load() {
+    let cancelled = false;
+    const RETRY_DELAYS_MS = [600, 1800];
+
+    async function attempt(n: number): Promise<void> {
       try {
         const supabase = createClient();
-        const { data } = await supabase
-          .from("properties")
-          .select("city:cities(name)")
-          .eq("status", "active")
-          .eq("approval_status", "approved");
+        const { data, error } = await supabase
+          .from("property_listings")
+          .select("city")
+          .eq("status", "active");
+        if (error) throw error;
         const map: Record<string, number> = {};
-        (data ?? []).forEach((p: any) => {
-          const name = p.city?.name ?? "";
+        (data ?? []).forEach((p: { city: string | null }) => {
+          const name = p.city ?? "";
           if (name) map[name] = (map[name] ?? 0) + 1;
         });
-        setCounts(map);
-        setTotalListings((data ?? []).length);
-      } catch {
-        setCounts({});
-        setTotalListings(0);
+        if (!cancelled) {
+          setCounts(map);
+          setTotalListings((data ?? []).length);
+          setCountsStatus("success");
+        }
+      } catch (err) {
+        if (n >= RETRY_DELAYS_MS.length) {
+          console.error("[LocationsPage] city counts failed after retries — showing error state, not fake zeros:", err);
+          if (!cancelled) setCountsStatus("error");
+          return;
+        }
+        await new Promise(resolve => setTimeout(resolve, RETRY_DELAYS_MS[n]));
+        if (!cancelled) await attempt(n + 1);
       }
     }
-    load();
+
+    attempt(0);
+    return () => { cancelled = true; };
   }, []);
 
   return (
@@ -101,7 +122,10 @@ export default function LocationsPage() {
               Premium listings in India's most sought-after cities. Verified properties, certified agents, and expert local knowledge — wherever you want to buy.
             </p>
             <div style={{ display: "flex", gap: "10px", justifyContent: "center", flexWrap: "wrap", animation: "fadeUp 0.5s 0.2s ease-out both" }}>
-              {[`${totalListings} Listings`, `${CITIES.length} Cities`].map(p => (
+              {[
+                ...(countsStatus === "success" ? [`${totalListings} Listings`] : []),
+                `${CITIES.length} Cities`,
+              ].map(p => (
                 <span key={p} style={{ padding: "7px 18px", background: "rgba(201,168,76,0.08)", border: "1px solid rgba(201,168,76,0.2)", borderRadius: "100px", fontSize: "12px", fontWeight: 600, color: "#10C4C3", letterSpacing: "0.05em" }}>{p}</span>
               ))}
             </div>
@@ -138,7 +162,9 @@ export default function LocationsPage() {
                   {/* Stats */}
                   <div style={{ padding: "18px 18px 20px" }}>
                     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                      <span style={{ fontSize: "12px", color: "#6B7C72" }}>{count > 0 ? `${count} listings` : "Coming soon"}</span>
+                      <span style={{ fontSize: "12px", color: "#6B7C72" }}>
+                        {countsStatus !== "success" ? "—" : count > 0 ? `${count} listings` : "Coming soon"}
+                      </span>
                       <span style={{ display: "inline-flex", alignItems: "center", gap: "5px", padding: "6px 14px", background: hover ? "#020C1C" : "#F8F6F1", borderRadius: "100px", fontSize: "11px", fontWeight: 700, color: hover ? "#10C4C3" : "#020C1C", letterSpacing: "0.06em", transition: "all 0.18s" }}>
                         Explore
                         <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" /></svg>

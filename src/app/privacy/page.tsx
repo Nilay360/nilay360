@@ -1,4 +1,12 @@
-﻿export default function PrivacyPage() {
+﻿import { createClient } from "@/lib/supabase/server";
+
+export default async function PrivacyPage() {
+  const supabase = await createClient();
+  const { data: contacts } = await supabase
+    .from("site_contacts")
+    .select("contact_type, label, phone, whatsapp")
+    .eq("is_active", true);
+
   return (
     <>
       <style>{`
@@ -831,8 +839,13 @@
                 <a href="mailto:contact@nilay360.com" style={{ color: '#10C4C3', textDecoration: 'none' }}>
                   contact@nilay360.com
                 </a>
-                <br />
-                <strong>WhatsApp:</strong> +91 70757 92497
+                {contacts?.map(c => (
+                  <span key={c.contact_type}>
+                    <br />
+                    <strong>{c.label}:</strong> {c.phone}
+                    {c.whatsapp && c.whatsapp !== c.phone && <> (WhatsApp: {c.whatsapp})</>}
+                  </span>
+                ))}
                 <br />
                 <strong>Address:</strong> 4th Floor, Trendz Techpark, Road No. 11, Kakatiya Hills, Guttala Begumpet,
                 Kavuri Hills, Madhapur, Hyderabad, Telangana 500081

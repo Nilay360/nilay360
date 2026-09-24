@@ -4,6 +4,8 @@ import { useState } from "react"
 import Link from "next/link"
 import { Phone, Mail, MapPin, MessageSquareText, Shield, Lock, Video, Building2, Home, Compass, Info, Newspaper, HelpCircle, Ticket, Handshake, Download, Smartphone, Globe, Headset, Menu, X } from "lucide-react"
 import { BRAND, NAV_LINKS } from "@/constants"
+import { useSiteContact, useSiteContacts } from "@/hooks/useSiteContact"
+import { telHref, waHref } from "@/lib/contactFormat"
 
 /* ─── /connect — full marketing landing page (link-in-bio hub, expanded) ───
    Navy background stays site-standard; accent switches to GOLD for this page
@@ -46,12 +48,6 @@ const FEEDBACK_FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLSfVazyCsqQIg
 const OFFICE_LOCATION_URL = "https://maps.app.goo.gl/jiGr42DrevGruwnh6"
 const LOGO_SRC = "/brand/Nilay360-09-Photoroom%20(1).png"
 const HERO_BG = "/brand/hero-background.jpg"
-const WHATSAPP_BASE = `https://wa.me/${BRAND.whatsapp.replace("+", "")}`
-const TEL_HREF = `tel:${BRAND.phone.replace(/\s+/g, "")}`
-
-function wa(message: string) {
-  return `${WHATSAPP_BASE}?text=${encodeURIComponent(message)}`
-}
 
 const HEADER_LINKS = [
   { label: "Home",       href: "/" },
@@ -146,6 +142,12 @@ export default function ConnectPage() {
   const [mobileNavOpen, setMobileNavOpen] = useState(false)
   const [newsletterEmail, setNewsletterEmail] = useState("")
   const [newsletterMsg, setNewsletterMsg] = useState(false)
+  const contact = useSiteContact("general")
+  const allContacts = useSiteContacts()
+  const TEL_HREF = contact ? telHref(contact.phone) : undefined
+  function wa(message: string) {
+    return contact ? waHref(contact.whatsapp ?? contact.phone, message) : undefined
+  }
 
   return (
     <>
@@ -334,7 +336,7 @@ export default function ConnectPage() {
             <h2 className="connect-section-title">Contact &amp; Support</h2>
             <div className="connect-help-grid">
               <a href={TEL_HREF} className={`${BTN} connect-glass`} style={{ color: "#fff" }}>
-                <Phone size={18} /> Call {BRAND.phone}
+                <Phone size={18} /> {contact ? `Call ${contact.phone}` : "Call Us"}
               </a>
               <a href={wa("Hi, I need some support.")} target="_blank" rel="noopener noreferrer" className={`${BTN} connect-glass`} style={{ color: "#fff" }}>
                 <IconWhatsApp /> WhatsApp Support
@@ -462,7 +464,9 @@ export default function ConnectPage() {
 
               <div className="connect-footer-col">
                 <h3 className="connect-footer-heading">Connect</h3>
-                <a href={TEL_HREF} className="connect-footer-link">{BRAND.phone}</a>
+                {allContacts.map(c => (
+                  <a key={c.contact_type} href={telHref(c.phone)} className="connect-footer-link">{c.label}: {c.phone}</a>
+                ))}
                 <a href={`mailto:${BRAND.email}`} className="connect-footer-link">{BRAND.email}</a>
                 <a href={OFFICE_LOCATION_URL} target="_blank" rel="noopener noreferrer" className="connect-footer-link">
                   <MapPin size={14} style={{ marginRight: 6 }} /> {BRAND.address}

@@ -1,6 +1,8 @@
 "use client";
 import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { useSiteContact, useSiteContacts } from "@/hooks/useSiteContact";
+import { telHref, waHref } from "@/lib/contactFormat";
 
 // profiles.phone is stored as "+91" + 10 digits (see api/verify-otp/route.ts) — this
 // form's own phone field is bare 10-digit (see handleSubmit's `+91${form.phone}`
@@ -114,6 +116,10 @@ export default function ContactPage() {
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [focusedField, setFocusedField] = useState<string | null>(null);
+  const contact = useSiteContact("general");
+  const contactWhatsapp = contact ? (contact.whatsapp ?? contact.phone) : null;
+  const contactWaHref = contact ? waHref(contactWhatsapp!, "Hi, I'm interested in a property on Nilay 360") : undefined;
+  const allContacts = useSiteContacts();
 
   const set = (k: keyof FormState) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
     setForm(f => ({ ...f, [k]: e.target.value }));
@@ -243,10 +249,10 @@ export default function ContactPage() {
             {/* Quick contact pills */}
             <div className="ct-hero-pills" style={{ display: "flex", gap: "12px", justifyContent: "center", flexWrap: "wrap", animation: "fadeUp 0.55s 0.2s ease-out both" }}>
               {[
-                { icon: "📞", label: "Call Us",  value: "+91 7075 792497",        href: "tel:+917075792497" },
+                contact && { icon: "📞", label: "Call Us",  value: contact.phone,   href: telHref(contact.phone) },
                 { icon: "✉",  label: "Email",   value: "contact@nilay360.com", href: "mailto:contact@nilay360.com" },
-                { icon: "💬", label: "WhatsApp", value: "+91 7075 792497",      href: "https://wa.me/917075792497?text=Hi%2C%20I%27m%20interested%20in%20a%20property%20on%20Nilay%20360" },
-              ].map(p => (
+                contact && { icon: "💬", label: "WhatsApp", value: contactWhatsapp!, href: contactWaHref! },
+              ].filter((p): p is { icon: string; label: string; value: string; href: string } => Boolean(p)).map(p => (
                 <a key={p.label} href={p.href} style={{ display: "flex", alignItems: "center", gap: "10px", padding: "10px 20px", background: "rgba(245,242,236,0.06)", border: "1px solid rgba(245,242,236,0.13)", borderRadius: "100px", textDecoration: "none", transition: "border-color 0.15s" }}
                   onMouseEnter={e => (e.currentTarget.style.borderColor = "rgba(16,196,195,0.4)")}
                   onMouseLeave={e => (e.currentTarget.style.borderColor = "rgba(245,242,236,0.13)")}>
@@ -378,11 +384,16 @@ export default function ContactPage() {
                 </div>
                 {[
                   { icon: "📍", label: "Address", value: "4th Floor, Trendz Techpark, Road No. 11, Kakatiya Hills\nGuttala Begumpet, Kavuri Hills, Madhapur, Hyderabad, Telangana 500081" },
-                  { icon: "📞", label: "Phone",    value: "+91 7075 792497",        href: "tel:+917075792497" },
+                  ...allContacts.flatMap(c => {
+                    const cWhatsapp = c.whatsapp ?? c.phone;
+                    return [
+                      { icon: "📞", label: `${c.label} — Phone`,    value: c.phone,    href: telHref(c.phone) },
+                      { icon: "💬", label: `${c.label} — WhatsApp`, value: cWhatsapp,  href: waHref(cWhatsapp, "Hi, I'm interested in a property on Nilay 360") },
+                    ];
+                  }),
                   { icon: "✉",  label: "Email",    value: "contact@nilay360.com",   href: "mailto:contact@nilay360.com" },
-                  { icon: "💬", label: "WhatsApp", value: "+91 7075 792497",         href: "https://wa.me/917075792497?text=Hi%2C%20I%27m%20interested%20in%20a%20property%20on%20Nilay%20360" },
                   { icon: "🕐", label: "Hours",    value: "Mon – Sat · 9 AM – 7 PM IST" },
-                ].map(item => (
+                ].filter((item): item is { icon: string; label: string; value: string; href?: string } => Boolean(item)).map(item => (
                   <div key={item.label} style={{ display: "flex", gap: "14px", alignItems: "flex-start", padding: "14px 0", borderBottom: "1px solid rgba(245,242,236,0.06)" }}>
                     <span style={{ fontSize: "17px", flexShrink: 0, marginTop: "1px" }}>{item.icon}</span>
                     <div>
@@ -449,7 +460,7 @@ export default function ContactPage() {
             </div>
             <div className="ct-offices-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "20px", alignItems: "start" }}>
               {[
-                { city: "Hyderabad", sub: "Headquarters",   address: "4th Floor, Trendz Techpark, Road No. 11, Kakatiya Hills\nGuttala Begumpet, Kavuri Hills, Madhapur, Hyderabad, Telangana 500081", phone: "+91 7075 792497", status: "Open",        statusColor: "#059669", statusBg: "rgba(5,150,105,0.08)", main: true },
+                { city: "Hyderabad", sub: "Headquarters",   address: "4th Floor, Trendz Techpark, Road No. 11, Kakatiya Hills\nGuttala Begumpet, Kavuri Hills, Madhapur, Hyderabad, Telangana 500081", phone: contact?.phone, status: "Open",        statusColor: "#059669", statusBg: "rgba(5,150,105,0.08)", main: true },
                 // Mumbai/Bengaluru have no address or phone yet — these offices
                 // don't exist yet, so a specific street address would be
                 // misleading. City + "Regional Office" + "Coming Soon" is the
@@ -524,9 +535,11 @@ export default function ContactPage() {
                 Browse Properties
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" /></svg>
               </a>
-              <a href="https://wa.me/917075792497?text=Hi%2C%20I%27m%20interested%20in%20a%20property%20on%20Nilay%20360" style={{ padding: "14px 36px", background: "transparent", border: "1.5px solid rgba(245,242,236,0.2)", borderRadius: "9px", color: "rgba(245,242,236,0.75)", fontSize: "13px", fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase", textDecoration: "none", display: "inline-flex", alignItems: "center", gap: "8px" }}>
-                <span style={{ fontSize: "16px" }}>💬</span> WhatsApp Us
-              </a>
+              {contactWaHref && (
+                <a href={contactWaHref} style={{ padding: "14px 36px", background: "transparent", border: "1.5px solid rgba(245,242,236,0.2)", borderRadius: "9px", color: "rgba(245,242,236,0.75)", fontSize: "13px", fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase", textDecoration: "none", display: "inline-flex", alignItems: "center", gap: "8px" }}>
+                  <span style={{ fontSize: "16px" }}>💬</span> WhatsApp Us
+                </a>
+              )}
             </div>
           </div>
         </section>

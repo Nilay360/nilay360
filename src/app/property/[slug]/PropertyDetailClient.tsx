@@ -819,9 +819,20 @@ function PropertyLocationMap({
 }: { latitude: number; longitude: number; title: string; fallbackEmbedUrl: string | null }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapDivRef = useRef<HTMLDivElement>(null);
+  const streetViewDivRef = useRef<HTMLDivElement>(null);
+  const panoramaRef = useRef<google.maps.StreetViewPanorama | null>(null);
   const [inView, setInView] = useState(false);
   const [mapReady, setMapReady] = useState(false);
   const [mapFailed, setMapFailed] = useState(false);
+  // Maps Phase 8 — gated on a real coverage check (StreetViewService),
+  // never assumed. Confirmed live against 11 real property coordinates:
+  // 8/11 (73%) had genuine nearby imagery, 3/11 did not — coverage is
+  // real but not universal, so the toggle only ever renders once this
+  // specific property's coverage is confirmed OK. No coverage → no
+  // toggle shown at all, rather than a button that leads to a broken/
+  // empty panorama.
+  const [streetViewAvailable, setStreetViewAvailable] = useState(false);
+  const [showStreetView, setShowStreetView] = useState(false);
 
   useEffect(() => {
     if (!containerRef.current || typeof IntersectionObserver === "undefined") {
@@ -878,6 +889,17 @@ function PropertyLocationMap({
         });
 
         setMapReady(true);
+
+        // Coverage check only — does not create the (billed-on-load)
+        // panorama itself. 50m radius matches the metadata check this
+        // feature was scoped against; OUTDOOR-only since an indoor/business
+        // panorama wouldn't show the property's actual street frontage.
+        new maps.StreetViewService().getPanorama(
+          { location: { lat: latitude, lng: longitude }, radius: 50, source: maps.StreetViewSource.OUTDOOR },
+          (_data, status) => {
+            if (!cancelled && status === maps.StreetViewStatus.OK) setStreetViewAvailable(true);
+          }
+        );
       })
       .catch(err => {
         console.error("[PropertyLocationMap] Failed to load Google Maps:", err);
@@ -885,6 +907,24 @@ function PropertyLocationMap({
       });
     return () => { cancelled = true; };
   }, [inView, latitude, longitude, title]);
+
+  // Panorama is created lazily on first toggle-on, not alongside the road
+  // map — avoids the extra load for the ~90% of visitors who never touch
+  // the toggle. Once created it's reused (never rebuilt) for subsequent
+  // toggles; visibility alone switches which one is shown.
+  useEffect(() => {
+    if (!showStreetView || !streetViewDivRef.current || panoramaRef.current) return;
+    loadGoogleMapsScript().then(maps => {
+      if (!streetViewDivRef.current || panoramaRef.current) return;
+      panoramaRef.current = new maps.StreetViewPanorama(streetViewDivRef.current, {
+        position: { lat: latitude, lng: longitude },
+        pov: { heading: 0, pitch: 0 },
+        addressControl: false,
+        fullscreenControl: false,
+        motionTracking: false,
+      });
+    });
+  }, [showStreetView, latitude, longitude]);
 
   // Coordinate-based deep link (dir/?api=1&destination=lat,lng) — more
   // accurate than the pre-existing locality-text search query, per spec.
@@ -927,16 +967,30 @@ function PropertyLocationMap({
       {!mapReady && (
         <div style={{ position: "absolute", inset: 0, background: "#111F33" }} />
       )}
-      <div ref={mapDivRef} style={{ position: "absolute", inset: 0, width: "100%", height: "100%" }} />
+      <div ref={mapDivRef} style={{ position: "absolute", inset: 0, width: "100%", height: "100%", visibility: showStreetView ? "hidden" : "visible" }} />
+      {/* Always mounted once created (never unmounted/recreated on toggle) —
+          only its visibility switches, same pattern as mapDivRef above. */}
+      <div ref={streetViewDivRef} style={{ position: "absolute", inset: 0, width: "100%", height: "100%", visibility: showStreetView ? "visible" : "hidden" }} />
       {mapReady && (
-        <a
-          href={directionsUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          style={{ position: "absolute", bottom: "12px", right: "12px", zIndex: 2, display: "flex", alignItems: "center", gap: "6px", padding: "8px 14px", borderRadius: "100px", fontSize: "12px", fontWeight: 700, color: "#020C1C", background: "#10C4C3", textDecoration: "none", boxShadow: "0 4px 16px rgba(0,0,0,0.3)" }}
-        >
-          Get Directions
-        </a>
+        <div style={{ position: "absolute", bottom: "12px", right: "12px", zIndex: 2, display: "flex", gap: "8px" }}>
+          {streetViewAvailable && (
+            <button
+              type="button"
+              onClick={() => setShowStreetView(v => !v)}
+              style={{ display: "flex", alignItems: "center", gap: "6px", padding: "8px 14px", borderRadius: "100px", fontSize: "12px", fontWeight: 700, cursor: "pointer", border: "none", color: showStreetView ? "#020C1C" : "#10C4C3", background: showStreetView ? "#10C4C3" : "rgba(2,12,28,0.75)", boxShadow: "0 4px 16px rgba(0,0,0,0.3)" }}
+            >
+              {showStreetView ? "Map View" : "Street View"}
+            </button>
+          )}
+          <a
+            href={directionsUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ display: "flex", alignItems: "center", gap: "6px", padding: "8px 14px", borderRadius: "100px", fontSize: "12px", fontWeight: 700, color: "#020C1C", background: "#10C4C3", textDecoration: "none", boxShadow: "0 4px 16px rgba(0,0,0,0.3)" }}
+          >
+            Get Directions
+          </a>
+        </div>
       )}
     </div>
   );
@@ -2242,6 +2296,28 @@ export default function PropertyDetailClient() {
                     </a>
                   )}
                 </div>
+
+                {/* Maps Phase 6 — nearest-per-category distance badges.
+                    Reuses `nearbyPlaces` (already fetched once for the
+                    "Nearby & Around" section below), zero new API calls —
+                    each category's array is already sorted nearest-first
+                    by /api/nearby-places' own query, so [0] is the nearest. */}
+                {nearbyPlaces && NEARBY_CATEGORY_ORDER.some(c => (nearbyPlaces[c]?.length ?? 0) > 0) && (
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: "8px", marginBottom: "24px" }}>
+                    {NEARBY_CATEGORY_ORDER.filter(c => (nearbyPlaces[c]?.length ?? 0) > 0).map(category => {
+                      const nearest = nearbyPlaces[category][0];
+                      const meta = NEARBY_CATEGORY_META[category];
+                      return (
+                        <span
+                          key={category}
+                          style={{ display: "inline-flex", alignItems: "center", gap: "6px", padding: "5px 12px", borderRadius: "100px", fontSize: "12px", fontWeight: 600, color: meta.color, background: `${meta.color}18`, border: `1px solid ${meta.color}44` }}
+                        >
+                          {meta.label.replace(/s$/, "")} {formatDistance(nearest.distance_meters)} away
+                        </span>
+                      );
+                    })}
+                  </div>
+                )}
 
                 {/* Key specs grid */}
                 <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(110px, 1fr))", gap: "12px" }}>
