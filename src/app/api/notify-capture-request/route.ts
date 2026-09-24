@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest, NextResponse, after } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { sendWhatsAppMessage } from '@/lib/whatsapp'
 
@@ -53,7 +53,10 @@ export async function POST(req: NextRequest) {
       for (const admin of admins) {
         if (admin.phone) {
           console.log(`[notify-capture-request] Calling sendWhatsAppMessage for admin ${admin.id}...`)
-          void sendWhatsAppMessage(admin.phone, admin.full_name?.trim() || 'there', notificationBody)
+          // after(), not a bare promise: Vercel can freeze the function once
+          // the response is sent, cutting off an un-awaited MSG91 call.
+          const phone = admin.phone, name = admin.full_name?.trim() || 'there'
+          after(() => sendWhatsAppMessage(phone, name, notificationBody))
         } else {
           console.log(`[notify-capture-request] Skipping — no phone on file for admin ${admin.id}`)
         }

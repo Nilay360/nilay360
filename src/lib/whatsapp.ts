@@ -25,6 +25,18 @@ function toBareInternationalPhone(phone: string): string {
   return digitsOnly;
 }
 
+// Meta rejects template variables containing newlines, tabs, or 4+
+// consecutive spaces, and very long values. Admin notes and other free
+// text flow straight into body_2, so every variable is flattened and
+// capped here rather than trusting each notify-* route to do it.
+function sanitizeTemplateVar(value: string, maxLength: number): string {
+  const flat = value
+    .replace(/[\r\n\t]+/g, " ")
+    .replace(/ {4,}/g, " ")
+    .trim();
+  return flat.length > maxLength ? `${flat.slice(0, maxLength - 1).trimEnd()}…` : flat;
+}
+
 export async function sendWhatsAppMessage(
   phone: string,
   customerName: string,
@@ -58,8 +70,8 @@ export async function sendWhatsAppMessage(
           {
             to: [toPhone],
             components: {
-              body_1: { type: "text", value: customerName },
-              body_2: { type: "text", value: messageBody },
+              body_1: { type: "text", value: sanitizeTemplateVar(customerName, 60) },
+              body_2: { type: "text", value: sanitizeTemplateVar(messageBody, 900) },
             },
           },
         ],

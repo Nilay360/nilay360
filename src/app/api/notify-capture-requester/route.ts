@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest, NextResponse, after } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { sendWhatsAppMessage } from '@/lib/whatsapp'
 
@@ -65,7 +65,10 @@ export async function POST(req: NextRequest) {
       .eq('id', requesterId)
       .maybeSingle()
     if (requesterProfile?.phone) {
-      void sendWhatsAppMessage(requesterProfile.phone, requesterProfile.full_name?.trim() || 'there', body)
+      // after(), not a bare promise: Vercel can freeze the function once the
+      // response is sent, cutting off an un-awaited MSG91 call.
+      const phone = requesterProfile.phone, name = requesterProfile.full_name?.trim() || 'there'
+      after(() => sendWhatsAppMessage(phone, name, body))
     }
 
     return NextResponse.json({ notified: true })

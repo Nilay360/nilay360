@@ -62,7 +62,8 @@ three as snapshots, not live truth:
 - Canonical agents are in `agent_profiles` (`agents` is dead). Canonical leads are `inquiries` +
   `inquiry_activities` (`leads`/`lead_activities` are dead).
 - Contact numbers come from `site_contacts` (migration 075, live) via `useSiteContact(s)` and
-  `src/lib/contactFormat.ts`. Never hardcode phone numbers.
+  `src/lib/contactFormat.ts`. Never hardcode phone numbers. The `general` (main) number is
+  **+91 70933 36360**.
 - The whole admin panel is one component: `src/app/admin/page.tsx`.
 - `SiteChrome.tsx` is the real live footer; `components/layout/Footer.tsx` is unused.
 - Known and deliberately unfixed: the un-layered CSS reset in `globals.css` zeroes Tailwind spacing
@@ -74,19 +75,22 @@ three as snapshots, not live truth:
 - Session work (contact system, Maps phases 3–6 and 8, liveStats resilience, locations/compare
   live-data fix, forgot-password email, migration 075) is backed up on branch
   `backup/session-2026-09-24` (`9e9b8d8`). Not merged into `main`.
-- Open from the last check: 2 new `react-hooks/set-state-in-effect` lint errors in the Contact
-  Numbers admin UI (admin/page.tsx ~L799, ~L853). The `customer_care` row's label reads
-  "General Enquiries" (a data fix for the founder to run). 075's header still says "NOT APPLIED".
+- Open: as of 2026-09-25 01:49 IST the live `site_contacts` rows had `general` = +91 72075 45360
+  and `customer_care` = +91 70933 36360 — the reverse of the intended main number above. Needs a
+  data fix the founder runs. 075's header still says "NOT APPLIED" (it is applied).
 
 ## Blockers that need the founder (not code)
 
-A. Street View key permission in Google Cloud Console (re-test with
-   `node scripts/check-streetview-permission.mjs`).
+A. ~~Street View key permission~~ — **RESOLVED 2026-09-25** (`node scripts/check-streetview-permission.mjs`
+   returned OK for Charminar). Note: that script prints the full browser Maps key; don't share raw output.
 B. A Map ID + cloud style profile before migrating `google.maps.Marker` → `AdvancedMarkerElement`
    (not urgent).
 C. WhatsApp automation is dead in production: `MSG91_WHATSAPP_INTEGRATED_NUMBER` /
-   `MSG91_WHATSAPP_TEMPLATE_NAME` are missing in Vercel, and template approval is unconfirmed.
-   Keep the "TEMPORARY" logs in `whatsapp.ts` until one real delivery succeeds.
+   `MSG91_WHATSAPP_TEMPLATE_NAME` are missing in Vercel. **Moving to sender `917093336360` and
+   template `nilay360_alert` (Utility category)** — replaces `nilay360_notification`. The template
+   takes 2 body variables: `body_1` = recipient name, `body_2` = message (sanitized/capped in
+   `whatsapp.ts`). Sends run via `after()` in all 6 notify-* routes. Keep the "TEMPORARY" logs in
+   `whatsapp.ts` until one real delivery succeeds.
 D. Home router/ISP DNS interference. Rule it out before treating a "0 listings" scare as a site bug.
 
 ## Priorities (the founder picks the order — one at a time)
