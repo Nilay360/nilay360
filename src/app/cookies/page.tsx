@@ -330,7 +330,7 @@
                         border: '1px solid #E8E3D9',
                         fontFamily: "var(--font-body-new)",
                         fontSize: '14px',
-                        color: '#333333',
+                        color: '#A9B4C2',
                         background: '#020C1C',
                         verticalAlign: 'top',
                       }}
@@ -343,7 +343,7 @@
                         border: '1px solid #E8E3D9',
                         fontFamily: "var(--font-body-new)",
                         fontSize: '14px',
-                        color: '#333333',
+                        color: '#A9B4C2',
                         background: '#020C1C',
                         verticalAlign: 'top',
                       }}
@@ -357,7 +357,7 @@
                         border: '1px solid #E8E3D9',
                         fontFamily: "var(--font-body-new)",
                         fontSize: '14px',
-                        color: '#333333',
+                        color: '#A9B4C2',
                         background: '#020C1C',
                         verticalAlign: 'top',
                       }}
@@ -370,7 +370,7 @@
                         border: '1px solid #E8E3D9',
                         fontFamily: "var(--font-body-new)",
                         fontSize: '14px',
-                        color: '#333333',
+                        color: '#A9B4C2',
                         background: '#020C1C',
                         verticalAlign: 'top',
                       }}
@@ -440,7 +440,7 @@
                         border: '1px solid #E8E3D9',
                         fontFamily: "var(--font-body-new)",
                         fontSize: '14px',
-                        color: '#333333',
+                        color: '#A9B4C2',
                         background: '#020C1C',
                         verticalAlign: 'top',
                       }}
@@ -453,7 +453,7 @@
                         border: '1px solid #E8E3D9',
                         fontFamily: "var(--font-body-new)",
                         fontSize: '14px',
-                        color: '#333333',
+                        color: '#A9B4C2',
                         background: '#020C1C',
                         verticalAlign: 'top',
                       }}
@@ -467,7 +467,7 @@
                         border: '1px solid #E8E3D9',
                         fontFamily: "var(--font-body-new)",
                         fontSize: '14px',
-                        color: '#333333',
+                        color: '#A9B4C2',
                         background: '#020C1C',
                         verticalAlign: 'top',
                       }}
@@ -480,7 +480,7 @@
                         border: '1px solid #E8E3D9',
                         fontFamily: "var(--font-body-new)",
                         fontSize: '14px',
-                        color: '#333333',
+                        color: '#A9B4C2',
                         background: '#020C1C',
                         verticalAlign: 'top',
                       }}
@@ -755,7 +755,7 @@
                   fontFamily: "var(--font-body-new)",
                   fontSize: '16px',
                   fontWeight: 400,
-                  color: '#333333',
+                  color: '#A9B4C2',
                   lineHeight: 2,
                 }}
               >

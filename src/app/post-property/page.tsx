@@ -204,7 +204,7 @@ const C = {
   goldBorder: 'rgba(201,168,76,0.30)',
   text: '#F5F2EC',
   textSub: '#9a9a9a',
-  textMuted: '#525252',
+  textMuted: '#8A8A8A',
   errorBg: 'rgba(224,85,85,0.10)',
   errorBorder: 'rgba(224,85,85,0.30)',
   error: '#e05555',

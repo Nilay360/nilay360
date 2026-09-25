@@ -448,7 +448,7 @@ function NewProjectsPageInner() {
         <section className="np-why" style={{ maxWidth: "1280px", margin: "0 auto", padding: "72px 48px" }}>
           <div style={{ textAlign: "center", marginBottom: "44px" }}>
             <Eyebrow label="The Advantage" />
-            <h2 style={{ fontFamily: "var(--font-heading-new)", fontSize: "clamp(28px, 3.5vw, 44px)", fontWeight: 400, color: "#020C1C" }}>
+            <h2 style={{ fontFamily: "var(--font-heading-new)", fontSize: "clamp(28px, 3.5vw, 44px)", fontWeight: 400, color: "#FFFFFF" }}>
               Why Buy a<br /><em style={{ fontStyle: "italic", color: "#10C4C3" }}>New Project?</em>
             </h2>
           </div>
@@ -481,7 +481,7 @@ function NewProjectsPageInner() {
             ].map(b => (
               <div key={b.title} style={{ background: b.bg, border: `1.5px solid ${b.border}`, borderRadius: "18px", padding: "28px 24px" }}>
                 <div style={{ fontSize: "28px", marginBottom: "14px" }}>{b.icon}</div>
-                <h3 style={{ fontFamily: "var(--font-heading-new)", fontSize: "20px", fontWeight: 600, color: "#020C1C", marginBottom: "10px" }}>{b.title}</h3>
+                <h3 style={{ fontFamily: "var(--font-heading-new)", fontSize: "20px", fontWeight: 600, color: "#FFFFFF", marginBottom: "10px" }}>{b.title}</h3>
                 <p style={{ fontSize: "12.5px", color: "#6B7C72", lineHeight: 1.75, marginBottom: "16px" }}>{b.desc}</p>
                 <ul style={{ listStyle: "none", display: "flex", flexDirection: "column", gap: "6px" }}>
                   {b.points.map(pt => (
@@ -502,7 +502,7 @@ function NewProjectsPageInner() {
           <div style={{ position: "absolute", inset: 0, background: "radial-gradient(ellipse 60% 55% at 50% 110%, rgba(201,168,76,0.1) 0%, transparent 55%)", pointerEvents: "none" }} />
           <div style={{ position: "relative", zIndex: 2, maxWidth: "680px", margin: "0 auto", textAlign: "center" }}>
             <Eyebrow label="Stay Ahead" />
-            <h2 style={{ fontFamily: "var(--font-heading-new)", fontSize: "clamp(34px, 5vw, 56px)", fontWeight: 300, color: "#020C1C", lineHeight: 1.15, marginBottom: "12px" }}>
+            <h2 style={{ fontFamily: "var(--font-heading-new)", fontSize: "clamp(34px, 5vw, 56px)", fontWeight: 300, color: "#FFFFFF", lineHeight: 1.15, marginBottom: "12px" }}>
               Be First<br /><em style={{ fontStyle: "italic", color: "#10C4C3" }}>to Know</em>
             </h2>
             <p style={{ fontSize: "14px", color: "rgba(245,242,236,0.45)", lineHeight: 1.75, marginBottom: "40px" }}>

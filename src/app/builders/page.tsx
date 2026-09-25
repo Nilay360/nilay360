@@ -633,7 +633,7 @@ export default function BuildersPage() {
           style={{
             fontFamily: "var(--font-body-new)",
             fontSize: 18,
-            color: IVORY,
+            color: "#FFFFFF",
             opacity: 0.85,
             maxWidth: 600,
             lineHeight: 1.7,
@@ -844,7 +844,7 @@ export default function BuildersPage() {
               fontFamily: "var(--font-heading-new)",
               fontSize: 40,
               fontWeight: 600,
-              color: DARK_GREEN,
+              color: "#FFFFFF",
               marginBottom: 16,
             }}
           >
@@ -854,7 +854,7 @@ export default function BuildersPage() {
             style={{
               fontFamily: "var(--font-body-new)",
               fontSize: 16,
-              color: "#777",
+              color: "#A9B4C2",
               marginBottom: 64,
               maxWidth: 660,
               margin: "0 auto 64px",
@@ -960,7 +960,7 @@ export default function BuildersPage() {
                     fontFamily: "var(--font-heading-new)",
                     fontSize: 20,
                     fontWeight: 600,
-                    color: DARK_GREEN,
+                    color: "#FFFFFF",
                     marginBottom: 8,
                     lineHeight: 1.2,
                   }}
@@ -1136,7 +1136,7 @@ export default function BuildersPage() {
               fontFamily: "var(--font-heading-new)",
               fontSize: 44,
               fontWeight: 600,
-              color: DARK_GREEN,
+              color: "#FFFFFF",
               lineHeight: 1.2,
               marginBottom: 16,
             }}
@@ -1147,7 +1147,7 @@ export default function BuildersPage() {
             style={{
               fontFamily: "var(--font-body-new)",
               fontSize: 17,
-              color: "#777",
+              color: "#A9B4C2",
               marginBottom: 40,
               lineHeight: 1.7,
             }}
@@ -1162,7 +1162,7 @@ export default function BuildersPage() {
               style={{
                 display: "inline-block",
                 background: DARK_GREEN,
-                color: IVORY,
+                color: "#FFFFFF",
                 fontFamily: "var(--font-body-new)",
                 fontSize: 14,
                 fontWeight: 600,

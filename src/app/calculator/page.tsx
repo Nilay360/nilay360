@@ -14,7 +14,7 @@ import Reveal from "@/components/ui/Reveal";
 const GOLD = "#10C4C3";
 const GREEN = "#0A1526";
 const BG = "#0a0a0a";
-const CREAM = "#020C1C";
+const CREAM = "#F5F2EC";
 
 // ── Formatting ───────────────────────────────────────────────────────────────
 function fmtINR(val: number, compact = false): string {

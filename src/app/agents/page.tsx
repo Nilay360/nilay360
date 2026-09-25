@@ -278,7 +278,7 @@ export default function AgentsPage() {
         {/* ── ALL AGENTS GRID ────────────────────────────────── */}
         <section className="ag-all" style={{ maxWidth: "1280px", margin: "0 auto", padding: "60px 48px 72px" }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "28px" }}>
-            <h2 style={{ fontFamily: "var(--font-heading-new)", fontSize: "28px", fontWeight: 400, color: "#020C1C" }}>
+            <h2 style={{ fontFamily: "var(--font-heading-new)", fontSize: "28px", fontWeight: 400, color: "#FFFFFF" }}>
               All Agents <span style={{ color: "#10C4C3", fontStyle: "italic" }}>({filtered.length})</span>
             </h2>
           </div>
@@ -331,7 +331,7 @@ export default function AgentsPage() {
           <div className="ag-become-grid" style={{ position: "relative", zIndex: 2, maxWidth: "1100px", margin: "0 auto", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "60px", alignItems: "center" }}>
             <div>
               <Eyebrow label="Join Our Network" />
-              <h2 style={{ fontFamily: "var(--font-heading-new)", fontSize: "clamp(32px, 4vw, 52px)", fontWeight: 300, color: "#020C1C", lineHeight: 1.15, marginBottom: "16px" }}>
+              <h2 style={{ fontFamily: "var(--font-heading-new)", fontSize: "clamp(32px, 4vw, 52px)", fontWeight: 300, color: "#FFFFFF", lineHeight: 1.15, marginBottom: "16px" }}>
                 Are You a Real Estate<br /><em style={{ fontStyle: "italic", color: "#10C4C3" }}>Professional?</em>
               </h2>
               <p style={{ fontSize: "14px", color: "rgba(245,242,236,0.45)", lineHeight: 1.8, marginBottom: "32px" }}>

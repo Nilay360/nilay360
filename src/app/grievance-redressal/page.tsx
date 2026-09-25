@@ -347,19 +347,19 @@ export default function GrievanceRedressalPage() {
               padding: '24px 28px',
               borderRadius: '2px',
             }}>
-              <p style={{ fontFamily: "var(--font-body-new)", fontSize: '15px', fontWeight: 500, color: '#020C1C', lineHeight: 1.8, marginBottom: '4px' }}>
+              <p style={{ fontFamily: "var(--font-body-new)", fontSize: '15px', fontWeight: 500, color: '#FFFFFF', lineHeight: 1.8, marginBottom: '4px' }}>
                 Name: [TBD]
               </p>
-              <p style={{ fontFamily: "var(--font-body-new)", fontSize: '15px', fontWeight: 400, color: '#555555', lineHeight: 1.8, marginBottom: '4px' }}>
+              <p style={{ fontFamily: "var(--font-body-new)", fontSize: '15px', fontWeight: 400, color: '#A9B4C2', lineHeight: 1.8, marginBottom: '4px' }}>
                 Designation: Grievance Officer
               </p>
-              <p style={{ fontFamily: "var(--font-body-new)", fontSize: '15px', fontWeight: 400, color: '#555555', lineHeight: 1.8, marginBottom: '4px' }}>
+              <p style={{ fontFamily: "var(--font-body-new)", fontSize: '15px', fontWeight: 400, color: '#A9B4C2', lineHeight: 1.8, marginBottom: '4px' }}>
                 Email: [TBD — pending confirmation]
               </p>
-              <p style={{ fontFamily: "var(--font-body-new)", fontSize: '15px', fontWeight: 400, color: '#555555', lineHeight: 1.8, marginBottom: '4px' }}>
+              <p style={{ fontFamily: "var(--font-body-new)", fontSize: '15px', fontWeight: 400, color: '#A9B4C2', lineHeight: 1.8, marginBottom: '4px' }}>
                 Address: 4th Floor, Trendz Techpark, Road No. 11, Kakatiya Hills, Guttala Begumpet, Kavuri Hills, Madhapur, Hyderabad, Telangana 500081
               </p>
-              <p style={{ fontFamily: "var(--font-body-new)", fontSize: '15px', fontWeight: 400, color: '#555555', lineHeight: 1.8 }}>
+              <p style={{ fontFamily: "var(--font-body-new)", fontSize: '15px', fontWeight: 400, color: '#A9B4C2', lineHeight: 1.8 }}>
                 Hours: Mon &ndash; Sat &middot; 9 AM &ndash; 7 PM IST
               </p>
             </div>
@@ -444,7 +444,7 @@ export default function GrievanceRedressalPage() {
                 fontFamily: "var(--font-body-new)",
                 fontSize: '15px',
                 fontWeight: 500,
-                color: '#020C1C',
+                color: '#FFFFFF',
                 lineHeight: 1.8,
                 marginBottom: '4px',
               }}>
@@ -454,7 +454,7 @@ export default function GrievanceRedressalPage() {
                 fontFamily: "var(--font-body-new)",
                 fontSize: '15px',
                 fontWeight: 400,
-                color: '#555555',
+                color: '#A9B4C2',
                 lineHeight: 1.8,
                 marginBottom: '4px',
               }}>
@@ -464,7 +464,7 @@ export default function GrievanceRedressalPage() {
                 fontFamily: "var(--font-body-new)",
                 fontSize: '15px',
                 fontWeight: 400,
-                color: '#555555',
+                color: '#A9B4C2',
                 lineHeight: 1.8,
               }}>
                 Address: 4th Floor, Trendz Techpark, Road No. 11, Kakatiya Hills, Guttala Begumpet, Kavuri Hills, Madhapur, Hyderabad, Telangana 500081

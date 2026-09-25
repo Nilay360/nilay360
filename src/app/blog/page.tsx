@@ -173,7 +173,7 @@ export default function BlogPage() {
               <div style={{ width: "5px", height: "5px", borderRadius: "50%", background: "#10C4C3" }} />
               <span style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.2em", color: "#10C4C3", textTransform: "uppercase" }}>Market Intelligence</span>
             </div>
-            <h1 style={{ fontFamily: "var(--font-heading-new)", fontSize: "clamp(42px, 6vw, 68px)", fontWeight: 300, lineHeight: 1.12, color: "#020C1C", marginBottom: "18px" }}>
+            <h1 style={{ fontFamily: "var(--font-heading-new)", fontSize: "clamp(42px, 6vw, 68px)", fontWeight: 300, lineHeight: 1.12, color: "#FFFFFF", marginBottom: "18px" }}>
               Property Insights<br /><em style={{ fontStyle: "italic", color: "#10C4C3" }}>& Guides</em>
             </h1>
             <p style={{ fontSize: "15px", color: "rgba(245,242,236,0.55)", lineHeight: 1.75, marginBottom: "36px", maxWidth: "520px", margin: "0 auto 36px" }}>
@@ -332,7 +332,7 @@ export default function BlogPage() {
                     <p style={{ fontSize: "10px", color: "rgba(245,242,236,0.3)", marginBottom: "18px", letterSpacing: "0.05em" }}>AVG SALE PRICE — HYDERABAD</p>
                     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 0", borderBottom: "1px solid rgba(245,242,236,0.07)" }}>
                       <div>
-                        <div style={{ fontSize: "13px", fontWeight: 600, color: "#020C1C", marginBottom: "2px" }}>Hyderabad</div>
+                        <div style={{ fontSize: "13px", fontWeight: 600, color: "#FFFFFF", marginBottom: "2px" }}>Hyderabad</div>
                         <div style={{ fontFamily: "var(--font-support-new)", fontSize: "17px", fontWeight: 500, color: "#10C4C3" }}>₹{liveStats.avgSalePricePerSqft.toLocaleString("en-IN")}/sqft</div>
                       </div>
                     </div>

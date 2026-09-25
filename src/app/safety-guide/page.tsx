@@ -29,8 +29,8 @@ export default function SafetyGuidePage() {
           },
         ].map(s => (
           <div key={s.h} style={{ marginBottom: 28 }}>
-            <h3 style={{ fontFamily: "var(--font-heading-new)", fontSize: 22, fontWeight: 700, color: "#020C1C", marginBottom: 8 }}>{s.h}</h3>
-            <p style={{ fontSize: 15, color: "#555", lineHeight: 1.75 }}>{s.b}</p>
+            <h3 style={{ fontFamily: "var(--font-heading-new)", fontSize: 22, fontWeight: 700, color: "#FFFFFF", marginBottom: 8 }}>{s.h}</h3>
+            <p style={{ fontSize: 15, color: "#A9B4C2", lineHeight: 1.75 }}>{s.b}</p>
           </div>
         ))}
       </div>

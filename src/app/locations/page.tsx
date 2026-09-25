@@ -137,7 +137,7 @@ export default function LocationsPage() {
           <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", marginBottom: "36px", flexWrap: "wrap", gap: "12px" }}>
             <div>
               <Eyebrow label="All Markets" />
-              <h2 style={{ fontFamily: "var(--font-heading-new)", fontSize: "clamp(30px, 3.8vw, 46px)", fontWeight: 400, color: "#020C1C" }}>
+              <h2 style={{ fontFamily: "var(--font-heading-new)", fontSize: "clamp(30px, 3.8vw, 46px)", fontWeight: 400, color: "#FFFFFF" }}>
                 Browse by City
               </h2>
             </div>
@@ -183,7 +183,7 @@ export default function LocationsPage() {
           <div style={{ maxWidth: "1000px", margin: "0 auto", position: "relative", zIndex: 2 }}>
             <div style={{ textAlign: "center", marginBottom: "48px" }}>
               <Eyebrow label="Market Snapshot" dark />
-              <h2 style={{ fontFamily: "var(--font-heading-new)", fontSize: "clamp(28px, 3.5vw, 44px)", fontWeight: 300, color: "#020C1C" }}>
+              <h2 style={{ fontFamily: "var(--font-heading-new)", fontSize: "clamp(28px, 3.5vw, 44px)", fontWeight: 300, color: "#FFFFFF" }}>
                 India Premium Real Estate<br /><em style={{ fontStyle: "italic", color: "#10C4C3" }}>Overview</em>
               </h2>
             </div>
@@ -198,7 +198,7 @@ export default function LocationsPage() {
                 <div key={s.label} style={{ background: "rgba(245,242,236,0.04)", border: "1px solid rgba(245,242,236,0.07)", borderRadius: "16px", padding: "32px 28px", textAlign: "center" }}>
                   <div style={{ fontSize: "28px", marginBottom: "14px" }}>{s.icon}</div>
                   <p style={{ fontFamily: "var(--font-support-new)", fontSize: "42px", fontWeight: 600, color: "#10C4C3", lineHeight: 1, marginBottom: "8px" }}>{s.value}</p>
-                  <p style={{ fontSize: "14px", fontWeight: 600, color: "#020C1C", marginBottom: "3px" }}>{s.label}</p>
+                  <p style={{ fontSize: "14px", fontWeight: 600, color: "#FFFFFF", marginBottom: "3px" }}>{s.label}</p>
                   <p style={{ fontSize: "11px", color: "rgba(245,242,236,0.35)" }}>{s.sub}</p>
                 </div>
               ))}
@@ -209,7 +209,7 @@ export default function LocationsPage() {
         {/* ── CTA ────────────────────────────────────────────── */}
         <section className="loc-pg-cta" style={{ background: "#020C1C", padding: "80px 48px", textAlign: "center" }}>
           <div style={{ maxWidth: "560px", margin: "0 auto" }}>
-            <h2 style={{ fontFamily: "var(--font-heading-new)", fontSize: "clamp(30px, 4vw, 46px)", fontWeight: 400, color: "#020C1C", marginBottom: "14px", lineHeight: 1.2 }}>
+            <h2 style={{ fontFamily: "var(--font-heading-new)", fontSize: "clamp(30px, 4vw, 46px)", fontWeight: 400, color: "#FFFFFF", marginBottom: "14px", lineHeight: 1.2 }}>
               Can't find your city?<br /><em style={{ fontStyle: "italic", color: "#10C4C3" }}>We're expanding.</em>
             </h2>
             <p style={{ fontSize: "14px", color: "#6B7C72", lineHeight: 1.75, marginBottom: "28px" }}>
@@ -217,7 +217,7 @@ export default function LocationsPage() {
             </p>
             <div style={{ display: "flex", gap: "12px", justifyContent: "center", flexWrap: "wrap" }}>
               <a href="/contact" style={{ padding: "13px 32px", background: "#10C4C3", borderRadius: "9px", color: "#020C1C", fontSize: "13px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", textDecoration: "none" }}>Register Interest</a>
-              <a href="/search"  style={{ padding: "13px 32px", background: "transparent", border: "1.5px solid rgba(13,43,31,0.18)", borderRadius: "9px", color: "#020C1C", fontSize: "13px", fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase", textDecoration: "none" }}>Browse All Properties</a>
+              <a href="/search"  style={{ padding: "13px 32px", background: "transparent", border: "1.5px solid rgba(13,43,31,0.18)", borderRadius: "9px", color: "#FFFFFF", fontSize: "13px", fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase", textDecoration: "none" }}>Browse All Properties</a>
             </div>
           </div>
         </section>

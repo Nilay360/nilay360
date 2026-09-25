@@ -831,7 +831,7 @@ export default async function PrivacyPage() {
                   fontFamily: "var(--font-body-new)",
                   fontSize: '16px',
                   fontWeight: 400,
-                  color: '#333333',
+                  color: '#A9B4C2',
                   lineHeight: 2,
                 }}
               >

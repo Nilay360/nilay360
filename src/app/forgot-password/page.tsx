@@ -42,16 +42,16 @@ export default function ForgotPasswordPage() {
         {status === "sent" ? (
           <div style={{ background:"#020C1C", borderRadius:16, padding:32, border:"1px solid rgba(0,0,0,0.06)", textAlign:"center" }}>
             <p style={{ fontSize:15, fontWeight:600, color:"#10C4C3", marginBottom:8 }}>Check your inbox</p>
-            <p style={{ fontSize:13, color:"#666", lineHeight:1.6 }}>
+            <p style={{ fontSize:13, color:"#A9B4C2", lineHeight:1.6 }}>
               If an account exists for {email}, we&apos;ve sent a link to reset your password.
             </p>
-            <p style={{ textAlign:"center", fontSize:13, color:"#666", marginTop:18 }}>
+            <p style={{ textAlign:"center", fontSize:13, color:"#A9B4C2", marginTop:18 }}>
               <a href="/login" style={{ color:"#10C4C3", fontWeight:600 }}>Back to Sign In</a>
             </p>
           </div>
         ) : (
           <form onSubmit={handleSubmit} style={{ background:"#020C1C", borderRadius:16, padding:32, border:"1px solid rgba(0,0,0,0.06)" }}>
-            <label style={{ display:"block", fontSize:12, fontWeight:600, color:"#020C1C", letterSpacing:"0.05em", textTransform:"uppercase", marginBottom:8 }}>Email Address</label>
+            <label style={{ display:"block", fontSize:12, fontWeight:600, color:"#FFFFFF", letterSpacing:"0.05em", textTransform:"uppercase", marginBottom:8 }}>Email Address</label>
             <input
               type="email" required placeholder="you@example.com"
               value={email} onChange={e => setEmail(e.target.value)}
@@ -65,7 +65,7 @@ export default function ForgotPasswordPage() {
               style={{ width:"100%", padding:"13px", background:"#10C4C3", border:"none", borderRadius:8, color:"#020C1C", fontSize:14, fontWeight:700, cursor: status === "sending" ? "not-allowed" : "pointer", opacity: status === "sending" ? 0.65 : 1, fontFamily:"var(--font-body-new)" }}>
               {status === "sending" ? "Sending…" : "Send Reset Link"}
             </button>
-            <p style={{ textAlign:"center", fontSize:13, color:"#666", marginTop:18 }}>
+            <p style={{ textAlign:"center", fontSize:13, color:"#A9B4C2", marginTop:18 }}>
               Remembered it? <a href="/login" style={{ color:"#10C4C3", fontWeight:600 }}>Back to Sign In</a>
             </p>
           </form>

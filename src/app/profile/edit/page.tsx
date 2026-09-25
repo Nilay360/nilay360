@@ -121,7 +121,7 @@ export default function ProfileEditPage() {
   if (loading) {
     return (
       <div style={{ minHeight: "100vh", background: G.ivory, paddingTop: 64, display: "flex", alignItems: "center", justifyContent: "center" }}>
-        <span style={{ color: G.dark, fontFamily: "var(--font-body-new)", fontSize: 14, opacity: 0.5 }}>Loading profile…</span>
+        <span style={{ color: "#FFFFFF", fontFamily: "var(--font-body-new)", fontSize: 14, opacity: 0.5 }}>Loading profile…</span>
       </div>
     );
   }
@@ -129,7 +129,7 @@ export default function ProfileEditPage() {
   if (!userId) {
     return (
       <div style={{ minHeight: "100vh", background: G.ivory, paddingTop: 64, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 16 }}>
-        <p style={{ color: G.dark, fontFamily: "var(--font-body-new)", fontSize: 16 }}>Please sign in to edit your profile.</p>
+        <p style={{ color: "#FFFFFF", fontFamily: "var(--font-body-new)", fontSize: 16 }}>Please sign in to edit your profile.</p>
         <Link href="/login" style={{ color: G.gold, fontWeight: 600, fontFamily: "var(--font-body-new)", textDecoration: "none" }}>Sign In →</Link>
       </div>
     );

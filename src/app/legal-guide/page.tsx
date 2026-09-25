@@ -432,7 +432,7 @@ export default function LegalGuidePage() {
               style={{
                 fontFamily: "var(--font-heading-new)",
                 fontSize: "26px",
-                color: "#020C1C",
+                color: "#FFFFFF",
                 fontWeight: 600,
                 marginBottom: "20px",
               }}
@@ -470,7 +470,7 @@ export default function LegalGuidePage() {
                     style={{
                       fontFamily: "var(--font-body-new)",
                       fontSize: "15px",
-                      color: "#333333",
+                      color: "#A9B4C2",
                     }}
                   >
                     {fact.value}
@@ -494,7 +494,7 @@ export default function LegalGuidePage() {
             style={{
               fontFamily: "var(--font-heading-new)",
               fontSize: "48px",
-              color: "#020C1C",
+              color: "#FFFFFF",
               fontWeight: 600,
               textAlign: "center",
               marginBottom: "12px",
@@ -506,7 +506,7 @@ export default function LegalGuidePage() {
             style={{
               fontFamily: "var(--font-body-new)",
               fontSize: "16px",
-              color: "#777777",
+              color: "#A9B4C2",
               textAlign: "center",
               marginBottom: "48px",
             }}
@@ -584,7 +584,7 @@ export default function LegalGuidePage() {
             style={{
               fontFamily: "var(--font-body-new)",
               fontSize: "16px",
-              color: "#777777",
+              color: "#666666",
               textAlign: "center",
               marginBottom: "56px",
             }}
@@ -755,7 +755,7 @@ export default function LegalGuidePage() {
             style={{
               fontFamily: "var(--font-heading-new)",
               fontSize: "48px",
-              color: "#020C1C",
+              color: "#FFFFFF",
               fontWeight: 600,
               textAlign: "center",
               marginBottom: "12px",
@@ -767,7 +767,7 @@ export default function LegalGuidePage() {
             style={{
               fontFamily: "var(--font-body-new)",
               fontSize: "16px",
-              color: "#777777",
+              color: "#A9B4C2",
               textAlign: "center",
               marginBottom: "48px",
             }}
@@ -898,7 +898,7 @@ export default function LegalGuidePage() {
                         border: "1px solid #E8E3D9",
                         fontFamily: "var(--font-body-new)",
                         fontSize: "15px",
-                        color: "#020C1C",
+                        color: i % 2 === 0 ? "#020C1C" : "#FFFFFF",
                         fontWeight: 500,
                         verticalAlign: "top",
                         whiteSpace: "nowrap",
@@ -912,7 +912,7 @@ export default function LegalGuidePage() {
                         border: "1px solid #E8E3D9",
                         fontFamily: "var(--font-body-new)",
                         fontSize: "15px",
-                        color: "#555555",
+                        color: i % 2 === 0 ? "#555555" : "#A9B4C2",
                         lineHeight: 1.7,
                         verticalAlign: "top",
                       }}
@@ -939,7 +939,7 @@ export default function LegalGuidePage() {
             style={{
               fontFamily: "var(--font-heading-new)",
               fontSize: "48px",
-              color: "#020C1C",
+              color: "#FFFFFF",
               fontWeight: 600,
               textAlign: "center",
               marginBottom: "48px",

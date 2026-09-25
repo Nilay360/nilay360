@@ -15,13 +15,13 @@ export default function AgentRegisterPage() {
       ]}
     >
       <div style={{ textAlign:"center", maxWidth:600, margin:"0 auto 8px" }}>
-        <h2 style={{ fontFamily:"var(--font-heading-new)", fontSize:32, fontWeight:700, color:"#020C1C", marginBottom:14 }}>Start your application</h2>
-        <p style={{ fontSize:15, color:"#666", lineHeight:1.7, marginBottom:24 }}>
+        <h2 style={{ fontFamily:"var(--font-heading-new)", fontSize:32, fontWeight:700, color:"#FFFFFF", marginBottom:14 }}>Start your application</h2>
+        <p style={{ fontSize:15, color:"#A9B4C2", lineHeight:1.7, marginBottom:24 }}>
           Create an account to begin onboarding, or explore the agent network to see who's already on board.
         </p>
         <div style={{ display:"flex", gap:12, justifyContent:"center", flexWrap:"wrap" }}>
           <a href="/register" style={{ padding:"13px 30px", background:"#10C4C3", borderRadius:8, color:"#020C1C", fontSize:14, fontWeight:700 }}>Apply Now</a>
-          <a href="/agents" style={{ padding:"13px 30px", border:"1px solid rgba(13,43,31,0.2)", borderRadius:8, color:"#020C1C", fontSize:14, fontWeight:500 }}>View Agent Network</a>
+          <a href="/agents" style={{ padding:"13px 30px", border:"1px solid rgba(13,43,31,0.2)", borderRadius:8, color:"#FFFFFF", fontSize:14, fontWeight:500 }}>View Agent Network</a>
         </div>
       </div>
     </PageShell>

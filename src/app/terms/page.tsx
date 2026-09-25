@@ -558,7 +558,7 @@ export default function TermsPage() {
                 fontFamily: "var(--font-body-new)",
                 fontSize: '15px',
                 fontWeight: 500,
-                color: '#020C1C',
+                color: '#FFFFFF',
                 lineHeight: 1.8,
                 marginBottom: '4px',
               }}>
@@ -568,7 +568,7 @@ export default function TermsPage() {
                 fontFamily: "var(--font-body-new)",
                 fontSize: '15px',
                 fontWeight: 400,
-                color: '#555555',
+                color: '#A9B4C2',
                 lineHeight: 1.8,
                 marginBottom: '4px',
               }}>
@@ -578,7 +578,7 @@ export default function TermsPage() {
                 fontFamily: "var(--font-body-new)",
                 fontSize: '15px',
                 fontWeight: 400,
-                color: '#555555',
+                color: '#A9B4C2',
                 lineHeight: 1.8,
               }}>
                 Address: 4th Floor, Trendz Techpark, Road No. 11, Kakatiya Hills, Guttala Begumpet, Kavuri Hills, Madhapur, Hyderabad, Telangana 500081

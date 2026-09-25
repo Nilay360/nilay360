@@ -459,7 +459,7 @@ function CommercialPageInner() {
           <p style={{
             fontFamily: "var(--font-body-new)",
             fontSize: 18,
-            color: "#020C1C",
+            color: "#FFFFFF",
             maxWidth: 600,
             margin: "0 auto 56px",
             lineHeight: 1.65,
@@ -528,7 +528,7 @@ function CommercialPageInner() {
             fontFamily: "var(--font-heading-new)",
             fontSize: 40,
             fontWeight: 600,
-            color: "#020C1C",
+            color: "#FFFFFF",
             marginBottom: 48,
             textAlign: "center",
           }}>
@@ -648,7 +648,7 @@ function CommercialPageInner() {
                   <label style={{
                     fontFamily: "var(--font-support-new)",
                     fontSize: 12,
-                    color: "#020C1C",
+                    color: "#FFFFFF",
                     fontWeight: 600,
                     letterSpacing: 1,
                     textTransform: "uppercase",
@@ -688,7 +688,7 @@ function CommercialPageInner() {
                   <label style={{
                     fontFamily: "var(--font-support-new)",
                     fontSize: 12,
-                    color: "#020C1C",
+                    color: "#FFFFFF",
                     fontWeight: 600,
                     letterSpacing: 1,
                     textTransform: "uppercase",
@@ -724,7 +724,7 @@ function CommercialPageInner() {
                   display: "block",
                   fontFamily: "var(--font-support-new)",
                   fontSize: 12,
-                  color: "#020C1C",
+                  color: "#FFFFFF",
                   fontWeight: 600,
                   letterSpacing: 1,
                   textTransform: "uppercase",
@@ -743,7 +743,7 @@ function CommercialPageInner() {
                         border: "1px solid rgba(201,168,76,0.4)",
                         borderRadius: 4,
                         background: loanPct === pct ? "#10C4C3" : "transparent",
-                        color: loanPct === pct ? "#020C1C" : "#020C1C",
+                        color: loanPct === pct ? "#020C1C" : "#FFFFFF",
                         fontFamily: "var(--font-body-new)",
                         fontSize: 13,
                         fontWeight: 600,
@@ -836,7 +836,7 @@ function CommercialPageInner() {
             fontFamily: "var(--font-heading-new)",
             fontSize: 40,
             fontWeight: 600,
-            color: "#020C1C",
+            color: "#FFFFFF",
             marginBottom: 40,
             textAlign: "center",
           }}>
@@ -967,7 +967,7 @@ function CommercialPageInner() {
                   fontFamily: "var(--font-heading-new)",
                   fontSize: 22,
                   fontWeight: 600,
-                  color: "#020C1C",
+                  color: "#FFFFFF",
                   marginBottom: 10,
                 }}>
                   {item.title}
@@ -975,7 +975,7 @@ function CommercialPageInner() {
                 <p style={{
                   fontFamily: "var(--font-body-new)",
                   fontSize: 14,
-                  color: "#555",
+                  color: "#A9B4C2",
                   lineHeight: 1.6,
                 }}>
                   {item.desc}
@@ -996,7 +996,7 @@ function CommercialPageInner() {
             fontFamily: "var(--font-heading-new)",
             fontSize: 40,
             fontWeight: 600,
-            color: "#020C1C",
+            color: "#FFFFFF",
             marginBottom: 56,
             textAlign: "center",
           }}>
@@ -1054,7 +1054,7 @@ function CommercialPageInner() {
                     fontFamily: "var(--font-heading-new)",
                     fontSize: 28,
                     fontWeight: 600,
-                    color: "#020C1C",
+                    color: "#FFFFFF",
                     marginBottom: 10,
                   }}>
                     {item.title}
@@ -1062,7 +1062,7 @@ function CommercialPageInner() {
                   <p style={{
                     fontFamily: "var(--font-body-new)",
                     fontSize: 16,
-                    color: "#555",
+                    color: "#A9B4C2",
                     lineHeight: 1.7,
                     maxWidth: 640,
                   }}>
@@ -1095,7 +1095,7 @@ function CommercialPageInner() {
         <p style={{
           fontFamily: "var(--font-body-new)",
           fontSize: 16,
-          color: "#020C1C",
+          color: "#FFFFFF",
           opacity: 0.8,
           marginBottom: 40,
         }}>

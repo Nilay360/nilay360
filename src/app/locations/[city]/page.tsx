@@ -282,7 +282,7 @@ export default function CityPage() {
               {[
                 { label: `${properties.length} listings`, icon: "🏠" },
               ].map(p => (
-                <span key={p.label} style={{ display: "inline-flex", alignItems: "center", gap: "6px", padding: "7px 16px", background: "rgba(245,242,236,0.08)", border: "1px solid rgba(245,242,236,0.15)", borderRadius: "100px", fontSize: "12px", fontWeight: 600, color: "#020C1C", backdropFilter: "blur(8px)" }}>
+                <span key={p.label} style={{ display: "inline-flex", alignItems: "center", gap: "6px", padding: "7px 16px", background: "rgba(245,242,236,0.08)", border: "1px solid rgba(245,242,236,0.15)", borderRadius: "100px", fontSize: "12px", fontWeight: 600, color: "#FFFFFF", backdropFilter: "blur(8px)" }}>
                   {p.icon} {p.label}
                 </span>
               ))}
@@ -296,10 +296,10 @@ export default function CityPage() {
             {/* Text */}
             <div>
               <Eyebrow label="About the City" />
-              <h2 style={{ fontFamily: "var(--font-heading-new)", fontSize: "clamp(28px, 3.5vw, 44px)", fontWeight: 400, color: "#020C1C", lineHeight: 1.2, marginBottom: "22px" }}>
+              <h2 style={{ fontFamily: "var(--font-heading-new)", fontSize: "clamp(28px, 3.5vw, 44px)", fontWeight: 400, color: "#FFFFFF", lineHeight: 1.2, marginBottom: "22px" }}>
                 Living in <em style={{ fontStyle: "italic", color: "#10C4C3" }}>{cfg.name}</em>
               </h2>
-              <p style={{ fontSize: "14px", color: "#4B5563", lineHeight: 1.85, marginBottom: "24px" }}>{cfg.lifestyle}</p>
+              <p style={{ fontSize: "14px", color: "#A9B4C2", lineHeight: 1.85, marginBottom: "24px" }}>{cfg.lifestyle}</p>
               <div className="loc-stats-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
                 {[
                   { icon: "👥", label: "Population",      value: cfg.population },
@@ -403,7 +403,7 @@ export default function CityPage() {
         <section style={{ maxWidth: "1280px", margin: "0 auto", padding: "72px 48px" }}>
           <div style={{ textAlign: "center", marginBottom: "44px" }}>
             <Eyebrow label="Infrastructure" />
-            <h2 style={{ fontFamily: "var(--font-heading-new)", fontSize: "clamp(28px, 3.5vw, 44px)", fontWeight: 400, color: "#020C1C" }}>
+            <h2 style={{ fontFamily: "var(--font-heading-new)", fontSize: "clamp(28px, 3.5vw, 44px)", fontWeight: 400, color: "#FFFFFF" }}>
               Amenities & Infrastructure
             </h2>
           </div>
@@ -447,7 +447,7 @@ export default function CityPage() {
           <div style={{ position: "absolute", inset: 0, backgroundImage: "linear-gradient(rgba(201,168,76,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(201,168,76,0.04) 1px, transparent 1px)", backgroundSize: "52px 52px", pointerEvents: "none" }} />
           <div style={{ position: "absolute", inset: 0, background: "radial-gradient(ellipse 60% 55% at 50% 110%, rgba(201,168,76,0.1) 0%, transparent 55%)", pointerEvents: "none" }} />
           <div style={{ position: "relative", zIndex: 2, maxWidth: "660px", margin: "0 auto", textAlign: "center" }}>
-            <h2 style={{ fontFamily: "var(--font-heading-new)", fontSize: "clamp(34px, 5vw, 56px)", fontWeight: 300, color: "#020C1C", lineHeight: 1.15, marginBottom: "16px" }}>
+            <h2 style={{ fontFamily: "var(--font-heading-new)", fontSize: "clamp(34px, 5vw, 56px)", fontWeight: 300, color: "#FFFFFF", lineHeight: 1.15, marginBottom: "16px" }}>
               Find Your Home<br /><em style={{ fontStyle: "italic", color: "#10C4C3" }}>in {cfg.name}</em>
             </h2>
             <p style={{ fontSize: "15px", color: "rgba(245,242,236,0.5)", lineHeight: 1.75, marginBottom: "36px" }}>

@@ -441,7 +441,7 @@ export default function ComparePage() {
         <section style={{ maxWidth: "1280px", margin: "0 auto", padding: "52px 48px 0" }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "12px", marginBottom: "24px" }}>
             <div>
-              <h2 style={{ fontFamily: "var(--font-heading-new)", fontSize: "26px", fontWeight: 500, color: "#020C1C" }}>Select Properties</h2>
+              <h2 style={{ fontFamily: "var(--font-heading-new)", fontSize: "26px", fontWeight: 500, color: "#FFFFFF" }}>Select Properties</h2>
               <p style={{ fontSize: "12px", color: "#9CA3AF", marginTop: "3px" }}>Choose up to 3 properties to compare</p>
             </div>
             <div style={{ display: "flex", gap: "10px" }}>
@@ -477,7 +477,7 @@ export default function ComparePage() {
                   <div style={{ width: "24px", height: "1.5px", background: "#10C4C3" }} />
                   <span style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.2em", color: "#10C4C3", textTransform: "uppercase" }}>Side-by-Side</span>
                 </div>
-                <h2 style={{ fontFamily: "var(--font-heading-new)", fontSize: "28px", fontWeight: 500, color: "#020C1C" }}>Detailed Comparison</h2>
+                <h2 style={{ fontFamily: "var(--font-heading-new)", fontSize: "28px", fontWeight: 500, color: "#FFFFFF" }}>Detailed Comparison</h2>
               </div>
               <span style={{ fontSize: "12px", color: "#9CA3AF" }}>🏆 = best value in category</span>
             </div>
@@ -581,9 +581,9 @@ export default function ComparePage() {
                 <div style={{ width: "24px", height: "1.5px", background: "#10C4C3" }} />
                 <span style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.2em", color: "#10C4C3", textTransform: "uppercase" }}>Discover More</span>
               </div>
-              <h2 style={{ fontFamily: "var(--font-heading-new)", fontSize: "28px", fontWeight: 500, color: "#020C1C" }}>You Might Also Like</h2>
+              <h2 style={{ fontFamily: "var(--font-heading-new)", fontSize: "28px", fontWeight: 500, color: "#FFFFFF" }}>You Might Also Like</h2>
             </div>
-            <a href="/properties" style={{ fontSize: "13px", fontWeight: 600, color: "#020C1C", textDecoration: "none", display: "flex", alignItems: "center", gap: "6px" }}>
+            <a href="/properties" style={{ fontSize: "13px", fontWeight: 600, color: "#FFFFFF", textDecoration: "none", display: "flex", alignItems: "center", gap: "6px" }}>
               View All
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" /></svg>
             </a>
@@ -599,7 +599,7 @@ export default function ComparePage() {
           <div style={{ position: "absolute", inset: 0, backgroundImage: "linear-gradient(rgba(201,168,76,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(201,168,76,0.04) 1px, transparent 1px)", backgroundSize: "52px 52px", pointerEvents: "none" }} />
           <div style={{ position: "absolute", inset: 0, background: "radial-gradient(ellipse 60% 55% at 50% 110%, rgba(201,168,76,0.1) 0%, transparent 55%)", pointerEvents: "none" }} />
           <div style={{ position: "relative", zIndex: 2, maxWidth: "660px", margin: "0 auto", textAlign: "center" }}>
-            <h2 style={{ fontFamily: "var(--font-heading-new)", fontSize: "clamp(34px, 5vw, 56px)", fontWeight: 300, color: "#020C1C", lineHeight: 1.15, marginBottom: "16px" }}>
+            <h2 style={{ fontFamily: "var(--font-heading-new)", fontSize: "clamp(34px, 5vw, 56px)", fontWeight: 300, color: "#FFFFFF", lineHeight: 1.15, marginBottom: "16px" }}>
               Found Your<br /><em style={{ fontStyle: "italic", color: "#10C4C3" }}>Perfect Match?</em>
             </h2>
             <p style={{ fontSize: "15px", color: "rgba(245,242,236,0.5)", lineHeight: 1.75, marginBottom: "36px" }}>
