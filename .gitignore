@@ -53,3 +53,8 @@ yarn-error.log*
 # output currently untracked in the working tree.
 android/
 node_modules/@capacitor/
+
+# Internal documents and notes — local only, NEVER commit (this repo is public).
+# See CLAUDE.local.md on the founder's machine.
+/docs/
+CLAUDE.local.md

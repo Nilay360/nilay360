@@ -6,12 +6,9 @@ Nilay360 (not "Nivila" — the outer folder name `NIVILA_Premium_Homepage` is le
 separate sister luxury brand). Mass-market PropTech platform for Indian real estate, launching
 from Hyderabad. Live at nilay360.com. Founder / product owner: Vanith Kandre ("Ricky").
 
-Full context lives in three documents. Read the relevant one before starting work, and treat all
-three as snapshots, not live truth:
-- `NILAY360_BLUEPRINT.md` (2026-09-20): schema inventory, features, admin, gaps, route map
-- `NILAY360_APP_DESIGN_BRIEF.md` (2026-09-21): screen-by-screen content/flow spec (~60 screens), REAL vs STUB
-- `docs/NILAY360_MASTER_DOCUMENT.pdf` (2026-09-24): handoff, blockers, Maps phases, reminder list,
-  native-app PRD
+This repository is PUBLIC. Internal notes, current state, blockers, security follow-ups and the
+full project documents live only on the founder's machine: `CLAUDE.local.md` and `docs/`, both
+git-ignored. Never commit them, and never add internal or security-sensitive detail to this file.
 
 ## Standing rules (non-negotiable, every session)
 
@@ -46,7 +43,7 @@ three as snapshots, not live truth:
 
 - Next.js 16.2.9 (App Router, Turbopack), React 19.2.4, TypeScript 5. Read
   `node_modules/next/dist/docs/` for APIs — this is not the Next.js from training data.
-- Supabase (project `xjdarhbzrpybqyqeeshy`) — Postgres, Auth, Storage, RLS everywhere.
+- Supabase — Postgres, Auth, Storage, RLS everywhere.
 - Hosting on Vercel; production branch `main`. `typescript.ignoreBuildErrors: true`, so type errors
   do not block deploys.
 - Tailwind 4, Radix, framer-motion/gsap/lenis, react-hook-form + zod.
@@ -83,29 +80,6 @@ three as snapshots, not live truth:
   shared footer → shared chrome → legal/static pages → marketing → discovery → flows → agent
   workspace → admin last. One commit per phase; `next build` + contrast re-check each time.
 
-## Current state (as of 2026-09-25)
-
-- `main` = `origin/main` = `c41c6d3`.
-- Session work (contact system, Maps phases 3–6 and 8, liveStats resilience, locations/compare
-  live-data fix, forgot-password email, migration 075) is backed up on branch
-  `backup/session-2026-09-24` (`9e9b8d8`). Not merged into `main`.
-- Live `site_contacts` confirmed 2026-09-25: `general` = +91 70933 36360, `customer_care` =
-  +91 72075 45360. 075's header still says "NOT APPLIED" (it is applied).
-
-## Blockers that need the founder (not code)
-
-A. ~~Street View key permission~~ — **RESOLVED 2026-09-25** (`node scripts/check-streetview-permission.mjs`
-   returned OK for Charminar). Note: that script prints the full browser Maps key; don't share raw output.
-B. A Map ID + cloud style profile before migrating `google.maps.Marker` → `AdvancedMarkerElement`
-   (not urgent).
-C. WhatsApp automation is dead in production: `MSG91_WHATSAPP_INTEGRATED_NUMBER` /
-   `MSG91_WHATSAPP_TEMPLATE_NAME` are missing in Vercel. **Moving to sender `917093336360` and
-   template `nilay360_alert` (Utility category)** — replaces `nilay360_notification`. The template
-   takes 2 body variables: `body_1` = recipient name, `body_2` = message (sanitized/capped in
-   `whatsapp.ts`). Sends run via `after()` in all 6 notify-* routes. Keep the "TEMPORARY" logs in
-   `whatsapp.ts` until one real delivery succeeds.
-D. Home router/ISP DNS interference. Rule it out before treating a "0 listings" scare as a site bug.
-
 ## Priorities (the founder picks the order — one at a time)
 
 - `/properties`: remove the dormant legacy `properties` table merge.
@@ -116,10 +90,8 @@ D. Home router/ISP DNS interference. Rule it out before treating a "0 listings" 
 - 1→5 videos per listing (`property_listing_videos`, mirroring `property_floor_plans`). Scoped, not built.
 - Post-property wizard: click-to-jump step indicator.
 - Homepage "Browse Properties" section below the search box.
-- Needs the founder to check first: `pg_policies` check for RLS-only migrations 035/042/045/056 (and
-  073), plus the undocumented `update_admin_all` policy; which `saved_properties` definition is live.
-- Tech debt: `conversations` SELECT policy recursion risk; merge the two profile editors; one
-  consistent sign-in results gate; README rewrite.
+- Tech debt: merge the two profile editors; one consistent sign-in results gate; README rewrite.
+  (Security follow-ups are tracked in `CLAUDE.local.md`.)
 - Unscoped (ask before starting): watermarking, admin bulk media download, Maps Phase 9
   natural-language search.
 - A native app is planned separately (Replit, React Native + Expo) on the **same** Supabase backend.
