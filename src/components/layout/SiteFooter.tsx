@@ -28,7 +28,7 @@ function isHidden(pathname: string): boolean {
 const COLUMNS: { heading: string; links: [string, string][] }[] = [
   { heading: "Properties", links: [["Buy", "/buy"], ["Rent", "/rent"], ["New Projects", "/new-projects"], ["Commercial", "/commercial"], ["Builders", "/builders"], ["Locations", "/locations"], ["Blog", "/blog"]] },
   { heading: "Company", links: [["About Us", "/about"], ["NRI Services", "/nri"], ["Careers", "/careers"], ["Press", "/press"], ["Contact", "/contact"]] },
-  { heading: "Agents", links: [["Our Agents", "/agents"], ["Hyderabad Agents", "/agents?city=Hyderabad"], ["Mumbai Agents", "/agents?city=Mumbai"], ["Bengaluru Agents", "/agents?city=Bengaluru"], ["Become an Agent", "/become-an-agent"]] },
+  { heading: "Agents", links: [["Our Agents", "/agents"], ["Hyderabad Agents", "/agents?city=Hyderabad"], ["Become an Agent", "/become-an-agent"]] },
   { heading: "Tools", links: [["EMI Calculator", "/calculator"], ["Investment Calc", "/investment-calculator"], ["Compare", "/compare"], ["Search", "/search"], ["RERA Guide", "/legal-guide"], ["Safety Guide", "/safety-guide"]] },
   { heading: "Legal", links: [["Privacy Policy", "/privacy"], ["Terms of Service", "/terms"], ["Cookie Policy", "/cookies"], ["Refund Policy", "/refund-policy"], ["Agent Terms", "/agent-terms"], ["Grievance Redressal", "/grievance-redressal"]] },
 ];

@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import Link from "next/link"
-import { Phone, Mail, MessageSquareText, Shield, Lock, Video, Building2, Home, Compass, Info, Newspaper, HelpCircle, Ticket, Handshake, Download, Smartphone, Globe, Headset, Menu, X } from "lucide-react"
+import { Phone, Mail, MapPin, MessageSquareText, Shield, Lock, Video, Building2, Home, Compass, Info, Newspaper, HelpCircle, Ticket, Handshake, Download, Smartphone, Globe, Headset, Menu, X } from "lucide-react"
 import { BRAND } from "@/constants"
 import { useSiteContact } from "@/hooks/useSiteContact"
 import { telHref, waHref } from "@/lib/contactFormat"
@@ -45,6 +45,7 @@ import { telHref, waHref } from "@/lib/contactFormat"
 */
 
 const FEEDBACK_FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLSfVazyCsqQIgzdaqffNM9IPkfub_WmsNT1CNXPDwnD2g2B9cg/viewform?usp=dialog"
+const OFFICE_LOCATION_URL = "https://maps.app.goo.gl/jiGr42DrevGruwnh6"
 const LOGO_SRC = "/brand/Nilay360-09-Photoroom%20(1).png"
 const HERO_BG = "/brand/hero-background.jpg"
 
@@ -339,6 +340,9 @@ export default function ConnectPage() {
               </a>
               <a href={`mailto:${BRAND.email}`} className={`${BTN} connect-glass`} style={{ color: "#fff" }}>
                 <Mail size={18} /> {BRAND.email}
+              </a>
+              <a href={OFFICE_LOCATION_URL} target="_blank" rel="noopener noreferrer" className={`${BTN} connect-glass`} style={{ color: "#fff" }}>
+                <MapPin size={18} /> {BRAND.address}
               </a>
             </div>
             <a
