@@ -66,8 +66,22 @@ three as snapshots, not live truth:
   **+91 70933 36360**.
 - The whole admin panel is one component: `src/app/admin/page.tsx`.
 - `SiteChrome.tsx` is the real live footer; `components/layout/Footer.tsx` is unused.
-- Known and deliberately unfixed: the un-layered CSS reset in `globals.css` zeroes Tailwind spacing
-  sitewide; design-system colour fragmentation.
+- The `globals.css` reset is inside `@layer base` (fixed 2026-08-29), so Tailwind spacing
+  utilities work. Most pages still use inline `style={{}}` objects, not Tailwind classes.
+- Colour system is fragmented: `tailwind.config.ts` colours are dead (Tailwind v4, no `@config`);
+  ~7,400 raw colour literals in `src/`; "gold" constants (`GOLD`, `G.gold`) and `--blue*` vars are
+  actually teal `#10C4C3`. See the colour plan below.
+
+## Colour plan (accepted 2026-09-25)
+
+- Target is a LIGHT theme. Tokens: ink `#020C1C`, teal `#10C4C3`, teal-deep `#087574`,
+  gold `#C9A45C`, gold-text `#8A6A2F`, muted `#475467`, bg `#FFFFFF`, bg-soft `#FAFAF7`,
+  border (e.g. `rgba(2,12,28,0.08)`), danger `#B42318`, success `#067647`, warning `#B54708`.
+- `teal` and `gold` fail as text on white (2.2:1 / 2.4:1): fills, borders and icons only. Text on
+  a teal fill is `ink`, never white. Text colours: ink, muted, teal-deep, gold-text.
+- Order: Step 0 contrast hotfix on the current dark theme → Phase 1 tokens in `globals.css` +
+  shared footer → shared chrome → legal/static pages → marketing → discovery → flows → agent
+  workspace → admin last. One commit per phase; `next build` + contrast re-check each time.
 
 ## Current state (as of 2026-09-25)
 
@@ -75,9 +89,8 @@ three as snapshots, not live truth:
 - Session work (contact system, Maps phases 3–6 and 8, liveStats resilience, locations/compare
   live-data fix, forgot-password email, migration 075) is backed up on branch
   `backup/session-2026-09-24` (`9e9b8d8`). Not merged into `main`.
-- Open: as of 2026-09-25 01:49 IST the live `site_contacts` rows had `general` = +91 72075 45360
-  and `customer_care` = +91 70933 36360 — the reverse of the intended main number above. Needs a
-  data fix the founder runs. 075's header still says "NOT APPLIED" (it is applied).
+- Live `site_contacts` confirmed 2026-09-25: `general` = +91 70933 36360, `customer_care` =
+  +91 72075 45360. 075's header still says "NOT APPLIED" (it is applied).
 
 ## Blockers that need the founder (not code)
 
