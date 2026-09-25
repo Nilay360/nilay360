@@ -395,18 +395,12 @@ function CommercialPageInner() {
           .cm-advantages { padding: 48px 16px !important; }
           .cm-why { padding: 48px 16px !important; }
           .cm-cta { padding: 56px 16px !important; }
-          .cm-footer { padding: 48px 16px 0 !important; }
-          .cm-footer-grid { grid-template-columns: 1fr 1fr !important; gap: 32px !important; }
-        }
-        @media (max-width: 480px) {
-          .cm-footer-grid { grid-template-columns: 1fr !important; }
         }
 
         .type-card:hover {
           box-shadow: 0 16px 48px rgba(0,0,0,0.35) !important;
           transform: translateY(-4px) !important;
         }
-        .footer-link:hover { color: #020C1C !important; }
         .nav-link:hover { color: #10C4C3 !important; }
         .cta-browse:hover { opacity: 0.88; }
         .cta-talk:hover { background: rgba(255,255,255,0.1) !important; }
@@ -1143,139 +1137,6 @@ function CommercialPageInner() {
         </div>
       </section>
 
-      {/* ── FOOTER ───────────────────────────────────────────────────── */}
-      <footer className="cm-footer" style={{
-        background: "#05080C",
-        padding: "60px 80px 0",
-      }}>
-        {/* Logo + tagline */}
-        <div style={{ marginBottom: 48 }}>
-          <p style={{
-            fontFamily: "var(--font-support-new)",
-            fontSize: 24,
-            fontWeight: 600,
-            color: "#10C4C3",
-            letterSpacing: 2,
-            marginBottom: 8,
-          }}>
-            Nilay 360 ·
-          </p>
-          <p style={{
-            fontFamily: "var(--font-body-new)",
-            fontSize: 13,
-            color: "rgba(245,242,236,0.5)",
-            maxWidth: 260,
-            lineHeight: 1.6,
-          }}>
-            Premium real estate experiences for discerning buyers and investors across India.
-          </p>
-        </div>
-
-        {/* 4-column grid */}
-        <div className="cm-footer-grid" style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(4, 1fr)",
-          gap: 40,
-          marginBottom: 48,
-        }}>
-          {[
-            {
-              heading: "Properties",
-              links: [
-                { label: "Buy", href: "/buy" },
-                { label: "Rent", href: "/rent" },
-                { label: "New Projects", href: "/new-projects" },
-                { label: "Commercial", href: "/commercial" },
-                { label: "Builders", href: "/builders" },
-                { label: "Blog", href: "/blog" },
-              ],
-            },
-            {
-              heading: "Company",
-              links: [
-                { label: "About Us", href: "/about" },
-                { label: "Our Agents", href: "/agents" },
-                { label: "NRI Services", href: "/nri" },
-                { label: "Careers", href: "/careers" },
-                { label: "Contact", href: "/contact" },
-              ],
-            },
-            {
-              heading: "Tools",
-              links: [
-                { label: "EMI Calculator", href: "/calculator" },
-                { label: "Compare", href: "/compare" },
-                { label: "Search", href: "/search" },
-                { label: "RERA Guide", href: "/legal-guide" },
-                { label: "Safety Guide", href: "/safety-guide" },
-              ],
-            },
-            {
-              heading: "Legal",
-              links: [
-                { label: "Privacy Policy", href: "/privacy" },
-                { label: "Terms", href: "/terms" },
-                { label: "Cookie Policy", href: "/cookies" },
-                { label: "RERA Guide", href: "/legal-guide" },
-                { label: "Agent Terms", href: "/agent-terms" },
-                { label: "Grievance Redressal", href: "/grievance-redressal" },
-              ],
-            },
-          ].map((col) => (
-            <div key={col.heading}>
-              <p style={{
-                fontFamily: "var(--font-support-new)",
-                fontSize: 11,
-                color: "#10C4C3",
-                letterSpacing: 2,
-                textTransform: "uppercase",
-                fontWeight: 600,
-                marginBottom: 20,
-              }}>
-                {col.heading}
-              </p>
-              <ul style={{ listStyle: "none" }}>
-                {col.links.map((link) => (
-                  <li key={link.href} style={{ marginBottom: 12 }}>
-                    <Link
-                      href={link.href}
-                      className="footer-link"
-                      style={{
-                        fontFamily: "var(--font-body-new)",
-                        fontSize: 14,
-                        color: "rgba(245,242,236,0.6)",
-                        textDecoration: "none",
-                        transition: "color 0.2s",
-                      }}
-                    >
-                      {link.label}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
-        </div>
-
-        {/* Bottom bar */}
-        <div style={{
-          borderTop: "1px solid rgba(255,255,255,0.1)",
-          padding: "24px 0 32px",
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          flexWrap: "wrap",
-          gap: 12,
-        }}>
-          <p style={{
-            fontFamily: "var(--font-body-new)",
-            fontSize: 13,
-            color: "rgba(245,242,236,0.4)",
-          }}>
-            © 2025 Nilay 360. All rights reserved.
-          </p>
-        </div>
-      </footer>
     </>
   );
 }

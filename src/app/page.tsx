@@ -597,13 +597,9 @@ export default function HomePage() {
           .cta-section { padding: clamp(48px,10vw,72px) clamp(16px,4vw,24px) !important; text-align: center !important; }
           .cta-heading { font-size: clamp(24px,6vw,36px) !important; }
           .cta-buttons { flex-direction: column !important; align-items: center !important; gap: 12px !important; }
-          .footer-section { padding: clamp(36px,8vw,56px) clamp(16px,4vw,24px) !important; }
-          .footer-grid { grid-template-columns: repeat(2,1fr) !important; gap: 24px !important; }
-          .footer-bottom { flex-direction: column !important; text-align: center !important; gap: 8px !important; }
         }
 
         @media (max-width: 480px) {
-          .footer-grid { grid-template-columns: 1fr !important; gap: 20px !important; }
           .cta-heading { font-size: clamp(22px,6vw,30px) !important; }
         }
       `}</style>
@@ -1393,54 +1389,6 @@ export default function HomePage() {
         </Reveal>
       </section>
 
-      {/* ══════════ SECTION 11 — FOOTER ══════════ */}
-      <footer className="footer-section" style={{background:G.black, padding:"56px 56px 28px", color:"rgba(255,255,255,0.55)"}}>
-        <div style={{maxWidth:"min(1280px, 100%)", margin:"0 auto", width:"100%", boxSizing:"border-box"}}>
-          <div className="footer-grid" style={{display:"grid", gridTemplateColumns:"2fr 1fr 1fr 1fr 1fr", gap:40, marginBottom:48}}>
-            {/* Brand */}
-            <div>
-              <a href="/" style={{display:"inline-block", marginBottom:12}}>
-                <img src="/brand/Nilay360-09-Photoroom%20(1).png" alt="Nilay 360" style={{ height: 32, width: 'auto', objectFit: 'contain' }} />
-              </a>
-              <p style={{fontSize:13, lineHeight:1.75, maxWidth:240, marginBottom:20}}>India's premium real estate platform connecting discerning buyers with exceptional properties.</p>
-              <div style={{display:"flex", gap:10}}>
-                {[
-                  {href:"https://www.instagram.com/nilay360_/", title:"Follow on Instagram", hoverBg:"rgba(225,48,108,0.15)", d:"M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"},
-                  {href:"https://www.linkedin.com/company/nilay360", title:"Connect on LinkedIn", hoverBg:"rgba(0,119,181,0.15)", d:"M4.98 3.5c0 1.381-1.11 2.5-2.48 2.5s-2.48-1.119-2.48-2.5c0-1.38 1.11-2.5 2.48-2.5s2.48 1.12 2.48 2.5zm.02 4.5h-5v16h5v-16zm7.982 0h-4.968v16h4.969v-8.399c0-4.67 6.029-5.052 6.029 0v8.399h4.988v-10.131c0-7.88-8.922-7.593-11.018-3.714v-2.155z"},
-                  {href:"https://www.youtube.com/@nilay360.digital", title:"Watch on YouTube", hoverBg:"rgba(255,0,0,0.15)", d:"M23.498 6.186a3.016 3.016 0 00-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 002.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 002.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"},
-                ].map(s=>(
-                  <a key={s.href} href={s.href} title={s.title} target="_blank" rel="noopener noreferrer"
-                    style={{width:36, height:36, borderRadius:10, background:"rgba(255,255,255,0.07)", display:"flex", alignItems:"center", justifyContent:"center", transition:"background 0.15s"}}
-                    onMouseOver={e=>(e.currentTarget.style.background=s.hoverBg)}
-                    onMouseOut={e=>(e.currentTarget.style.background="rgba(255,255,255,0.07)")}>
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="rgba(255,255,255,0.6)"><path d={s.d} /></svg>
-                  </a>
-                ))}
-              </div>
-            </div>
-            {/* Cols */}
-            {[
-              {heading:"Properties", links:[["Buy","/buy"],["Rent","/rent"],["New Projects","/new-projects"],["Commercial","/commercial"],["Builders","/builders"],["Blog","/blog"]]},
-              {heading:"Company",    links:[["About Us","/about"],["Our Agents","/agents"],["NRI Services","/nri"],["Careers","/careers"],["Contact","/contact"]]},
-              {heading:"Tools",      links:[["EMI Calculator","/calculator"],["Compare","/compare"],["Search","/search"],["RERA Guide","/legal-guide"],["Safety Guide","/safety-guide"]]},
-              {heading:"Legal",      links:[["Privacy Policy","/privacy"],["Terms of Service","/terms"],["Cookie Policy","/cookies"],["RERA Guide","/legal-guide"],["Agent Terms","/agent-terms"],["Grievance Redressal","/grievance-redressal"]]},
-            ].map(col=>(
-              <div key={col.heading}>
-                <h4 style={{fontSize:10, fontWeight:700, color:"#fff", letterSpacing:"0.15em", textTransform:"uppercase", marginBottom:16}}>{col.heading}</h4>
-                {col.links.map(([l,h])=>(
-                  <a key={l} href={h} style={{display:"block", color:"rgba(255,255,255,0.5)", fontSize:13, marginBottom:10, transition:"color 0.15s"}}
-                    onMouseOver={e=>(e.currentTarget.style.color=G.gold)} onMouseOut={e=>(e.currentTarget.style.color="rgba(255,255,255,0.5)")}>{l}</a>
-                ))}
-              </div>
-            ))}
-          </div>
-
-          <div className="footer-bottom" style={{borderTop:"1px solid rgba(255,255,255,0.07)", paddingTop:24, display:"flex", justifyContent:"space-between", alignItems:"center", flexWrap:"wrap", gap:12}}>
-            <p style={{fontSize:12}}>© {new Date().getFullYear()} Nilay 360 · All rights reserved.</p>
-            <p style={{fontSize:12}}>All listings subject to availability. Prices are indicative. Verify with RERA before purchase.</p>
-          </div>
-        </div>
-      </footer>
     </>
   );
 }

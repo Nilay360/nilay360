@@ -16,6 +16,7 @@ import AuthModal from "@/components/auth/AuthModal"
 import ProfileCompletionModal from "@/components/auth/ProfileCompletionModal"
 import { PostHogProvider, PostHogPageView } from "@/components/providers/PostHogProvider"
 import FloatingContactMenu from "@/components/contact/FloatingContactMenu"
+import SiteFooter from "@/components/layout/SiteFooter"
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://nilay360.com"),
@@ -78,6 +79,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 <PostHogPageView />
               </Suspense>
               {children}
+              <SiteFooter />
               <CompareBar />
               <FloatingContactMenu />
             </CompareProvider>

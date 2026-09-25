@@ -8,7 +8,6 @@ import { createClient } from "@/lib/supabase/client";
 const DARK_GREEN = "#020C1C";
 const GOLD = "#10C4C3";
 const IVORY = "#020C1C";
-const FOOTER_BG = "#05080C";
 
 // ─── Developer data ───────────────────────────────────────────────────────────
 // No real developer/builder table exists yet — this page has no data source
@@ -444,17 +443,6 @@ export default function BuildersPage() {
           transition: color 0.2s;
         }
         .nav-link:hover { color: ${GOLD}; }
-
-        .footer-link {
-          font-family: var(--font-body-new);
-          font-size: 14px;
-          color: rgba(245,242,236,0.6);
-          text-decoration: none;
-          display: block;
-          margin-bottom: 10px;
-          transition: color 0.2s;
-        }
-        .footer-link:hover { color: ${IVORY}; }
 
         .step-card:not(:last-child)::after {
           content: '';
@@ -1199,158 +1187,6 @@ export default function BuildersPage() {
       {/* ══════════════════════════════════════════════════════
           8. FOOTER
       ══════════════════════════════════════════════════════ */}
-      <footer style={{ background: FOOTER_BG }}>
-        <div
-          className="bd-footer-grid"
-          style={{
-            maxWidth: 1200,
-            margin: "0 auto",
-            padding: "60px 80px 0",
-            display: "grid",
-            gridTemplateColumns: "repeat(4, 1fr)",
-            gap: 40,
-          }}
-        >
-          {/* Column 1 */}
-          <div>
-            <div
-              style={{
-                fontFamily: "var(--font-support-new)",
-                fontSize: 11,
-                fontWeight: 700,
-                color: GOLD,
-                letterSpacing: "2px",
-                textTransform: "uppercase",
-                marginBottom: 20,
-              }}
-            >
-              Properties
-            </div>
-            {[
-              { label: "Buy", href: "/buy" },
-              { label: "Rent", href: "/rent" },
-              { label: "New Projects", href: "/new-projects" },
-              { label: "Commercial", href: "/commercial" },
-              { label: "Builders", href: "/builders" },
-              { label: "Blog", href: "/blog" },
-            ].map(({ label, href }) => (
-              <Link key={label} href={href} className="footer-link">
-                {label}
-              </Link>
-            ))}
-          </div>
-
-          {/* Column 2 */}
-          <div>
-            <div
-              style={{
-                fontFamily: "var(--font-support-new)",
-                fontSize: 11,
-                fontWeight: 700,
-                color: GOLD,
-                letterSpacing: "2px",
-                textTransform: "uppercase",
-                marginBottom: 20,
-              }}
-            >
-              Company
-            </div>
-            {[
-              { label: "About Us", href: "/about" },
-              { label: "Our Agents", href: "/agents" },
-              { label: "NRI Services", href: "/nri" },
-              { label: "Careers", href: "/careers" },
-              { label: "Contact", href: "/contact" },
-            ].map(({ label, href }) => (
-              <Link key={label} href={href} className="footer-link">
-                {label}
-              </Link>
-            ))}
-          </div>
-
-          {/* Column 3 */}
-          <div>
-            <div
-              style={{
-                fontFamily: "var(--font-support-new)",
-                fontSize: 11,
-                fontWeight: 700,
-                color: GOLD,
-                letterSpacing: "2px",
-                textTransform: "uppercase",
-                marginBottom: 20,
-              }}
-            >
-              Tools
-            </div>
-            {[
-              { label: "EMI Calculator", href: "/calculator" },
-              { label: "Compare", href: "/compare" },
-              { label: "Search", href: "/search" },
-              { label: "RERA Guide", href: "/legal-guide" },
-              { label: "Safety Guide", href: "/safety-guide" },
-            ].map(({ label, href }) => (
-              <Link key={label} href={href} className="footer-link">
-                {label}
-              </Link>
-            ))}
-          </div>
-
-          {/* Column 4 */}
-          <div>
-            <div
-              style={{
-                fontFamily: "var(--font-support-new)",
-                fontSize: 11,
-                fontWeight: 700,
-                color: GOLD,
-                letterSpacing: "2px",
-                textTransform: "uppercase",
-                marginBottom: 20,
-              }}
-            >
-              Legal
-            </div>
-            {[
-              { label: "Privacy Policy", href: "/privacy" },
-              { label: "Terms", href: "/terms" },
-              { label: "Cookie Policy", href: "/cookies" },
-              { label: "RERA Guide", href: "/legal-guide" },
-              { label: "Agent Terms", href: "/agent-terms" },
-              { label: "Grievance Redressal", href: "/grievance-redressal" },
-            ].map(({ label, href }) => (
-              <Link key={label} href={href} className="footer-link">
-                {label}
-              </Link>
-            ))}
-          </div>
-        </div>
-
-        {/* Bottom bar */}
-        <div
-          className="bd-footer-bottom"
-          style={{
-            maxWidth: 1200,
-            margin: "0 auto",
-            padding: "28px 80px 40px",
-            borderTop: "1px solid rgba(255,255,255,0.1)",
-            marginTop: 48,
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-          }}
-        >
-          <span
-            style={{
-              fontFamily: "var(--font-body-new)",
-              fontSize: 13,
-              color: "rgba(245,242,236,0.4)",
-            }}
-          >
-            © 2025 Nilay 360. All rights reserved.
-          </span>
-        </div>
-      </footer>
     </>
   );
 }

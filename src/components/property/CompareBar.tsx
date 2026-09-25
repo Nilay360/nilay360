@@ -1,4 +1,5 @@
 ﻿"use client";
+import { useCallback, useEffect, useRef } from "react";
 import { useCompare, COMPARE_MAX } from "@/context/CompareContext";
 import { optimizedImageUrl } from "@/lib/image-url";
 
@@ -8,10 +9,29 @@ const G = { dark: "#020C1C", gold: "#10C4C3" };
 // Hidden when nothing is selected. Mounted globally in the root layout.
 export default function CompareBar() {
   const { items, count, remove, clear } = useCompare();
+
+  // Publish the bar's live height (it wraps to ~125px+ on phones) so the
+  // site-wide footer can pad exactly enough to stay readable above it.
+  const observer = useRef<ResizeObserver | null>(null);
+  const barRef = useCallback((el: HTMLDivElement | null) => {
+    observer.current?.disconnect();
+    observer.current = null;
+    const root = document.documentElement;
+    if (!el) { root.style.removeProperty("--compare-bar-height"); return; }
+    observer.current = new ResizeObserver(() => {
+      root.style.setProperty("--compare-bar-height", `${Math.ceil(el.getBoundingClientRect().height)}px`);
+    });
+    observer.current.observe(el);
+  }, []);
+  useEffect(() => () => {
+    observer.current?.disconnect();
+    document.documentElement.style.removeProperty("--compare-bar-height");
+  }, []);
+
   if (count === 0) return null;
 
   return (
-    <div style={{ position: "fixed", bottom: 0, left: 0, right: 0, zIndex: 250, background: G.dark, borderTop: "1px solid rgba(201,168,76,0.3)", padding: "14px 24px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: "16px", flexWrap: "wrap", boxShadow: "0 -8px 40px rgba(0,0,0,0.3)", fontFamily: "var(--font-body-new)" }}>
+    <div ref={barRef} style={{ position: "fixed", bottom: 0, left: 0, right: 0, zIndex: 250, background: G.dark, borderTop: "1px solid rgba(201,168,76,0.3)", padding: "14px 24px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: "16px", flexWrap: "wrap", boxShadow: "0 -8px 40px rgba(0,0,0,0.3)", fontFamily: "var(--font-body-new)" }}>
       <div style={{ display: "flex", alignItems: "center", gap: "14px", flexWrap: "wrap", minWidth: 0 }}>
         <span style={{ fontSize: "12px", color: "rgba(245,242,236,0.6)", whiteSpace: "nowrap" }}>
           Comparing <strong style={{ color: G.gold }}>{count}</strong> / {COMPARE_MAX}

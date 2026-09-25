@@ -362,12 +362,9 @@ export default function AgentProfilePage() {
           .as-left { width: 100% !important; }
           .as-right { width: 100% !important; position: static !important; }
           .as-listings-grid { grid-template-columns: 1fr !important; }
-          .as-footer { padding: 48px 16px 0 !important; }
-          .as-footer-grid { grid-template-columns: 1fr 1fr !important; gap: 32px !important; }
         }
         @media (max-width: 480px) {
           .as-stats { grid-template-columns: 1fr 1fr !important; }
-          .as-footer-grid { grid-template-columns: 1fr !important; }
           .as-hero-actions a, .as-hero-actions button { flex: 1 1 100% !important; }
         }
       `}</style>
@@ -617,32 +614,6 @@ export default function AgentProfilePage() {
           </div>
         </div>
 
-        {/* ── FOOTER ─────────────────────────────────────────── */}
-        <footer className="as-footer" style={{ background: "#05080C", padding: "72px 48px 0" }}>
-          <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
-            <div className="as-footer-grid" style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1fr", gap: "48px", paddingBottom: "56px", borderBottom: "1px solid rgba(245,242,236,0.06)" }}>
-              <div>
-                <div style={{ fontFamily: "var(--font-support-new)", fontSize: "18px", fontWeight: 600, color: "#fff", letterSpacing: "0.16em", marginBottom: "14px" }}>Nilay 360 <span style={{ color: "#10C4C3" }}>·</span></div>
-                <p style={{ fontSize: "13px", color: "rgba(245,242,236,0.35)", lineHeight: 1.75, maxWidth: "280px" }}>India's premium real estate platform connecting discerning buyers with exceptional properties.</p>
-              </div>
-              {[
-                { heading: "Find Agents", links: [["All Agents","/agents"],["Join Network","/become-an-agent"]] },
-                { heading: "Company",     links: [["About Us","/about"],["New Projects","/new-projects"],["NRI Services","/nri"],["Contact","/contact"]] },
-                { heading: "Tools",       links: [["EMI Calculator","/calculator"],["Compare","/compare"],["Search","/search"],["Locations","/locations"]] },
-              ].map(col => (
-                <div key={col.heading}>
-                  <h4 style={{ fontSize: "11px", fontWeight: 700, letterSpacing: "0.16em", color: "rgba(245,242,236,0.3)", textTransform: "uppercase", marginBottom: "18px" }}>{col.heading}</h4>
-                  <div style={{ display: "flex", flexDirection: "column", gap: "11px" }}>
-                    {col.links.map(([l,h]) => <a key={l} href={h} style={{ fontSize: "13px", color: "rgba(245,242,236,0.45)", textDecoration: "none" }}>{l}</a>)}
-                  </div>
-                </div>
-              ))}
-            </div>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "22px 0", flexWrap: "wrap", gap: "12px" }}>
-              <p style={{ fontSize: "12px", color: "rgba(245,242,236,0.2)" }}>© 2025 Nilay 360. All rights reserved.</p>
-            </div>
-          </div>
-        </footer>
       </div>
     </>
   );

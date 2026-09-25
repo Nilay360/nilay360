@@ -326,6 +326,23 @@ function SearchPageInner() {
   const [loading, setLoading] = useState(true);
   const [savedIds, setSavedIds] = useState<Set<string>>(new Set());
   const [compareIds, setCompareIds] = useState<Set<string>>(new Set());
+  // The fixed compare bar below (shown at 2+ selections) would cover the
+  // bottom of the site-wide footer — publish its live height so SiteFooter pads.
+  const compareBarObserver = useRef<ResizeObserver | null>(null);
+  const compareBarRef = useCallback((el: HTMLDivElement | null) => {
+    compareBarObserver.current?.disconnect();
+    compareBarObserver.current = null;
+    const root = document.documentElement;
+    if (!el) { root.style.removeProperty("--bottom-bar-offset"); return; }
+    compareBarObserver.current = new ResizeObserver(() => {
+      root.style.setProperty("--bottom-bar-offset", `${Math.ceil(el.getBoundingClientRect().height)}px`);
+    });
+    compareBarObserver.current.observe(el);
+  }, []);
+  useEffect(() => () => {
+    compareBarObserver.current?.disconnect();
+    document.documentElement.style.removeProperty("--bottom-bar-offset");
+  }, []);
   const [showSaveModal, setShowSaveModal] = useState(false);
   const [saveSearchName, setSaveSearchName] = useState("");
   const [savedSearches, setSavedSearches] = useState<string[]>([]);
@@ -1100,7 +1117,7 @@ function SearchPageInner() {
 
         {/* ── COMPARE BAR ── */}
         {compareIds.size >= 2 && (
-          <div style={{ position: "fixed", bottom: 0, left: 0, right: 0, zIndex: 200, background: "#020C1C", borderTop: "1px solid rgba(16,196,195,0.3)", padding: "16px 48px", display: "flex", alignItems: "center", justifyContent: "space-between", animation: "slideUp 0.25s ease-out", boxShadow: "0 -8px 40px rgba(0,0,0,0.3)" }}>
+          <div ref={compareBarRef} style={{ position: "fixed", bottom: 0, left: 0, right: 0, zIndex: 200, background: "#020C1C", borderTop: "1px solid rgba(16,196,195,0.3)", padding: "16px 48px", display: "flex", alignItems: "center", justifyContent: "space-between", animation: "slideUp 0.25s ease-out", boxShadow: "0 -8px 40px rgba(0,0,0,0.3)" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
             <span style={{ fontSize: "13px", color: "rgba(255,255,255,0.6)" }}>Comparing</span>
             <div style={{ display: "flex", gap: "10px" }}>

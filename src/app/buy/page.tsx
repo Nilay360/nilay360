@@ -123,12 +123,6 @@ function PropertyCard({ p }: { p: Property }) {
 }
 
 // ── Footer data ───────────────────────────────────────────────
-const FOOTER_COLS = [
-  { heading: "Properties", links: [["Buy","/buy"],["Rent","/rent"],["New Projects","/new-projects"],["Commercial","/commercial"],["Builders","/builders"],["Blog","/blog"]] },
-  { heading: "Company",    links: [["About Us","/about"],["Our Agents","/agents"],["NRI Services","/nri"],["Careers","/careers"],["Contact","/contact"]] },
-  { heading: "Tools",      links: [["EMI Calculator","/calculator"],["Compare","/compare"],["Search","/search"],["RERA Guide","/legal-guide"],["Safety Guide","/safety-guide"]] },
-  { heading: "Legal",      links: [["Privacy Policy","/privacy"],["Terms of Service","/terms"],["Cookie Policy","/cookies"],["RERA Guide","/legal-guide"],["Agent Terms","/agent-terms"],["Grievance Redressal","/grievance-redressal"]] },
-];
 
 // Sale is currently Hyderabad-only. A non-Hyderabad city reaching this page
 // (bookmark, old link, typed URL) should show an honest message, not a
@@ -228,12 +222,9 @@ function BuyPageInner() {
           .buy-why { padding: 48px 16px !important; }
           .buy-why-grid { grid-template-columns: repeat(2,1fr) !important; gap: 16px !important; }
           .buy-cta { padding: 48px 16px !important; }
-          .buy-footer { padding: 48px 16px 0 !important; }
-          .buy-footer-grid { grid-template-columns: 1fr 1fr !important; gap: 32px !important; }
         }
         @media (max-width: 480px) {
           .buy-why-grid { grid-template-columns: 1fr !important; }
-          .buy-footer-grid { grid-template-columns: 1fr !important; }
         }
       `}</style>
 
@@ -484,39 +475,6 @@ function BuyPageInner() {
           </div>
         </section>
 
-        {/* ── FOOTER ───────────────────────────────────────────── */}
-        <footer className="buy-footer" style={{ background: "#05080C", padding: "72px 48px 0" }}>
-          <div style={{ maxWidth: "1280px", margin: "0 auto" }}>
-            <div className="buy-footer-grid" style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1fr 1fr", gap: "40px", paddingBottom: "56px", borderBottom: "1px solid rgba(245,242,236,0.06)" }}>
-              <div>
-                <div style={{ fontFamily: "var(--font-support-new)", fontSize: "18px", fontWeight: 600, color: "#fff", letterSpacing: "0.16em", marginBottom: "14px" }}>Nilay 360 <span style={{ color: "#10C4C3" }}>·</span></div>
-                <p style={{ fontSize: "13px", color: "rgba(245,242,236,0.35)", lineHeight: 1.75, maxWidth: "260px", marginBottom: "20px" }}>India's premium real estate platform connecting discerning buyers with exceptional properties.</p>
-                <div style={{ display: "flex", gap: "10px" }}>
-                  {[
-                    { s: "IN", href: "https://www.instagram.com/nilay360_/" },
-                    { s: "LI", href: "https://linkedin.com/company/nilay360" },
-                    { s: "YT", href: "https://www.youtube.com/@nilay360.digital" },
-                  ].map(({ s, href }) => (
-                    <a key={s} href={href} target="_blank" rel="noopener noreferrer" aria-label={s} style={{ width: "34px", height: "34px", borderRadius: "8px", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.07)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "10px", color: "rgba(255,255,255,0.35)", fontWeight: 700, textDecoration: "none" }}>{s}</a>
-                  ))}
-                </div>
-              </div>
-              {FOOTER_COLS.map(col => (
-                <div key={col.heading}>
-                  <h4 style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.16em", color: "rgba(245,242,236,0.28)", textTransform: "uppercase", marginBottom: "18px" }}>{col.heading}</h4>
-                  <div style={{ display: "flex", flexDirection: "column", gap: "11px" }}>
-                    {col.links.map(([l, h]) => (
-                      <a key={l} href={h} style={{ fontSize: "13px", color: "rgba(245,242,236,0.45)", textDecoration: "none" }}>{l}</a>
-                    ))}
-                  </div>
-                </div>
-              ))}
-            </div>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "22px 0", flexWrap: "wrap", gap: "12px" }}>
-              <p style={{ fontSize: "12px", color: "rgba(245,242,236,0.2)" }}>© 2025 Nilay 360. All rights reserved.</p>
-            </div>
-          </div>
-        </footer>
 
       </div>
     </>

@@ -158,7 +158,6 @@ export default function BlogPage() {
           .bl-layout { flex-direction: column !important; padding: 32px 16px 60px !important; gap: 24px !important; }
           .bl-articles { flex: none !important; width: 100% !important; }
           .bl-sidebar { flex: none !important; width: 100% !important; position: static !important; top: auto !important; }
-          .bl-footer { padding: 32px 16px !important; }
         }
       `}</style>
 
@@ -402,16 +401,6 @@ export default function BlogPage() {
           </aside>
         </section>
 
-        {/* ── FOOTER BAND ── */}
-        <div className="bl-footer" style={{ background: "#020C1C", borderTop: "1px solid rgba(201,168,76,0.12)", padding: "32px 48px", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "16px" }}>
-          <span style={{ fontFamily: "var(--font-support-new)", fontSize: "14px", fontWeight: 600, color: "#fff", letterSpacing: "0.16em" }}>Nilay 360 <span style={{ color: "#10C4C3" }}>·</span></span>
-          <p style={{ fontSize: "12px", color: "rgba(245,242,236,0.3)" }}>© 2025 Nilay 360. Premium Real Estate Intelligence.</p>
-          <div style={{ display: "flex", gap: "20px" }}>
-            {[["Privacy Policy","/privacy"],["Terms of Service","/terms"],["Contact","/contact"]].map(([l,h]) => (
-              <a key={l} href={h} style={{ fontSize: "12px", color: "rgba(245,242,236,0.35)", textDecoration: "none" }}>{l}</a>
-            ))}
-          </div>
-        </div>
 
       </div>
     </>

@@ -1,9 +1,9 @@
-﻿/* Shared Nilay 360 navbar + footer + page shell.
-   Navbar and Footer here are rendered only by PageShell (secondary chrome for
-   placeholder / content pages). The root layout supplies the primary chrome.
+﻿/* Shared Nilay 360 navbar + page shell.
+   Navbar here is rendered only by PageShell (secondary chrome for
+   placeholder / content pages). The root layout supplies the primary chrome,
+   including the site-wide footer (src/components/layout/SiteFooter.tsx).
    Server component (no client state) — safe to import anywhere. */
 import type { ReactNode } from "react";
-import { FooterPhone } from "./FooterPhone";
 
 const NAV = [
   ["Buy","/buy"],["Rent","/rent"],["New Projects","/new-projects"],
@@ -32,55 +32,6 @@ export function Navbar() {
   );
 }
 
-export function Footer() {
-  const cols = [
-    { heading:"Properties", links:[["Buy","/buy"],["Rent","/rent"],["New Projects","/new-projects"],["Commercial","/commercial"],["Builders","/builders"],["Blog","/blog"]] },
-    { heading:"Company",    links:[["About Us","/about"],["Our Agents","/agents"],["NRI Services","/nri"],["Careers","/careers"],["Press","/press"],["Contact","/contact"]] },
-    { heading:"Tools",      links:[["EMI Calculator","/calculator"],["Investment Calc","/investment-calculator"],["Compare","/compare"],["Search","/search"],["RERA Guide","/legal-guide"],["Safety Guide","/safety-guide"]] },
-    { heading:"Legal",      links:[["Privacy Policy","/privacy"],["Terms of Service","/terms"],["Cookie Policy","/cookies"],["Refund Policy","/refund-policy"],["Agent Terms","/agent-terms"],["Grievance Redressal","/grievance-redressal"]] },
-  ];
-  return (
-    <footer className="sc-footer" style={{ background:"#020C1C", padding:"56px 56px 28px", color:"rgba(255,255,255,0.55)" }}>
-      <div style={{ maxWidth:1280, margin:"0 auto" }}>
-        <div className="sc-footer-grid" style={{ display:"grid", gridTemplateColumns:"2fr 1fr 1fr 1fr 1fr", gap:40, marginBottom:48 }}>
-          <div>
-            <a href="/" style={{ display:"inline-block", marginBottom:12 }}>
-              <img src="/brand/Nilay360-09-Photoroom%20(1).png" alt="Nilay 360" style={{ height: 32, width: 'auto', objectFit: 'contain' }} />
-            </a>
-            <p style={{ fontSize:13, lineHeight:1.75, maxWidth:240, marginBottom:20 }}>India&apos;s premium real estate platform connecting discerning buyers with exceptional properties.</p>
-            <FooterPhone />
-            <div style={{ display:"flex", gap:10 }}>
-              {[
-                { label:"Instagram", icon:"IG", href:"https://www.instagram.com/nilay360_/" },
-                { label:"LinkedIn",  icon:"LI", href:"https://linkedin.com/company/nilay360" },
-                { label:"Facebook",  icon:"FB", href:"https://facebook.com/nilay360" },
-                { label:"YouTube",   icon:"YT", href:"https://www.youtube.com/@nilay360.digital" },
-              ].map(s => (
-                <a key={s.label} href={s.href} aria-label={s.label} target="_blank" rel="noopener noreferrer"
-                  style={{ width:32, height:32, borderRadius:8, border:"1px solid rgba(255,255,255,0.1)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:10, fontWeight:700, color:"rgba(255,255,255,0.5)", textDecoration:"none" }}>
-                  {s.icon}
-                </a>
-              ))}
-            </div>
-          </div>
-          {cols.map(col => (
-            <div key={col.heading}>
-              <h4 style={{ fontSize:10, fontWeight:700, color:"#FFFFFF", letterSpacing:"0.15em", textTransform:"uppercase", marginBottom:16 }}>{col.heading}</h4>
-              {col.links.map(([l,h]) => (
-                <a key={l} href={h} style={{ display:"block", color:"rgba(255,255,255,0.5)", fontSize:13, marginBottom:10 }}>{l}</a>
-              ))}
-            </div>
-          ))}
-        </div>
-        <div className="sc-footer-bottom" style={{ borderTop:"1px solid rgba(255,255,255,0.08)", paddingTop:24, display:"flex", justifyContent:"space-between", alignItems:"center", flexWrap:"wrap", gap:12 }}>
-          <p style={{ fontSize:12 }}>© {new Date().getFullYear()} Nilay 360 · All rights reserved.</p>
-          <p style={{ fontSize:12 }}>All listings subject to availability. Verify with RERA before purchase.</p>
-        </div>
-      </div>
-    </footer>
-  );
-}
-
 /* Full page shell: fonts + navbar + hero + body + footer.
    `bullets` renders a feature/coming-soon list; `children` adds custom content. */
 export function PageShell({
@@ -91,7 +42,7 @@ export function PageShell({
 }) {
   return (
     <>
-      <style>{`*{box-sizing:border-box;margin:0;padding:0}body{font-family:var(--font-body-new);background:#020C1C;color:#FFFFFF}a{text-decoration:none;color:inherit}@media(max-width:820px){.nv-center{display:none!important}}@media(max-width:768px){.sc-nav{padding:0 16px!important}.sc-nav-actions{gap:8px!important}.sc-hero{padding:90px 16px 48px!important}.sc-body{padding:32px 16px!important}.sc-bullets{grid-template-columns:1fr!important;gap:12px!important}.sc-cta-banner{padding:28px 20px!important;flex-direction:column!important;gap:16px!important}.sc-footer{padding:48px 16px 24px!important}.sc-footer-grid{grid-template-columns:1fr 1fr!important;gap:28px!important}.sc-footer-bottom{flex-direction:column!important;text-align:center!important;gap:8px!important}}@media(max-width:480px){.sc-footer-grid{grid-template-columns:1fr!important}.sc-bullets{grid-template-columns:1fr!important}}`}</style>
+      <style>{`*{box-sizing:border-box;margin:0;padding:0}body{font-family:var(--font-body-new);background:#020C1C;color:#FFFFFF}a{text-decoration:none;color:inherit}@media(max-width:820px){.nv-center{display:none!important}}@media(max-width:768px){.sc-nav{padding:0 16px!important}.sc-nav-actions{gap:8px!important}.sc-hero{padding:90px 16px 48px!important}.sc-body{padding:32px 16px!important}.sc-bullets{grid-template-columns:1fr!important;gap:12px!important}.sc-cta-banner{padding:28px 20px!important;flex-direction:column!important;gap:16px!important}}@media(max-width:480px){.sc-bullets{grid-template-columns:1fr!important}}`}</style>
       <Navbar />
 
       {/* Hero */}
@@ -145,7 +96,6 @@ export function PageShell({
         </div>
       </section>
 
-      <Footer />
     </>
   );
 }
